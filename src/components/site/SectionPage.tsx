@@ -58,7 +58,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
             Subscribers see this section before it goes public. Get the dispatch.
           </p>
           <div className="max-w-md mx-auto">
-            <NewsletterInline source={`section-${eyebrow.toLowerCase().replace(/\s+/g, "-")}`} darkOnLight={false} />
+            <NewsletterInline source={`section-${eyebrow.toLowerCase().replace(/\s+/g, "-")}`} />
           </div>
           <Link to="/insights" className="inline-block mt-8 font-mono text-[10px] uppercase tracking-widest underline underline-offset-4 opacity-70 hover:opacity-100">
             ← Back to the archive
