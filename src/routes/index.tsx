@@ -41,13 +41,6 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const TOPICS = [
-  "Stakeholder Management",
-  "Escalation Frameworks",
-  "Negotiation Theory",
-  "Sales Qualification",
-  "AI Deployment",
-];
 
 function HomePage() {
   const { data: posts } = useSuspenseQuery(postsQuery);
