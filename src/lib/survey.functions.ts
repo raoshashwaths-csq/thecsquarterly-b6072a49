@@ -1,45 +1,53 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { SURVEY, scoreToTier } from "./survey";
+import { QUESTIONS, calculateScore } from "./survey";
 
 const SubmitSchema = z.object({
+  name: z.string().trim().min(1).max(200),
   email: z.string().trim().toLowerCase().email().max(255),
   company: z.string().trim().min(1).max(200),
-  role: z.string().trim().min(1).max(200),
-  answers: z.record(z.string().min(1).max(20), z.number().int().min(0).max(3)),
+  title: z.string().trim().min(1).max(200),
+  segment: z.string().trim().max(50).optional().default(""),
+  hcm_status: z.string().trim().max(50).optional().default(""),
+  answers: z.record(z.string().min(1).max(40), z.number().int().min(0).max(5)),
 });
 
 export const submitSurvey = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SubmitSchema.parse(input))
   .handler(async ({ data }) => {
-    // Server-side scoring — never trust client-sent score.
-    let score = 0;
-    for (const q of SURVEY) {
-      const a = data.answers[q.id];
-      const opt = q.options.find((o) => o.value === a);
-      if (!opt) {
-        throw new Error(`Missing answer for ${q.id}`);
+    // Validate every metric was answered.
+    for (const q of QUESTIONS) {
+      for (const m of q.metrics) {
+        if (typeof data.answers[m.id] !== "number") {
+          throw new Error(`Missing answer for ${m.id}`);
+        }
       }
-      score += opt.value;
     }
 
-    const tier = scoreToTier(score);
+    // Server-side scoring — never trust client.
+    const result = calculateScore(data.answers);
 
     const { error } = await supabaseAdmin.from("survey_responses").insert({
+      name: data.name,
       email: data.email,
       company: data.company,
-      role: data.role,
+      role: data.title,
+      title: data.title,
+      segment: data.segment || null,
+      hcm_status: data.hcm_status || null,
       answers: data.answers,
-      score,
-      tier: tier.tier,
+      score: result.finalScore,
+      tier: result.tier,
+      foundational_score: Math.round(result.foundationalTotal * 10) / 10,
+      agent_score: Math.round(result.agentTotal * 10) / 10,
+      dimension_scores: result.dimensionScores,
     });
     if (error) {
       console.error("submitSurvey error", error);
       throw new Error("Could not save your responses.");
     }
 
-    // Also opt them into the newsletter (best-effort).
     await supabaseAdmin
       .from("subscribers")
       .upsert(
@@ -47,5 +55,5 @@ export const submitSurvey = createServerFn({ method: "POST" })
         { onConflict: "email" },
       );
 
-    return { score, tier: tier.tier, blurb: tier.blurb, recommendations: tier.recommendations };
+    return result;
   });

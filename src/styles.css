@@ -16,6 +16,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-secondary-accent: var(--secondary-accent);
+  --color-secondary-accent-foreground: var(--secondary-accent-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -40,13 +42,16 @@
 :root {
   --radius: 0.25rem;
 
-  /* Editorial palette — warm paper, ink black, oxblood accent */
+  /* Editorial palette — warm paper, ink black, oxblood accent + patina gold */
   --background: oklch(0.957 0.008 95);
   --foreground: oklch(0.205 0 0);
   --muted: oklch(0.92 0.005 95);
   --muted-foreground: oklch(0.205 0 0 / 0.55);
   --accent: oklch(0.41 0.13 28);
   --accent-foreground: oklch(0.98 0 0);
+  /* Secondary accent — antique brass / patina gold (used sparingly for callouts, numerals) */
+  --secondary-accent: oklch(0.62 0.105 75);
+  --secondary-accent-foreground: oklch(0.205 0 0);
   --border: oklch(0.205 0 0 / 0.1);
   --input: oklch(0.205 0 0 / 0.15);
   --ring: oklch(0.41 0.13 28);
@@ -70,6 +75,8 @@
   --muted-foreground: oklch(0.96 0 0 / 0.6);
   --accent: oklch(0.55 0.16 28);
   --accent-foreground: oklch(0.98 0 0);
+  --secondary-accent: oklch(0.7 0.115 75);
+  --secondary-accent-foreground: oklch(0.18 0 0);
   --border: oklch(1 0 0 / 0.1);
   --input: oklch(1 0 0 / 0.15);
   --ring: oklch(0.55 0.16 28);
