@@ -85,34 +85,55 @@ export type Database = {
       }
       survey_responses: {
         Row: {
+          agent_score: number | null
           answers: Json
           company: string | null
           created_at: string
+          dimension_scores: Json | null
           email: string
+          foundational_score: number | null
+          hcm_status: string | null
           id: string
+          name: string | null
           role: string | null
           score: number
+          segment: string | null
           tier: string
+          title: string | null
         }
         Insert: {
+          agent_score?: number | null
           answers: Json
           company?: string | null
           created_at?: string
+          dimension_scores?: Json | null
           email: string
+          foundational_score?: number | null
+          hcm_status?: string | null
           id?: string
+          name?: string | null
           role?: string | null
           score: number
+          segment?: string | null
           tier: string
+          title?: string | null
         }
         Update: {
+          agent_score?: number | null
           answers?: Json
           company?: string | null
           created_at?: string
+          dimension_scores?: Json | null
           email?: string
+          foundational_score?: number | null
+          hcm_status?: string | null
           id?: string
+          name?: string | null
           role?: string | null
           score?: number
+          segment?: string | null
           tier?: string
+          title?: string | null
         }
         Relationships: []
       }

@@ -4,11 +4,20 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { listPosts } from "@/lib/posts.functions";
+import editorialHero from "@/assets/editorial-hero.jpg";
 
 const postsQuery = queryOptions({
   queryKey: ["posts"],
   queryFn: () => listPosts(),
 });
+
+const SECTIONS = [
+  { to: "/vanguard", name: "The CS Vanguard", blurb: "Proactive plays for fruitful engagement." },
+  { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically." },
+  { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts." },
+  { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators." },
+] as const;
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,13 +41,6 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const TOPICS = [
-  "Stakeholder Management",
-  "Escalation Frameworks",
-  "Negotiation Theory",
-  "Sales Qualification",
-  "AI Deployment",
-];
 
 function HomePage() {
   const { data: posts } = useSuspenseQuery(postsQuery);
@@ -49,34 +51,50 @@ function HomePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      {/* Hero */}
-      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-16 text-center animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6 font-medium">
+      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center animate-fade-up">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-medium">
           Weekly Dispatch for the 1% of Operators
         </div>
         <h1 className="font-display text-6xl md:text-8xl lg:text-9xl mb-12 text-balance leading-[0.9] tracking-tight">
-          The architecture of <span className="italic">retention.</span>
+          The architecture of <span className="italic text-accent">retention.</span>
         </h1>
         <NewsletterInline source="home-hero" />
       </header>
 
-      <div className="h-px bg-border max-w-7xl w-full mx-auto animate-reveal-line" />
+      {/* Editorial hero image */}
+      <figure className="max-w-7xl w-full mx-auto px-6 animate-fade-up [animation-delay:150ms]">
+        <img
+          src={editorialHero}
+          alt="Empty modernist boardroom at dawn — the quiet authority of institutional knowledge"
+          width={1600}
+          height={1024}
+          className="w-full aspect-[16/9] object-cover grayscale contrast-110"
+        />
+        <figcaption className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground text-center">
+          Volume I · Issue 01
+        </figcaption>
+      </figure>
 
-      {/* Topics strip */}
-      <section className="max-w-7xl w-full mx-auto px-6 py-8 flex flex-wrap gap-x-12 gap-y-4 font-mono text-[10px] uppercase tracking-widest animate-fade-up [animation-delay:200ms]">
-        <span className="text-muted-foreground">Curated Topics:</span>
-        {TOPICS.map((t) => (
-          <Link
-            key={t}
-            to="/insights"
-            className="hover:underline underline-offset-4 hover:text-accent transition-colors"
-          >
-            {t}
-          </Link>
-        ))}
+      <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
+
+      {/* Sections strip */}
+      <section className="max-w-7xl w-full mx-auto px-6 py-16 animate-fade-up [animation-delay:300ms]">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-10">
+          The Sections
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-10">
+          {SECTIONS.map((s, i) => (
+            <Link key={s.to} to={s.to} className="group border-t border-border pt-5 block">
+              <div className="font-mono text-[11px] text-secondary-accent mb-3">0{i + 1}</div>
+              <h2 className="font-display text-2xl mb-2 leading-tight group-hover:italic transition-all">{s.name}</h2>
+              <p className="text-sm text-foreground/65 text-pretty">{s.blurb}</p>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
+
 
       {/* Featured + Sidebar */}
       {featured && (
