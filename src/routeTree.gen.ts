@@ -9,22 +9,46 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VanguardRouteImport } from './routes/vanguard'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
+import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as CodexRouteImport } from './routes/codex'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 
+const VanguardRoute = VanguardRouteImport.update({
+  id: '/vanguard',
+  path: '/vanguard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RetentionProtocolRoute = RetentionProtocolRouteImport.update({
+  id: '/retention-protocol',
+  path: '/retention-protocol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OutcomeForumRoute = OutcomeForumRouteImport.update({
+  id: '/outcome-forum',
+  path: '/outcome-forum',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodexRoute = CodexRouteImport.update({
+  id: '/codex',
+  path: '/codex',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiReadinessRoute = AiReadinessRouteImport.update({
@@ -57,8 +81,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/codex': typeof CodexRoute
   '/insights': typeof InsightsRouteWithChildren
+  '/outcome-forum': typeof OutcomeForumRoute
+  '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/vanguard': typeof VanguardRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/insights/$slug': typeof InsightsSlugRoute
 }
@@ -66,8 +94,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/codex': typeof CodexRoute
   '/insights': typeof InsightsRouteWithChildren
+  '/outcome-forum': typeof OutcomeForumRoute
+  '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/vanguard': typeof VanguardRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/insights/$slug': typeof InsightsSlugRoute
 }
@@ -76,8 +108,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/codex': typeof CodexRoute
   '/insights': typeof InsightsRouteWithChildren
+  '/outcome-forum': typeof OutcomeForumRoute
+  '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/vanguard': typeof VanguardRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/insights/$slug': typeof InsightsSlugRoute
 }
@@ -87,8 +123,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-readiness'
+    | '/codex'
     | '/insights'
+    | '/outcome-forum'
+    | '/retention-protocol'
     | '/subscribe'
+    | '/vanguard'
     | '/ai-readiness/survey'
     | '/insights/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -96,8 +136,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-readiness'
+    | '/codex'
     | '/insights'
+    | '/outcome-forum'
+    | '/retention-protocol'
     | '/subscribe'
+    | '/vanguard'
     | '/ai-readiness/survey'
     | '/insights/$slug'
   id:
@@ -105,8 +149,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/ai-readiness'
+    | '/codex'
     | '/insights'
+    | '/outcome-forum'
+    | '/retention-protocol'
     | '/subscribe'
+    | '/vanguard'
     | '/ai-readiness/survey'
     | '/insights/$slug'
   fileRoutesById: FileRoutesById
@@ -115,12 +163,23 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
+  CodexRoute: typeof CodexRoute
   InsightsRoute: typeof InsightsRouteWithChildren
+  OutcomeForumRoute: typeof OutcomeForumRoute
+  RetentionProtocolRoute: typeof RetentionProtocolRoute
   SubscribeRoute: typeof SubscribeRoute
+  VanguardRoute: typeof VanguardRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vanguard': {
+      id: '/vanguard'
+      path: '/vanguard'
+      fullPath: '/vanguard'
+      preLoaderRoute: typeof VanguardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subscribe': {
       id: '/subscribe'
       path: '/subscribe'
@@ -128,11 +187,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/retention-protocol': {
+      id: '/retention-protocol'
+      path: '/retention-protocol'
+      fullPath: '/retention-protocol'
+      preLoaderRoute: typeof RetentionProtocolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/outcome-forum': {
+      id: '/outcome-forum'
+      path: '/outcome-forum'
+      fullPath: '/outcome-forum'
+      preLoaderRoute: typeof OutcomeForumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights': {
       id: '/insights'
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/codex': {
+      id: '/codex'
+      path: '/codex'
+      fullPath: '/codex'
+      preLoaderRoute: typeof CodexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai-readiness': {
@@ -201,9 +281,23 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AiReadinessRoute: AiReadinessRouteWithChildren,
+  CodexRoute: CodexRoute,
   InsightsRoute: InsightsRouteWithChildren,
+  OutcomeForumRoute: OutcomeForumRoute,
+  RetentionProtocolRoute: RetentionProtocolRoute,
   SubscribeRoute: SubscribeRoute,
+  VanguardRoute: VanguardRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
