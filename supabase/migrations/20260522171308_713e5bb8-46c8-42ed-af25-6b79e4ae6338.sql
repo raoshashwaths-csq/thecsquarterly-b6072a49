@@ -1,0 +1,9 @@
+
+ALTER TABLE public.survey_responses
+  ADD COLUMN IF NOT EXISTS name TEXT,
+  ADD COLUMN IF NOT EXISTS title TEXT,
+  ADD COLUMN IF NOT EXISTS segment TEXT,
+  ADD COLUMN IF NOT EXISTS hcm_status TEXT,
+  ADD COLUMN IF NOT EXISTS foundational_score NUMERIC,
+  ADD COLUMN IF NOT EXISTS agent_score NUMERIC,
+  ADD COLUMN IF NOT EXISTS dimension_scores JSONB;
