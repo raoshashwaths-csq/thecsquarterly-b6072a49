@@ -9,38 +9,146 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
+import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 
+const SubscribeRoute = SubscribeRouteImport.update({
+  id: '/subscribe',
+  path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiReadinessRoute = AiReadinessRouteImport.update({
+  id: '/ai-readiness',
+  path: '/ai-readiness',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsSlugRoute = InsightsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => InsightsRoute,
+} as any)
+const AiReadinessSurveyRoute = AiReadinessSurveyRouteImport.update({
+  id: '/survey',
+  path: '/survey',
+  getParentRoute: () => AiReadinessRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/insights': typeof InsightsRouteWithChildren
+  '/subscribe': typeof SubscribeRoute
+  '/ai-readiness/survey': typeof AiReadinessSurveyRoute
+  '/insights/$slug': typeof InsightsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/insights': typeof InsightsRouteWithChildren
+  '/subscribe': typeof SubscribeRoute
+  '/ai-readiness/survey': typeof AiReadinessSurveyRoute
+  '/insights/$slug': typeof InsightsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/insights': typeof InsightsRouteWithChildren
+  '/subscribe': typeof SubscribeRoute
+  '/ai-readiness/survey': typeof AiReadinessSurveyRoute
+  '/insights/$slug': typeof InsightsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/ai-readiness'
+    | '/insights'
+    | '/subscribe'
+    | '/ai-readiness/survey'
+    | '/insights/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/ai-readiness'
+    | '/insights'
+    | '/subscribe'
+    | '/ai-readiness/survey'
+    | '/insights/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/ai-readiness'
+    | '/insights'
+    | '/subscribe'
+    | '/ai-readiness/survey'
+    | '/insights/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AiReadinessRoute: typeof AiReadinessRouteWithChildren
+  InsightsRoute: typeof InsightsRouteWithChildren
+  SubscribeRoute: typeof SubscribeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/subscribe': {
+      id: '/subscribe'
+      path: '/subscribe'
+      fullPath: '/subscribe'
+      preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-readiness': {
+      id: '/ai-readiness'
+      path: '/ai-readiness'
+      fullPath: '/ai-readiness'
+      preLoaderRoute: typeof AiReadinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +156,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/$slug': {
+      id: '/insights/$slug'
+      path: '/$slug'
+      fullPath: '/insights/$slug'
+      preLoaderRoute: typeof InsightsSlugRouteImport
+      parentRoute: typeof InsightsRoute
+    }
+    '/ai-readiness/survey': {
+      id: '/ai-readiness/survey'
+      path: '/survey'
+      fullPath: '/ai-readiness/survey'
+      preLoaderRoute: typeof AiReadinessSurveyRouteImport
+      parentRoute: typeof AiReadinessRoute
+    }
   }
 }
 
+interface AiReadinessRouteChildren {
+  AiReadinessSurveyRoute: typeof AiReadinessSurveyRoute
+}
+
+const AiReadinessRouteChildren: AiReadinessRouteChildren = {
+  AiReadinessSurveyRoute: AiReadinessSurveyRoute,
+}
+
+const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
+  AiReadinessRouteChildren,
+)
+
+interface InsightsRouteChildren {
+  InsightsSlugRoute: typeof InsightsSlugRoute
+}
+
+const InsightsRouteChildren: InsightsRouteChildren = {
+  InsightsSlugRoute: InsightsSlugRoute,
+}
+
+const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
+  InsightsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AiReadinessRoute: AiReadinessRouteWithChildren,
+  InsightsRoute: InsightsRouteWithChildren,
+  SubscribeRoute: SubscribeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

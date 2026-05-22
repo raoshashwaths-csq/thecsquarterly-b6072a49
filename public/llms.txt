@@ -1,0 +1,22 @@
+# The CS Quarterly
+
+> A weekly dispatch and content hub for Customer Success leaders and mid-level managers. Curated essays on stakeholder management, escalation, negotiation, sales qualification, and AI deployment, plus the annual AI Readiness Survey for CS and HR leaders.
+
+The CS Quarterly publishes one essay per week aimed at VPs, Directors, and Senior CSMs at SaaS companies between $20M and $1B ARR. The audience is operators running revenue retention, not generalist marketing readers.
+
+## Pages
+
+- [Home](/): The current dispatch, recent essays, and the AI Readiness Survey CTA.
+- [Insights](/insights): Filterable archive of all essays by category.
+- [AI Readiness Survey](/ai-readiness): A 12-question diagnostic for HR and CS leaders, scoring across Strategy, Data, Skills, and Culture.
+- [About](/about): Editorial mission and audience.
+- [Subscribe](/subscribe): Newsletter signup.
+
+## Insights
+
+- [Why high-touch Customer Success is a scaling liability](/insights/high-touch-cs-scaling-liability)
+- [The negotiator's dilemma: winning renewals without discounting](/insights/negotiators-dilemma-renewals)
+- [Structural stakeholders: mapping power dynamics in enterprise accounts](/insights/stakeholder-mapping-frameworks)
+- [Managing the C-suite during enterprise escalations](/insights/escalation-playbook-c-suite)
+- [Identifying churn risk before the contract is signed](/insights/qualification-bridge-sales-cs)
+- [Algorithmic orchestration: the new CS operating model](/insights/ai-orchestration-cs-org)

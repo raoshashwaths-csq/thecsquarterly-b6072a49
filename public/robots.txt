@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Block survey form page from index (results & forms aren't useful in search)
+Disallow: /ai-readiness/survey

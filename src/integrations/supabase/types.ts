@@ -14,7 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      posts: {
+        Row: {
+          author: string
+          body: string
+          category: string
+          created_at: string
+          excerpt: string
+          hero_prompt: string | null
+          id: string
+          is_premium: boolean
+          published_at: string
+          read_minutes: number
+          slug: string
+          title: string
+        }
+        Insert: {
+          author?: string
+          body: string
+          category: string
+          created_at?: string
+          excerpt: string
+          hero_prompt?: string | null
+          id?: string
+          is_premium?: boolean
+          published_at?: string
+          read_minutes?: number
+          slug: string
+          title: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          category?: string
+          created_at?: string
+          excerpt?: string
+          hero_prompt?: string | null
+          id?: string
+          is_premium?: boolean
+          published_at?: string
+          read_minutes?: number
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          segment: string | null
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          segment?: string | null
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          segment?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
+      survey_responses: {
+        Row: {
+          answers: Json
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          role: string | null
+          score: number
+          tier: string
+        }
+        Insert: {
+          answers: Json
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          role?: string | null
+          score: number
+          tier: string
+        }
+        Update: {
+          answers?: Json
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          role?: string | null
+          score?: number
+          tier?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
