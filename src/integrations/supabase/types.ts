@@ -66,6 +66,8 @@ export type Database = {
         Row: {
           author: string
           body: string
+          body_mckinsey: string | null
+          body_wodehouse: string | null
           category: string
           cover_image_url: string | null
           created_at: string
@@ -81,10 +83,14 @@ export type Database = {
           subtitle: string | null
           tier: string
           title: string
+          title_mckinsey: string | null
+          title_wodehouse: string | null
         }
         Insert: {
           author?: string
           body: string
+          body_mckinsey?: string | null
+          body_wodehouse?: string | null
           category: string
           cover_image_url?: string | null
           created_at?: string
@@ -100,10 +106,14 @@ export type Database = {
           subtitle?: string | null
           tier?: string
           title: string
+          title_mckinsey?: string | null
+          title_wodehouse?: string | null
         }
         Update: {
           author?: string
           body?: string
+          body_mckinsey?: string | null
+          body_wodehouse?: string | null
           category?: string
           cover_image_url?: string | null
           created_at?: string
@@ -119,6 +129,8 @@ export type Database = {
           subtitle?: string | null
           tier?: string
           title?: string
+          title_mckinsey?: string | null
+          title_wodehouse?: string | null
         }
         Relationships: []
       }
