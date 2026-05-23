@@ -17,21 +17,26 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
       <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-baseline gap-2 group">
+        <Link to="/" className="flex items-baseline gap-1 group">
           <span className="font-display text-2xl tracking-tight leading-none">The CS Quarterly</span>
-          <span aria-hidden className="hidden sm:inline-block h-2 w-2 rounded-full bg-secondary-accent -translate-y-[0.65em] group-hover:bg-accent transition-colors" />
+          <span aria-hidden className="hidden sm:inline-block h-[6px] w-[6px] rounded-full bg-secondary-accent group-hover:bg-accent transition-colors" />
         </Link>
-        <div className="flex items-center gap-5 font-mono text-[11px] font-semibold uppercase tracking-widest">
-          {sections.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="hidden md:inline hover:text-accent transition-colors"
-              activeProps={{ className: "hidden md:inline text-accent" }}
-            >
-              {item.label}
-            </Link>
+        <div className="flex items-center gap-4 font-mono text-[11px] font-semibold uppercase tracking-widest">
+          {sections.map((item, i) => (
+            <div key={item.to} className="hidden md:flex items-center gap-4">
+              {i > 0 && (
+                <span aria-hidden className="h-3 w-px bg-border/60" />
+              )}
+              <Link
+                to={item.to}
+                className="hover:text-accent transition-colors"
+                activeProps={{ className: "text-accent" }}
+              >
+                {item.label}
+              </Link>
+            </div>
           ))}
+          <span aria-hidden className="hidden md:inline-block h-3 w-px bg-border/60" />
           {user ? (
             <>
               <Link to="/account" className="hidden md:inline hover:text-accent">Account</Link>
