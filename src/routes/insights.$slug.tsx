@@ -153,7 +153,39 @@ function PostPage() {
             <span>{new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
           </div>
           {hasBothTones && (
-            <ToneToggle tone={tone} setTone={setTone} />
+            <div className="relative">
+              <ToneToggle tone={tone} setTone={setTone} />
+              {showToneHint && (
+                <div
+                  role="dialog"
+                  className="absolute right-0 top-full mt-3 z-30 w-72 bg-foreground text-background p-4 shadow-xl animate-fade-up"
+                >
+                  <button
+                    aria-label="Dismiss"
+                    onClick={() => setShowToneHint(false)}
+                    className="absolute top-2 right-2 opacity-60 hover:opacity-100"
+                  >
+                    <X size={14} />
+                  </button>
+                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-secondary-accent mb-2 font-semibold">
+                    <Glasses size={12} /> / <Smile size={12} /> Try the tone toggle
+                  </div>
+                  <p className="text-sm leading-snug text-background/85 normal-case tracking-normal font-body">
+                    Read every essay in two voices, analytical or witty. Subscribers get unlimited access to both.
+                  </p>
+                  <button
+                    onClick={() => setShowToneHint(false)}
+                    className="mt-3 font-mono text-[10px] uppercase tracking-widest text-secondary-accent hover:text-background"
+                  >
+                    Got it →
+                  </button>
+                  <span
+                    aria-hidden
+                    className="absolute -top-1.5 right-6 h-3 w-3 rotate-45 bg-foreground"
+                  />
+                </div>
+              )}
+            </div>
           )}
         </div>
 
