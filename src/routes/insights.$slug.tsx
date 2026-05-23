@@ -1,10 +1,11 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { Glasses, Smile } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Glasses, Smile, X } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
+import { useAuth } from "@/hooks/useAuth";
 import { getPost } from "@/lib/posts.functions";
 
 const postQuery = (slug: string) =>
@@ -92,10 +93,30 @@ function PostPage() {
   const { slug } = Route.useParams();
   const { data: post } = useSuspenseQuery(postQuery(slug));
   const [tone, setTone] = useState<Tone>("mckinsey");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [showToneHint, setShowToneHint] = useState(false);
 
   const hasMck = !!(post?.title_mckinsey && post?.body_mckinsey);
   const hasWod = !!(post?.title_wodehouse && post?.body_wodehouse);
   const hasBothTones = hasMck && hasWod;
+
+  // First 2 article opens: show toggle hint. From the 3rd open onwards: redirect to paywall (unless signed in).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const key = "cs_article_views";
+    const prev = parseInt(window.localStorage.getItem(key) ?? "0", 10) || 0;
+    const next = prev + 1;
+    window.localStorage.setItem(key, String(next));
+    if (!user && next >= 3) {
+      navigate({ to: "/pricing", search: { from: "paywall" } as never });
+      return;
+    }
+    if (hasBothTones && next <= 2) {
+      const t = window.setTimeout(() => setShowToneHint(true), 600);
+      return () => window.clearTimeout(t);
+    }
+  }, [slug, user, hasBothTones, navigate]);
 
   const { title, body } = useMemo(() => {
     if (!post) return { title: "", body: "" };
