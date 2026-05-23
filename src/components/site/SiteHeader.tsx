@@ -21,7 +21,7 @@ export function SiteHeader() {
           <span className="font-display text-2xl tracking-tight">The CS Quarterly</span>
           <span className="hidden sm:inline-block h-[6px] w-[6px] rounded-full bg-secondary-accent translate-y-[-2px] group-hover:bg-accent transition-colors" />
         </Link>
-        <div className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-widest">
+        <div className="flex items-center gap-5 font-mono text-[11px] font-semibold uppercase tracking-widest">
           {sections.map((item) => (
             <Link
               key={item.to}
@@ -46,8 +46,8 @@ export function SiteHeader() {
             <Link to="/login" className="hidden md:inline hover:text-accent">Sign in</Link>
           )}
           <Link
-            to="/subscribe"
-            className="px-4 py-2 border border-foreground hover:bg-foreground hover:text-background transition-all duration-300"
+            to="/pricing"
+            className="px-4 py-2 border border-foreground font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
           >
             Subscribe
           </Link>
