@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as CodexRouteImport } from './routes/codex'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -70,6 +71,11 @@ const AiReadinessRoute = AiReadinessRouteImport.update({
   path: '/ai-readiness',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountRoute = AccountRouteImport.update({
   id: '/account',
   path: '/account',
@@ -105,6 +111,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
+  '/admin': typeof AdminRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/ai-readiness'
     | '/codex'
     | '/insights'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/ai-readiness'
     | '/codex'
     | '/insights'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/account'
+    | '/admin'
     | '/ai-readiness'
     | '/codex'
     | '/insights'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
+  AdminRoute: typeof AdminRoute
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
   CodexRoute: typeof CodexRouteWithChildren
   InsightsRoute: typeof InsightsRouteWithChildren
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       path: '/ai-readiness'
       fullPath: '/ai-readiness'
       preLoaderRoute: typeof AiReadinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account': {
@@ -370,6 +390,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
+  AdminRoute: AdminRoute,
   AiReadinessRoute: AiReadinessRouteWithChildren,
   CodexRoute: CodexRouteWithChildren,
   InsightsRoute: InsightsRouteWithChildren,
