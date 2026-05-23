@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
-export const Route = createFileRoute("/ai-readiness")({
+export const Route = createFileRoute("/ai-readiness/")({
   head: () => ({
     meta: [
       { title: "Super Agent Readiness Diagnostic — The CS Quarterly" },

@@ -10,7 +10,7 @@ const playbooksQuery = queryOptions({
   queryFn: () => listPlaybooks(),
 });
 
-export const Route = createFileRoute("/codex")({
+export const Route = createFileRoute("/codex/")({
   head: () => ({
     meta: [
       { title: "The CS Codex — Executive playbooks for revenue operators" },

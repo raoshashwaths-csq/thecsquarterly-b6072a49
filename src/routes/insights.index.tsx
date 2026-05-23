@@ -10,7 +10,7 @@ const postsQuery = queryOptions({
   queryFn: () => listPosts(),
 });
 
-export const Route = createFileRoute("/insights")({
+export const Route = createFileRoute("/insights/")({
   head: () => ({
     meta: [
       { title: "Insights — The CS Quarterly" },
