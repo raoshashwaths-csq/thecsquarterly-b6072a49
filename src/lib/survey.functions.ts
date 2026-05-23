@@ -14,7 +14,15 @@ const SubmitSchema = z.object({
 });
 
 export const submitSurvey = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => SubmitSchema.parse(input))
+  .inputValidator((input: unknown) => {
+    const parsed = SubmitSchema.safeParse(input);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      const field = first?.path.join(".") || "input";
+      throw new Error(`Please check the ${field} field: ${first?.message ?? "invalid value"}.`);
+    }
+    return parsed.data;
+  })
   .handler(async ({ data }) => {
     // Validate every metric was answered.
     for (const q of QUESTIONS) {
