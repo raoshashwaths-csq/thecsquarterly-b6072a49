@@ -83,8 +83,8 @@ function PricingPage() {
           <div className="border-2 border-accent p-10 flex flex-col relative">
             <div className="absolute -top-3 left-10 bg-accent text-accent-foreground px-3 py-1 font-mono text-[9px] uppercase tracking-widest">Recommended</div>
             <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-4">Vanguard Access</div>
-            <div className="font-display text-6xl mb-2">$19<span className="text-2xl text-muted-foreground">/mo</span></div>
-            <div className="text-sm text-muted-foreground mb-2">or $190/year (save 17%)</div>
+            <div className="font-display text-6xl mb-2">$49<span className="text-2xl text-muted-foreground">/mo</span></div>
+            <div className="text-sm text-muted-foreground mb-2">or $490/year (save 17%)</div>
             <div className="text-xs text-secondary-accent mb-8">Includes $500+ of Executive Playbooks</div>
             <ul className="space-y-3 mb-10 flex-1">
               {VANGUARD.map((f) => (
