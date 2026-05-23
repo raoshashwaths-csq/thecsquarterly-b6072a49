@@ -22,6 +22,9 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as CodexIndexRouteImport } from './routes/codex.index'
+import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
@@ -91,6 +94,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => InsightsRoute,
+} as any)
+const CodexIndexRoute = CodexIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CodexRoute,
+} as any)
+const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AiReadinessRoute,
+} as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -124,15 +142,15 @@ export interface FileRoutesByFullPath {
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/ai-readiness/': typeof AiReadinessIndexRoute
+  '/codex/': typeof CodexIndexRoute
+  '/insights/': typeof InsightsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
-  '/ai-readiness': typeof AiReadinessRouteWithChildren
-  '/codex': typeof CodexRouteWithChildren
-  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
@@ -142,6 +160,9 @@ export interface FileRoutesByTo {
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/ai-readiness': typeof AiReadinessIndexRoute
+  '/codex': typeof CodexIndexRoute
+  '/insights': typeof InsightsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,6 +182,9 @@ export interface FileRoutesById {
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/ai-readiness/': typeof AiReadinessIndexRoute
+  '/codex/': typeof CodexIndexRoute
+  '/insights/': typeof InsightsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,15 +205,15 @@ export interface FileRouteTypes {
     | '/ai-readiness/survey'
     | '/codex/$slug'
     | '/insights/$slug'
+    | '/ai-readiness/'
+    | '/codex/'
+    | '/insights/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/account'
     | '/admin'
-    | '/ai-readiness'
-    | '/codex'
-    | '/insights'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
@@ -199,6 +223,9 @@ export interface FileRouteTypes {
     | '/ai-readiness/survey'
     | '/codex/$slug'
     | '/insights/$slug'
+    | '/ai-readiness'
+    | '/codex'
+    | '/insights'
   id:
     | '__root__'
     | '/'
@@ -217,6 +244,9 @@ export interface FileRouteTypes {
     | '/ai-readiness/survey'
     | '/codex/$slug'
     | '/insights/$slug'
+    | '/ai-readiness/'
+    | '/codex/'
+    | '/insights/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -328,6 +358,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/': {
+      id: '/insights/'
+      path: '/'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof InsightsRoute
+    }
+    '/codex/': {
+      id: '/codex/'
+      path: '/'
+      fullPath: '/codex/'
+      preLoaderRoute: typeof CodexIndexRouteImport
+      parentRoute: typeof CodexRoute
+    }
+    '/ai-readiness/': {
+      id: '/ai-readiness/'
+      path: '/'
+      fullPath: '/ai-readiness/'
+      preLoaderRoute: typeof AiReadinessIndexRouteImport
+      parentRoute: typeof AiReadinessRoute
+    }
     '/insights/$slug': {
       id: '/insights/$slug'
       path: '/$slug'
@@ -354,10 +405,12 @@ declare module '@tanstack/react-router' {
 
 interface AiReadinessRouteChildren {
   AiReadinessSurveyRoute: typeof AiReadinessSurveyRoute
+  AiReadinessIndexRoute: typeof AiReadinessIndexRoute
 }
 
 const AiReadinessRouteChildren: AiReadinessRouteChildren = {
   AiReadinessSurveyRoute: AiReadinessSurveyRoute,
+  AiReadinessIndexRoute: AiReadinessIndexRoute,
 }
 
 const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
@@ -366,20 +419,24 @@ const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
 
 interface CodexRouteChildren {
   CodexSlugRoute: typeof CodexSlugRoute
+  CodexIndexRoute: typeof CodexIndexRoute
 }
 
 const CodexRouteChildren: CodexRouteChildren = {
   CodexSlugRoute: CodexSlugRoute,
+  CodexIndexRoute: CodexIndexRoute,
 }
 
 const CodexRouteWithChildren = CodexRoute._addFileChildren(CodexRouteChildren)
 
 interface InsightsRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
 }
 
 const InsightsRouteChildren: InsightsRouteChildren = {
   InsightsSlugRoute: InsightsSlugRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
 }
 
 const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
@@ -404,3 +461,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
