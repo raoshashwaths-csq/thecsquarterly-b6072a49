@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, Linkedin, Twitter } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 const SECTIONS = [
   { label: "The CS Vanguard", path: "/vanguard" },
@@ -12,103 +12,127 @@ const RESOURCES = [
   { label: "AI Readiness Diagnostic", path: "/ai-readiness" },
   { label: "Pricing", path: "/pricing" },
   { label: "Subscribe", path: "/subscribe" },
+  { label: "Account", path: "/account" },
 ] as const;
 
-const ABOUT_LINKS = [
+const COMPANY = [
   { label: "Our Mission", path: "/about" },
   { label: "Editorial Standards", path: "/about" },
   { label: "Contact", path: "/subscribe" },
+  { label: "Login", path: "/login" },
+] as const;
+
+const SOCIAL = [
+  { label: "LinkedIn", href: "#" },
+  { label: "Twitter / X", href: "#" },
+  { label: "RSS", href: "#" },
 ] as const;
 
 export function SiteFooter() {
   return (
-    <footer className="bg-foreground text-background py-16 md:py-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
-          {/* Brand */}
-          <div className="md:col-span-1">
-            <Link to="/" className="flex items-baseline gap-1 mb-4">
-              <span className="font-display text-xl font-semibold tracking-tight">
-                The CS Quarterly
-              </span>
-              <span className="text-secondary-accent text-xl leading-none">.</span>
-            </Link>
-            <p className="font-body text-sm leading-relaxed text-background/60 mb-6">
-              The architecture of retention. Strategic intelligence for Customer
-              Success leaders navigating the autonomous revolution.
+    <footer className="bg-foreground text-background relative overflow-hidden">
+      {/* Top CTA strip */}
+      <div className="border-b border-background/10">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-12 md:py-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="max-w-2xl">
+            <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-secondary-accent mb-4">
+              The Briefing / Weekly
             </p>
-            <div className="flex items-center gap-4">
-              <a href="#" aria-label="LinkedIn" className="text-background/40 hover:text-secondary-accent transition-colors">
-                <Linkedin size={18} />
-              </a>
-              <a href="#" aria-label="Twitter" className="text-background/40 hover:text-secondary-accent transition-colors">
-                <Twitter size={18} />
-              </a>
-              <Link to="/subscribe" aria-label="Email" className="text-background/40 hover:text-secondary-accent transition-colors">
-                <Mail size={18} />
-              </Link>
-            </div>
+            <h2 className="font-display text-3xl md:text-5xl leading-[1.05] tracking-tight">
+              Strategic intelligence for the<br />architects of retention.
+            </h2>
           </div>
+          <Link
+            to="/subscribe"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-secondary-accent text-foreground font-mono text-xs uppercase tracking-[0.2em] hover:bg-background hover:text-foreground transition-colors whitespace-nowrap"
+          >
+            Subscribe Free <ArrowUpRight size={14} />
+          </Link>
+        </div>
+      </div>
 
-          {/* Sections */}
+      {/* Link columns */}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 py-16 md:py-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
+          <FooterCol title="Sections" links={SECTIONS} />
+          <FooterCol title="Resources" links={RESOURCES} />
+          <FooterCol title="Company" links={COMPANY} />
           <div>
-            <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-secondary-accent mb-6">
-              Sections
+            <h4 className="font-mono text-[11px] uppercase tracking-[0.25em] text-background/40 mb-6">
+              Social
             </h4>
             <ul className="space-y-3">
-              {SECTIONS.map((l) => (
-                <li key={l.path}>
-                  <Link to={l.path} className="font-body text-sm text-background/60 hover:text-background transition-colors">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-secondary-accent mb-6">
-              Resources
-            </h4>
-            <ul className="space-y-3">
-              {RESOURCES.map((l) => (
+              {SOCIAL.map((l) => (
                 <li key={l.label}>
-                  <Link to={l.path} className="font-body text-sm text-background/60 hover:text-background transition-colors">
+                  <a
+                    href={l.href}
+                    className="group inline-flex items-center gap-1.5 font-body text-sm text-background/70 hover:text-background transition-colors"
+                  >
                     {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* About */}
-          <div>
-            <h4 className="font-mono text-xs uppercase tracking-[0.2em] text-secondary-accent mb-6">
-              About
-            </h4>
-            <ul className="space-y-3">
-              {ABOUT_LINKS.map((l) => (
-                <li key={l.label}>
-                  <Link to={l.path} className="font-body text-sm text-background/60 hover:text-background transition-colors">
-                    {l.label}
-                  </Link>
+                    <ArrowUpRight size={12} className="opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                  </a>
                 </li>
               ))}
             </ul>
           </div>
         </div>
+      </div>
 
-        <div className="mt-16 pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="font-mono text-xs text-background/40">
-            © {new Date().getFullYear()} The CS Quarterly. All rights reserved.
-          </p>
+      {/* Giant wordmark */}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 pb-8">
+        <Link to="/" className="block group" aria-label="The CS Quarterly home">
+          <div className="font-display font-medium tracking-[-0.04em] leading-[0.85] text-background/95 select-none text-[22vw] md:text-[18vw]">
+            CS Quarterly<span className="text-secondary-accent">.</span>
+          </div>
+        </Link>
+      </div>
+
+      {/* Meta bar */}
+      <div className="border-t border-background/10">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-6 flex-wrap">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40">
+              © {new Date().getFullYear()} The CS Quarterly
+            </p>
+            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/30">
+              Est. 2026 · London / New York
+            </span>
+          </div>
           <div className="flex items-center gap-6">
-            <a href="#" className="font-mono text-xs text-background/40 hover:text-background/70 transition-colors">Privacy</a>
-            <a href="#" className="font-mono text-xs text-background/40 hover:text-background/70 transition-colors">Terms</a>
+            <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Privacy</a>
+            <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Terms</a>
+            <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Colophon</a>
           </div>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string;
+  links: ReadonlyArray<{ label: string; path: string }>;
+}) {
+  return (
+    <div>
+      <h4 className="font-mono text-[11px] uppercase tracking-[0.25em] text-background/40 mb-6">
+        {title}
+      </h4>
+      <ul className="space-y-3">
+        {links.map((l) => (
+          <li key={l.label}>
+            <Link
+              to={l.path}
+              className="font-body text-sm text-background/70 hover:text-background transition-colors"
+            >
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
