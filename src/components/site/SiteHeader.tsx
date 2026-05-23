@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { RetentionLedger } from "./RetentionLedger";
+
 
 const sections = [
   { to: "/vanguard", label: "Vanguard" },
