@@ -1,7 +1,8 @@
-// Super Agent Readiness Diagnostic — questions, options, and scoring logic
-// preserved from the original HTML diagnostic (11 dimensions, 44 metrics).
+// CS Operating Maturity Diagnostic — 8 dimensions, 32 metrics.
+// Replaces the legacy HR/HCM "Super Agent" diagnostic. Audience: VP/Director
+// of Customer Success at $20M–$1B ARR SaaS companies.
 
-export type SurveySection = "Foundational Readiness" | "Agent-Level Readiness";
+export type SurveySection = "Foundational Discipline" | "Strategic Operating";
 
 export type Metric = { id: string; label: string; help: string };
 
@@ -18,145 +19,120 @@ export type Question = {
 };
 
 export const SCORE_OPTIONS = [
-  { value: 0, label: "0 · Absent", desc: "Doesn't exist" },
-  { value: 1, label: "1 · Ad-hoc", desc: "Manual / paper / spreadsheet" },
-  { value: 2, label: "2 · Basic", desc: "In system but messy (>30% gaps)" },
-  { value: 3, label: "3 · Structured", desc: "In system, gaps <15%" },
-  { value: 4, label: "4 · Governed", desc: "Standardised & audited" },
-  { value: 5, label: "5 · AI-ready", desc: "Real-time, API-exposed" },
+  { value: 0, label: "0 · Absent", desc: "Doesn't exist in our org" },
+  { value: 1, label: "1 · Ad-hoc", desc: "Tribal knowledge / case by case" },
+  { value: 2, label: "2 · Inconsistent", desc: "Some teams do it, most don't" },
+  { value: 3, label: "3 · Standardised", desc: "Documented and broadly followed" },
+  { value: 4, label: "4 · Measured", desc: "Tracked with KPIs and reviewed" },
+  { value: 5, label: "5 · Optimised", desc: "Continuously improved, exec-visible" },
 ] as const;
 
+// Foundational: 50 pts (15+10+15+10).  Strategic: 50 pts (15+10+15+10).
 export const QUESTIONS: Question[] = [
-  { id: "A1", section: "Foundational Readiness", title: "HCM Data Foundation",
-    desc: "Super Agent inherits roles, permissions, and approvals from your HCM. Without a clean foundation, no agent can act safely.",
+  { id: "A1", section: "Foundational Discipline", title: "Account Segmentation & Coverage",
+    desc: "Whether your book is intentionally tiered — and whether coverage matches contract value, expansion potential, and risk.",
     weight: 15, cardClass: "foundation",
     metrics: [
-      { id: "a1_completeness", label: "Employee master record completeness", help: "What % of employee records have all core fields populated (role, manager, location, cost centre)?" },
-      { id: "a1_orghier", label: "Org hierarchy & reporting accuracy", help: "How accurate is your reporting structure — including dotted lines, legal entities, business units?" },
-      { id: "a1_positions", label: "Position-based staffing model", help: "Do you use positions (not just job titles) so the agent knows which roles to backfill?" },
-      { id: "a1_docs", label: "Document library digitisation", help: "Are policies, contracts, and letters digitised, versioned, and tagged?" },
-      { id: "a1_ess", label: "Employee self-service adoption", help: "What % of employees actively use the ESS portal each month?" },
+      { id: "a1_tiers", label: "Tier definitions are written and enforced", help: "Are tier criteria (ARR, strategic value, growth potential) documented and used to set coverage?" },
+      { id: "a1_ratios", label: "CSM-to-ARR ratios match tier", help: "Do enterprise CSMs hold defensible portfolios (e.g., $4–8M ARR) vs. scaled CSMs running pooled books?" },
+      { id: "a1_coverage", label: "Coverage model differentiated by tier", help: "Do top tiers get named exec sponsors, QBRs, and proactive plans — not the same motion as mid-market?" },
+      { id: "a1_reviewed", label: "Segmentation reviewed quarterly", help: "Is the segmentation revisited every quarter against actual NRR, GRR, and product usage?" },
     ]},
-  { id: "A2", section: "Foundational Readiness", title: "Identity, Permissions & Approvals",
-    desc: "Super Agent will only act within your access controls. Weak identity = unsafe AI.",
+
+  { id: "A2", section: "Foundational Discipline", title: "Health Score & Risk Signal Quality",
+    desc: "Whether your health score is a leading indicator or theatre. Garbage health scores produce garbage interventions.",
     weight: 10, cardClass: "identity",
     metrics: [
-      { id: "a2_sso", label: "SSO via SAML 2.0 / OAuth", help: "Is single sign-on live across your HR + IT systems?" },
-      { id: "a2_rbac", label: "Role-based access control (RBAC)", help: "Is your access matrix documented and reviewed at least annually?" },
-      { id: "a2_approvals", label: "Digital approval workflows", help: "What % of approvals are in-system (not email-based)?" },
-      { id: "a2_sod", label: "Segregation-of-duties rules", help: "Are SoD policies defined and enforced (e.g., maker-checker)?" },
+      { id: "a2_inputs", label: "Health score uses 5+ weighted inputs", help: "Does the score blend usage, sentiment, NPS/CSAT, exec engagement, and support volume — not just login frequency?" },
+      { id: "a2_calibrated", label: "Health score calibrated against churn data", help: "Has the score been back-tested against actual past churn / downsell events?" },
+      { id: "a2_owner", label: "Named owner per risk signal", help: "When a signal fires, is there one named CSM accountable for the play and the outcome?" },
+      { id: "a2_actioned", label: "% of red accounts with active play in 5 days", help: "What share of accounts that go red get a documented intervention plan within one business week?" },
     ]},
-  { id: "A3", section: "Foundational Readiness", title: "Cross-System Integration & MCP-Readiness",
-    desc: "Super Agent's superpower is orchestrating across HR, IT, Finance, CRM. This needs API-reachable systems.",
-    weight: 10, cardClass: "integration",
+
+  { id: "A3", section: "Foundational Discipline", title: "Onboarding & Time-to-Value",
+    desc: "First 90 days predict the next 900. Whether you operate a deterministic onboarding or hand-wave through it.",
+    weight: 15, cardClass: "integration",
     metrics: [
-      { id: "a3_systems", label: "External systems with named use cases", help: "How many non-HR systems (ITSM, Finance, CRM, Slack/Teams) have stated AI use cases?" },
-      { id: "a3_apis", label: "API availability for top 3 systems", help: "Are RESTful authenticated APIs available for your highest-priority external systems?" },
-      { id: "a3_ipaas", label: "iPaaS / integration middleware adoption", help: "Do you actively use integration middleware with running recipes?" },
-      { id: "a3_aiagents", label: "Existing AI agents in environment", help: "Do you already use Copilot, Claude, Gemini, or other MCP-compatible agents anywhere?" },
+      { id: "a3_milestones", label: "Onboarding has defined milestones with dates", help: "Are 30/60/90 day value milestones documented per customer at kickoff?" },
+      { id: "a3_ttv", label: "Time-to-first-value is measured per cohort", help: "Do you report median TTV by segment and trend it month over month?" },
+      { id: "a3_handoff", label: "Sales → CS handoff is a structured artefact", help: "Is there a required handoff doc (success criteria, stakeholders, risks) signed by both parties?" },
+      { id: "a3_redflag", label: "Stalled onboardings escalate automatically", help: "If a milestone slips past SLA, is there an automatic escalation to the CS leader?" },
     ]},
-  { id: "A4", section: "Foundational Readiness", title: "Governance, Audit & Compliance",
-    desc: "Super Agent ships with audit trails — but you need to want them and act on them.",
-    weight: 8, cardClass: "governance",
+
+  { id: "A4", section: "Foundational Discipline", title: "Stakeholder Mapping Discipline",
+    desc: "Whether you can name the four people who control renewal — or whether you only know the champion.",
+    weight: 10, cardClass: "governance",
     metrics: [
-      { id: "a4_dpia", label: "DPIA / privacy framework for AI", help: "Is a Data Protection Impact Assessment in place for AI use cases?" },
-      { id: "a4_certs", label: "Compliance certification requirements", help: "Have GDPR / SOC 2 / CCPA / local-law requirements been documented?" },
-      { id: "a4_authority", label: "AI decision-authority matrix", help: "Have you defined what AI can auto-approve vs. what requires human review?" },
-      { id: "a4_owner", label: "AI/data governance owner", help: "Is there a named accountable owner for AI governance in your org?" },
+      { id: "a4_map", label: "Top-tier accounts have a written stakeholder map", help: "Does every strategic account have a documented power map (economic buyer, champion, blocker, end users)?" },
+      { id: "a4_multithread", label: "Multi-threaded ≥3 people in buyer org", help: "What % of strategic accounts have active relationships with three or more contacts on the buyer side?" },
+      { id: "a4_refreshed", label: "Stakeholder map refreshed every 90 days", help: "Are maps formally revisited each quarter to catch turnover, reorgs, and new sponsors?" },
+      { id: "a4_execsponsor", label: "Exec sponsor program is live, not theatrical", help: "Do exec sponsors actually attend QBRs and intervene on saves — or is it just a slide?" },
     ]},
-  { id: "A5", section: "Foundational Readiness", title: "Workflow Digitisation",
-    desc: "You can't agentify what isn't digital. Workflows on email or paper are invisible to AI.",
-    weight: 7, cardClass: "workflow",
+
+  { id: "B1", section: "Strategic Operating", title: "Renewal & Expansion Forecasting",
+    desc: "The CFO doesn't care about your gut. Whether your forecast holds up at 60-day-out and whether CS owns expansion explicitly.",
+    weight: 15, cardClass: "agent-emp",
     metrics: [
-      { id: "a5_pctdigital", label: "% of HR processes on a digital workflow", help: "Roughly what proportion of your HR processes run inside a workflow tool?" },
-      { id: "a5_policylib", label: "Searchable digital policy library", help: "Are policies digitised in a searchable repository (not a shared drive)?" },
-      { id: "a5_top5", label: "Top 5 workflows standardised", help: "Are hire, onboard, offboard, leave, and expense workflows standardised org-wide?" },
-      { id: "a5_manualsteps", label: "Few manual handoffs per workflow", help: "On average, how few manual handoffs exist per workflow? (lower = better, higher score)" },
+      { id: "b1_forecast", label: "Renewal forecast at 90/60/30 days out", help: "Is there a documented renewal forecast at each interval, with named risk?" },
+      { id: "b1_accuracy", label: "Forecast accuracy within ±5%", help: "Over the last 4 quarters, has renewal forecast variance stayed inside ±5%?" },
+      { id: "b1_expansion", label: "CS owns expansion targets explicitly", help: "Do CSMs / CSAs carry a written expansion quota or shared one with AEs — not just 'influence'?" },
+      { id: "b1_nrr", label: "NRR trended and reviewed monthly with exec team", help: "Is NRR (and GRR) on the monthly exec dashboard with named action owners?" },
     ]},
-  { id: "B1", section: "Agent-Level Readiness", title: "Employee Self-Service Agent",
-    desc: "Powers HR queries, policy lookup, leave optimisation, shift swap. The most common starter agent.",
-    weight: 10, cardClass: "agent-emp",
-    metrics: [
-      { id: "b1_essmau", label: "ESS monthly active users", help: "What % of employees log into the ESS portal monthly?" },
-      { id: "b1_policies", label: "Policies digitised & tagged", help: "Are policy documents searchable and tagged for AI retrieval?" },
-      { id: "b1_leaveconfig", label: "Leave/attendance configured by geography", help: "Is leave & attendance correctly configured for every country you operate in?" },
-      { id: "b1_helpdesk", label: "Helpdesk ticket history (12+ months)", help: "Do you have at least 12 months of structured helpdesk tickets to train on?" },
-    ]},
-  { id: "B2", section: "Agent-Level Readiness", title: "Line Manager Agent",
-    desc: "Backfills roles, spots attrition risk, drafts feedback, surfaces team analytics.",
+
+  { id: "B2", section: "Strategic Operating", title: "Escalation Playbook Maturity",
+    desc: "Whether your team has a sequenced, exec-tested protocol when a strategic account goes red — or whether everyone improvises.",
     weight: 10, cardClass: "agent-mgr",
     metrics: [
-      { id: "b2_hierarchy", label: "Manager hierarchy clean & current", help: "Is your manager-employee mapping accurate with no orphan reports?" },
-      { id: "b2_perfdata", label: "Digital performance data (2+ cycles)", help: "Do you have at least 2 cycles of digital performance data available?" },
-      { id: "b2_goals", label: "Goals / OKRs captured in system", help: "What % of employees have active digital goals or OKRs?" },
-      { id: "b2_attrition", label: "Attrition baseline by team", help: "Do you track attrition by team / function / location with a baseline?" },
+      { id: "b2_playbook", label: "Documented escalation playbook exists", help: "Is there a written sequence for severity 1/2 escalations — owners, comms, decision points?" },
+      { id: "b2_warroom", label: "War-room model with named roles", help: "When an account goes critical, are CS, Product, Engineering, and Exec roles pre-assigned, not improvised?" },
+      { id: "b2_postmortem", label: "Post-mortem runs on every escalation", help: "Does every Sev 1/2 escalation produce a written post-mortem with actions and owners?" },
+      { id: "b2_csat", label: "Escalation CSAT tracked post-resolution", help: "Do you survey the customer 14 days after resolution and trend the recovery signal?" },
     ]},
-  { id: "B3", section: "Agent-Level Readiness", title: "Recruiter Agent",
-    desc: "Parses resumes, screens candidates, drafts JDs, schedules interviews, generates offer letters.",
-    weight: 10, cardClass: "agent-rec",
+
+  { id: "B3", section: "Strategic Operating", title: "QBR & Value Realisation Reporting",
+    desc: "QBRs should produce decisions, not slides. Whether yours are forensic value reviews or status meetings dressed up.",
+    weight: 15, cardClass: "agent-rec",
     metrics: [
-      { id: "b3_ats", label: "ATS data in system or integrated", help: "Is your ATS data accessible — with at least 24 months of historical hires?" },
-      { id: "b3_jd", label: "Structured, skills-tagged JD library", help: "Are your JDs in a structured library with skills tags?" },
-      { id: "b3_rubric", label: "Interview rubric / scorecard adoption", help: "What % of interviews use a structured rubric (vs free-text notes)?" },
-      { id: "b3_skills", label: "Skills taxonomy in place", help: "Do you have a skills taxonomy (or ready to adopt a 40k+ skills ontology)?" },
+      { id: "b3_template", label: "Standard QBR template enforced", help: "Is there one mandatory QBR template across the team (not 12 freelance versions)?" },
+      { id: "b3_value", label: "Quantified value realised per account", help: "Does every strategic QBR present hard ROI / value figures — not adoption screenshots?" },
+      { id: "b3_outcomes", label: "Mutual success plan reviewed each QBR", help: "Is the customer's written success plan tracked and updated, with status visible to both sides?" },
+      { id: "b3_attendance", label: "Customer exec attends ≥75% of QBRs", help: "What % of strategic QBRs have the customer's actual exec sponsor in the room?" },
     ]},
-  { id: "B4", section: "Agent-Level Readiness", title: "HRBP / HR Admin Agent",
-    desc: "Handles HR workflow setup, policy queries, exception handling, analytics surfacing.",
-    weight: 8, cardClass: "agent-hrbp",
+
+  { id: "B4", section: "Strategic Operating", title: "AI & Automation in the CS Motion",
+    desc: "Whether you have a sequenced AI deployment plan — or a Slack of vendor demos and no production use.",
+    weight: 10, cardClass: "agent-hrbp",
     metrics: [
-      { id: "b4_policylib", label: "Master policy library digital", help: "Is your master HR policy library fully digital and current?" },
-      { id: "b4_coverage", label: "HRBP coverage model defined", help: "Is your HRBP coverage clearly defined by BU / region / function?" },
-      { id: "b4_sops", label: "Exception SOPs documented", help: "Are exception-handling SOPs documented (not tribal knowledge)?" },
-      { id: "b4_consumers", label: "Named analytics consumers", help: "Are there named end-users for HR analytics with stated questions?" },
-    ]},
-  { id: "B5", section: "Agent-Level Readiness", title: "Payroll Admin Agent",
-    desc: "Detects payroll anomalies, resolves queries, validates expenses, monitors statutory compliance.",
-    weight: 7, cardClass: "agent-pay",
-    metrics: [
-      { id: "b5_payroll", label: "Payroll on platform or 2-way integrated", help: "Is payroll on your HCM, or fully bi-directionally integrated?" },
-      { id: "b5_components", label: "Pay components standardised", help: "Are pay components consolidated to under ~50 unique heads per legal entity?" },
-      { id: "b5_history", label: "12+ months historical payroll runs", help: "Do you have at least 12 months of historical payroll runs available?" },
-      { id: "b5_expense", label: "Expense policy digitised with rules", help: "Is your expense policy in a rules engine (not a PDF)?" },
-    ]},
-  { id: "B6", section: "Agent-Level Readiness", title: "Cross-System / IT-Finance Agent",
-    desc: "The MCP unlock. Coordinates deprovisioning, ticket triage, finance approvals across systems.",
-    weight: 5, cardClass: "agent-cross",
-    metrics: [
-      { id: "b6_itsm", label: "ITSM platform with API access", help: "Is your ITSM (Jira, ServiceNow, Freshservice) accessible via API?" },
-      { id: "b6_provision", label: "Onboarding includes IT provisioning", help: "Are IT account creation and access provisioning already part of digital onboarding?" },
-      { id: "b6_finance", label: "Finance system API-accessible", help: "Can your finance system be reached via documented APIs?" },
-      { id: "b6_comms", label: "Slack/Teams integration live", help: "Is your enterprise comms platform already integrated with HR workflows?" },
+      { id: "b4_strategy", label: "Written AI roadmap for CS exists", help: "Is there a 12-month plan naming which CS workflows AI will touch, in what sequence?" },
+      { id: "b4_ops", label: "≥2 AI use cases in production", help: "Are at least two AI use cases (e.g., churn prediction, QBR drafting, ticket triage) actually live and used weekly?" },
+      { id: "b4_quality", label: "Output quality measured and humans-in-loop", help: "Do you measure model output quality and route low-confidence cases to humans?" },
+      { id: "b4_data", label: "Customer data exposed cleanly to AI tools", help: "Are usage, support, and CRM data available to AI tools via APIs — not export-and-pray?" },
     ]},
 ];
 
 export const GAP_FIXES: Record<string, string> = {
-  A1: "Run a 4-week HCM data audit. Target >95% record completeness, position-based staffing, and >70% ESS adoption before any AI pilot.",
-  A2: "Stand up SSO (SAML 2.0/OAuth), document your RBAC matrix, and migrate email-based approvals into digital workflows.",
-  A3: "Identify your top 3 non-HR systems (ITSM, Finance, comms) and confirm API access. Adopt an iPaaS for integration recipes.",
-  A4: "Appoint a named AI governance owner. Draft a DPIA template and an AI decision-authority matrix before any agent goes live.",
-  A5: "Pick your top 5 workflows (hire, onboard, offboard, leave, expense) and standardise them digitally before agentifying them.",
-  B1: "Drive ESS adoption to 70%+ and tag your policy library. Without these, the Employee Agent has nothing to retrieve from.",
-  B2: "Operationalise digital goals/OKRs at 80%+ adoption and clean up your manager hierarchy — no orphan reports.",
-  B3: "Move your ATS data into your HCM or fully integrate it. Adopt a structured skills ontology as your taxonomy.",
-  B4: "Document HRBP coverage and exception SOPs. Identify named analytics consumers with stated questions.",
-  B5: "Consolidate pay components to <50 per entity. Move expense policy from PDFs into a rules engine.",
-  B6: "Confirm API access to your ITSM and finance systems. Integrate Slack/Teams with HR workflows before activating MCP.",
+  A1: "Rebuild segmentation around ARR, expansion potential, and strategic value. Match CSM ratios to tier. Review quarterly against NRR.",
+  A2: "Reweight your health score with five inputs minimum, back-test against last 18 months of churn, and assign a named owner per red signal.",
+  A3: "Codify onboarding milestones with dates per customer. Track median TTV by cohort. Make sales→CS handoff a signed artefact, not a Slack message.",
+  A4: "Mandate written stakeholder maps for every strategic account. Refresh quarterly. Multi-thread to three contacts minimum.",
+  B1: "Stand up 90/60/30-day renewal forecasts. Get accuracy inside ±5%. Give CS an explicit expansion target with a written quota or shared accountability.",
+  B2: "Write the escalation playbook your team is currently improvising. Pre-assign war-room roles. Run post-mortems on every Sev 1/2 — not just the disasters.",
+  B3: "Enforce one QBR template. Make every strategic QBR present quantified value realised. Track customer exec attendance and treat <75% as a leading risk signal.",
+  B4: "Pick two AI use cases (churn prediction + QBR drafting are the safest starting bets) and ship them inside 90 days. Measure output quality and keep humans in the loop on low-confidence cases.",
 };
 
 export const AGENT_INFO: Record<string, { name: string; desc: string }> = {
-  B1: { name: "Employee Self-Service Agent", desc: "HR queries, policy lookup, leave optimisation" },
-  B2: { name: "Line Manager Agent", desc: "Backfill roles, spot attrition, draft feedback" },
-  B3: { name: "Recruiter Agent", desc: "Parse resumes, screen candidates, schedule interviews" },
-  B4: { name: "HRBP / HR Admin Agent", desc: "Workflow setup, policy queries, exceptions" },
-  B5: { name: "Payroll Admin Agent", desc: "Anomaly detection, expense validation" },
-  B6: { name: "Cross-System / IT-Finance Agent", desc: "Onboarding, deprovisioning, ticket triage via MCP" },
+  B1: { name: "Renewal & Expansion Forecasting", desc: "90/60/30-day forecast, NRR ownership, expansion quotas" },
+  B2: { name: "Escalation Playbook", desc: "Sequenced response, war-room, post-mortems" },
+  B3: { name: "QBR & Value Realisation", desc: "Standardised template, quantified ROI, exec attendance" },
+  B4: { name: "AI Augmentation", desc: "Production AI in CS workflows, with quality controls" },
 };
 
 export const AGENT_RECS: Record<TierName, string[]> = {
   Block: [],
-  Pilot: ["B1", "B3"],
-  Scale: ["B1", "B2", "B3", "B4"],
-  "AI Native": ["B1", "B2", "B3", "B4", "B5", "B6"],
+  Pilot: ["B3"],
+  Scale: ["B1", "B3"],
+  "AI Native": ["B1", "B2", "B3", "B4"],
 };
 
 export type TierName = "Block" | "Pilot" | "Scale" | "AI Native";
@@ -187,24 +163,24 @@ export type ScoreResult = {
 
 const PLAN_BY_TIER: Record<TierName, { week: string; title: string; items: string[] }[]> = {
   Block: [
-    { week: "Days 1–30", title: "Foundation Audit", items: ["Audit HCM data quality across all employees", "Document org hierarchy gaps + duplicate records", "Build the business case for HCM modernisation"] },
-    { week: "Days 31–60", title: "Data Hygiene Sprint", items: ["Close >95% record-completeness gap", "Migrate email approvals into workflow tool", "Stand up SSO if not already in place"] },
-    { week: "Days 61–90", title: "Re-Assess Readiness", items: ["Drive ESS adoption to >70%", "Appoint AI governance owner", "Re-take this diagnostic — aim for Pilot tier"] },
+    { week: "Days 1–30", title: "Segmentation & Health Score Reset", items: ["Rebuild account segmentation around ARR + strategic value", "Audit health score against last 18 months of churn", "Name a single CS leader accountable for the reset"] },
+    { week: "Days 31–60", title: "Onboarding Discipline", items: ["Roll out a single onboarding template with 30/60/90 milestones", "Mandate a sales→CS handoff artefact", "Measure median time-to-first-value baseline"] },
+    { week: "Days 61–90", title: "Re-baseline & Re-score", items: ["Map stakeholders on top 20 accounts", "Stand up basic renewal forecast", "Re-take this diagnostic — aim for Pilot tier"] },
   ],
   Pilot: [
-    { week: "Days 1–30", title: "Pilot Scoping", items: ["Pick 1–2 agents (Employee + Recruiter recommended)", "Define success KPIs (deflection rate, time-to-hire)", "Train an internal AI champion"] },
-    { week: "Days 31–60", title: "Deploy & Tune", items: ["Live deploy in 1 BU or region", "Run weekly tuning + feedback loops", "Collect baseline metrics vs current state"] },
-    { week: "Days 61–90", title: "Measure & Expand", items: ["Report results to exec sponsor", "Document playbook for rollout", "Plan persona #3 (Manager or HRBP)"] },
+    { week: "Days 1–30", title: "Forecast & QBR Tightening", items: ["Stand up 90/60/30-day renewal forecast", "Enforce one QBR template across the team", "Track customer exec attendance at strategic QBRs"] },
+    { week: "Days 31–60", title: "Escalation Playbook", items: ["Document the escalation sequence and war-room roles", "Run post-mortems on the last 3 escalations", "Identify two AI use cases worth piloting (churn prediction + QBR drafting)"] },
+    { week: "Days 61–90", title: "Expansion Ownership", items: ["Give CS an explicit expansion target", "Tie CSM comp to NRR contribution", "Trend NRR / GRR monthly with exec team"] },
   ],
   Scale: [
-    { week: "Days 1–30", title: "Multi-Agent Design", items: ["Map 5–10 agents across personas", "Identify top 2 external systems for MCP (Jira/Slack/SNow)", "Set up Control Center governance + telemetry"] },
-    { week: "Days 31–60", title: "Phased Rollout", items: ["Deploy Employee + Manager + Recruiter agents org-wide", "Activate MCP for first external system", "Train HRBPs and managers on the conversational UI"] },
-    { week: "Days 61–90", title: "Optimise & Govern", items: ["Add HRBP + Payroll agents", "Quarterly bias + accuracy audits", "Build ROI dashboard for the CHRO/CFO"] },
+    { week: "Days 1–30", title: "Multi-Threading & Stakeholder Maps", items: ["Mandate written stakeholder maps on all strategic accounts", "Multi-thread to ≥3 contacts on top 50 accounts", "Activate exec sponsor program with real attendance"] },
+    { week: "Days 31–60", title: "AI in Production", items: ["Ship one AI use case to production (start with QBR drafting or churn prediction)", "Measure output quality and route low-confidence to humans", "Expose usage + support + CRM data via APIs"] },
+    { week: "Days 61–90", title: "Forecast Accuracy", items: ["Drive renewal forecast accuracy inside ±5%", "Publish quarterly NRR / GRR scorecard to board", "Plan second AI use case"] },
   ],
   "AI Native": [
-    { week: "Days 1–30", title: "Full Suite Deployment", items: ["Activate all 6 persona agents", "Stand up MCP across 3+ external systems", "Bring-your-own-agent: connect existing Copilot/Claude/Gemini"] },
-    { week: "Days 31–60", title: "Cross-System Orchestration", items: ["Roll out end-to-end workflows (hire-to-onboard, offboard-to-deprovision)", "Activate Control Center for prompt governance + model choice", "Establish AI Centre of Excellence"] },
-    { week: "Days 61–90", title: "Lead the Market", items: ["Publish case-study metrics internally + externally", "Pilot custom agents for industry-specific use cases", "Expand to finance/CRM agents via MCP"] },
+    { week: "Days 1–30", title: "Optimise & Audit", items: ["Audit health score back-testing against last 8 quarters", "Refresh stakeholder maps on all tier-1 accounts", "Re-baseline AI output quality KPIs"] },
+    { week: "Days 31–60", title: "Expand AI Surface Area", items: ["Add a third AI use case (e.g., proactive escalation detection)", "Pilot agentic workflows on lower-risk tiers", "Establish a CS AI council with Product + Eng"] },
+    { week: "Days 61–90", title: "Publish the Playbook", items: ["Productise your retention playbook as internal training", "Share NRR results externally as proof", "Mentor peer CS orgs — leadership is now a moat"] },
   ],
 };
 
@@ -218,46 +194,47 @@ export function calculateScore(answers: Record<string, number>): ScoreResult {
     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
     const weighted = (avg / 5) * q.weight;
     dimensionScores[q.id] = { id: q.id, label: q.title, section: q.section, weight: q.weight, avg, weighted };
-    if (q.section === "Foundational Readiness") foundationalTotal += weighted;
+    if (q.section === "Foundational Discipline") foundationalTotal += weighted;
     else agentTotal += weighted;
   }
 
   let totalScore = foundationalTotal + agentTotal;
   const blockers: string[] = [];
-  if (dimensionScores.A1.avg < 3.0) { totalScore = Math.min(totalScore, 35); blockers.push("A1"); }
+  // Foundational gates: you cannot be AI-native without segmentation, health, and stakeholder discipline.
+  if (dimensionScores.A1.avg < 2.5) { totalScore = Math.min(totalScore, 40); blockers.push("A1"); }
   if (dimensionScores.A2.avg < 2.5) { totalScore = Math.min(totalScore, 50); blockers.push("A2"); }
-  if (dimensionScores.A4.avg < 2.0) { totalScore = Math.min(totalScore, 55); blockers.push("A4"); }
+  if (dimensionScores.A3.avg < 2.0) { totalScore = Math.min(totalScore, 55); blockers.push("A3"); }
   const finalScore = Math.round(totalScore);
 
   let tier: TierName, tierLabel: string, recommendation: string, headline: string;
   if (finalScore <= 40) {
     tier = "Block";
-    tierLabel = "Block — Not Yet Ready";
-    recommendation = "Foundation-first: Stabilise core HCM + data hygiene before deploying any agents";
-    headline = "Your organisation isn't ready for agentic AI yet — and that's okay. Right now, deploying agents would amplify data and process gaps rather than solve them. Focus on the foundation for 6 months, then re-score.";
+    tierLabel = "Block — Foundation Not Set";
+    recommendation = "Foundation first: stabilise segmentation, health scoring, and onboarding before scaling motion or layering AI";
+    headline = "The CS function is operating on craft, not system. That works at $20M ARR; it breaks at $80M. Before adding AI or expansion targets, fix the foundation — segmentation, health, onboarding, stakeholder maps. Re-score in 90 days.";
   } else if (finalScore <= 60) {
     tier = "Pilot";
-    tierLabel = "Pilot Ready — 1–2 Agents";
-    recommendation = "Deploy 1–2 low-risk agents (Employee Self-Service + Recruiter) — no MCP, no cross-system orchestration yet";
-    headline = "You're in the right shape for a focused pilot. Start with 1–2 contained agents to demonstrate value, build internal AI literacy, and gather production data that will train the next wave. Hold off on MCP and cross-system orchestration until your foundation strengthens.";
+    tierLabel = "Pilot Ready — Tighten the Motion";
+    recommendation = "Tighten forecast accuracy, enforce one QBR standard, and pilot one AI use case (QBR drafting or churn prediction)";
+    headline = "The fundamentals are mostly there. The next move is operational tightening: a deterministic renewal forecast, a single QBR template, and one piloted AI use case to build internal literacy. Don't try to roll out everything at once.";
   } else if (finalScore <= 80) {
     tier = "Scale";
-    tierLabel = "Scale Ready — 5–10 Agents";
-    recommendation = "Deploy 5–10 agents across multiple personas; activate MCP for 1–2 external systems (e.g., Jira or Slack)";
-    headline = "You're ready for a meaningful Super Agent rollout. Your data foundation and governance are strong enough to deploy across multiple personas — Employee, Manager, Recruiter, HRBP — and to begin orchestrating with external systems via MCP.";
+    tierLabel = "Scale Ready — Multi-Thread & Automate";
+    recommendation = "Mandate stakeholder discipline across all strategic accounts, get forecast inside ±5%, and put 1–2 AI use cases in production";
+    headline = "You have the foundation and the discipline. The next leg is multi-threading every strategic account, getting your renewal forecast inside ±5%, and putting AI in production on the workflows where it pays off fastest.";
   } else {
     tier = "AI Native";
-    tierLabel = "AI Native — Full Suite + MCP";
-    recommendation = "Full agent deployment with MCP orchestration, Control Center governance, and bring-your-own-agent model";
-    headline = "Your organisation is in the top decile of AI readiness. You can deploy the full agent suite — 15+ agents across all personas, MCP cross-system orchestration, Control Center governance, and bring-your-own-agent integration.";
+    tierLabel = "AI Native — Leadership Posture";
+    recommendation = "Operate as a reference org: ship the third AI use case, productise your retention playbook, and benchmark publicly";
+    headline = "You're operating in the top decile. The remaining work is leadership posture — third AI use case, public benchmarking, mentoring peer CS orgs, and treating your retention playbook as IP, not folklore.";
   }
 
   if (blockers.length) {
     const reasons: string[] = [];
-    if (blockers.includes("A1")) reasons.push("HCM data foundation is below the safe threshold");
-    if (blockers.includes("A2")) reasons.push("identity & permissions are not enterprise-ready");
-    if (blockers.includes("A4")) reasons.push("AI governance is not in place");
-    headline += " Critical gaps detected: " + reasons.join("; ") + ". These must be addressed first.";
+    if (blockers.includes("A1")) reasons.push("account segmentation is below threshold");
+    if (blockers.includes("A2")) reasons.push("health scoring isn't a reliable leading indicator");
+    if (blockers.includes("A3")) reasons.push("onboarding is not deterministic");
+    headline += " Critical gaps detected: " + reasons.join("; ") + ". Fix these before anything else.";
   }
 
   const sorted = Object.values(dimensionScores).sort(

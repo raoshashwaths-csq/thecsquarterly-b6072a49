@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SectionPage } from "@/components/site/SectionPage";
+import { SectionPage, sectionPostsQuery } from "@/components/site/SectionPage";
 
 export const Route = createFileRoute("/retention-protocol")({
   head: () => ({
@@ -11,8 +11,10 @@ export const Route = createFileRoute("/retention-protocol")({
     ],
     links: [{ rel: "canonical", href: "/retention-protocol" }],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(sectionPostsQuery("retention-protocol")),
   component: () => (
     <SectionPage
+      sectionSlug="retention-protocol"
       eyebrow="The Retention Protocol"
       title="Identify churn early. Reverse it"
       italicWord="systematically."

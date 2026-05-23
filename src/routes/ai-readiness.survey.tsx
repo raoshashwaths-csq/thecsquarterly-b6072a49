@@ -10,10 +10,10 @@ import { submitSurvey } from "@/lib/survey.functions";
 export const Route = createFileRoute("/ai-readiness/survey")({
   head: () => ({
     meta: [
-      { title: "Super Agent Readiness Diagnostic — The CS Quarterly" },
+      { title: "CS Operating Maturity Diagnostic — The CS Quarterly" },
       {
         name: "description",
-        content: "11 dimensions, 44 metrics. Discover whether your HR data and systems are ready to deploy agentic AI — and the exact gaps to close.",
+        content: "8 dimensions, 32 metrics. Benchmark your Customer Success operating model against the discipline of top-decile retention orgs.",
       },
       { property: "og:url", content: "/ai-readiness/survey" },
       { name: "robots", content: "noindex" },
@@ -91,13 +91,13 @@ function SurveyPage() {
         {step === -1 && (
           <div className="animate-fade-up">
             <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
-              8 minutes · 11 dimensions · 44 metrics
+              6 minutes · 8 dimensions · 32 metrics
             </div>
             <h1 className="font-display text-5xl md:text-6xl leading-[0.95] mb-6">
-              Is your organisation ready for <span className="text-secondary-accent">agentic AI?</span>
+              Is your CS function <span className="text-secondary-accent">built to retain?</span>
             </h1>
             <p className="text-lg text-foreground/75 mb-10 text-pretty">
-              Tell us who's asking. We'll score you across 11 readiness dimensions and generate your personalised report instantly.
+              Benchmark your operating model — segmentation, health, onboarding, forecasting, escalation, QBRs, AI — against the discipline of top-decile retention orgs.
             </p>
             <div className="space-y-7">
               <div className="grid sm:grid-cols-2 gap-7">
@@ -117,12 +117,12 @@ function SurveyPage() {
                   <option value="enterprise">10,001 – 25,000 (Enterprise)</option>
                   <option value="enterprise">25,000+ (Enterprise)</option>
                 </SelectField>
-                <SelectField label="Current HCM platform" value={hcm} onChange={setHcm}>
+                <SelectField label="CS platform in use" value={hcm} onChange={setHcm}>
                   <option value="">Select status</option>
-                  <option value="no">Not on any HCM</option>
-                  <option value="yes-core">On HCM — core only</option>
-                  <option value="yes-sense">On HCM + AI modules</option>
-                  <option value="competitor">Evaluating options</option>
+                  <option value="none">Spreadsheets / CRM only</option>
+                  <option value="legacy">Gainsight / Totango / ChurnZero</option>
+                  <option value="modern">Vitally / Catalyst / Planhat</option>
+                  <option value="evaluating">Currently evaluating</option>
                 </SelectField>
               </div>
             </div>
@@ -256,8 +256,8 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
         </section>
 
         <section className="grid md:grid-cols-2 gap-12 mb-16">
-          <Breakdown title="Foundational Readiness" max={50} total={result.foundationalTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Foundational Readiness")} />
-          <Breakdown title="Agent-Level Readiness" max={50} total={result.agentTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Agent-Level Readiness")} />
+          <Breakdown title="Foundational Discipline" max={50} total={result.foundationalTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Foundational Discipline")} />
+          <Breakdown title="Strategic Operating" max={50} total={result.agentTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Strategic Operating")} />
         </section>
 
         <section className="mb-16">
