@@ -70,13 +70,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "The CS Quarterly" },
       { property: "og:site_name", content: "The CS Quarterly" },
       { property: "og:type", content: "website" },
-      { property: "og:title", content: "The CS Quarterly" },
+      { property: "og:title", content: "The CS Quarterly, A weekly dispatch for Customer Success leaders" },
       {
         property: "og:description",
         content:
           "A weekly dispatch for Customer Success leaders and managers. Curated news, playbooks, and the annual AI Readiness Survey.",
       },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "The CS Quarterly, A weekly dispatch for Customer Success leaders" },
+      { name: "description", content: "Customer Success Hub is a website offering customer success news, insights, and skill-building resources for leaders and managers." },
+      { property: "og:description", content: "Customer Success Hub is a website offering customer success news, insights, and skill-building resources for leaders and managers." },
+      { name: "twitter:description", content: "Customer Success Hub is a website offering customer success news, insights, and skill-building resources for leaders and managers." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1d55390b-5bae-4a83-bfe6-bd917c3839ce/id-preview-cc1f29ab--c27c8cd5-f9e8-4a7e-ae58-891ca6953866.lovable.app-1779579388710.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1d55390b-5bae-4a83-bfe6-bd917c3839ce/id-preview-cc1f29ab--c27c8cd5-f9e8-4a7e-ae58-891ca6953866.lovable.app-1779579388710.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
