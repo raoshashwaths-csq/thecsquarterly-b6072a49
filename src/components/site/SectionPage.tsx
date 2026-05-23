@@ -64,7 +64,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
                   <span className="text-accent">{p.category}</span>
                   <span>{p.read_minutes} min</span>
                 </div>
-                <h3 className="font-display text-2xl md:text-3xl mb-3 leading-tight group-hover:italic transition-all">
+                <h3 className="font-display text-2xl md:text-3xl mb-3 leading-tight transition-all">
                   {p.title}
                 </h3>
                 <p className="text-foreground/70 text-pretty">{p.excerpt}</p>

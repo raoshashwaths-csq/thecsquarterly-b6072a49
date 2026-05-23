@@ -52,7 +52,7 @@ export function Paywall({
           className="bg-secondary-accent text-secondary-accent-foreground py-4 px-6 hover:opacity-90 transition-all"
         >
           <div className="font-mono text-[10px] uppercase tracking-widest mb-1">Vanguard</div>
-          <div className="font-display text-2xl">$19 <span className="text-sm opacity-70">/ month</span></div>
+          <div className="font-display text-2xl">$49 <span className="text-sm opacity-70">/ month</span></div>
           <div className="text-xs mt-1 opacity-80">Unlocks the entire Codex + every premium dispatch.</div>
         </Link>
       </div>

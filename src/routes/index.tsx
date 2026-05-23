@@ -73,7 +73,7 @@ function HomePage() {
           {SECTIONS.map((s, i) => (
             <Link key={s.to} to={s.to} className="group border-t border-border pt-5 block">
               <div className="font-mono text-[11px] text-secondary-accent mb-3">0{i + 1}</div>
-              <h2 className="font-display text-2xl mb-2 leading-tight group-hover:italic transition-all">{s.name}</h2>
+              <h2 className="font-display text-2xl mb-2 leading-tight transition-all">{s.name}</h2>
               <p className="text-sm text-foreground/65 text-pretty">{s.blurb}</p>
             </Link>
           ))}
@@ -92,7 +92,7 @@ function HomePage() {
                 Insight #{posts.length.toString().padStart(3, "0")} — {featured.read_minutes} min read
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
-                <h2 className="font-display text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight group-hover:italic transition-all">
+                <h2 className="font-display text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight transition-all">
                   {featured.title}
                 </h2>
               </Link>
@@ -169,7 +169,7 @@ function HomePage() {
                   <span>{p.category}</span>
                   <span>{p.read_minutes} min</span>
                 </div>
-                <h3 className="font-display text-2xl md:text-3xl mb-3 leading-tight group-hover:italic transition-all">
+                <h3 className="font-display text-2xl md:text-3xl mb-3 leading-tight transition-all">
                   {p.title}
                 </h3>
                 <p className="text-foreground/70 text-pretty">{p.excerpt}</p>

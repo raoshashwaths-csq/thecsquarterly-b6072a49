@@ -77,7 +77,7 @@ function InsightsPage() {
                 <span className="text-accent">{p.category}</span>
                 <span>{p.read_minutes} min</span>
               </div>
-              <h2 className="font-display text-3xl md:text-4xl mb-3 leading-tight group-hover:italic transition-all">
+              <h2 className="font-display text-3xl md:text-4xl mb-3 leading-tight transition-all">
                 {p.title}
               </h2>
               <p className="text-foreground/70 text-pretty">{p.excerpt}</p>
