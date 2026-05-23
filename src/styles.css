@@ -35,7 +35,7 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
 
-  --font-display: "Fraunces", "Playfair Display", Georgia, serif;
+  --font-display: "Newsreader", "Source Serif 4", Georgia, serif;
   --font-body: "Source Serif 4", "Lora", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
