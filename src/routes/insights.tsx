@@ -71,18 +71,13 @@ function InsightsPage() {
               key={p.id}
               to="/insights/$slug"
               params={{ slug: p.slug }}
-              className="group block"
+              className="group block border-t border-border pt-6"
             >
-              <div className="aspect-[16/10] bg-muted mb-6 grayscale group-hover:grayscale-0 transition-all flex items-center justify-center">
-                <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                  {p.category}
-                </span>
-              </div>
-              <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+              <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
                 <span className="text-accent">{p.category}</span>
                 <span>{p.read_minutes} min</span>
               </div>
-              <h2 className="font-display text-3xl mb-3 leading-tight group-hover:italic transition-all">
+              <h2 className="font-display text-3xl md:text-4xl mb-3 leading-tight group-hover:italic transition-all">
                 {p.title}
               </h2>
               <p className="text-foreground/70 text-pretty">{p.excerpt}</p>
@@ -90,6 +85,7 @@ function InsightsPage() {
                 By {p.author}
               </div>
             </Link>
+
           ))}
         </div>
       </main>
