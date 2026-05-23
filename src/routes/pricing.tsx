@@ -29,6 +29,7 @@ const FREE = [
 ];
 const VANGUARD = [
   "Everything in Free Briefing",
+  "Unlimited witty + analytical article access (toggle every dispatch)",
   "Full library of premium dispatches (Vanguard, Outcome Forum, Codex deep-dives)",
   "Unlimited access to The Codex, $500+ of executive playbooks",
   "AI Readiness Custom Blueprint (12-page diagnostic report)",
