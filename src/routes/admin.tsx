@@ -13,7 +13,7 @@ import {
 } from "@/lib/posts.functions";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin — The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin, The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
   component: AdminPage,
 });
 

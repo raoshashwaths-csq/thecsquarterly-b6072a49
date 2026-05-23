@@ -20,10 +20,10 @@ export const Route = createFileRoute("/insights/$slug")({
     return post;
   },
   head: ({ loaderData, params }) => {
-    if (!loaderData) return { meta: [{ title: "Insight — The CS Quarterly" }] };
+    if (!loaderData) return { meta: [{ title: "Insight, The CS Quarterly" }] };
     return {
       meta: [
-        { title: `${loaderData.title} — The CS Quarterly` },
+        { title: `${loaderData.title}, The CS Quarterly` },
         { name: "description", content: loaderData.excerpt },
         { property: "og:title", content: loaderData.title },
         { property: "og:description", content: loaderData.excerpt },

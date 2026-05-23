@@ -22,7 +22,7 @@ const SECTIONS = [
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The CS Quarterly — The architecture of retention" },
+      { title: "The CS Quarterly, The architecture of retention" },
       {
         name: "description",
         content:
@@ -89,7 +89,7 @@ function HomePage() {
           <div className="grid lg:grid-cols-12 gap-16">
             <div className="lg:col-span-7">
               <div className="mb-8 font-mono text-[11px] text-accent font-medium">
-                Insight #{posts.length.toString().padStart(3, "0")} — {featured.read_minutes} min read
+                Insight #{posts.length.toString().padStart(3, "0")}, {featured.read_minutes} min read
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
                 <h2 className="font-display text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight transition-all">

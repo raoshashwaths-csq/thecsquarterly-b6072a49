@@ -6,7 +6,7 @@ import { NewsletterInline } from "@/components/site/NewsletterInline";
 export const Route = createFileRoute("/subscribe")({
   head: () => ({
     meta: [
-      { title: "Subscribe — The CS Quarterly" },
+      { title: "Subscribe, The CS Quarterly" },
       {
         name: "description",
         content:

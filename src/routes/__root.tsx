@@ -61,7 +61,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "The CS Quarterly — A weekly dispatch for Customer Success leaders" },
+      { title: "The CS Quarterly, A weekly dispatch for Customer Success leaders" },
       {
         name: "description",
         content:

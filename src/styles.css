@@ -3,7 +3,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* Polished editorial typography — Fraunces (display), Source Serif 4 (body), JetBrains Mono (utility). */
+/* Polished editorial typography, Fraunces (display), Source Serif 4 (body), JetBrains Mono (utility). */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -45,14 +45,14 @@
 :root {
   --radius: 0.25rem;
 
-  /* Editorial palette — warm paper, ink black, oxblood accent + patina gold */
+  /* Editorial palette, warm paper, ink black, oxblood accent + patina gold */
   --background: oklch(0.957 0.008 95);
   --foreground: oklch(0.205 0 0);
   --muted: oklch(0.92 0.005 95);
   --muted-foreground: oklch(0.205 0 0 / 0.55);
   --accent: oklch(0.41 0.13 28);
   --accent-foreground: oklch(0.98 0 0);
-  /* Patina gold — used sparingly */
+  /* Patina gold, used sparingly */
   --secondary-accent: oklch(0.66 0.115 75);
   --secondary-accent-foreground: oklch(0.205 0 0);
   --border: oklch(0.205 0 0 / 0.1);

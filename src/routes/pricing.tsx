@@ -11,9 +11,9 @@ import { getMe, startSubscriptionPlaceholder } from "@/lib/auth.functions";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — The CS Quarterly" },
+      { title: "Pricing, The CS Quarterly" },
       { name: "description", content: "Free Briefing or Vanguard Access. The reference newsletter for serious CS operators." },
-      { property: "og:title", content: "The CS Quarterly — Pricing" },
+      { property: "og:title", content: "The CS Quarterly, Pricing" },
       { property: "og:url", content: "/pricing" },
     ],
     links: [{ rel: "canonical", href: "/pricing" }],
@@ -30,7 +30,7 @@ const FREE = [
 const VANGUARD = [
   "Everything in Free Briefing",
   "Full library of premium dispatches (Vanguard, Outcome Forum, Codex deep-dives)",
-  "Unlimited access to The Codex — $500+ of executive playbooks",
+  "Unlimited access to The Codex, $500+ of executive playbooks",
   "AI Readiness Custom Blueprint (12-page diagnostic report)",
   "Quarterly NRR / Payback Period data drops",
   "Members-only escalation & QBR templates",
@@ -45,7 +45,7 @@ function PricingPage() {
     if (!user) { window.location.href = "/login"; return; }
     try {
       await startSub();
-      toast.success("Vanguard activated (preview — Stripe checkout wires up later).");
+      toast.success("Vanguard activated (preview, Stripe checkout wires up later).");
       me.refetch();
     } catch (e) { toast.error((e as Error).message); }
   };

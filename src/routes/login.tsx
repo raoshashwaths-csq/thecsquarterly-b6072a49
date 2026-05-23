@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Sign in — The CS Quarterly" },
+      { title: "Sign in, The CS Quarterly" },
       { name: "robots", content: "noindex" },
     ],
   }),

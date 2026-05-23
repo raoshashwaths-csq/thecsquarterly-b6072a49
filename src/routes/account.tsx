@@ -11,7 +11,7 @@ import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth
 export const Route = createFileRoute("/account")({
   head: () => ({
     meta: [
-      { title: "Your account — The CS Quarterly" },
+      { title: "Your account, The CS Quarterly" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -61,7 +61,7 @@ function AccountPage() {
                     onClick={async () => {
                       try {
                         await startSub();
-                        toast.success("Vanguard access activated (placeholder — Stripe wires up later).");
+                        toast.success("Vanguard access activated (placeholder, Stripe wires up later).");
                         me.refetch();
                       } catch (e) { toast.error((e as Error).message); }
                     }}
