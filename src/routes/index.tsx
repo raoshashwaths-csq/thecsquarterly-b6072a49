@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { listPosts } from "@/lib/posts.functions";
-import editorialHero from "@/assets/editorial-hero.jpg";
+
 
 const postsQuery = queryOptions({
   queryKey: ["posts"],
