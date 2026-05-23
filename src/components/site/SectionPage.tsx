@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
+import { listPostsBySection } from "@/lib/posts.functions";
 
 export type SectionPageProps = {
   eyebrow: string;
@@ -10,10 +12,18 @@ export type SectionPageProps = {
   tagline: string;
   description: string;
   pillars: { number: string; title: string; body: string }[];
-  comingSoon?: string;
+  sectionSlug: "vanguard" | "retention-protocol" | "outcome-forum";
 };
 
-export function SectionPage({ eyebrow, title, italicWord, tagline, description, pillars, comingSoon }: SectionPageProps) {
+export const sectionPostsQuery = (slug: string) =>
+  queryOptions({
+    queryKey: ["posts", "section", slug],
+    queryFn: () => listPostsBySection({ data: { section: slug } }),
+  });
+
+export function SectionPage({ eyebrow, title, italicWord, tagline, description, pillars, sectionSlug }: SectionPageProps) {
+  const { data: posts } = useSuspenseQuery(sectionPostsQuery(sectionSlug));
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -32,36 +42,84 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
 
       <section className="max-w-7xl w-full mx-auto px-6 py-20">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-10">
-          What lives in this section
+        <div className="flex justify-between items-end mb-12">
+          <h2 className="font-display text-4xl">
+            {posts.length > 0 ? "Dispatches in this section" : "What lives in this section"}
+          </h2>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            {posts.length} {posts.length === 1 ? "essay" : "essays"}
+          </span>
         </div>
-        <div className="grid md:grid-cols-3 gap-x-12 gap-y-12">
-          {pillars.map((p) => (
-            <article key={p.number} className="border-t border-border pt-6">
-              <div className="font-mono text-[11px] text-secondary-accent mb-3">{p.number}</div>
-              <h2 className="font-display text-2xl mb-3 leading-tight">{p.title}</h2>
-              <p className="text-foreground/70 text-pretty">{p.body}</p>
-            </article>
-          ))}
-        </div>
+
+        {posts.length > 0 ? (
+          <div className="grid md:grid-cols-2 gap-x-16 gap-y-12">
+            {posts.map((p) => (
+              <Link
+                key={p.id}
+                to="/insights/$slug"
+                params={{ slug: p.slug }}
+                className="group block border-t border-border pt-6"
+              >
+                <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
+                  <span className="text-accent">{p.category}</span>
+                  <span>{p.read_minutes} min</span>
+                </div>
+                <h3 className="font-display text-2xl md:text-3xl mb-3 leading-tight group-hover:italic transition-all">
+                  {p.title}
+                </h3>
+                <p className="text-foreground/70 text-pretty">{p.excerpt}</p>
+                <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-secondary-accent">
+                  Read essay →
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-x-12 gap-y-12">
+            {pillars.map((p) => (
+              <article key={p.number} className="border-t border-border pt-6">
+                <div className="font-mono text-[11px] text-secondary-accent mb-3">{p.number}</div>
+                <h3 className="font-display text-2xl mb-3 leading-tight">{p.title}</h3>
+                <p className="text-foreground/70 text-pretty">{p.body}</p>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
+
+      {posts.length > 0 && (
+        <section className="max-w-7xl w-full mx-auto px-6 pb-20">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-10">
+            The editorial spine of this section
+          </div>
+          <div className="grid md:grid-cols-3 gap-x-12 gap-y-12">
+            {pillars.map((p) => (
+              <article key={p.number} className="border-t border-border pt-6">
+                <div className="font-mono text-[11px] text-secondary-accent mb-3">{p.number}</div>
+                <h3 className="font-display text-xl mb-3 leading-tight">{p.title}</h3>
+                <p className="text-sm text-foreground/70 text-pretty">{p.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">
-            {comingSoon ?? "In production"}
+            Subscribe to the dispatch
           </div>
           <h3 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
-            The first essays land soon.
+            One essay every Tuesday.
           </h3>
           <p className="text-background/70 mb-10 text-pretty">
-            Subscribers see this section before it goes public. Get the dispatch.
+            Subscribers see new entries in this section before they go public.
           </p>
           <div className="max-w-md mx-auto">
-            <NewsletterInline source={`section-${eyebrow.toLowerCase().replace(/\s+/g, "-")}`} />
+            <NewsletterInline source={`section-${sectionSlug}`} />
           </div>
           <Link to="/insights" className="inline-block mt-8 font-mono text-[10px] uppercase tracking-widest underline underline-offset-4 opacity-70 hover:opacity-100">
-            ← Back to the archive
+            ← Back to the full archive
           </Link>
         </div>
       </section>

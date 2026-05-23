@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SectionPage } from "@/components/site/SectionPage";
+import { SectionPage, sectionPostsQuery } from "@/components/site/SectionPage";
 
 export const Route = createFileRoute("/vanguard")({
   head: () => ({
@@ -11,8 +11,10 @@ export const Route = createFileRoute("/vanguard")({
     ],
     links: [{ rel: "canonical", href: "/vanguard" }],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(sectionPostsQuery("vanguard")),
   component: () => (
     <SectionPage
+      sectionSlug="vanguard"
       eyebrow="The CS Vanguard"
       title="Proactive plays for"
       italicWord="fruitful engagement."
