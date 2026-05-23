@@ -106,15 +106,20 @@ function PostPage() {
 
   if (!post) return null;
 
+  const toneClass = tone === "wodehouse" ? "tone-witty" : "tone-analytic";
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <article className="max-w-3xl mx-auto px-6 pt-20 pb-16 animate-fade-up">
+      <article className={`max-w-3xl mx-auto px-6 pt-20 pb-16 animate-fade-up ${toneClass}`}>
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
           {post.category} · {post.read_minutes} min read
         </div>
-        <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10">
+        <h1
+          key={`title-${tone}`}
+          className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10 animate-tone-swap"
+        >
           {title}
         </h1>
         <p className="text-2xl text-foreground/70 italic leading-snug mb-10 text-pretty">
@@ -131,7 +136,7 @@ function PostPage() {
           )}
         </div>
 
-        <div className="prose-content mt-12">{renderMarkdownLite(body)}</div>
+        <div key={`body-${tone}`} className="prose-content mt-12 animate-tone-swap">{renderMarkdownLite(body)}</div>
       </article>
 
       <section className="bg-foreground text-background py-20">
@@ -167,27 +172,31 @@ function ToneToggle({ tone, setTone }: { tone: Tone; setTone: (t: Tone) => void 
     <div
       role="tablist"
       aria-label="Article tone"
-      className="inline-flex items-stretch border border-border bg-background"
+      className="inline-flex items-stretch border border-border bg-background rounded-sm overflow-hidden"
     >
       <button
         role="tab"
+        aria-label="Analytical tone"
+        title="Analytical"
         aria-selected={tone === "mckinsey"}
         onClick={() => setTone("mckinsey")}
-        className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+        className={`px-3 py-1.5 flex items-center justify-center transition-all duration-300 ${
           tone === "mckinsey" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
         }`}
       >
-        McKinsey
+        <Glasses size={16} strokeWidth={1.75} />
       </button>
       <button
         role="tab"
+        aria-label="Witty tone"
+        title="Witty"
         aria-selected={tone === "wodehouse"}
         onClick={() => setTone("wodehouse")}
-        className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors ${
-          tone === "wodehouse" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+        className={`px-3 py-1.5 flex items-center justify-center transition-all duration-300 ${
+          tone === "wodehouse" ? "bg-secondary-accent text-secondary-accent-foreground" : "text-muted-foreground hover:text-foreground"
         }`}
       >
-        Wodehouse
+        <Smile size={16} strokeWidth={1.75} />
       </button>
     </div>
   );
