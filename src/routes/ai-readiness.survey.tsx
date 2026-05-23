@@ -256,8 +256,8 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
         </section>
 
         <section className="grid md:grid-cols-2 gap-12 mb-16">
-          <Breakdown title="Foundational Readiness" max={50} total={result.foundationalTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Foundational Readiness")} />
-          <Breakdown title="Agent-Level Readiness" max={50} total={result.agentTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Agent-Level Readiness")} />
+          <Breakdown title="Foundational Discipline" max={50} total={result.foundationalTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Foundational Discipline")} />
+          <Breakdown title="Strategic Operating" max={50} total={result.agentTotal} items={Object.values(result.dimensionScores).filter((d) => d.section === "Strategic Operating")} />
         </section>
 
         <section className="mb-16">
