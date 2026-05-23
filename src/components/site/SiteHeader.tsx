@@ -17,15 +17,15 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
       <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-baseline gap-1 group">
-          <span className="font-display text-2xl tracking-tight leading-none">The CS Quarterly</span>
+        <Link to="/" className="flex items-baseline gap-1 group mr-8">
+          <span className="font-display text-xl tracking-tight leading-none">The CS Quarterly</span>
           <span aria-hidden className="hidden sm:inline-block h-[6px] w-[6px] rounded-full bg-secondary-accent group-hover:bg-accent transition-colors" />
         </Link>
-        <div className="flex items-center gap-4 font-mono text-[11px] font-semibold uppercase tracking-widest">
+        <div className="flex items-center gap-4 font-mono text-[10px] font-semibold uppercase tracking-widest">
           {sections.map((item, i) => (
             <div key={item.to} className="hidden md:flex items-center gap-4">
               {i > 0 && (
-                <span aria-hidden className="h-3 w-px bg-border/60" />
+                <span aria-hidden className="h-3 w-px bg-border/90" />
               )}
               <Link
                 to={item.to}
@@ -36,7 +36,7 @@ export function SiteHeader() {
               </Link>
             </div>
           ))}
-          <span aria-hidden className="hidden md:inline-block h-3 w-px bg-border/60" />
+          <span aria-hidden className="hidden md:inline-block h-3 w-px bg-border/90" />
           {user ? (
             <>
               <Link to="/account" className="hidden md:inline hover:text-accent">Account</Link>
