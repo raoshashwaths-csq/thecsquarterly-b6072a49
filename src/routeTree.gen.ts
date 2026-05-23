@@ -15,6 +15,7 @@ import { Route as RetentionProtocolRouteImport } from './routes/retention-protoc
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
@@ -57,6 +58,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiReadinessRoute = AiReadinessRouteImport.update({
   id: '/ai-readiness',
   path: '/ai-readiness',
@@ -83,9 +89,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsIndexRoute = InsightsIndexRouteImport.update({
-  id: '/insights/',
-  path: '/insights/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => InsightsRoute,
 } as any)
 const CodexIndexRoute = CodexIndexRouteImport.update({
   id: '/codex/',
@@ -98,9 +104,9 @@ const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
   getParentRoute: () => AiReadinessRoute,
 } as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
-  id: '/insights/$slug',
-  path: '/insights/$slug',
-  getParentRoute: () => rootRouteImport,
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => InsightsRoute,
 } as any)
 const CodexSlugRoute = CodexSlugRouteImport.update({
   id: '/$slug',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
@@ -157,6 +164,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
@@ -178,6 +186,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/insights'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/insights'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
@@ -235,15 +245,14 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRoute
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
+  InsightsRoute: typeof InsightsRouteWithChildren
   LoginRoute: typeof LoginRoute
   OutcomeForumRoute: typeof OutcomeForumRoute
   PricingRoute: typeof PricingRoute
   RetentionProtocolRoute: typeof RetentionProtocolRoute
   SubscribeRoute: typeof SubscribeRoute
   VanguardRoute: typeof VanguardRoute
-  InsightsSlugRoute: typeof InsightsSlugRoute
   CodexIndexRoute: typeof CodexIndexRoute
-  InsightsIndexRoute: typeof InsightsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -290,6 +299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-readiness': {
       id: '/ai-readiness'
       path: '/ai-readiness'
@@ -327,10 +343,10 @@ declare module '@tanstack/react-router' {
     }
     '/insights/': {
       id: '/insights/'
-      path: '/insights'
+      path: '/'
       fullPath: '/insights/'
       preLoaderRoute: typeof InsightsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof InsightsRoute
     }
     '/codex/': {
       id: '/codex/'
@@ -348,10 +364,10 @@ declare module '@tanstack/react-router' {
     }
     '/insights/$slug': {
       id: '/insights/$slug'
-      path: '/insights/$slug'
+      path: '/$slug'
       fullPath: '/insights/$slug'
       preLoaderRoute: typeof InsightsSlugRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof InsightsRoute
     }
     '/codex/$slug': {
       id: '/codex/$slug'
@@ -384,21 +400,34 @@ const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
   AiReadinessRouteChildren,
 )
 
+interface InsightsRouteChildren {
+  InsightsSlugRoute: typeof InsightsSlugRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
+}
+
+const InsightsRouteChildren: InsightsRouteChildren = {
+  InsightsSlugRoute: InsightsSlugRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
+}
+
+const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
+  InsightsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
   AdminRoute: AdminRoute,
   AiReadinessRoute: AiReadinessRouteWithChildren,
+  InsightsRoute: InsightsRouteWithChildren,
   LoginRoute: LoginRoute,
   OutcomeForumRoute: OutcomeForumRoute,
   PricingRoute: PricingRoute,
   RetentionProtocolRoute: RetentionProtocolRoute,
   SubscribeRoute: SubscribeRoute,
   VanguardRoute: VanguardRoute,
-  InsightsSlugRoute: InsightsSlugRoute,
   CodexIndexRoute: CodexIndexRoute,
-  InsightsIndexRoute: InsightsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
