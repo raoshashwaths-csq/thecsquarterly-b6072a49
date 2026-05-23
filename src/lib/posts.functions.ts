@@ -10,6 +10,10 @@ export type Post = {
   subtitle: string | null;
   excerpt: string;
   body: string;
+  title_mckinsey: string | null;
+  body_mckinsey: string | null;
+  title_wodehouse: string | null;
+  body_wodehouse: string | null;
   category: string;
   section: string;
   author: string;
@@ -23,7 +27,8 @@ export type Post = {
 };
 
 const SELECT_COLS =
-  "id, slug, title, subtitle, excerpt, body, category, section, author, read_minutes, hero_prompt, cover_image_url, is_premium, tier, published, published_at";
+  "id, slug, title, subtitle, excerpt, body, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse, category, section, author, read_minutes, hero_prompt, cover_image_url, is_premium, tier, published, published_at";
+
 
 export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
