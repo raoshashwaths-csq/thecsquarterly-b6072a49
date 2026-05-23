@@ -109,7 +109,7 @@ function PostPage() {
     const next = prev + 1;
     window.localStorage.setItem(key, String(next));
     if (!user && next >= 3) {
-      navigate({ to: "/pricing", search: { from: "paywall" } as never });
+      navigate({ to: "/pricing" });
       return;
     }
     if (hasBothTones && next <= 2) {
