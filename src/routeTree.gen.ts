@@ -16,6 +16,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as CodexRouteImport } from './routes/codex'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
@@ -63,6 +64,11 @@ const InsightsRoute = InsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CodexRoute = CodexRouteImport.update({
+  id: '/codex',
+  path: '/codex',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiReadinessRoute = AiReadinessRouteImport.update({
   id: '/ai-readiness',
   path: '/ai-readiness',
@@ -94,9 +100,9 @@ const InsightsIndexRoute = InsightsIndexRouteImport.update({
   getParentRoute: () => InsightsRoute,
 } as any)
 const CodexIndexRoute = CodexIndexRouteImport.update({
-  id: '/codex/',
-  path: '/codex/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => CodexRoute,
 } as any)
 const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
   id: '/',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
@@ -164,6 +171,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
@@ -186,6 +194,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/codex'
     | '/insights'
     | '/login'
     | '/outcome-forum'
@@ -224,6 +233,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/codex'
     | '/insights'
     | '/login'
     | '/outcome-forum'
@@ -245,6 +255,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRoute
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
+  CodexRoute: typeof CodexRouteWithChildren
   InsightsRoute: typeof InsightsRouteWithChildren
   LoginRoute: typeof LoginRoute
   OutcomeForumRoute: typeof OutcomeForumRoute
@@ -252,7 +263,6 @@ export interface RootRouteChildren {
   RetentionProtocolRoute: typeof RetentionProtocolRoute
   SubscribeRoute: typeof SubscribeRoute
   VanguardRoute: typeof VanguardRoute
-  CodexIndexRoute: typeof CodexIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -306,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/codex': {
+      id: '/codex'
+      path: '/codex'
+      fullPath: '/codex'
+      preLoaderRoute: typeof CodexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-readiness': {
       id: '/ai-readiness'
       path: '/ai-readiness'
@@ -350,10 +367,10 @@ declare module '@tanstack/react-router' {
     }
     '/codex/': {
       id: '/codex/'
-      path: '/codex'
+      path: '/'
       fullPath: '/codex/'
       preLoaderRoute: typeof CodexIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof CodexRoute
     }
     '/ai-readiness/': {
       id: '/ai-readiness/'
@@ -400,6 +417,18 @@ const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
   AiReadinessRouteChildren,
 )
 
+interface CodexRouteChildren {
+  CodexSlugRoute: typeof CodexSlugRoute
+  CodexIndexRoute: typeof CodexIndexRoute
+}
+
+const CodexRouteChildren: CodexRouteChildren = {
+  CodexSlugRoute: CodexSlugRoute,
+  CodexIndexRoute: CodexIndexRoute,
+}
+
+const CodexRouteWithChildren = CodexRoute._addFileChildren(CodexRouteChildren)
+
 interface InsightsRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
@@ -420,6 +449,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AdminRoute: AdminRoute,
   AiReadinessRoute: AiReadinessRouteWithChildren,
+  CodexRoute: CodexRouteWithChildren,
   InsightsRoute: InsightsRouteWithChildren,
   LoginRoute: LoginRoute,
   OutcomeForumRoute: OutcomeForumRoute,
@@ -427,7 +457,6 @@ const rootRouteChildren: RootRouteChildren = {
   RetentionProtocolRoute: RetentionProtocolRoute,
   SubscribeRoute: SubscribeRoute,
   VanguardRoute: VanguardRoute,
-  CodexIndexRoute: CodexIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
