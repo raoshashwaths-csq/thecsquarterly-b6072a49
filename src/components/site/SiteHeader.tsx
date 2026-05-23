@@ -53,7 +53,7 @@ export function SiteHeader() {
           </Link>
         </div>
       </nav>
-      <RetentionLedger />
+
     </header>
   );
 }
