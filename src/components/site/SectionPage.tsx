@@ -106,6 +106,10 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
         </section>
       )}
 
+      {extras}
+
+
+
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">
