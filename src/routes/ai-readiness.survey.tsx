@@ -7,6 +7,8 @@ import { QUESTIONS, SCORE_OPTIONS, GAP_FIXES, AGENT_INFO } from "@/lib/survey";
 import type { ScoreResult } from "@/lib/survey";
 import { submitSurvey } from "@/lib/survey.functions";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const Route = createFileRoute("/ai-readiness/survey")({
   head: () => ({
     meta: [
@@ -44,7 +46,8 @@ function SurveyPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ScoreResult | null>(null);
 
-  const leadValid = name.trim() && email.trim() && company.trim() && title.trim() && segment;
+  const emailValid = EMAIL_PATTERN.test(email.trim());
+  const leadValid = name.trim() && emailValid && company.trim() && title.trim() && segment;
   const currentQuestion = step >= 0 ? QUESTIONS[step] : null;
   const allCurrentAnswered = currentQuestion
     ? currentQuestion.metrics.every((m) => typeof answers[m.id] === "number")
@@ -127,8 +130,22 @@ function SurveyPage() {
               </div>
             </div>
             <div className="flex justify-end mt-12 pt-8 border-t border-border">
+              {email.trim() && !emailValid && (
+                <p className="text-destructive font-mono text-[11px] uppercase tracking-widest">
+                  Enter a valid work email to start.
+                </p>
+              )}
               <button
-                onClick={() => { setStep(0); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                type="button"
+                onClick={() => {
+                  if (!leadValid) {
+                    setError(email.trim() && !emailValid ? "Enter a valid work email to start." : "Complete all required fields to start.");
+                    return;
+                  }
+                  setError(null);
+                  setStep(0);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
                 disabled={!leadValid}
                 className="px-8 py-4 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest font-bold disabled:opacity-30 hover:bg-accent transition-colors"
               >

@@ -14,37 +14,37 @@ const SubmitSchema = z.object({
 });
 
 export const submitSurvey = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => {
-    const parsed = SubmitSchema.safeParse(input);
+  .inputValidator((input: unknown) => input)
+  .handler(async ({ data }) => {
+    const parsed = SubmitSchema.safeParse(data);
     if (!parsed.success) {
       const first = parsed.error.issues[0];
       const field = first?.path.join(".") || "input";
       throw new Error(`Please check the ${field} field: ${first?.message ?? "invalid value"}.`);
     }
-    return parsed.data;
-  })
-  .handler(async ({ data }) => {
+    const submission = parsed.data;
+
     // Validate every metric was answered.
     for (const q of QUESTIONS) {
       for (const m of q.metrics) {
-        if (typeof data.answers[m.id] !== "number") {
+        if (typeof submission.answers[m.id] !== "number") {
           throw new Error(`Missing answer for ${m.id}`);
         }
       }
     }
 
     // Server-side scoring — never trust client.
-    const result = calculateScore(data.answers);
+    const result = calculateScore(submission.answers);
 
     const { error } = await supabaseAdmin.from("survey_responses").insert({
-      name: data.name,
-      email: data.email,
-      company: data.company,
-      role: data.title,
-      title: data.title,
-      segment: data.segment || null,
-      hcm_status: data.hcm_status || null,
-      answers: data.answers,
+      name: submission.name,
+      email: submission.email,
+      company: submission.company,
+      role: submission.title,
+      title: submission.title,
+      segment: submission.segment || null,
+      hcm_status: submission.hcm_status || null,
+      answers: submission.answers,
       score: result.finalScore,
       tier: result.tier,
       foundational_score: Math.round(result.foundationalTotal * 10) / 10,
@@ -59,7 +59,7 @@ export const submitSurvey = createServerFn({ method: "POST" })
     await supabaseAdmin
       .from("subscribers")
       .upsert(
-        { email: data.email, source: "ai-readiness-survey", segment: "leader" },
+        { email: submission.email, source: "ai-readiness-survey", segment: "leader" },
         { onConflict: "email" },
       );
 

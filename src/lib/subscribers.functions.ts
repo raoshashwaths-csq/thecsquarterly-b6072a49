@@ -9,12 +9,19 @@ const SubscribeSchema = z.object({
 });
 
 export const subscribe = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => SubscribeSchema.parse(input))
+  .inputValidator((input: unknown) => input)
   .handler(async ({ data }) => {
+    const parsed = SubscribeSchema.safeParse(data);
+    if (!parsed.success) {
+      const first = parsed.error.issues[0];
+      const field = first?.path.join(".") || "input";
+      throw new Error(`Please check the ${field} field: ${first?.message ?? "invalid value"}.`);
+    }
+
     const { error } = await supabaseAdmin
       .from("subscribers")
       .upsert(
-        { email: data.email, source: data.source ?? "site", segment: data.segment ?? "other" },
+        { email: parsed.data.email, source: parsed.data.source ?? "site", segment: parsed.data.segment ?? "other" },
         { onConflict: "email" },
       );
 
