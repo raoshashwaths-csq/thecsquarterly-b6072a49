@@ -101,18 +101,22 @@ function PostPage() {
   const hasWod = !!(post?.title_wodehouse && post?.body_wodehouse);
   const hasBothTones = hasMck && hasWod;
 
-  // First 2 article opens: show toggle hint. From the 3rd open onwards: redirect to paywall (unless signed in).
+  // Track distinct articles viewed. Allow 3 free, then paywall on a 4th new article.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const key = "cs_article_views";
-    const prev = parseInt(window.localStorage.getItem(key) ?? "0", 10) || 0;
-    const next = prev + 1;
-    window.localStorage.setItem(key, String(next));
-    if (!user && next >= 3) {
-      navigate({ to: "/pricing" });
-      return;
+    const key = "cs_articles_seen";
+    let seen: string[] = [];
+    try { seen = JSON.parse(window.localStorage.getItem(key) ?? "[]"); } catch { seen = []; }
+    const isNew = !seen.includes(slug);
+    if (isNew) {
+      if (!user && seen.length >= 3) {
+        navigate({ to: "/pricing" });
+        return;
+      }
+      seen.push(slug);
+      window.localStorage.setItem(key, JSON.stringify(seen));
     }
-    if (hasBothTones && next <= 2) {
+    if (hasBothTones && seen.length <= 2) {
       const t = window.setTimeout(() => setShowToneHint(true), 600);
       return () => window.clearTimeout(t);
     }
