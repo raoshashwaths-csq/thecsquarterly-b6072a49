@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/ai-readiness/")({
   head: () => ({
     meta: [
-      { title: "Super Agent Readiness Diagnostic — The CS Quarterly" },
+      { title: "Super Agent Readiness Diagnostic, The CS Quarterly" },
       {
         name: "description",
         content: "An 8-minute diagnostic across 11 readiness dimensions and 44 metrics. Discover whether your HR and CS organisation is ready to deploy agentic AI.",
@@ -22,9 +22,9 @@ export const Route = createFileRoute("/ai-readiness/")({
 const PILLARS = [
   { name: "HCM Data Foundation", weight: 15, blurb: "The cleanliness of employee records, hierarchy, positions, and self-service adoption." },
   { name: "Identity, Permissions & Approvals", weight: 10, blurb: "SSO, RBAC, digital approvals, and segregation-of-duties." },
-  { name: "Integration & MCP-Readiness", weight: 10, blurb: "API access to ITSM, finance, comms — and your existing AI agent footprint." },
+  { name: "Integration & MCP-Readiness", weight: 10, blurb: "API access to ITSM, finance, comms, and your existing AI agent footprint." },
   { name: "Governance, Audit & Compliance", weight: 8, blurb: "DPIA, decision-authority matrix, and a named AI governance owner." },
-  { name: "Workflow Digitisation", weight: 7, blurb: "Whether your top processes live in workflows — or in email and PDFs." },
+  { name: "Workflow Digitisation", weight: 7, blurb: "Whether your top processes live in workflows, or in email and PDFs." },
   { name: "Six Persona Agents", weight: 50, blurb: "Per-persona readiness for Employee, Manager, Recruiter, HRBP, Payroll, and Cross-System agents." },
 ];
 
@@ -50,7 +50,7 @@ function AiReadinessLanding() {
           Start the diagnostic
         </Link>
         <p className="mt-6 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          Block · Pilot · Scale · AI Native — find your tier instantly
+          Block · Pilot · Scale · AI Native, find your tier instantly
         </p>
       </header>
 
@@ -80,7 +80,7 @@ function AiReadinessLanding() {
           <p className="font-display text-3xl md:text-4xl mb-10 leading-tight italic">
             "Only 13% of organisations are truly AI-ready."
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-12">— Cisco AI Readiness Index, 2025</p>
+          <p className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-12">,  Cisco AI Readiness Index, 2025</p>
           <Link
             to="/ai-readiness/survey"
             className="inline-block px-10 py-5 bg-background text-foreground font-mono text-[11px] uppercase tracking-widest font-bold hover:bg-accent hover:text-accent-foreground transition-colors"

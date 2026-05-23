@@ -12,7 +12,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const Route = createFileRoute("/ai-readiness/survey")({
   head: () => ({
     meta: [
-      { title: "CS Operating Maturity Diagnostic — The CS Quarterly" },
+      { title: "CS Operating Maturity Diagnostic, The CS Quarterly" },
       {
         name: "description",
         content: "8 dimensions, 32 metrics. Benchmark your Customer Success operating model against the discipline of top-decile retention orgs.",
@@ -100,7 +100,7 @@ function SurveyPage() {
               Is your CS function <span className="text-secondary-accent">built to retain?</span>
             </h1>
             <p className="text-lg text-foreground/75 mb-10 text-pretty">
-              Benchmark your operating model — segmentation, health, onboarding, forecasting, escalation, QBRs, AI — against the discipline of top-decile retention orgs.
+              Benchmark your operating model, segmentation, health, onboarding, forecasting, escalation, QBRs, AI, against the discipline of top-decile retention orgs.
             </p>
             <div className="space-y-7">
               <div className="grid sm:grid-cols-2 gap-7">

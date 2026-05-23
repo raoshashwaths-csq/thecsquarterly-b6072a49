@@ -16,13 +16,14 @@ const SECTIONS = [
   { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically." },
   { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts." },
   { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators." },
+  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 11 dimensions, 44 metrics." },
 ] as const;
 
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The CS Quarterly — The architecture of retention" },
+      { title: "The CS Quarterly, The architecture of retention" },
       {
         name: "description",
         content:
@@ -52,12 +53,15 @@ function HomePage() {
       <SiteHeader />
 
       <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-medium">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           Weekly Dispatch for the 1% of Operators
         </div>
-        <h1 className="font-display text-6xl md:text-8xl lg:text-9xl mb-12 text-balance leading-[0.9] tracking-tight">
-          The architecture of <span className="italic text-accent">retention.</span>
+        <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
+          Stop managing accounts. <span className="italic text-accent">Start engineering trajectory.</span>
         </h1>
+        <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-10">
+          Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships.
+        </p>
         <NewsletterInline source="home-hero" />
       </header>
 
@@ -66,15 +70,28 @@ function HomePage() {
 
       {/* Sections strip */}
       <section className="max-w-7xl w-full mx-auto px-6 py-16 animate-fade-up [animation-delay:300ms]">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-10">
-          The Sections
+        <div className="flex items-end justify-between mb-10">
+          <div className="font-mono text-[11px] uppercase tracking-widest text-foreground font-semibold">
+            The Sections
+          </div>
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            {SECTIONS.length} disciplines
+          </div>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
           {SECTIONS.map((s, i) => (
-            <Link key={s.to} to={s.to} className="group border-t border-border pt-5 block">
-              <div className="font-mono text-[11px] text-secondary-accent mb-3">0{i + 1}</div>
-              <h2 className="font-display text-2xl mb-2 leading-tight transition-all">{s.name}</h2>
-              <p className="text-sm text-foreground/65 text-pretty">{s.blurb}</p>
+            <Link
+              key={s.to}
+              to={s.to}
+              className="group relative block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-6 pt-7"
+            >
+              <span aria-hidden className="absolute top-0 left-6 right-6 h-px bg-foreground/80" />
+              <div className="font-mono text-[11px] text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
+              <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">{s.name}</h2>
+              <p className="text-sm text-foreground/65 text-pretty mb-4">{s.blurb}</p>
+              <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/60 group-hover:text-accent transition-colors">
+                Enter section →
+              </div>
             </Link>
           ))}
         </div>
@@ -89,7 +106,7 @@ function HomePage() {
           <div className="grid lg:grid-cols-12 gap-16">
             <div className="lg:col-span-7">
               <div className="mb-8 font-mono text-[11px] text-accent font-medium">
-                Insight #{posts.length.toString().padStart(3, "0")} — {featured.read_minutes} min read
+                Insight #{posts.length.toString().padStart(3, "0")}, {featured.read_minutes} min read
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
                 <h2 className="font-display text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight transition-all">

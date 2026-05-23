@@ -3,7 +3,7 @@
 @source "../src";
 @import "tw-animate-css";
 
-/* Polished editorial typography — Fraunces (display), Source Serif 4 (body), JetBrains Mono (utility). */
+/* Polished editorial typography, Fraunces (display), Source Serif 4 (body), JetBrains Mono (utility). */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -45,16 +45,16 @@
 :root {
   --radius: 0.25rem;
 
-  /* Editorial palette — warm paper, ink black, oxblood accent + patina gold */
+  /* Editorial palette, warm paper, ink black, oxblood accent + patina gold */
   --background: oklch(0.957 0.008 95);
   --foreground: oklch(0.205 0 0);
   --muted: oklch(0.92 0.005 95);
   --muted-foreground: oklch(0.205 0 0 / 0.55);
   --accent: oklch(0.41 0.13 28);
   --accent-foreground: oklch(0.98 0 0);
-  /* Patina gold — used sparingly */
-  --secondary-accent: oklch(0.66 0.115 75);
-  --secondary-accent-foreground: oklch(0.205 0 0);
+  /* Patina gold, deepened for legibility on warm paper */
+  --secondary-accent: oklch(0.52 0.13 70);
+  --secondary-accent-foreground: oklch(0.98 0 0);
   --border: oklch(0.205 0 0 / 0.1);
   --input: oklch(0.205 0 0 / 0.15);
   --ring: oklch(0.41 0.13 28);
@@ -123,14 +123,17 @@
   animation: tone-swap 0.45s var(--ease-out-expo) both;
 }
 
-/* Tone-aware accent: witty mode shifts to patina gold, analytic stays oxblood */
+/* Tone-aware accent: witty mode shifts to deeper patina gold for legibility */
 .tone-witty {
-  --accent: oklch(0.66 0.115 75);
-  --accent-foreground: oklch(0.205 0 0);
-  --ring: oklch(0.66 0.115 75);
+  --accent: oklch(0.52 0.13 70);
+  --accent-foreground: oklch(0.98 0 0);
+  --ring: oklch(0.52 0.13 70);
   transition: --accent 0.4s ease;
 }
 .tone-witty .prose-content { font-style: normal; }
+
+/* Bump weight on small mono labels so gold/oxblood eyebrows stay legible */
+.font-mono { font-weight: 500; letter-spacing: 0.02em; }
 
 @layer base {
   * {

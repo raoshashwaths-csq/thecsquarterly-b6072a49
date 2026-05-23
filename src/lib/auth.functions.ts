@@ -35,7 +35,7 @@ export const getMe = createServerFn({ method: "GET" })
     };
   });
 
-// Placeholder "start subscription" — until Stripe is wired, this just activates
+// Placeholder "start subscription", until Stripe is wired, this just activates
 // the Vanguard tier for the signed-in user so the gated UX is testable.
 export const startSubscriptionPlaceholder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -56,7 +56,7 @@ export const startSubscriptionPlaceholder = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// Placeholder one-off purchase — records the purchase row so the gated content unlocks.
+// Placeholder one-off purchase, records the purchase row so the gated content unlocks.
 export const recordPurchasePlaceholder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => {

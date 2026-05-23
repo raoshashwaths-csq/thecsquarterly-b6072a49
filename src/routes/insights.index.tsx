@@ -13,13 +13,13 @@ const postsQuery = queryOptions({
 export const Route = createFileRoute("/insights/")({
   head: () => ({
     meta: [
-      { title: "Insights — The CS Quarterly" },
+      { title: "Insights, The CS Quarterly" },
       {
         name: "description",
         content:
           "Essays, playbooks, and dispatches on Customer Success leadership: stakeholder management, escalation, negotiation, sales qualification, AI deployment.",
       },
-      { property: "og:title", content: "Insights — The CS Quarterly" },
+      { property: "og:title", content: "Insights, The CS Quarterly" },
       { property: "og:description", content: "Essays and playbooks on CS leadership." },
       { property: "og:url", content: "/insights" },
     ],

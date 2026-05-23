@@ -22,10 +22,10 @@ export const Route = createFileRoute("/codex/$slug")({
     return pb;
   },
   head: ({ loaderData, params }) => {
-    if (!loaderData) return { meta: [{ title: "Playbook — The CS Codex" }] };
+    if (!loaderData) return { meta: [{ title: "Playbook, The CS Codex" }] };
     return {
       meta: [
-        { title: `${loaderData.title} — The CS Codex` },
+        { title: `${loaderData.title}, The CS Codex` },
         { name: "description", content: loaderData.summary },
         { property: "og:title", content: loaderData.title },
         { property: "og:description", content: loaderData.summary },
@@ -58,7 +58,7 @@ function PlaybookPage() {
     if (!user) { window.location.href = "/login"; return; }
     try {
       await purchase({ data: { itemType: "playbook", itemId: pb.id, amountCents: pb.price_cents } });
-      toast.success("Playbook unlocked (preview — Stripe checkout activates in the next release).");
+      toast.success("Playbook unlocked (preview, Stripe checkout activates in the next release).");
       purchases.refetch();
     } catch (e) { toast.error((e as Error).message); }
   };

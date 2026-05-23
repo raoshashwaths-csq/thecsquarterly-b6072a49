@@ -33,7 +33,7 @@ export const submitSurvey = createServerFn({ method: "POST" })
       }
     }
 
-    // Server-side scoring — never trust client.
+    // Server-side scoring, never trust client.
     const result = calculateScore(submission.answers);
 
     const { error } = await supabaseAdmin.from("survey_responses").insert({

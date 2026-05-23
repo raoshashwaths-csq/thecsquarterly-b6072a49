@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -13,6 +14,7 @@ export type SectionPageProps = {
   description: string;
   pillars: { number: string; title: string; body: string }[];
   sectionSlug: "vanguard" | "retention-protocol" | "outcome-forum";
+  extras?: ReactNode;
 };
 
 export const sectionPostsQuery = (slug: string) =>
@@ -21,7 +23,7 @@ export const sectionPostsQuery = (slug: string) =>
     queryFn: () => listPostsBySection({ data: { section: slug } }),
   });
 
-export function SectionPage({ eyebrow, title, italicWord, tagline, description, pillars, sectionSlug }: SectionPageProps) {
+export function SectionPage({ eyebrow, title, italicWord, tagline, description, pillars, sectionSlug, extras }: SectionPageProps) {
   const { data: posts } = useSuspenseQuery(sectionPostsQuery(sectionSlug));
 
   return (
@@ -103,6 +105,10 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
           </div>
         </section>
       )}
+
+      {extras}
+
+
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">

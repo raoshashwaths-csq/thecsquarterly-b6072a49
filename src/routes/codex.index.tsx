@@ -13,7 +13,7 @@ const playbooksQuery = queryOptions({
 export const Route = createFileRoute("/codex/")({
   head: () => ({
     meta: [
-      { title: "The CS Codex — Executive playbooks for revenue operators" },
+      { title: "The CS Codex, Executive playbooks for revenue operators" },
       { name: "description", content: "The reference library of frameworks, templates, and playbooks for elite Customer Success teams. Buy individually or unlock all with Vanguard." },
       { property: "og:title", content: "The CS Codex" },
       { property: "og:url", content: "/codex" },
@@ -89,10 +89,10 @@ function CodexPage() {
         <div className="max-w-3xl mx-auto px-6 text-center">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">The economics</div>
           <h3 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
-            $500+ of playbooks. <span className="italic">$19 a month.</span>
+            $500+ of playbooks. <span className="italic">$49 a month.</span>
           </h3>
           <p className="text-background/70 mb-10 text-pretty">
-            One Vanguard subscription pays for itself the moment you open a second playbook. Everything in the Codex, every premium dispatch, every Custom Blueprint — included.
+            One Vanguard subscription pays for itself the moment you open a second playbook. Everything in the Codex, every premium dispatch, every Custom Blueprint, included.
           </p>
           <Link to="/pricing" className="inline-block px-8 py-4 bg-secondary-accent text-secondary-accent-foreground font-mono text-[11px] uppercase tracking-widest hover:opacity-90">
             See Vanguard pricing

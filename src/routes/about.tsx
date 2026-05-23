@@ -5,13 +5,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — The CS Quarterly" },
+      { title: "About, The CS Quarterly" },
       {
         name: "description",
         content:
           "The CS Quarterly is a weekly dispatch and research hub for Customer Success leaders and mid-level managers.",
       },
-      { property: "og:title", content: "About — The CS Quarterly" },
+      { property: "og:title", content: "About, The CS Quarterly" },
       { property: "og:description", content: "A weekly dispatch for CS leaders and managers." },
       { property: "og:url", content: "/about" },
     ],
@@ -40,7 +40,7 @@ function AboutPage() {
             We cover the things you can't learn from a vendor webinar: stakeholder management at the C-suite, escalation playbooks under pressure, sales qualification done with rigor, and the art of negotiating renewals without discounting.
           </p>
           <p>
-            We also run the annual AI Readiness Survey for CS and HR leaders — a 12-question diagnostic that benchmarks where you are and tells you what to do next.
+            We also run the annual AI Readiness Survey for CS and HR leaders, a 12-question diagnostic that benchmarks where you are and tells you what to do next.
           </p>
           <p className="font-display italic text-2xl pt-4">
             No noise. No vendor pitches. One essay every Tuesday.
