@@ -133,7 +133,8 @@
 .tone-witty .prose-content { font-style: normal; }
 
 /* Bump weight on small mono labels so gold/oxblood eyebrows stay legible */
-.font-mono { font-weight: 500; letter-spacing: 0.02em; }
+.font-mono { font-weight: 600; letter-spacing: 0.08em; font-size: max(12px, 1em); }
+.text-secondary-accent.font-mono, .text-accent.font-mono { font-weight: 700; }
 
 @layer base {
   * {
