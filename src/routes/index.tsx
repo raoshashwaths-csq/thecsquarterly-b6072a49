@@ -61,21 +61,8 @@ function HomePage() {
         <NewsletterInline source="home-hero" />
       </header>
 
-      {/* Editorial hero image */}
-      <figure className="max-w-7xl w-full mx-auto px-6 animate-fade-up [animation-delay:150ms]">
-        <img
-          src={editorialHero}
-          alt="Empty modernist boardroom at dawn — the quiet authority of institutional knowledge"
-          width={1600}
-          height={1024}
-          className="w-full aspect-[16/9] object-cover grayscale contrast-110"
-        />
-        <figcaption className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground text-center">
-          Volume I · Issue 01
-        </figcaption>
-      </figure>
-
       <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
+
 
       {/* Sections strip */}
       <section className="max-w-7xl w-full mx-auto px-6 py-16 animate-fade-up [animation-delay:300ms]">
