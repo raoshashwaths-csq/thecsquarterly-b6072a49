@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
@@ -32,20 +33,6 @@ export const Route = createFileRoute("/insights/$slug")({
         { property: "article:published_time", content: loaderData.published_at },
       ],
       links: [{ rel: "canonical", href: `/insights/${params.slug}` }],
-      scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Article",
-            headline: loaderData.title,
-            description: loaderData.excerpt,
-            author: { "@type": "Person", name: loaderData.author },
-            datePublished: loaderData.published_at,
-            articleSection: loaderData.category,
-          }),
-        },
-      ],
     };
   },
   component: PostPage,
@@ -53,44 +40,69 @@ export const Route = createFileRoute("/insights/$slug")({
 
 function renderMarkdownLite(body: string) {
   return body.split("\n\n").map((para, i) => {
-    if (para.startsWith("## ")) {
+    const p = para.trim();
+    if (!p) return null;
+    if (p.startsWith("## ")) {
       return (
-        <h2 key={i} className="font-display text-3xl md:text-4xl mt-12 mb-6 leading-tight">
-          {para.replace(/^##\s+/, "")}
+        <h2 key={i} className="font-display text-3xl md:text-4xl mt-14 mb-6 leading-tight tracking-tight">
+          {p.replace(/^##\s+/, "")}
         </h2>
       );
     }
-    if (/^\d+\.\s/.test(para)) {
-      const items = para.split("\n").map((l) => l.replace(/^\d+\.\s+/, ""));
+    if (/^\d+\.\s/m.test(p)) {
+      const items = p.split("\n").map((l) => l.replace(/^\s*\d+\.\s+/, ""));
       return (
-        <ol key={i} className="list-decimal pl-6 space-y-2 text-lg leading-relaxed my-6">
-          {items.map((it, j) => (
-            <li key={j}>{it}</li>
-          ))}
+        <ol key={i} className="list-decimal pl-6 space-y-2 text-lg leading-relaxed my-6 marker:text-secondary-accent marker:font-mono">
+          {items.map((it, j) => (<li key={j}>{renderInline(it)}</li>))}
         </ol>
       );
     }
-    if (para.startsWith("- ")) {
-      const items = para.split("\n").map((l) => l.replace(/^-\s+/, ""));
+    if (/^[-*]\s/m.test(p)) {
+      const items = p.split("\n").map((l) => l.replace(/^\s*[-*]\s+/, ""));
       return (
-        <ul key={i} className="list-disc pl-6 space-y-2 text-lg leading-relaxed my-6">
-          {items.map((it, j) => (
-            <li key={j}>{it}</li>
-          ))}
+        <ul key={i} className="list-disc pl-6 space-y-2 text-lg leading-relaxed my-6 marker:text-secondary-accent">
+          {items.map((it, j) => (<li key={j}>{renderInline(it)}</li>))}
         </ul>
       );
     }
     return (
       <p key={i} className="text-lg leading-relaxed my-6 text-foreground/85">
-        {para}
+        {renderInline(p)}
       </p>
     );
   });
 }
 
+function renderInline(text: string) {
+  // Minimal bold rendering for **...**
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) =>
+    /^\*\*[^*]+\*\*$/.test(part) ? (
+      <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
+    ) : (
+      <span key={i}>{part}</span>
+    ),
+  );
+}
+
+type Tone = "mckinsey" | "wodehouse";
+
 function PostPage() {
   const { slug } = Route.useParams();
   const { data: post } = useSuspenseQuery(postQuery(slug));
+  const [tone, setTone] = useState<Tone>("mckinsey");
+
+  const hasMck = !!(post?.title_mckinsey && post?.body_mckinsey);
+  const hasWod = !!(post?.title_wodehouse && post?.body_wodehouse);
+  const hasBothTones = hasMck && hasWod;
+
+  const { title, body } = useMemo(() => {
+    if (!post) return { title: "", body: "" };
+    if (tone === "mckinsey" && hasMck) return { title: post.title_mckinsey!, body: post.body_mckinsey! };
+    if (tone === "wodehouse" && hasWod) return { title: post.title_wodehouse!, body: post.body_wodehouse! };
+    return { title: post.title, body: post.body };
+  }, [post, tone, hasMck, hasWod]);
+
   if (!post) return null;
 
   return (
@@ -102,27 +114,25 @@ function PostPage() {
           {post.category} · {post.read_minutes} min read
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10">
-          {post.title}
+          {title}
         </h1>
         <p className="text-2xl text-foreground/70 italic leading-snug mb-10 text-pretty">
           {post.excerpt}
         </p>
-        <div className="flex items-center gap-4 pb-10 border-b border-border font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-          <span>By {post.author}</span>
-          <span>·</span>
-          <span>{new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-10 border-b border-border font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+          <div className="flex items-center gap-4">
+            <span>By {post.author}</span>
+            <span>·</span>
+            <span>{new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
+          </div>
+          {hasBothTones && (
+            <ToneToggle tone={tone} setTone={setTone} />
+          )}
         </div>
 
-        <div className="aspect-[21/9] bg-muted my-12 grayscale flex items-center justify-center">
-          <span className="font-mono text-[10px] uppercase tracking-widest opacity-40">
-            {post.category}
-          </span>
-        </div>
-
-        <div className="prose-content">{renderMarkdownLite(post.body)}</div>
+        <div className="prose-content mt-12">{renderMarkdownLite(body)}</div>
       </article>
 
-      {/* Inline newsletter CTA */}
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h3 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
@@ -147,6 +157,37 @@ function PostPage() {
       </div>
 
       <SiteFooter />
+    </div>
+  );
+}
+
+function ToneToggle({ tone, setTone }: { tone: Tone; setTone: (t: Tone) => void }) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Article tone"
+      className="inline-flex items-stretch border border-border bg-background"
+    >
+      <button
+        role="tab"
+        aria-selected={tone === "mckinsey"}
+        onClick={() => setTone("mckinsey")}
+        className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+          tone === "mckinsey" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        McKinsey
+      </button>
+      <button
+        role="tab"
+        aria-selected={tone === "wodehouse"}
+        onClick={() => setTone("wodehouse")}
+        className={`px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+          tone === "wodehouse" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        Wodehouse
+      </button>
     </div>
   );
 }
