@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SectionPage } from "@/components/site/SectionPage";
+import { SectionPage, sectionPostsQuery } from "@/components/site/SectionPage";
 
 export const Route = createFileRoute("/outcome-forum")({
   head: () => ({
@@ -11,8 +11,10 @@ export const Route = createFileRoute("/outcome-forum")({
     ],
     links: [{ rel: "canonical", href: "/outcome-forum" }],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(sectionPostsQuery("outcome-forum")),
   component: () => (
     <SectionPage
+      sectionSlug="outcome-forum"
       eyebrow="The Outcome Forum"
       title="Validated outcomes, with the"
       italicWord="receipts."
