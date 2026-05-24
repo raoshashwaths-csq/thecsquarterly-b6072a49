@@ -116,11 +116,14 @@ function HomePage() {
               <p className="text-xl leading-relaxed text-foreground/80 mb-10 text-pretty">
                 {featured.excerpt}
               </p>
-              <div className="border-y border-border py-8 mb-12">
-                <p className="font-display italic text-2xl md:text-3xl leading-snug text-pretty">
-                  "{featured.excerpt}"
-                </p>
-              </div>
+              {featured.subtitle && (
+                <div className="border-y border-border py-8 mb-12">
+                  <p className="font-display italic text-2xl md:text-3xl leading-snug text-pretty">
+                    {featured.subtitle}
+                  </p>
+                </div>
+              )}
+
 
               <Link
                 to="/insights/$slug"
