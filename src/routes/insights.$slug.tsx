@@ -157,12 +157,15 @@ function PostPage() {
             <span>{new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
           </div>
           {hasBothTones && (
-            <div className="relative">
+            <div className="relative flex items-center gap-3">
+              <span className="sm:hidden font-mono text-[10px] normal-case tracking-normal text-muted-foreground">
+                Switch tone →
+              </span>
               <ToneToggle tone={tone} setTone={setTone} />
               {showToneHint && (
                 <div
                   role="dialog"
-                  className="fixed left-4 right-4 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:w-72 top-auto bottom-4 sm:bottom-auto mt-0 sm:mt-3 z-50 bg-foreground text-background p-4 shadow-xl animate-fade-up"
+                  className="hidden sm:block absolute right-0 top-full mt-3 z-30 w-72 bg-foreground text-background p-4 shadow-xl animate-fade-up"
                 >
                   <button
                     aria-label="Dismiss"
@@ -185,7 +188,7 @@ function PostPage() {
                   </button>
                   <span
                     aria-hidden
-                    className="hidden sm:block absolute -top-1.5 right-6 h-3 w-3 rotate-45 bg-foreground"
+                    className="absolute -top-1.5 right-6 h-3 w-3 rotate-45 bg-foreground"
                   />
                 </div>
               )}
