@@ -1,8 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import {
+  LayoutDashboard, FileText, MessageSquare, BookOpen, Users, CreditCard,
+  ShoppingBag, BarChart3, Sparkles, Search as SearchIcon, UsersRound, Mail, Link as LinkIcon,
+} from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,11 +15,37 @@ import {
   listAllPostsAdmin, listAllPlaybooksAdmin, upsertPost, deletePost,
   upsertPlaybook, deletePlaybook,
 } from "@/lib/posts.functions";
+import {
+  getAdminStats, listSubscribers, listSubscriptions, listPurchases, listSurveyResponses,
+} from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin, The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({ meta: [{ title: "Admin · The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
   component: AdminPage,
 });
+
+type SectionKey =
+  | "dashboard" | "posts" | "conversations" | "playbooks"
+  | "subscribers" | "subscriptions" | "purchases" | "payment-links"
+  | "diagnostic" | "community" | "ai-agent" | "search" | "email";
+
+type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
+
+const NAV: NavItem[] = [
+  { key: "dashboard", label: "Overview", icon: LayoutDashboard, group: "Editorial" },
+  { key: "posts", label: "Articles", icon: FileText, group: "Editorial" },
+  { key: "conversations", label: "1:1 Conversations", icon: MessageSquare, soon: true, group: "Editorial" },
+  { key: "playbooks", label: "Codex Playbooks", icon: BookOpen, group: "Editorial" },
+  { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
+  { key: "subscriptions", label: "Members", icon: Users, group: "Audience" },
+  { key: "diagnostic", label: "Diagnostic Responses", icon: BarChart3, group: "Audience" },
+  { key: "community", label: "Community", icon: UsersRound, soon: true, group: "Audience" },
+  { key: "purchases", label: "Purchases", icon: ShoppingBag, group: "Commerce" },
+  { key: "payment-links", label: "Payment Links", icon: LinkIcon, soon: true, group: "Commerce" },
+  { key: "ai-agent", label: "AI Agent", icon: Sparkles, soon: true, group: "Operations" },
+  { key: "search", label: "Global Search", icon: SearchIcon, soon: true, group: "Operations" },
+  { key: "email", label: "Editorial Email", icon: CreditCard, soon: true, group: "Operations" },
+];
 
 const SECTIONS = ["vanguard", "retention-protocol", "outcome-forum", "codex"] as const;
 
@@ -24,6 +54,7 @@ function AdminPage() {
   const navigate = useNavigate();
   const fetchMe = useServerFn(getMe);
   const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe(), enabled: !!user });
+  const [active, setActive] = useState<SectionKey>("dashboard");
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -45,16 +76,98 @@ function AdminPage() {
     );
   }
 
+  const groups = useMemo(() => {
+    const g: Record<string, NavItem[]> = {};
+    NAV.forEach((n) => { (g[n.group] ||= []).push(n); });
+    return g;
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 max-w-7xl mx-auto px-6 py-12 w-full">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">Editorial dashboard</div>
-        <h1 className="font-display text-5xl mb-10">The Newsroom</h1>
+      <main className="flex-1 max-w-[1500px] mx-auto px-6 py-10 w-full">
+        <div className="mb-8">
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Editorial dashboard</div>
+          <h1 className="font-display text-5xl">The Newsroom</h1>
+        </div>
+
         {me.data?.isAdmin && (
-          <div className="grid lg:grid-cols-2 gap-12">
-            <PostsAdmin />
-            <PlaybooksAdmin />
+          <div className="grid lg:grid-cols-[260px_1fr] gap-10">
+            <aside className="lg:sticky lg:top-24 self-start">
+              <nav className="space-y-6">
+                {Object.entries(groups).map(([group, items]) => (
+                  <div key={group}>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2 px-2">{group}</div>
+                    <ul className="space-y-px">
+                      {items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = active === item.key;
+                        return (
+                          <li key={item.key}>
+                            <button
+                              onClick={() => setActive(item.key)}
+                              className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors border-l-2 ${
+                                isActive
+                                  ? "border-accent bg-muted/40 text-foreground"
+                                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                              }`}
+                            >
+                              <Icon className="h-4 w-4 shrink-0" />
+                              <span className="flex-1 truncate">{item.label}</span>
+                              {item.soon && (
+                                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground border border-border px-1.5 py-0.5">
+                                  Soon
+                                </span>
+                              )}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </nav>
+            </aside>
+
+            <section className="min-w-0">
+              {active === "dashboard" && <DashboardSection />}
+              {active === "posts" && <PostsAdmin />}
+              {active === "playbooks" && <PlaybooksAdmin />}
+              {active === "subscribers" && <SubscribersList />}
+              {active === "subscriptions" && <SubscriptionsList />}
+              {active === "purchases" && <PurchasesList />}
+              {active === "diagnostic" && <DiagnosticList />}
+              {active === "conversations" && <ComingSoon
+                title="1:1 Conversations with Leaders"
+                blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."
+                checklist={["Conversation table (guest, role, company, scheduled_at)", "Transcript + audio file storage", "Publish as its own article type", "Featured-guest carousel on home"]}
+              />}
+              {active === "community" && <ComingSoon
+                title="Community"
+                blurb="Unlocks at 1,000 paid members. Threaded discussions, AMAs with the leaders we interview, and a private channel for Vanguard members."
+                checklist={["Spaces (general, retention, ai, hiring)", "Threads + replies with reactions", "Moderation queue + reports", "Member directory with company filter"]}
+              />}
+              {active === "ai-agent" && <ComingSoon
+                title="Editorial AI Agent"
+                blurb="A co-pilot that drafts the 3-2-1 model articles in your voice, suggests headlines, and flags repetition between title, subtitle and excerpt."
+                checklist={["Style-guide retrieval (memory + past pieces)", "Draft → review → revise loop", "Repetition detector for title/subtitle/excerpt", "Push to Articles as a draft"]}
+              />}
+              {active === "search" && <ComingSoon
+                title="Global Search"
+                blurb="One search bar over articles, playbooks, conversations, and community threads with semantic + keyword ranking."
+                checklist={["pg_trgm + pgvector index on posts/playbooks", "Embeddings job on publish", "Cmd-K palette in admin + site header", "Top-result preview cards"]}
+              />}
+              {active === "payment-links" && <ComingSoon
+                title="Payment Links"
+                blurb="Single-click links for Vanguard subscriptions and Codex playbooks. Create, share, and track conversions per link."
+                checklist={["Stripe payment-link table (slug → price_id)", "Per-link conversion metrics", "Embed as buttons in articles", "Promo codes + expiry"]}
+              />}
+              {active === "email" && <ComingSoon
+                title="Editorial Email"
+                blurb="Send the weekly dispatch from admin@thecsquarterly.com with the same 3-2-1 layout. Auto-build the issue from the latest articles."
+                checklist={["Verified sender on thecsquarterly.com", "Auto-compose from new articles", "Segment by tier (free vs Vanguard)", "Open + click tracking"]}
+              />}
+            </section>
           </div>
         )}
       </main>
@@ -62,6 +175,185 @@ function AdminPage() {
     </div>
   );
 }
+
+// ============== Sections ==============
+
+function StatCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
+  return (
+    <div className="border border-border p-5">
+      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">{label}</div>
+      <div className="font-display text-4xl leading-none">{value}</div>
+      {hint && <div className="text-xs text-muted-foreground mt-2">{hint}</div>}
+    </div>
+  );
+}
+
+function DashboardSection() {
+  const fetchStats = useServerFn(getAdminStats);
+  const stats = useQuery({ queryKey: ["admin-stats"], queryFn: () => fetchStats() });
+  const d = stats.data;
+  return (
+    <div className="space-y-8">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard label="Published Articles" value={d?.posts ?? "—"} />
+        <StatCard label="Codex Playbooks" value={d?.playbooks ?? "—"} />
+        <StatCard label="Active Members" value={d?.activeSubscriptions ?? "—"} hint="Community unlocks at 1,000" />
+        <StatCard label="Newsletter Subscribers" value={d?.subscribers ?? "—"} />
+        <StatCard label="Diagnostic Responses" value={d?.surveys ?? "—"} />
+        <StatCard label="Revenue" value={d ? `$${(d.revenueCents / 100).toFixed(0)}` : "—"} hint="From completed purchases" />
+      </div>
+      <div className="border border-border p-6">
+        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-2">Editorial cadence</div>
+        <p className="font-display text-2xl leading-snug max-w-2xl">
+          New articles follow the 3-2-1 model: <span className="text-accent">3 facts</span>, <span className="text-accent">2 insights</span>, <span className="text-accent">1 actionable</span>. Title, subtitle and excerpt must each say something different.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function ComingSoon({ title, blurb, checklist }: { title: string; blurb: string; checklist: string[] }) {
+  return (
+    <div className="space-y-6">
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Groundwork ready</div>
+        <h2 className="font-display text-4xl mb-3">{title}</h2>
+        <p className="text-muted-foreground max-w-2xl leading-relaxed">{blurb}</p>
+      </div>
+      <div className="border border-border p-6">
+        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">When you're ready, this becomes</div>
+        <ul className="space-y-2">
+          {checklist.map((c) => (
+            <li key={c} className="flex items-start gap-3 text-sm">
+              <span className="text-accent mt-0.5">·</span>
+              <span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function DataTable<T extends Record<string, any>>({ rows, cols, empty }: {
+  rows: T[]; cols: { key: keyof T | string; label: string; render?: (r: T) => React.ReactNode }[]; empty: string;
+}) {
+  if (!rows.length) return <div className="border border-border p-6 text-sm text-muted-foreground">{empty}</div>;
+  return (
+    <div className="border border-border overflow-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-muted/40">
+          <tr>{cols.map((c) => (
+            <th key={String(c.key)} className="text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground px-4 py-3">
+              {c.label}
+            </th>
+          ))}</tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {rows.map((r, i) => (
+            <tr key={i} className="hover:bg-muted/20">
+              {cols.map((c) => (
+                <td key={String(c.key)} className="px-4 py-3 align-top">
+                  {c.render ? c.render(r) : String(r[c.key as keyof T] ?? "—")}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+const fmtDate = (s?: string | null) => (s ? new Date(s).toLocaleDateString() : "—");
+
+function SubscribersList() {
+  const fn = useServerFn(listSubscribers);
+  const q = useQuery({ queryKey: ["admin-subscribers"], queryFn: () => fn() });
+  return (
+    <div className="space-y-4">
+      <h2 className="font-display text-3xl">Newsletter Subscribers</h2>
+      <DataTable
+        rows={q.data ?? []}
+        empty="No subscribers yet."
+        cols={[
+          { key: "email", label: "Email" },
+          { key: "segment", label: "Segment" },
+          { key: "source", label: "Source" },
+          { key: "created_at", label: "Joined", render: (r) => fmtDate(r.created_at) },
+        ]}
+      />
+    </div>
+  );
+}
+
+function SubscriptionsList() {
+  const fn = useServerFn(listSubscriptions);
+  const q = useQuery({ queryKey: ["admin-subscriptions"], queryFn: () => fn() });
+  return (
+    <div className="space-y-4">
+      <h2 className="font-display text-3xl">Members</h2>
+      <DataTable
+        rows={q.data ?? []}
+        empty="No members yet."
+        cols={[
+          { key: "user_id", label: "User", render: (r) => <code className="text-xs">{String(r.user_id).slice(0, 8)}</code> },
+          { key: "tier", label: "Tier" },
+          { key: "status", label: "Status" },
+          { key: "current_period_end", label: "Renews", render: (r) => fmtDate(r.current_period_end) },
+          { key: "created_at", label: "Joined", render: (r) => fmtDate(r.created_at) },
+        ]}
+      />
+    </div>
+  );
+}
+
+function PurchasesList() {
+  const fn = useServerFn(listPurchases);
+  const q = useQuery({ queryKey: ["admin-purchases"], queryFn: () => fn() });
+  return (
+    <div className="space-y-4">
+      <h2 className="font-display text-3xl">Purchases</h2>
+      <DataTable
+        rows={q.data ?? []}
+        empty="No purchases yet."
+        cols={[
+          { key: "user_id", label: "User", render: (r) => <code className="text-xs">{String(r.user_id).slice(0, 8)}</code> },
+          { key: "item_type", label: "Type" },
+          { key: "item_id", label: "Item" },
+          { key: "amount_cents", label: "Amount", render: (r) => `$${(r.amount_cents / 100).toFixed(2)}` },
+          { key: "status", label: "Status" },
+          { key: "created_at", label: "When", render: (r) => fmtDate(r.created_at) },
+        ]}
+      />
+    </div>
+  );
+}
+
+function DiagnosticList() {
+  const fn = useServerFn(listSurveyResponses);
+  const q = useQuery({ queryKey: ["admin-surveys"], queryFn: () => fn() });
+  return (
+    <div className="space-y-4">
+      <h2 className="font-display text-3xl">Diagnostic Responses</h2>
+      <DataTable
+        rows={q.data ?? []}
+        empty="No diagnostic responses yet."
+        cols={[
+          { key: "email", label: "Email" },
+          { key: "name", label: "Name" },
+          { key: "company", label: "Company" },
+          { key: "role", label: "Role" },
+          { key: "score", label: "Score" },
+          { key: "tier", label: "Tier" },
+          { key: "created_at", label: "When", render: (r) => fmtDate(r.created_at) },
+        ]}
+      />
+    </div>
+  );
+}
+
+// ============== Posts & Playbooks (unchanged structure, restyled headings) ==============
 
 function PostsAdmin() {
   const fetchAll = useServerFn(listAllPostsAdmin);
@@ -90,12 +382,12 @@ function PostsAdmin() {
   };
 
   return (
-    <section>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-2xl">Posts</h2>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New post</button>
+    <section className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-3xl">Articles</h2>
+        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New article</button>
       </div>
-      <div className="border border-border divide-y divide-border max-h-96 overflow-auto">
+      <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
         {(list.data ?? []).map((p) => (
           <div key={p.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
@@ -110,19 +402,19 @@ function PostsAdmin() {
             </div>
           </div>
         ))}
-        {list.data?.length === 0 && <div className="p-6 text-sm text-muted-foreground">No posts yet.</div>}
+        {list.data?.length === 0 && <div className="p-6 text-sm text-muted-foreground">No articles yet.</div>}
       </div>
 
       {editing && (
         <div className="fixed inset-0 bg-foreground/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-background border border-border w-full max-w-2xl p-6 my-8">
-            <div className="font-display text-2xl mb-4">{editing.id ? "Edit post" : "New post"}</div>
+            <div className="font-display text-2xl mb-4">{editing.id ? "Edit article" : "New article"}</div>
             <div className="grid gap-3 text-sm">
               <input placeholder="Slug (lowercase-with-dashes)" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className="border border-border px-3 py-2" />
               <input placeholder="Title" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="border border-border px-3 py-2" />
-              <input placeholder="Subtitle (optional)" value={editing.subtitle ?? ""} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} className="border border-border px-3 py-2" />
-              <textarea placeholder="Excerpt" value={editing.excerpt} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={2} className="border border-border px-3 py-2" />
-              <textarea placeholder="Body (markdown lite: ## heading, - bullet)" value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={12} className="border border-border px-3 py-2 font-mono text-xs" />
+              <input placeholder="Subtitle (distinct from title)" value={editing.subtitle ?? ""} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} className="border border-border px-3 py-2" />
+              <textarea placeholder="Excerpt (distinct from title & subtitle)" value={editing.excerpt} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={2} className="border border-border px-3 py-2" />
+              <textarea placeholder="Body (markdown lite: ## heading, - bullet). Follow 3 facts, 2 insights, 1 actionable." value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={12} className="border border-border px-3 py-2 font-mono text-xs" />
               <div className="grid grid-cols-2 gap-3">
                 <input placeholder="Category" value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className="border border-border px-3 py-2" />
                 <select value={editing.section} onChange={(e) => setEditing({ ...editing, section: e.target.value })} className="border border-border px-3 py-2">
@@ -171,18 +463,18 @@ function PlaybooksAdmin() {
   };
 
   return (
-    <section>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display text-2xl">Codex Playbooks</h2>
+    <section className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-3xl">Codex Playbooks</h2>
         <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New playbook</button>
       </div>
-      <div className="border border-border divide-y divide-border max-h-96 overflow-auto">
+      <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
         {(list.data ?? []).map((p: any) => (
           <div key={p.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="font-display text-lg truncate">{p.title}</div>
               <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                {p.category} · ${(p.price_cents/100).toFixed(0)} · {p.pages}pp
+                {p.category} · ${(p.price_cents / 100).toFixed(0)} · {p.pages}pp
               </div>
             </div>
             <div className="flex gap-2 shrink-0">

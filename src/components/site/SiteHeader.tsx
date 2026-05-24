@@ -96,6 +96,11 @@ export function SiteHeader() {
                     Account
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin" className="font-mono text-[11px] uppercase tracking-widest">
+                    Admin
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => {
