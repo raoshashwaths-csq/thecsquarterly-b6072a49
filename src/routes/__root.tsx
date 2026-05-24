@@ -118,7 +118,8 @@ function RootShell({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      {/* paper-grain: subtle paper texture overlay on cream sections. Remove this class to disable globally. */}
+      <body className="paper-grain">
         {children}
         <Scripts />
       </body>
