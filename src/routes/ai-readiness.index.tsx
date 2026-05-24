@@ -5,13 +5,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/ai-readiness/")({
   head: () => ({
     meta: [
-      { title: "Super Agent Readiness Diagnostic, The CS Quarterly" },
+      { title: "CS Operating Maturity Diagnostic, The CS Quarterly" },
       {
         name: "description",
-        content: "An 8-minute diagnostic across 11 readiness dimensions and 44 metrics. Discover whether your HR and CS organisation is ready to deploy agentic AI.",
+        content: "A 6-minute diagnostic across 8 dimensions and 32 metrics. Benchmark your Customer Success operating model against top-decile retention orgs and see whether you're ready to deploy agentic AI.",
       },
-      { property: "og:title", content: "Super Agent Readiness Diagnostic" },
-      { property: "og:description", content: "11 dimensions · 44 metrics · Personalised 90-day plan." },
+      { property: "og:title", content: "CS Operating Maturity Diagnostic" },
+      { property: "og:description", content: "8 dimensions · 32 metrics · Personalised 90-day plan." },
       { property: "og:url", content: "/ai-readiness" },
     ],
     links: [{ rel: "canonical", href: "/ai-readiness" }],
@@ -20,12 +20,14 @@ export const Route = createFileRoute("/ai-readiness/")({
 });
 
 const PILLARS = [
-  { name: "HCM Data Foundation", weight: 15, blurb: "The cleanliness of employee records, hierarchy, positions, and self-service adoption." },
-  { name: "Identity, Permissions & Approvals", weight: 10, blurb: "SSO, RBAC, digital approvals, and segregation-of-duties." },
-  { name: "Integration & MCP-Readiness", weight: 10, blurb: "API access to ITSM, finance, comms, and your existing AI agent footprint." },
-  { name: "Governance, Audit & Compliance", weight: 8, blurb: "DPIA, decision-authority matrix, and a named AI governance owner." },
-  { name: "Workflow Digitisation", weight: 7, blurb: "Whether your top processes live in workflows, or in email and PDFs." },
-  { name: "Six Persona Agents", weight: 50, blurb: "Per-persona readiness for Employee, Manager, Recruiter, HRBP, Payroll, and Cross-System agents." },
+  { name: "Account Segmentation & Coverage", weight: 15, blurb: "Whether your book is intentionally tiered and whether coverage matches contract value, expansion potential, and risk." },
+  { name: "Health Score & Risk Signal Quality", weight: 10, blurb: "Whether your health score is a leading indicator, calibrated against actual churn, or theatre dressed up as a dashboard." },
+  { name: "Onboarding & Time-to-Value", weight: 15, blurb: "Whether the first 90 days run on a deterministic playbook with measured TTV, or on hand-waved goodwill." },
+  { name: "Stakeholder Mapping Discipline", weight: 10, blurb: "Whether you can name the four people who actually control renewal, or whether you only know the champion." },
+  { name: "Renewal & Expansion Forecasting", weight: 15, blurb: "Whether your 90/60/30-day forecast holds inside ±5% and whether CS owns expansion explicitly, not by influence." },
+  { name: "Escalation Playbook Maturity", weight: 10, blurb: "Whether a Sev 1/2 account triggers a sequenced, exec-tested protocol, or whether everyone improvises in Slack." },
+  { name: "QBR & Value Realisation Reporting", weight: 15, blurb: "Whether QBRs produce decisions and quantified ROI, or status slides with adoption screenshots." },
+  { name: "AI & Automation in the CS Motion", weight: 10, blurb: "Whether you have a sequenced AI roadmap with production use cases, or a Slack channel of vendor demos." },
 ];
 
 function AiReadinessLanding() {
@@ -35,13 +37,13 @@ function AiReadinessLanding() {
 
       <header className="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center animate-fade-up">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-medium">
-          8 Minutes · 11 Dimensions · 44 Metrics
+          6 Minutes · 8 Dimensions · 32 Metrics
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10">
-          Is your organisation ready for <span className="italic text-accent">agentic AI?</span>
+          Is your CS function <span className="italic text-accent">built to retain?</span>
         </h1>
         <p className="text-xl text-foreground/75 max-w-2xl mx-auto text-pretty mb-12">
-          The Super Agent Readiness Diagnostic scores your HR and CS organisation across 11 readiness dimensions, surfaces your top three gaps, and delivers a 90-day plan tailored to your tier.
+          The CS Operating Maturity Diagnostic scores your Customer Success organisation across 8 operating dimensions, surfaces your top three gaps, and delivers a 90-day plan tailored to your tier, from foundation to AI-native.
         </p>
         <Link
           to="/ai-readiness/survey"
@@ -64,7 +66,7 @@ function AiReadinessLanding() {
           {PILLARS.map((d, i) => (
             <div key={d.name} className="border-t border-border pt-6">
               <div className="flex justify-between items-baseline mb-3">
-                <span className="font-mono text-[11px] text-secondary-accent">Pillar {String(i + 1).padStart(2, "0")}</span>
+                <span className="font-mono text-[11px] text-secondary-accent">Dimension {String(i + 1).padStart(2, "0")}</span>
                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{d.weight} pts</span>
               </div>
               <h2 className="font-display text-3xl mb-3">{d.name}</h2>
@@ -78,9 +80,9 @@ function AiReadinessLanding() {
         <div className="max-w-3xl mx-auto px-6 text-center">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">External Research</div>
           <p className="font-display text-3xl md:text-4xl mb-10 leading-tight italic">
-            "Only 13% of organisations are truly AI-ready."
+            "The median SaaS company loses 13% of ARR to churn and downsell every year. Top-decile retention orgs lose less than 4%."
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-12">,  Cisco AI Readiness Index, 2025</p>
+          <p className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-12">, SaaS Capital Retention Benchmarks, 2024</p>
           <Link
             to="/ai-readiness/survey"
             className="inline-block px-10 py-5 bg-background text-foreground font-mono text-[11px] uppercase tracking-widest font-bold hover:bg-accent hover:text-accent-foreground transition-colors"
