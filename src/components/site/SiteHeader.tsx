@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 
 const sections = [
   { to: "/vanguard", label: "Vanguard" },
@@ -65,6 +66,8 @@ export function SiteHeader() {
           </div>
 
           <span aria-hidden className="hidden md:inline-block h-3 w-px bg-border/90" />
+
+          <ThemeToggle />
 
           {user ? (
             <DropdownMenu>
