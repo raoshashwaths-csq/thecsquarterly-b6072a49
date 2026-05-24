@@ -157,8 +157,8 @@ function PostPage() {
             <span>{new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
           </div>
           {hasBothTones && (
-            <div className="relative flex items-center gap-3">
-              <span className="sm:hidden font-mono text-[10px] normal-case tracking-normal text-muted-foreground">
+            <div className="relative flex items-center gap-2 shrink-0 leading-none">
+              <span className="sm:hidden font-mono text-[10px] normal-case tracking-normal text-muted-foreground whitespace-nowrap leading-none">
                 Switch tone →
               </span>
               <ToneToggle tone={tone} setTone={setTone} />
