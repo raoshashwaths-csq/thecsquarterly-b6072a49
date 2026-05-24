@@ -18,7 +18,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
       <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-baseline gap-1 group mr-8">
-          <span className="font-display text-xl tracking-tight leading-none">The CS Quarterly</span>
+          <span className="font-display tracking-tight leading-none text-2xl">The CS Quarterly</span>
           <span aria-hidden className="hidden sm:inline-block h-[6px] w-[6px] rounded-full bg-secondary-accent group-hover:bg-accent transition-colors" />
         </Link>
         <div className="flex items-center gap-4 font-mono text-[10px] font-semibold uppercase tracking-widest">
