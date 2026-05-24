@@ -162,7 +162,7 @@ function PostPage() {
               {showToneHint && (
                 <div
                   role="dialog"
-                  className="absolute right-0 top-full mt-3 z-30 w-72 bg-foreground text-background p-4 shadow-xl animate-fade-up"
+                  className="absolute right-0 top-full mt-3 z-30 w-[calc(100vw-3rem)] max-w-xs sm:w-72 bg-foreground text-background p-4 shadow-xl animate-fade-up"
                 >
                   <button
                     aria-label="Dismiss"
