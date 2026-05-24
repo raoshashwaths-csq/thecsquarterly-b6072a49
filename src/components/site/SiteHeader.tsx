@@ -41,11 +41,10 @@ export function SiteHeader() {
       <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
         <Link to="/" className="group leading-none shrink-0">
           <span className="font-display tracking-tight leading-none text-2xl">
-            The CS Quarterly
-            <span
+            The CS Quarterly<span
               aria-hidden
-              className="inline-block h-[7px] w-[7px] rounded-full bg-secondary-accent group-hover:bg-accent transition-colors ml-[1px] align-baseline translate-y-[1px]"
-            />
+              className="text-secondary-accent group-hover:text-accent transition-colors font-bold"
+            >.</span>
           </span>
         </Link>
 
