@@ -82,7 +82,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-6 md:px-8 pb-8">
         <Link to="/" className="block group" aria-label="The CS Quarterly home">
           <div className="font-display font-medium tracking-[-0.04em] leading-[0.85] text-background/95 select-none text-[18vw] md:text-[18vw] break-words">
-            CS Quarterly<span className="text-secondary-accent">.</span>
+            The CS Quarterly<span className="text-secondary-accent">.</span>
           </div>
         </Link>
       </div>
@@ -94,9 +94,6 @@ export function SiteFooter() {
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40">
               © {new Date().getFullYear()} The CS Quarterly
             </p>
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/30">
-              Est. 2026 · London / New York
-            </span>
           </div>
           <div className="flex items-center gap-6">
             <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Privacy</a>
