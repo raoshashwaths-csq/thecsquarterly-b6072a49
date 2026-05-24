@@ -94,9 +94,6 @@ export function SiteFooter() {
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40">
               © {new Date().getFullYear()} The CS Quarterly
             </p>
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/30">
-              Est. 2026 · London / New York
-            </span>
           </div>
           <div className="flex items-center gap-6">
             <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Privacy</a>
