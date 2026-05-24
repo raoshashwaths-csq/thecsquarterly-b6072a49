@@ -38,9 +38,9 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
-      <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-8">
-        <Link to="/" className="group leading-none shrink-0">
-          <span className="font-display tracking-tight leading-none text-2xl">
+      <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3 md:gap-8">
+        <Link to="/" className="group leading-none shrink min-w-0">
+          <span className="font-display tracking-tight leading-none text-lg md:text-2xl whitespace-nowrap truncate block">
             The CS Quarterly<span
               aria-hidden
               className="text-secondary-accent group-hover:text-accent transition-colors font-bold"
@@ -115,7 +115,7 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/login"
-              className="px-4 py-2 border border-foreground font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
+              className="shrink-0 whitespace-nowrap px-3 py-1.5 md:px-4 md:py-2 border border-foreground font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
             >
               Sign in
             </Link>

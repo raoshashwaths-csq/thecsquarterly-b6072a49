@@ -32,7 +32,7 @@ export function NewsletterInline({
 
   return (
     <form onSubmit={onSubmit} className="max-w-xl mx-auto w-full">
-      <div className="relative flex items-center border-b border-foreground/30 focus-within:border-foreground transition-colors py-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:border-b sm:border-foreground/30 sm:focus-within:border-foreground transition-colors sm:py-2 gap-3 sm:gap-0">
         <input
           type="email"
           required
@@ -40,12 +40,12 @@ export function NewsletterInline({
           onChange={(e) => setEmail(e.target.value)}
           placeholder={placeholder}
           disabled={status === "loading" || status === "ok"}
-          className="w-full bg-transparent outline-none py-2 text-lg placeholder:text-muted-foreground/50 disabled:opacity-60"
+          className="w-full bg-transparent outline-none py-2 text-base sm:text-lg placeholder:text-muted-foreground/50 disabled:opacity-60 border-b border-foreground/30 sm:border-b-0 focus:border-foreground sm:focus:border-b-0"
         />
         <button
           type="submit"
           disabled={status === "loading" || status === "ok"}
-          className="font-mono text-[11px] uppercase tracking-widest font-bold whitespace-nowrap pl-4 hover:text-accent disabled:opacity-50"
+          className="font-mono text-[11px] uppercase tracking-widest font-bold whitespace-nowrap sm:pl-4 hover:text-accent disabled:opacity-50 py-2 sm:py-0 border border-foreground sm:border-0 self-start sm:self-auto px-4 sm:px-0 hover:bg-foreground hover:text-background sm:hover:bg-transparent sm:hover:text-accent transition-colors"
         >
           {status === "loading" ? "Subscribing…" : status === "ok" ? "Subscribed" : cta}
         </button>

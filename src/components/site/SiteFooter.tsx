@@ -81,7 +81,7 @@ export function SiteFooter() {
       {/* Giant wordmark */}
       <div className="max-w-7xl mx-auto px-6 md:px-8 pb-8">
         <Link to="/" className="block group" aria-label="The CS Quarterly home">
-          <div className="font-display font-medium tracking-[-0.04em] leading-[0.85] text-background/95 select-none text-[22vw] md:text-[18vw]">
+          <div className="font-display font-medium tracking-[-0.04em] leading-[0.85] text-background/95 select-none text-[18vw] md:text-[18vw] break-words">
             CS Quarterly<span className="text-secondary-accent">.</span>
           </div>
         </Link>
