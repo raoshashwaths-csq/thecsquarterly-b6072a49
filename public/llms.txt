@@ -1,14 +1,14 @@
 # The CS Quarterly
 
-> A weekly dispatch and content hub for Customer Success leaders and mid-level managers. Curated essays on stakeholder management, escalation, negotiation, sales qualification, and AI deployment, plus the annual AI Readiness Survey for CS and HR leaders.
+> A weekly dispatch and content hub for Customer Success leaders and mid-level managers. Curated essays on stakeholder management, escalation, negotiation, sales qualification, and AI deployment, plus the CS Operating Maturity Diagnostic.
 
 The CS Quarterly publishes one essay per week aimed at VPs, Directors, and Senior CSMs at SaaS companies between $20M and $1B ARR. The audience is operators running revenue retention, not generalist marketing readers.
 
 ## Pages
 
-- [Home](/): The current dispatch, recent essays, and the AI Readiness Survey CTA.
+- [Home](/): The current dispatch, recent essays, and the diagnostic CTA.
 - [Insights](/insights): Filterable archive of all essays by category.
-- [AI Readiness Survey](/ai-readiness): A 12-question diagnostic for HR and CS leaders, scoring across Strategy, Data, Skills, and Culture.
+- [CS Operating Maturity Diagnostic](/ai-readiness): A 6-minute diagnostic across 8 dimensions and 32 metrics, scoring CS orgs from Block to AI Native.
 - [About](/about): Editorial mission and audience.
 - [Subscribe](/subscribe): Newsletter signup.
 
