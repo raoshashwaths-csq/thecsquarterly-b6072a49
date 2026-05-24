@@ -265,7 +265,7 @@ function DataTable<T extends Record<string, any>>({ rows, cols, empty }: {
   );
 }
 
-const fmtDate = (s?: string) => (s ? new Date(s).toLocaleDateString() : "—");
+const fmtDate = (s?: string | null) => (s ? new Date(s).toLocaleDateString() : "—");
 
 function SubscribersList() {
   const fn = useServerFn(listSubscribers);
