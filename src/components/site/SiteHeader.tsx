@@ -19,7 +19,7 @@ export function SiteHeader() {
       <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-baseline gap-1 group mr-8">
           <span className="font-display tracking-tight leading-none text-2xl">The CS Quarterly</span>
-          <span aria-hidden className="hidden sm:inline-block h-[6px] w-[6px] rounded-full bg-secondary-accent group-hover:bg-accent transition-colors" />
+          <span aria-hidden className="inline-block h-[7px] w-[7px] rounded-full bg-secondary-accent group-hover:bg-accent transition-colors translate-y-[1px]" />
         </Link>
         <div className="flex items-center gap-4 font-mono text-[10px] font-semibold uppercase tracking-widest">
           {sections.map((item, i) => (
