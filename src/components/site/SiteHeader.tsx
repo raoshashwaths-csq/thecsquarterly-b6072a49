@@ -67,6 +67,8 @@ export function SiteHeader() {
 
           <span aria-hidden className="hidden md:inline-block h-3 w-px bg-border/90" />
 
+          <ThemeToggle />
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
