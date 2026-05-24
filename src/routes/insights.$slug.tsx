@@ -162,7 +162,7 @@ function PostPage() {
               {showToneHint && (
                 <div
                   role="dialog"
-                  className="absolute right-0 top-full mt-3 z-30 w-[calc(100vw-3rem)] max-w-xs sm:w-72 bg-foreground text-background p-4 shadow-xl animate-fade-up"
+                  className="fixed left-4 right-4 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:w-72 top-auto bottom-4 sm:bottom-auto mt-0 sm:mt-3 z-50 bg-foreground text-background p-4 shadow-xl animate-fade-up"
                 >
                   <button
                     aria-label="Dismiss"
@@ -185,7 +185,7 @@ function PostPage() {
                   </button>
                   <span
                     aria-hidden
-                    className="absolute -top-1.5 right-6 h-3 w-3 rotate-45 bg-foreground"
+                    className="hidden sm:block absolute -top-1.5 right-6 h-3 w-3 rotate-45 bg-foreground"
                   />
                 </div>
               )}
