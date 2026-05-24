@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 
 const sections = [
   { to: "/vanguard", label: "Vanguard" },
