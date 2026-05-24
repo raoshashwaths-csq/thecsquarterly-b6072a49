@@ -109,16 +109,16 @@ function SurveyPage() {
               </div>
               <div className="grid sm:grid-cols-2 gap-7">
                 <Field label="Company *" value={company} onChange={setCompany} placeholder="Acme Inc." />
-                <Field label="Job title *" value={title} onChange={setTitle} placeholder="VP HR / CHRO / CIO" />
+                <Field label="Job title *" value={title} onChange={setTitle} placeholder="VP CS / CCO / Head of CS" />
               </div>
               <div className="grid sm:grid-cols-2 gap-7">
-                <SelectField label="Employee count *" value={segment} onChange={setSegment}>
+                <SelectField label="ARR band *" value={segment} onChange={setSegment}>
                   <option value="">Select range</option>
-                  <option value="growth">200 – 1,000 (Growth)</option>
-                  <option value="growth">1,001 – 3,000 (Growth)</option>
-                  <option value="enterprise">3,001 – 10,000 (Enterprise)</option>
-                  <option value="enterprise">10,001 – 25,000 (Enterprise)</option>
-                  <option value="enterprise">25,000+ (Enterprise)</option>
+                  <option value="growth">$20M – $50M ARR</option>
+                  <option value="growth">$50M – $100M ARR</option>
+                  <option value="enterprise">$100M – $300M ARR</option>
+                  <option value="enterprise">$300M – $1B ARR</option>
+                  <option value="enterprise">$1B+ ARR</option>
                 </SelectField>
                 <SelectField label="CS platform in use" value={hcm} onChange={setHcm}>
                   <option value="">Select status</option>
