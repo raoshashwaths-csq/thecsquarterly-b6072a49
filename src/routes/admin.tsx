@@ -364,16 +364,22 @@ function PostsAdmin() {
 
   const blank = () => setEditing({
     slug: "", title: "", subtitle: "", excerpt: "", body: "## Heading\n\nWrite here.",
+    title_mckinsey: "", body_mckinsey: "",
+    title_wodehouse: "", body_wodehouse: "",
     category: "Vanguard", section: "vanguard", author: "The Editors",
     read_minutes: 7, tier: "free", published: true, cover_image_url: "",
   });
 
   const submit = async () => {
     try {
-      const payload = { ...editing };
+      const payload: any = { ...editing };
       if (!payload.id) delete payload.id;
       if (!payload.cover_image_url) delete payload.cover_image_url;
       if (!payload.subtitle) delete payload.subtitle;
+      // Nullify empty tone variants so they don't render an empty toggle.
+      (["title_mckinsey","body_mckinsey","title_wodehouse","body_wodehouse"] as const).forEach((k) => {
+        if (!payload[k] || !String(payload[k]).trim()) payload[k] = null;
+      });
       await save({ data: payload });
       toast.success("Saved.");
       setEditing(null);
@@ -385,9 +391,9 @@ function PostsAdmin() {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-3xl">Articles</h2>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New article</button>
+        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-foreground/90 transition-colors">+ New article</button>
       </div>
-      <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
+      <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto bg-background">
         {(list.data ?? []).map((p) => (
           <div key={p.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
@@ -397,47 +403,168 @@ function PostsAdmin() {
               </div>
             </div>
             <div className="flex gap-2 shrink-0">
-              <button onClick={() => setEditing(p)} className="px-3 py-1 border border-border text-xs">Edit</button>
-              <button onClick={async () => { if (confirm("Delete?")) { await del({ data: { id: p.id } }); list.refetch(); } }} className="px-3 py-1 border border-destructive text-destructive text-xs">Delete</button>
+              <button onClick={() => setEditing(p)} className="px-3 py-1 border border-border text-xs hover:bg-muted/40 transition-colors">Edit</button>
+              <button onClick={async () => { if (confirm("Delete?")) { await del({ data: { id: p.id } }); list.refetch(); } }} className="px-3 py-1 border border-destructive text-destructive text-xs hover:bg-destructive/10 transition-colors">Delete</button>
             </div>
           </div>
         ))}
         {list.data?.length === 0 && <div className="p-6 text-sm text-muted-foreground">No articles yet.</div>}
       </div>
 
-      {editing && (
-        <div className="fixed inset-0 bg-foreground/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-background border border-border w-full max-w-2xl p-6 my-8">
-            <div className="font-display text-2xl mb-4">{editing.id ? "Edit article" : "New article"}</div>
-            <div className="grid gap-3 text-sm">
-              <input placeholder="Slug (lowercase-with-dashes)" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className="border border-border px-3 py-2" />
-              <input placeholder="Title" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="border border-border px-3 py-2" />
-              <input placeholder="Subtitle (distinct from title)" value={editing.subtitle ?? ""} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} className="border border-border px-3 py-2" />
-              <textarea placeholder="Excerpt (distinct from title & subtitle)" value={editing.excerpt} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={2} className="border border-border px-3 py-2" />
-              <textarea placeholder="Body (markdown lite: ## heading, - bullet). Follow 3 facts, 2 insights, 1 actionable." value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={12} className="border border-border px-3 py-2 font-mono text-xs" />
-              <div className="grid grid-cols-2 gap-3">
-                <input placeholder="Category" value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className="border border-border px-3 py-2" />
-                <select value={editing.section} onChange={(e) => setEditing({ ...editing, section: e.target.value })} className="border border-border px-3 py-2">
-                  {SECTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-                <input placeholder="Author" value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} className="border border-border px-3 py-2" />
-                <input type="number" min={1} max={120} value={editing.read_minutes} onChange={(e) => setEditing({ ...editing, read_minutes: parseInt(e.target.value) })} className="border border-border px-3 py-2" />
-                <select value={editing.tier} onChange={(e) => setEditing({ ...editing, tier: e.target.value })} className="border border-border px-3 py-2">
-                  <option value="free">Free</option><option value="premium">Premium</option>
-                </select>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={editing.published} onChange={(e) => setEditing({ ...editing, published: e.target.checked })} /> Published</label>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 mt-6">
-              <button onClick={() => setEditing(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
-              <button onClick={submit} className="px-4 py-2 bg-foreground text-background text-sm font-mono uppercase tracking-widest">Save</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {editing && <PostEditor editing={editing} setEditing={setEditing} onCancel={() => setEditing(null)} onSubmit={submit} />}
     </section>
   );
 }
+
+type Tone = "default" | "analytical" | "witty";
+
+function PostEditor({ editing, setEditing, onCancel, onSubmit }: {
+  editing: any; setEditing: (e: any) => void; onCancel: () => void; onSubmit: () => void;
+}) {
+  const [tone, setTone] = useState<Tone>("default");
+  const inputCls = "w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors";
+  const selectCls = `${inputCls} appearance-none cursor-pointer`;
+
+  return (
+    <div className="fixed inset-0 bg-foreground/70 z-50 flex items-start sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
+      <div className="bg-background border border-border w-full max-w-2xl my-0 sm:my-8 max-h-[100dvh] sm:max-h-[calc(100dvh-4rem)] flex flex-col shadow-2xl">
+        {/* Sticky header */}
+        <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border bg-background sticky top-0 z-10">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-1">
+              {editing.id ? "Editing" : "New article"}
+            </div>
+            <div className="font-display text-2xl leading-tight">
+              {editing.title || "Untitled"}
+            </div>
+          </div>
+          <button onClick={onCancel} aria-label="Close" className="text-muted-foreground hover:text-foreground text-2xl leading-none px-2">×</button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          {/* Tone tabs */}
+          <div className="inline-flex border border-border bg-background rounded-sm overflow-hidden text-xs font-mono uppercase tracking-widest">
+            {([
+              { k: "default", label: "Canonical" },
+              { k: "analytical", label: "Analytical" },
+              { k: "witty", label: "Witty" },
+            ] as { k: Tone; label: string }[]).map((t) => (
+              <button
+                key={t.k}
+                onClick={() => setTone(t.k)}
+                className={`px-3 py-1.5 transition-colors ${
+                  tone === t.k
+                    ? t.k === "witty"
+                      ? "bg-secondary-accent text-secondary-accent-foreground"
+                      : "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {tone === "default"
+              ? "The canonical version. Required."
+              : tone === "analytical"
+              ? "McKinsey-style structured analysis. Optional — leave blank to skip."
+              : "Wodehouse-style witty voice. Optional — leave blank to skip."}
+          </p>
+
+          {tone === "default" && (
+            <div className="grid gap-3 text-sm">
+              <Field label="Slug">
+                <input placeholder="lowercase-with-dashes" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Title">
+                <input placeholder="Headline" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Subtitle" hint="Distinct from the title.">
+                <input value={editing.subtitle ?? ""} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Excerpt" hint="Distinct from both title and subtitle.">
+                <textarea value={editing.excerpt} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={2} className={inputCls} />
+              </Field>
+              <Field label="Body" hint="Markdown lite (## heading, - bullet). Follow 3 facts, 2 insights, 1 actionable.">
+                <textarea value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={14} className={`${inputCls} font-mono text-xs leading-relaxed`} />
+              </Field>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <Field label="Category">
+                  <input value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className={inputCls} />
+                </Field>
+                <Field label="Section">
+                  <select value={editing.section} onChange={(e) => setEditing({ ...editing, section: e.target.value })} className={selectCls}>
+                    {SECTIONS.map((s) => <option key={s} value={s} className="bg-background text-foreground">{s}</option>)}
+                  </select>
+                </Field>
+                <Field label="Author">
+                  <input value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} className={inputCls} />
+                </Field>
+                <Field label="Read minutes">
+                  <input type="number" min={1} max={120} value={editing.read_minutes} onChange={(e) => setEditing({ ...editing, read_minutes: parseInt(e.target.value) || 1 })} className={inputCls} />
+                </Field>
+                <Field label="Tier">
+                  <select value={editing.tier} onChange={(e) => setEditing({ ...editing, tier: e.target.value })} className={selectCls}>
+                    <option value="free" className="bg-background text-foreground">Free</option>
+                    <option value="premium" className="bg-background text-foreground">Premium (Vanguard)</option>
+                  </select>
+                </Field>
+                <Field label="Status">
+                  <label className="flex items-center gap-2 border border-border px-3 py-2 cursor-pointer bg-background">
+                    <input type="checkbox" checked={editing.published} onChange={(e) => setEditing({ ...editing, published: e.target.checked })} className="accent-accent" />
+                    <span className="text-sm">Published</span>
+                  </label>
+                </Field>
+              </div>
+            </div>
+          )}
+
+          {tone === "analytical" && (
+            <div className="grid gap-3 text-sm">
+              <Field label="Analytical title" hint="Optional. Leave blank to skip the analytical voice for this piece.">
+                <input value={editing.title_mckinsey ?? ""} onChange={(e) => setEditing({ ...editing, title_mckinsey: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Analytical body" hint="Same 3-2-1 structure, McKinsey register.">
+                <textarea value={editing.body_mckinsey ?? ""} onChange={(e) => setEditing({ ...editing, body_mckinsey: e.target.value })} rows={20} className={`${inputCls} font-mono text-xs leading-relaxed`} />
+              </Field>
+            </div>
+          )}
+
+          {tone === "witty" && (
+            <div className="grid gap-3 text-sm">
+              <Field label="Witty title" hint="Optional. Leave blank to skip the witty voice for this piece.">
+                <input value={editing.title_wodehouse ?? ""} onChange={(e) => setEditing({ ...editing, title_wodehouse: e.target.value })} className={inputCls} />
+              </Field>
+              <Field label="Witty body" hint="Same 3-2-1 structure, Wodehouse register.">
+                <textarea value={editing.body_wodehouse ?? ""} onChange={(e) => setEditing({ ...editing, body_wodehouse: e.target.value })} rows={20} className={`${inputCls} font-mono text-xs leading-relaxed`} />
+              </Field>
+            </div>
+          )}
+        </div>
+
+        {/* Sticky footer */}
+        <div className="flex justify-end gap-2 px-6 py-4 border-t border-border bg-background sticky bottom-0 z-10">
+          <button onClick={onCancel} className="px-4 py-2 border border-border text-sm hover:bg-muted/40 transition-colors">Cancel</button>
+          <button onClick={onSubmit} className="px-4 py-2 bg-foreground text-background text-sm font-mono uppercase tracking-widest hover:bg-foreground/90 transition-colors">Save</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1.5">{label}</div>
+      {children}
+      {hint && <div className="text-[11px] text-muted-foreground mt-1.5 leading-snug">{hint}</div>}
+    </label>
+  );
+}
+
 
 function PlaybooksAdmin() {
   const fetchAll = useServerFn(listAllPlaybooksAdmin);
@@ -487,29 +614,64 @@ function PlaybooksAdmin() {
       </div>
 
       {editing && (
-        <div className="fixed inset-0 bg-foreground/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-background border border-border w-full max-w-2xl p-6 my-8">
-            <div className="font-display text-2xl mb-4">{editing.id ? "Edit playbook" : "New playbook"}</div>
-            <div className="grid gap-3 text-sm">
-              <input placeholder="Slug" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className="border border-border px-3 py-2" />
-              <input placeholder="Title" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="border border-border px-3 py-2" />
-              <textarea placeholder="Summary" value={editing.summary} onChange={(e) => setEditing({ ...editing, summary: e.target.value })} rows={2} className="border border-border px-3 py-2" />
-              <textarea placeholder="Body (markdown lite)" value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={10} className="border border-border px-3 py-2 font-mono text-xs" />
-              <div className="grid grid-cols-2 gap-3">
-                <input placeholder="Category" value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className="border border-border px-3 py-2" />
-                <input type="number" placeholder="Price (cents)" value={editing.price_cents} onChange={(e) => setEditing({ ...editing, price_cents: parseInt(e.target.value) })} className="border border-border px-3 py-2" />
-                <input type="number" placeholder="Pages" value={editing.pages} onChange={(e) => setEditing({ ...editing, pages: parseInt(e.target.value) })} className="border border-border px-3 py-2" />
-                <label className="flex items-center gap-2"><input type="checkbox" checked={editing.included_in_vanguard} onChange={(e) => setEditing({ ...editing, included_in_vanguard: e.target.checked })} /> In Vanguard</label>
-                <label className="flex items-center gap-2"><input type="checkbox" checked={editing.published} onChange={(e) => setEditing({ ...editing, published: e.target.checked })} /> Published</label>
+        <div className="fixed inset-0 bg-foreground/70 z-50 flex items-start sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
+          <div className="bg-background border border-border w-full max-w-2xl my-0 sm:my-8 max-h-[100dvh] sm:max-h-[calc(100dvh-4rem)] flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border bg-background sticky top-0 z-10">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-1">
+                  {editing.id ? "Editing playbook" : "New playbook"}
+                </div>
+                <div className="font-display text-2xl leading-tight">{editing.title || "Untitled"}</div>
+              </div>
+              <button onClick={() => setEditing(null)} aria-label="Close" className="text-muted-foreground hover:text-foreground text-2xl leading-none px-2">×</button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+              <div className="grid gap-3 text-sm">
+                <Field label="Slug">
+                  <input value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
+                </Field>
+                <Field label="Title">
+                  <input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
+                </Field>
+                <Field label="Summary">
+                  <textarea value={editing.summary} onChange={(e) => setEditing({ ...editing, summary: e.target.value })} rows={2} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
+                </Field>
+                <Field label="Body" hint="Markdown lite.">
+                  <textarea value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={14} className="w-full border border-border bg-background text-foreground px-3 py-2 font-mono text-xs leading-relaxed focus:outline-none focus:border-accent transition-colors" />
+                </Field>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <Field label="Category">
+                    <input value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
+                  </Field>
+                  <Field label="Price (cents)">
+                    <input type="number" value={editing.price_cents} onChange={(e) => setEditing({ ...editing, price_cents: parseInt(e.target.value) || 0 })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
+                  </Field>
+                  <Field label="Pages">
+                    <input type="number" value={editing.pages} onChange={(e) => setEditing({ ...editing, pages: parseInt(e.target.value) || 0 })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
+                  </Field>
+                  <Field label="Vanguard">
+                    <label className="flex items-center gap-2 border border-border px-3 py-2 cursor-pointer bg-background">
+                      <input type="checkbox" checked={editing.included_in_vanguard} onChange={(e) => setEditing({ ...editing, included_in_vanguard: e.target.checked })} className="accent-accent" />
+                      <span className="text-sm">Included in Vanguard</span>
+                    </label>
+                  </Field>
+                  <Field label="Status">
+                    <label className="flex items-center gap-2 border border-border px-3 py-2 cursor-pointer bg-background">
+                      <input type="checkbox" checked={editing.published} onChange={(e) => setEditing({ ...editing, published: e.target.checked })} className="accent-accent" />
+                      <span className="text-sm">Published</span>
+                    </label>
+                  </Field>
+                </div>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-6">
-              <button onClick={() => setEditing(null)} className="px-4 py-2 border border-border text-sm">Cancel</button>
-              <button onClick={submit} className="px-4 py-2 bg-foreground text-background text-sm font-mono uppercase tracking-widest">Save</button>
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-border bg-background sticky bottom-0 z-10">
+              <button onClick={() => setEditing(null)} className="px-4 py-2 border border-border text-sm hover:bg-muted/40 transition-colors">Cancel</button>
+              <button onClick={submit} className="px-4 py-2 bg-foreground text-background text-sm font-mono uppercase tracking-widest hover:bg-foreground/90 transition-colors">Save</button>
             </div>
           </div>
         </div>
       )}
+
     </section>
   );
 }

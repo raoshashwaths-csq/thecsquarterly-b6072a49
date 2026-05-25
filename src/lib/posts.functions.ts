@@ -77,6 +77,10 @@ const PostSchema = z.object({
   subtitle: z.string().trim().max(500).optional().nullable(),
   excerpt: z.string().trim().min(1).max(800),
   body: z.string().trim().min(1).max(120000),
+  title_mckinsey: z.string().trim().max(300).optional().nullable(),
+  body_mckinsey: z.string().trim().max(120000).optional().nullable(),
+  title_wodehouse: z.string().trim().max(300).optional().nullable(),
+  body_wodehouse: z.string().trim().max(120000).optional().nullable(),
   category: z.string().trim().min(1).max(80),
   section: z.enum(["vanguard", "retention-protocol", "outcome-forum", "codex"]),
   author: z.string().trim().min(1).max(120).default("The Editors"),
@@ -85,6 +89,7 @@ const PostSchema = z.object({
   published: z.boolean().default(true),
   cover_image_url: z.string().trim().max(500).optional().nullable(),
 });
+
 
 export const upsertPost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
