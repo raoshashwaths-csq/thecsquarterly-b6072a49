@@ -74,6 +74,22 @@ export const getPost = createServerFn({ method: "GET" })
     return (post ?? null) as Post | null;
   });
 
+export const listSeriesParts = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ series_slug: z.string().min(1).max(80) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    // Return ALL parts (including unpublished/future) — admin client bypasses RLS.
+    // The UI uses published_at + published flags to mark which are locked vs available.
+    const { data: rows, error } = await supabaseAdmin
+      .from("posts")
+      .select("slug, title, series_part, series_total, series_title, published, published_at, tier, is_premium")
+      .eq("series_slug", data.series_slug)
+      .order("series_part", { ascending: true });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
 // ----- Admin -----
 const PostSchema = z.object({
   id: z.string().uuid().optional(),
