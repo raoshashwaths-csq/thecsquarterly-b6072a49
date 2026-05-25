@@ -5,6 +5,7 @@ import { Glasses, Smile, X } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
+import { SeriesRail } from "@/components/site/SeriesRail";
 import { useAuth } from "@/hooks/useAuth";
 import { getPost } from "@/lib/posts.functions";
 
