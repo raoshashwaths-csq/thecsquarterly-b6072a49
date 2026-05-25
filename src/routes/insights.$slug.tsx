@@ -133,72 +133,122 @@ function PostPage() {
   if (!post) return null;
 
   const toneClass = tone === "wodehouse" ? "tone-witty" : "tone-analytic";
+  const isSeries = !!post.series_slug;
+  const sources = (post.sources ?? "")
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const articleInner = (
+    <article className={`animate-fade-up ${toneClass}`}>
+      {isSeries && (
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+          {post.series_title} · Part {post.series_part} of {post.series_total}
+        </div>
+      )}
+      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+        {post.category} · {post.read_minutes} min read
+      </div>
+      <h1
+        key={`title-${tone}`}
+        className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10 animate-tone-swap"
+      >
+        {title}
+      </h1>
+      <p className="text-2xl text-foreground/70 italic leading-snug mb-10 text-pretty">
+        {post.excerpt}
+      </p>
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-10 border-b border-border font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+        <div className="flex items-center gap-4">
+          <span>By {post.author}</span>
+          <span>·</span>
+          <span>{new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
+        </div>
+        {hasBothTones && (
+          <div className="relative flex items-center gap-2 shrink-0 leading-none">
+            <span className="sm:hidden font-mono text-[10px] normal-case tracking-normal text-muted-foreground whitespace-nowrap leading-none">
+              Switch tone →
+            </span>
+            <ToneToggle tone={tone} setTone={setTone} />
+            {showToneHint && (
+              <div
+                role="dialog"
+                className="hidden sm:block absolute right-0 top-full mt-3 z-30 w-72 bg-foreground text-background p-4 shadow-xl animate-fade-up"
+              >
+                <button
+                  aria-label="Dismiss"
+                  onClick={() => setShowToneHint(false)}
+                  className="absolute top-2 right-2 opacity-60 hover:opacity-100"
+                >
+                  <X size={14} />
+                </button>
+                <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-secondary-accent mb-2 font-semibold">
+                  <Glasses size={12} /> / <Smile size={12} /> Try the tone toggle
+                </div>
+                <p className="text-sm leading-snug text-background/85 normal-case tracking-normal font-body">
+                  Read every essay in two voices, analytical or witty. Subscribers get unlimited access to both.
+                </p>
+                <button
+                  onClick={() => setShowToneHint(false)}
+                  className="mt-3 font-mono text-[10px] uppercase tracking-widest text-secondary-accent hover:text-background"
+                >
+                  Got it →
+                </button>
+                <span
+                  aria-hidden
+                  className="absolute -top-1.5 right-6 h-3 w-3 rotate-45 bg-foreground"
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div key={`body-${tone}`} className="prose-content mt-12 animate-tone-swap">{renderMarkdownLite(body)}</div>
+
+      {sources.length > 0 && (
+        <section className="mt-20 pt-10 border-t border-border">
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-5">
+            Sources & further reading
+          </div>
+          <ol className="space-y-2 list-decimal pl-6 marker:text-secondary-accent marker:font-mono text-sm text-foreground/75">
+            {sources.map((src, i) => {
+              const m = src.match(/(https?:\/\/\S+)/);
+              if (m) {
+                const before = src.slice(0, m.index).replace(/[—\-:\s]+$/, "").trim();
+                return (
+                  <li key={i}>
+                    {before && <span>{before} — </span>}
+                    <a href={m[1]} target="_blank" rel="noreferrer noopener" className="underline underline-offset-2 hover:text-accent break-all">
+                      {m[1]}
+                    </a>
+                  </li>
+                );
+              }
+              return <li key={i}>{src}</li>;
+            })}
+          </ol>
+        </section>
+      )}
+    </article>
+  );
 
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <article className={`max-w-3xl mx-auto px-6 pt-20 pb-16 animate-fade-up ${toneClass}`}>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
-          {post.category} · {post.read_minutes} min read
+      {isSeries ? (
+        <div className="max-w-7xl w-full mx-auto px-6 pt-20 pb-16 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-x-16 gap-y-10">
+          <SeriesRail
+            seriesSlug={post.series_slug!}
+            seriesTitle={post.series_title ?? "Series"}
+            currentSlug={slug}
+          />
+          <div className="max-w-3xl">{articleInner}</div>
         </div>
-        <h1
-          key={`title-${tone}`}
-          className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10 animate-tone-swap"
-        >
-          {title}
-        </h1>
-        <p className="text-2xl text-foreground/70 italic leading-snug mb-10 text-pretty">
-          {post.excerpt}
-        </p>
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-10 border-b border-border font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <span>By {post.author}</span>
-            <span>·</span>
-            <span>{new Date(post.published_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
-          </div>
-          {hasBothTones && (
-            <div className="relative flex items-center gap-2 shrink-0 leading-none">
-              <span className="sm:hidden font-mono text-[10px] normal-case tracking-normal text-muted-foreground whitespace-nowrap leading-none">
-                Switch tone →
-              </span>
-              <ToneToggle tone={tone} setTone={setTone} />
-              {showToneHint && (
-                <div
-                  role="dialog"
-                  className="hidden sm:block absolute right-0 top-full mt-3 z-30 w-72 bg-foreground text-background p-4 shadow-xl animate-fade-up"
-                >
-                  <button
-                    aria-label="Dismiss"
-                    onClick={() => setShowToneHint(false)}
-                    className="absolute top-2 right-2 opacity-60 hover:opacity-100"
-                  >
-                    <X size={14} />
-                  </button>
-                  <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-secondary-accent mb-2 font-semibold">
-                    <Glasses size={12} /> / <Smile size={12} /> Try the tone toggle
-                  </div>
-                  <p className="text-sm leading-snug text-background/85 normal-case tracking-normal font-body">
-                    Read every essay in two voices, analytical or witty. Subscribers get unlimited access to both.
-                  </p>
-                  <button
-                    onClick={() => setShowToneHint(false)}
-                    className="mt-3 font-mono text-[10px] uppercase tracking-widest text-secondary-accent hover:text-background"
-                  >
-                    Got it →
-                  </button>
-                  <span
-                    aria-hidden
-                    className="absolute -top-1.5 right-6 h-3 w-3 rotate-45 bg-foreground"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div key={`body-${tone}`} className="prose-content mt-12 animate-tone-swap">{renderMarkdownLite(body)}</div>
-      </article>
+      ) : (
+        <div className="max-w-3xl mx-auto px-6 pt-20 pb-16">{articleInner}</div>
+      )}
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
