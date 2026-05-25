@@ -79,7 +79,12 @@ export type Database = {
           published_at: string
           read_minutes: number
           section: string
+          series_part: number | null
+          series_slug: string | null
+          series_title: string | null
+          series_total: number | null
           slug: string
+          sources: string | null
           subtitle: string | null
           tier: string
           title: string
@@ -102,7 +107,12 @@ export type Database = {
           published_at?: string
           read_minutes?: number
           section?: string
+          series_part?: number | null
+          series_slug?: string | null
+          series_title?: string | null
+          series_total?: number | null
           slug: string
+          sources?: string | null
           subtitle?: string | null
           tier?: string
           title: string
@@ -125,7 +135,12 @@ export type Database = {
           published_at?: string
           read_minutes?: number
           section?: string
+          series_part?: number | null
+          series_slug?: string | null
+          series_title?: string | null
+          series_total?: number | null
           slug?: string
+          sources?: string | null
           subtitle?: string | null
           tier?: string
           title?: string
