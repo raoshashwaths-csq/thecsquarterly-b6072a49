@@ -24,10 +24,15 @@ export type Post = {
   tier: string;
   published: boolean;
   published_at: string;
+  series_slug: string | null;
+  series_title: string | null;
+  series_part: number | null;
+  series_total: number | null;
+  sources: string | null;
 };
 
 const SELECT_COLS =
-  "id, slug, title, subtitle, excerpt, body, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse, category, section, author, read_minutes, hero_prompt, cover_image_url, is_premium, tier, published, published_at";
+  "id, slug, title, subtitle, excerpt, body, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse, category, section, author, read_minutes, hero_prompt, cover_image_url, is_premium, tier, published, published_at, series_slug, series_title, series_part, series_total, sources";
 
 
 export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
@@ -67,6 +72,22 @@ export const getPost = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     return (post ?? null) as Post | null;
+  });
+
+export const listSeriesParts = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ series_slug: z.string().min(1).max(80) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    // Return ALL parts (including unpublished/future) — admin client bypasses RLS.
+    // The UI uses published_at + published flags to mark which are locked vs available.
+    const { data: rows, error } = await supabaseAdmin
+      .from("posts")
+      .select("slug, title, series_part, series_total, series_title, published, published_at, tier, is_premium")
+      .eq("series_slug", data.series_slug)
+      .order("series_part", { ascending: true });
+    if (error) throw new Error(error.message);
+    return rows ?? [];
   });
 
 // ----- Admin -----
