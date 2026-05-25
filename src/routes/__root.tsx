@@ -81,17 +81,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Customer Success Hub is a website offering customer success news, insights, and skill-building resources for leaders and managers." },
       { property: "og:description", content: "Customer Success Hub is a website offering customer success news, insights, and skill-building resources for leaders and managers." },
       { name: "twitter:description", content: "Customer Success Hub is a website offering customer success news, insights, and skill-building resources for leaders and managers." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1d55390b-5bae-4a83-bfe6-bd917c3839ce/id-preview-cc1f29ab--c27c8cd5-f9e8-4a7e-ae58-891ca6953866.lovable.app-1779579388710.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1d55390b-5bae-4a83-bfe6-bd917c3839ce/id-preview-cc1f29ab--c27c8cd5-f9e8-4a7e-ae58-891ca6953866.lovable.app-1779579388710.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Lora:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap",
-      },
     ],
     scripts: [
       {
