@@ -24,10 +24,15 @@ export type Post = {
   tier: string;
   published: boolean;
   published_at: string;
+  series_slug: string | null;
+  series_title: string | null;
+  series_part: number | null;
+  series_total: number | null;
+  sources: string | null;
 };
 
 const SELECT_COLS =
-  "id, slug, title, subtitle, excerpt, body, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse, category, section, author, read_minutes, hero_prompt, cover_image_url, is_premium, tier, published, published_at";
+  "id, slug, title, subtitle, excerpt, body, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse, category, section, author, read_minutes, hero_prompt, cover_image_url, is_premium, tier, published, published_at, series_slug, series_title, series_part, series_total, sources";
 
 
 export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
