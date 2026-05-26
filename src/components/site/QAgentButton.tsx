@@ -55,8 +55,38 @@ export function QAgentButton() {
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
+  // Watch for sign-in transition (null → user). Trigger attention + hint.
+  useEffect(() => {
+    const prev = prevUserIdRef.current;
+    const current = user?.id ?? null;
+    prevUserIdRef.current = current;
+    if (!current || prev === current) return;
+    // prev was null and we now have a user → just signed in.
+    try {
+      const key = `${LOGIN_HINT_KEY}.${current}`;
+      if (localStorage.getItem(key) === "1") return;
+      localStorage.setItem(key, "1");
+    } catch {
+      // ignore
+    }
+    const inT = window.setTimeout(() => {
+      setAttention(true);
+      setHintLeaving(false);
+      setHint(true);
+    }, 800);
+    const leaveT = window.setTimeout(() => setHintLeaving(true), 800 + 5600);
+    const outT = window.setTimeout(() => setHint(false), 800 + 5600 + 320);
+    return () => {
+      window.clearTimeout(inT);
+      window.clearTimeout(leaveT);
+      window.clearTimeout(outT);
+    };
+  }, [user?.id]);
+
   const dismissAttention = () => {
     setAttention(false);
+    setHintLeaving(true);
+    window.setTimeout(() => setHint(false), 300);
     try {
       localStorage.setItem(SEEN_KEY, "1");
     } catch {
@@ -68,6 +98,7 @@ export function QAgentButton() {
     setOpen(true);
     dismissAttention();
   };
+
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
