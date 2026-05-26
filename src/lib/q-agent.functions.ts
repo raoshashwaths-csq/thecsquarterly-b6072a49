@@ -197,16 +197,52 @@ export const getQRun = createServerFn({ method: "GET" })
     return { runId: o.runId };
   })
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("q_runs")
-      .select("id, node_id, context, witty, zones, created_at")
+      .select("id, node_id, context, witty, zones, shared, user_id, created_at")
       .eq("id", data.runId)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!row) throw new Error("Run not found");
-    return row as {
+    return {
+      ...row,
+      isOwner: row.user_id === userId,
+    } as {
       id: string; node_id: string; context: Record<string, string>;
-      witty: boolean; zones: RunZones; created_at: string;
+      witty: boolean; zones: RunZones; shared: boolean;
+      user_id: string; isOwner: boolean; created_at: string;
     };
+  });
+
+export const listMyQRuns = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("q_runs")
+      .select("id, node_id, created_at, witty, shared")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (error) throw new Error(error.message);
+    return { runs: (data ?? []) as Array<{ id: string; node_id: string; created_at: string; witty: boolean; shared: boolean }> };
+  });
+
+export const setQRunShared = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => {
+    const o = input as { runId?: string; shared?: boolean };
+    if (!o.runId || typeof o.runId !== "string") throw new Error("runId required");
+    return { runId: o.runId, shared: Boolean(o.shared) };
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase
+      .from("q_runs")
+      .update({ shared: data.shared })
+      .eq("id", data.runId)
+      .eq("user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true, shared: data.shared };
   });
