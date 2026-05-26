@@ -3,6 +3,7 @@ import { useRouterState, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { askQ } from "@/lib/q-agent.functions";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Sheet,
   SheetContent,
@@ -14,10 +15,14 @@ import { Switch } from "@/components/ui/switch";
 
 const TRIAL_KEY = "q.trial.used";
 const SEEN_KEY = "q.attention.seen";
+const LOGIN_HINT_KEY = "q.hint.login";
+
 
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
   const [attention, setAttention] = useState(false);
+  const [hint, setHint] = useState(false);
+  const [hintLeaving, setHintLeaving] = useState(false);
   const [witty, setWitty] = useState(false);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
@@ -26,8 +31,13 @@ export function QAgentButton() {
   const ask = useServerFn(askQ);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { user } = useAuth();
+  const prevUserIdRef = useRef<string | null>(null);
 
-  // First-visit / login attention pulse (once per browser, until dismissed)
+  // Login-triggered hint: when the user transitions from signed-out → signed-in,
+  // pulse the button and float a one-line label next to it for ~6s. Once per
+  // logged-in user per browser (keyed by uid) so it never nags.
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -45,8 +55,38 @@ export function QAgentButton() {
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
+  // Watch for sign-in transition (null → user). Trigger attention + hint.
+  useEffect(() => {
+    const prev = prevUserIdRef.current;
+    const current = user?.id ?? null;
+    prevUserIdRef.current = current;
+    if (!current || prev === current) return;
+    // prev was null and we now have a user → just signed in.
+    try {
+      const key = `${LOGIN_HINT_KEY}.${current}`;
+      if (localStorage.getItem(key) === "1") return;
+      localStorage.setItem(key, "1");
+    } catch {
+      // ignore
+    }
+    const inT = window.setTimeout(() => {
+      setAttention(true);
+      setHintLeaving(false);
+      setHint(true);
+    }, 800);
+    const leaveT = window.setTimeout(() => setHintLeaving(true), 800 + 5600);
+    const outT = window.setTimeout(() => setHint(false), 800 + 5600 + 320);
+    return () => {
+      window.clearTimeout(inT);
+      window.clearTimeout(leaveT);
+      window.clearTimeout(outT);
+    };
+  }, [user?.id]);
+
   const dismissAttention = () => {
     setAttention(false);
+    setHintLeaving(true);
+    window.setTimeout(() => setHint(false), 300);
     try {
       localStorage.setItem(SEEN_KEY, "1");
     } catch {
@@ -58,6 +98,7 @@ export function QAgentButton() {
     setOpen(true);
     dismissAttention();
   };
+
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +142,32 @@ export function QAgentButton() {
         </span>
         <span className="sr-only">Ask Q</span>
       </button>
+
+      {hint && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-leaving={hintLeaving ? "true" : "false"}
+          onClick={dismissAttention}
+          className="q-hint fixed z-40 bottom-[6.25rem] right-[5.5rem] md:bottom-[8.25rem] md:right-[6.75rem] cursor-pointer select-none"
+          style={{ transform: "translateY(-50%)" }}
+        >
+          <div className="relative bg-foreground text-background px-3.5 py-2 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)]">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-background/70">
+              Meet Q
+            </div>
+            <div className="font-display text-sm leading-tight mt-0.5">
+              Your operator agent is ready<span className="text-accent">.</span>
+            </div>
+            {/* Tail pointing at the Q button */}
+            <span
+              aria-hidden
+              className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-foreground rotate-45"
+            />
+          </div>
+        </div>
+      )}
+
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
