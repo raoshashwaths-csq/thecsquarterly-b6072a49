@@ -123,26 +123,6 @@
   animation: tone-swap 0.45s var(--ease-out-expo) both;
 }
 
-/* Q agent — period bounce + attention call */
-@keyframes q-period-bounce {
-  0%, 70%, 100% { transform: translateY(0); }
-  82% { transform: translateY(-7px); }
-  90% { transform: translateY(-2px); }
-}
-.animate-q-period {
-  display: inline-block;
-  animation: q-period-bounce 2.4s var(--ease-out-expo) infinite;
-  transform-origin: center bottom;
-}
-@keyframes q-attention {
-  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 55%, transparent); }
-  70% { box-shadow: 0 0 0 18px color-mix(in oklab, var(--accent) 0%, transparent); }
-  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 0%, transparent); }
-}
-.animate-q-attention {
-  animation: q-attention 1.6s var(--ease-out-expo) 3;
-}
-
 /* ---------------------------------------------------------------
    Paper grain overlay (reversible)
    Enabled via `paper-grain` class on <body>. Remove that class in
