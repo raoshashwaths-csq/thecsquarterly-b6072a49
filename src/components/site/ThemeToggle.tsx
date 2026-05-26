@@ -9,30 +9,45 @@ function getInitialTheme(): "light" | "dark" {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-// Resolve the *next* theme's background by briefly flipping the root class.
-function getThemeBg(next: "light" | "dark"): string {
+// Resolve the *next* theme's --background as a computed rgb() string.
+// We briefly flip the dark class on <html>, paint a hidden probe with
+// background:var(--background), then read its computed backgroundColor —
+// which the browser normalizes to rgb()/rgba(), safe for SVG fill.
+function getThemeBgRgb(next: "light" | "dark"): string {
   const root = document.documentElement;
   const wasDark = root.classList.contains("dark");
   const shouldBeDark = next === "dark";
   if (wasDark !== shouldBeDark) root.classList.toggle("dark", shouldBeDark);
-  const bg = getComputedStyle(root).getPropertyValue("--background").trim();
+
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;background:var(--background)";
+  document.body.appendChild(probe);
+  const rgb = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+
   if (wasDark !== shouldBeDark) root.classList.toggle("dark", wasDark);
-  if (bg) return bg.startsWith("oklch") || bg.startsWith("#") || bg.startsWith("rgb") ? bg : `oklch(${bg})`;
-  return next === "dark" ? "#121212" : "#fbf9f6";
+  return rgb || (next === "dark" ? "rgb(18,18,18)" : "rgb(251,249,246)");
 }
 
-// Disable any global CSS transitions on color/background tokens during the
-// reveal so the underlying page doesn't cross-fade and fight the mask.
+// Inject a style tag that disables transitions on color/background tokens
+// during the reveal so the page doesn't cross-fade under the mask.
 function suppressGlobalTransitions(): () => void {
   const style = document.createElement("style");
   style.setAttribute("data-theme-suppress", "");
   style.textContent =
-    "*,*::before,*::after{transition:none!important;animation-duration:0s!important}";
+    "*,*::before,*::after{transition:none!important}";
   document.head.appendChild(style);
   return () => {
     requestAnimationFrame(() => style.remove());
   };
 }
+
+const EASE = (t: number) => {
+  // cubic-bezier(0.65, 0, 0.35, 1) approximated via the standard
+  // ease-in-out cubic formula. Matches the requested luxury feel.
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+};
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -76,16 +91,14 @@ export function ThemeToggle() {
     const vh = window.innerHeight;
     const dx = Math.max(cx, vw - cx);
     const dy = Math.max(cy, vh - cy);
-    // Pad for organic displacement spill.
-    const radius = Math.hypot(dx, dy) * 1.15 + 120;
-    const nextBg = getThemeBg(next);
+    // Pad to account for the displacement spill, so the mask fully covers
+    // the viewport even after the turbulence pushes the edge inward.
+    const radius = Math.hypot(dx, dy) * 1.25 + 200;
+    const nextBg = getThemeBgRgb(next);
 
-    // Stable, namespace-safe id per invocation.
     const fid = `csq-ink-${Math.random().toString(36).slice(2, 8)}`;
+    const seed = Math.floor(Math.random() * 1000);
 
-    // SVG overlay: a single filled circle with a turbulence + displacement
-    // filter so the expanding edge reads as an organic ink/fabric front,
-    // not a geometric ring. The whole svg is GPU-composited via will-change.
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("width", String(vw));
@@ -94,18 +107,21 @@ export function ThemeToggle() {
     svg.setAttribute("preserveAspectRatio", "none");
     svg.style.cssText = [
       "position:fixed",
-      "inset:0",
-      "z-index:9999",
+      "left:0",
+      "top:0",
+      "width:100vw",
+      "height:100vh",
+      "z-index:2147483647",
       "pointer-events:none",
-      "will-change:transform,opacity",
+      "will-change:transform",
       "contain:strict",
     ].join(";");
 
     svg.innerHTML = `
       <defs>
-        <filter id="${fid}" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="${Math.floor(Math.random() * 100)}" result="noise"/>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="140" xChannelSelector="R" yChannelSelector="G"/>
+        <filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves="2" seed="${seed}" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="180" xChannelSelector="R" yChannelSelector="G"/>
         </filter>
       </defs>
       <circle cx="${cx}" cy="${cy}" r="0" fill="${nextBg}" filter="url(#${fid})"></circle>
@@ -117,29 +133,34 @@ export function ThemeToggle() {
     const restoreTransitions = suppressGlobalTransitions();
     animatingRef.current = true;
 
-    const anim = circle.animate(
-      [{ r: "0" }, { r: String(radius) }],
-      {
-        duration: 350,
-        easing: "cubic-bezier(0.65, 0, 0.35, 1)",
-        fill: "forwards",
-      },
-    );
+    const duration = 350;
+    const start = performance.now();
+    let swapped = false;
 
-    // Apply the theme just before the mask fully covers the viewport so the
-    // swap happens under cover. With duration=350ms, swap at ~55% (when the
-    // ink front has already passed every pixel after displacement).
-    const swapAt = window.setTimeout(apply, 200);
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / duration);
+      const eased = EASE(t);
+      circle.setAttribute("r", String(eased * radius));
 
-    anim.onfinish = () => {
-      window.clearTimeout(swapAt);
-      // Ensure theme is applied (in case onfinish fires before the timeout).
-      document.documentElement.classList.toggle("dark", next === "dark");
-      setTheme(next);
-      svg.remove();
-      restoreTransitions();
-      animatingRef.current = false;
+      // Swap the actual theme once the ink front has clearly passed
+      // every pixel of the viewport. ~60% covers safely with displacement.
+      if (!swapped && t >= 0.6) {
+        swapped = true;
+        apply();
+      }
+
+      if (t < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        if (!swapped) apply();
+        svg.remove();
+        restoreTransitions();
+        animatingRef.current = false;
+      }
     };
+
+    requestAnimationFrame(tick);
   }
 
   return (
