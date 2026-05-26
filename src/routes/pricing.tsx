@@ -184,11 +184,12 @@ function PricingPage() {
         {/* Tier matrix */}
         <section className="max-w-7xl mx-auto px-6 pb-20">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {TIERS.map((t) => (
-              <div
+            {TIERS.map((t, i) => (
+              <Reveal
                 key={t.slug}
+                index={i}
                 className={
-                  "flex flex-col p-8 border " +
+                  "flex flex-col p-8 border card-lift " +
                   (t.emphasis
                     ? "border-2 border-accent bg-card relative"
                     : "border-border bg-card/60")
