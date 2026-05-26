@@ -36,14 +36,18 @@ function AgentFrameworkPage() {
   useEffect(() => {
     if (loading || !user) { setHasVanguard(user ? false : null); return; }
     (async () => {
-      const { data } = await supabase
-        .from("subscriptions")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .eq("tier", "vanguard")
-        .maybeSingle();
-      setHasVanguard(!!data);
+      const [{ data: roles }, { data: sub }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", user.id),
+        supabase
+          .from("subscriptions")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("status", "active")
+          .eq("tier", "vanguard")
+          .maybeSingle(),
+      ]);
+      const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+      setHasVanguard(isAdmin || !!sub);
     })();
   }, [user, loading]);
 

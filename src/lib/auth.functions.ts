@@ -23,7 +23,9 @@ export const getMe = createServerFn({ method: "GET" })
     ]);
 
     const isAdmin = (roles ?? []).some((r) => r.role === "admin");
-    const tier = (sub?.tier === "vanguard" && sub?.status === "active") ? "vanguard" : "free";
+    // Admins get every feature unlocked — treated as active Vanguard.
+    const tier: "free" | "vanguard" =
+      isAdmin || (sub?.tier === "vanguard" && sub?.status === "active") ? "vanguard" : "free";
 
     return {
       userId,
@@ -31,7 +33,7 @@ export const getMe = createServerFn({ method: "GET" })
       displayName: profile?.display_name ?? null,
       isAdmin,
       subscriptionTier: tier,
-      subscriptionStatus: sub?.status ?? "inactive",
+      subscriptionStatus: isAdmin ? "active" : (sub?.status ?? "inactive"),
     };
   });
 
