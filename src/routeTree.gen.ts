@@ -30,6 +30,7 @@ import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
+import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
@@ -136,6 +137,11 @@ const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
   path: '/agent/framework',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
+  id: '/agent/response/$runId',
+  path: '/agent/response/$runId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/agent/response/$runId': typeof AgentResponseRunIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/agent/response/$runId': typeof AgentResponseRunIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/agent/response/$runId': typeof AgentResponseRunIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/agent/response/$runId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/ai-readiness'
     | '/codex'
     | '/insights'
+    | '/agent/response/$runId'
   id:
     | '__root__'
     | '/'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/agent/response/$runId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -289,6 +301,7 @@ export interface RootRouteChildren {
   SubscribeRoute: typeof SubscribeRoute
   VanguardRoute: typeof VanguardRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
+  AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -440,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentFrameworkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agent/response/$runId': {
+      id: '/agent/response/$runId'
+      path: '/agent/response/$runId'
+      fullPath: '/agent/response/$runId'
+      preLoaderRoute: typeof AgentResponseRunIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -499,6 +519,7 @@ const rootRouteChildren: RootRouteChildren = {
   SubscribeRoute: SubscribeRoute,
   VanguardRoute: VanguardRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
+  AgentResponseRunIdRoute: AgentResponseRunIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
