@@ -212,6 +212,7 @@ export type Database = {
           created_at: string
           id: string
           node_id: string
+          shared: boolean
           user_id: string
           witty: boolean
           zones: Json
@@ -221,6 +222,7 @@ export type Database = {
           created_at?: string
           id?: string
           node_id: string
+          shared?: boolean
           user_id: string
           witty?: boolean
           zones: Json
@@ -230,6 +232,7 @@ export type Database = {
           created_at?: string
           id?: string
           node_id?: string
+          shared?: boolean
           user_id?: string
           witty?: boolean
           zones?: Json
