@@ -10,6 +10,7 @@ import {
 import { Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { QAgentButton } from "@/components/site/QAgentButton";
 
 import appCss from "../styles.css?url";
 
@@ -145,6 +146,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthInvalidator />
       <Outlet />
+      <QAgentButton />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
