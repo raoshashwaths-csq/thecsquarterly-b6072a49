@@ -42,13 +42,39 @@ export const Route = createFileRoute("/insights/$slug")({
 });
 
 function renderMarkdownLite(body: string) {
-  return body.split("\n\n").map((para, i) => {
-    const p = para.trim();
+  // Normalize: ensure heading lines are isolated by blank lines so they always
+  // parse as their own block (handles authors who omit blank lines around ##).
+  const normalized = body
+    .replace(/\r\n/g, "\n")
+    .replace(/([^\n])\n(#{1,6}[^#\n])/g, "$1\n\n$2")
+    .replace(/(^|\n)(#{1,6}[^\n]*?)\n(?!\n)/g, "$1$2\n\n");
+
+  return normalized.split(/\n{2,}/).map((para, i) => {
+    // Strip trailing hash decorations like "## Heading ##" and collapse stray spaces.
+    const p = para.trim().replace(/\s*#+\s*$/, "").trim();
     if (!p) return null;
-    if (p.startsWith("## ")) {
+
+    const h3 = p.match(/^###\s*(.+)$/);
+    if (h3) {
+      return (
+        <h3 key={i} className="font-display text-2xl md:text-3xl mt-12 mb-4 leading-tight tracking-tight">
+          {h3[1].trim()}
+        </h3>
+      );
+    }
+    const h2 = p.match(/^##\s*(.+)$/);
+    if (h2) {
       return (
         <h2 key={i} className="font-display text-3xl md:text-4xl mt-14 mb-6 leading-tight tracking-tight">
-          {p.replace(/^##\s+/, "")}
+          {h2[1].trim()}
+        </h2>
+      );
+    }
+    const h1 = p.match(/^#\s+(.+)$/);
+    if (h1) {
+      return (
+        <h2 key={i} className="font-display text-3xl md:text-4xl mt-14 mb-6 leading-tight tracking-tight">
+          {h1[1].trim()}
         </h2>
       );
     }
