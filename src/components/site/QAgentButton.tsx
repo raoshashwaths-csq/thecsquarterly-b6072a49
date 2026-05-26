@@ -260,7 +260,7 @@ export function QAgentButton() {
                 onClick={() => setOpen(false)}
                 className="block text-center mb-3 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
               >
-                Unlock unlimited Q. · Vanguard
+                Unlock unlimited <QMark periodClassName="text-accent-foreground/70" /> · Vanguard
               </Link>
             )}
 
