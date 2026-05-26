@@ -21,6 +21,8 @@ const LOGIN_HINT_KEY = "q.hint.login";
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
   const [attention, setAttention] = useState(false);
+  const [hint, setHint] = useState(false);
+  const [hintLeaving, setHintLeaving] = useState(false);
   const [witty, setWitty] = useState(false);
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
@@ -29,8 +31,13 @@ export function QAgentButton() {
   const ask = useServerFn(askQ);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const { user } = useAuth();
+  const prevUserIdRef = useRef<string | null>(null);
 
-  // First-visit / login attention pulse (once per browser, until dismissed)
+  // Login-triggered hint: when the user transitions from signed-out → signed-in,
+  // pulse the button and float a one-line label next to it for ~6s. Once per
+  // logged-in user per browser (keyed by uid) so it never nags.
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
