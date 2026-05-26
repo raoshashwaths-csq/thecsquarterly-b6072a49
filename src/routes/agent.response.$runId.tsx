@@ -6,6 +6,7 @@ import { getQRun, setQRunShared, type RunZones } from "@/lib/q-agent.functions";
 import { getNode, breadcrumbFor } from "@/lib/q-trees";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { QMark } from "@/components/site/QMark";
 import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/agent/response/$runId")({
@@ -86,7 +87,7 @@ function ResponsePage() {
 
           {!run && !error && (
             <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50 text-center mt-24">
-              Q is composing the response…
+              <QMark /> is composing the response…
             </div>
           )}
 
@@ -94,7 +95,7 @@ function ResponsePage() {
             <>
               <div className="mb-10">
                 <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
-                  Q Response · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
+                  <QMark periodClassName="text-foreground" /> Response · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
                 </div>
                 <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3 break-words">
                   {node?.label ?? "Decision"}<span className="text-accent">.</span>
