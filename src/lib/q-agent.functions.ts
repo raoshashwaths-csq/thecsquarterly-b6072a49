@@ -73,17 +73,34 @@ function buildUser(args: {
   ].join("\n\n");
 }
 
+function sanitize(s: string): string {
+  return s
+    // strip markdown bold/italic asterisks and underscores around words
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/\*(.+?)\*/g, "$1")
+    .replace(/__(.+?)__/g, "$1")
+    .replace(/_(?=\S)(.+?)(?<=\S)_/g, "$1")
+    // strip leading markdown headings
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "")
+    // strip backticks
+    .replace(/`+/g, "")
+    // collapse runs of 3+ dashes/equals (markdown HR)
+    .replace(/^[-=]{3,}\s*$/gm, "")
+    // tidy excess blank lines
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 function parseZones(raw: string): RunZones {
   const parts = raw.split(/^-{2,}\s*ZONE\s*-{2,}\s*$/im).map((s) => s.trim()).filter(Boolean);
-  const strip = (s: string) => s.replace(/^(zone\s*\d+\s*[—\-:·]?\s*)?(diagnosis|playbook|executable)\s*[:\-—]?\s*/i, "").trim();
+  const strip = (s: string) => sanitize(s.replace(/^(zone\s*\d+\s*[—\-:·]?\s*)?(diagnosis|playbook|executable)\s*[:\-—]?\s*/i, "").trim());
   if (parts.length >= 3) {
     return { diagnosis: strip(parts[0]), playbook: strip(parts[1]), executable: strip(parts[2]) };
   }
-  // Fallback — model didn't follow markers. Surface raw under diagnosis.
   return {
-    diagnosis: raw.trim(),
-    playbook: "_(Q did not return a structured playbook. Use Run again.)_",
-    executable: "_(No executable artifact returned.)_",
+    diagnosis: sanitize(raw),
+    playbook: "(Q did not return a structured playbook. Use Run again.)",
+    executable: "(No executable artifact returned.)",
   };
 }
 
