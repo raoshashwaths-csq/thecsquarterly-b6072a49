@@ -15,6 +15,7 @@ import { Route as RetentionProtocolRouteImport } from './routes/retention-protoc
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as JobBoardRouteImport } from './routes/job-board'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as CodexRouteImport } from './routes/codex'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
@@ -57,6 +58,11 @@ const OutcomeForumRoute = OutcomeForumRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobBoardRoute = JobBoardRouteImport.update({
+  id: '/job-board',
+  path: '/job-board',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsRoute = InsightsRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
+  '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRoute
+  '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
+  '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/ai-readiness'
     | '/codex'
     | '/insights'
+    | '/job-board'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/admin'
+    | '/job-board'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/ai-readiness'
     | '/codex'
     | '/insights'
+    | '/job-board'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
   CodexRoute: typeof CodexRouteWithChildren
   InsightsRoute: typeof InsightsRouteWithChildren
+  JobBoardRoute: typeof JobBoardRoute
   LoginRoute: typeof LoginRoute
   OutcomeForumRoute: typeof OutcomeForumRoute
   PricingRoute: typeof PricingRoute
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/job-board': {
+      id: '/job-board'
+      path: '/job-board'
+      fullPath: '/job-board'
+      preLoaderRoute: typeof JobBoardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/insights': {
@@ -451,6 +471,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiReadinessRoute: AiReadinessRouteWithChildren,
   CodexRoute: CodexRouteWithChildren,
   InsightsRoute: InsightsRouteWithChildren,
+  JobBoardRoute: JobBoardRoute,
   LoginRoute: LoginRoute,
   OutcomeForumRoute: OutcomeForumRoute,
   PricingRoute: PricingRoute,
