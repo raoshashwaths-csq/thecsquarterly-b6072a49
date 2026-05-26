@@ -77,7 +77,7 @@ export function LanguageSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Choose language edition"
-        className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 border border-transparent hover:border-border hover:text-accent transition-colors text-[10px] font-semibold uppercase tracking-widest"
+        className="inline-flex items-center gap-1.5 px-2 py-1 border border-transparent hover:border-border hover:text-accent transition-colors text-[10px] font-semibold uppercase tracking-widest"
       >
         <Globe size={13} aria-hidden />
         <span className="leading-none">{active.code.toUpperCase()}</span>
