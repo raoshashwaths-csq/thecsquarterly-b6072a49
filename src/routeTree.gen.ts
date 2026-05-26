@@ -31,6 +31,7 @@ import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
@@ -142,6 +143,12 @@ const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
   path: '/agent/response/$runId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/insights/'
     | '/agent/response/$runId'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -259,6 +270,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/insights'
     | '/agent/response/$runId'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -283,6 +295,7 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/insights/'
     | '/agent/response/$runId'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -302,6 +315,7 @@ export interface RootRouteChildren {
   VanguardRoute: typeof VanguardRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -460,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentResponseRunIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -520,6 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   VanguardRoute: VanguardRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   AgentResponseRunIdRoute: AgentResponseRunIdRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
