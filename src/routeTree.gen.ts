@@ -29,6 +29,8 @@ import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.inde
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
+import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
+import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
@@ -130,6 +132,16 @@ const AiReadinessSurveyRoute = AiReadinessSurveyRouteImport.update({
   path: '/survey',
   getParentRoute: () => AiReadinessRoute,
 } as any)
+const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
+  id: '/agent/framework',
+  path: '/agent/framework',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
+  id: '/agent/response/$runId',
+  path: '/agent/response/$runId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -146,12 +158,14 @@ export interface FileRoutesByFullPath {
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/agent/response/$runId': typeof AgentResponseRunIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,12 +179,14 @@ export interface FileRoutesByTo {
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/agent/response/$runId': typeof AgentResponseRunIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -188,12 +204,14 @@ export interface FileRoutesById {
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/agent/response/$runId': typeof AgentResponseRunIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -212,12 +230,14 @@ export interface FileRouteTypes {
     | '/retention-protocol'
     | '/subscribe'
     | '/vanguard'
+    | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
     | '/insights/$slug'
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/agent/response/$runId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -231,12 +251,14 @@ export interface FileRouteTypes {
     | '/retention-protocol'
     | '/subscribe'
     | '/vanguard'
+    | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
     | '/insights/$slug'
     | '/ai-readiness'
     | '/codex'
     | '/insights'
+    | '/agent/response/$runId'
   id:
     | '__root__'
     | '/'
@@ -253,12 +275,14 @@ export interface FileRouteTypes {
     | '/retention-protocol'
     | '/subscribe'
     | '/vanguard'
+    | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
     | '/insights/$slug'
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/agent/response/$runId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -276,6 +300,8 @@ export interface RootRouteChildren {
   RetentionProtocolRoute: typeof RetentionProtocolRoute
   SubscribeRoute: typeof SubscribeRoute
   VanguardRoute: typeof VanguardRoute
+  AgentFrameworkRoute: typeof AgentFrameworkRoute
+  AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -420,6 +446,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiReadinessSurveyRouteImport
       parentRoute: typeof AiReadinessRoute
     }
+    '/agent/framework': {
+      id: '/agent/framework'
+      path: '/agent/framework'
+      fullPath: '/agent/framework'
+      preLoaderRoute: typeof AgentFrameworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agent/response/$runId': {
+      id: '/agent/response/$runId'
+      path: '/agent/response/$runId'
+      fullPath: '/agent/response/$runId'
+      preLoaderRoute: typeof AgentResponseRunIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -478,6 +518,8 @@ const rootRouteChildren: RootRouteChildren = {
   RetentionProtocolRoute: RetentionProtocolRoute,
   SubscribeRoute: SubscribeRoute,
   VanguardRoute: VanguardRoute,
+  AgentFrameworkRoute: AgentFrameworkRoute,
+  AgentResponseRunIdRoute: AgentResponseRunIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
