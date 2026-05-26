@@ -73,6 +73,11 @@ All four powered by `SectionPage.tsx` + `listPostsBySection`.
 
 **Approved, not yet built:** `/jobs` (CS job board, affiliate-monetized), `/community` ("The Guild Hall"), `/salary-benchmarks`, `/sponsorship`, `/playbooks` (index), `/events`.
 
+**Deferred checklist:**
+- `/job-board` will live on a separate domain. Keep the marketing surface on this site minimal (single nav entry + redirect). Build recruiter auth, recruiter dashboard, and posting flow on the separate domain — not on this app.
+- Guild Hall + full Job Board buildout: revisit after 500–1000 users.
+- Multilingual rollout: SEA (id, ms, vi, th, tl) + MENA (ar, fa, he, tr). Language switcher is wired in the header; translation pipeline + RTL layout pass still to ship.
+
 Each route has its own `head()` with unique title, description, og:title, og:description. og:image only on leaf routes (dynamic for `$slug` from loader data).
 
 ---

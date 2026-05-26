@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -109,10 +109,10 @@ const TIERS: Tier[] = [
     name: "Team Growth",
     price: "$999",
     cadence: "/ month",
-    blurb: "Scaled CS orgs with branded benchmarks and hiring leverage.",
+    blurb: "Scaled CS orgs with shared benchmarks and hiring leverage.",
     highlights: [
       "Everything in Team Starter",
-      "White-labeled Quarterly Benchmark PDFs",
+      "Quarterly Benchmark PDFs (NRR, Payback, GRR)",
       "3 active Featured job listings / year",
       "Team analytics dashboard",
     ],
@@ -127,10 +127,10 @@ const TIERS: Tier[] = [
     cadence: "/ month",
     blurb: "A direct line to the editorial team and a dedicated channel.",
     highlights: [
-      "Live quarterly briefing call with editorial",
       "Custom onboarding modules",
       "Dedicated Slack channel",
       "Custom RAG corpus extensions",
+      "Priority editorial response window",
     ],
     seats: "Up to 50 seats",
     sessions: "5,000 pooled Q sessions / month",
@@ -247,28 +247,6 @@ function PricingPage() {
           </div>
         </section>
 
-        {/* Hiring CTA */}
-        <section className="max-w-6xl mx-auto px-6 pb-24">
-          <div className="border border-border bg-card p-10 md:p-12 flex flex-col md:flex-row items-start md:items-center gap-8">
-            <div className="flex-1">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-secondary-accent mb-3">
-                For employers
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl leading-tight mb-3">
-                Hiring CS operators? <span className="italic">Post on the Quarterly.</span>
-              </h2>
-              <p className="text-sm text-foreground/70 max-w-prose">
-                Listings ship inside the Tuesday dispatch and the standalone job board. Standard postings from $299, Executive Search at $1,500 flat.
-              </p>
-            </div>
-            <Link
-              to="/job-board"
-              className="shrink-0 px-6 py-3.5 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
-            >
-              See recruiter options
-            </Link>
-          </div>
-        </section>
       </main>
       <SiteFooter />
     </div>
