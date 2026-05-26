@@ -11,6 +11,7 @@ const SECTIONS = [
 const RESOURCES = [
   { label: "AI Readiness Diagnostic", path: "/ai-readiness" },
   { label: "Pricing", path: "/pricing" },
+  { label: "Job Board", path: "/job-board" },
   { label: "Subscribe", path: "/subscribe" },
   { label: "Account", path: "/account" },
 ] as const;
