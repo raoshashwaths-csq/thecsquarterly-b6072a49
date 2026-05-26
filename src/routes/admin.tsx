@@ -117,7 +117,7 @@ function AdminPage() {
                               }`}
                             >
                               <Icon className="h-4 w-4 shrink-0" />
-                              <span className="flex-1 truncate">{item.label}</span>
+                              <span className="flex-1 truncate">{item.key === "q-agent" ? <><QMark /> Operator Agent</> : item.label}</span>
                               {item.soon && (
                                 <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground border border-border px-1.5 py-0.5">
                                   Soon
@@ -141,6 +141,7 @@ function AdminPage() {
               {active === "subscriptions" && <SubscriptionsList />}
               {active === "purchases" && <PurchasesList />}
               {active === "diagnostic" && <DiagnosticList />}
+              {active === "q-agent" && <QAgentAdmin />}
               {active === "conversations" && <ComingSoon
                 title="1:1 Conversations with Leaders"
                 blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."
