@@ -109,17 +109,22 @@ export const runQNode = createServerFn({ method: "POST" })
       throw new Error("Invalid decision node");
     }
 
-    // Vanguard gate — active subscription with tier='vanguard'
+    // Vanguard gate — active subscription with tier='vanguard', admins bypass.
     const { supabase, userId } = context;
-    const { data: sub } = await supabase
-      .from("subscriptions")
-      .select("status, tier")
-      .eq("user_id", userId)
-      .eq("status", "active")
-      .eq("tier", "vanguard")
-      .maybeSingle();
-    if (!sub) {
-      throw new Error("VANGUARD_REQUIRED");
+    const { data: roles } = await supabase
+      .from("user_roles").select("role").eq("user_id", userId);
+    const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+    if (!isAdmin) {
+      const { data: sub } = await supabase
+        .from("subscriptions")
+        .select("status, tier")
+        .eq("user_id", userId)
+        .eq("status", "active")
+        .eq("tier", "vanguard")
+        .maybeSingle();
+      if (!sub) {
+        throw new Error("VANGUARD_REQUIRED");
+      }
     }
 
     const breadcrumb = breadcrumbFor(node.id);
