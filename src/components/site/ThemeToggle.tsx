@@ -9,19 +9,21 @@ function getInitialTheme(): "light" | "dark" {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-// Read the resolved background color of the given theme by toggling the class
-// on a hidden probe element, so the reveal overlay matches the real palette.
+// Read the resolved background color of the *next* theme by briefly toggling the
+// dark class on <html>, sampling, then reverting. CSS vars are defined on :root,
+// so a hidden probe with a class won't work — we must flip the real root.
 function getThemeBg(next: "light" | "dark"): string {
-  const probe = document.createElement("div");
-  probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;";
-  probe.className = next === "dark" ? "dark" : "";
-  // Inherit the bg token from the next theme.
-  probe.style.background = "var(--background)";
-  document.body.appendChild(probe);
-  const bg = getComputedStyle(probe).backgroundColor;
-  document.body.removeChild(probe);
-  return bg || (next === "dark" ? "#121212" : "#fbf9f6");
+  const root = document.documentElement;
+  const wasDark = root.classList.contains("dark");
+  const shouldBeDark = next === "dark";
+  if (wasDark !== shouldBeDark) root.classList.toggle("dark", shouldBeDark);
+  const bg = getComputedStyle(root).getPropertyValue("--background").trim();
+  if (wasDark !== shouldBeDark) root.classList.toggle("dark", wasDark);
+  // --background is a raw oklch(...) string. Wrap it back into a valid color.
+  if (bg) return bg.startsWith("oklch") || bg.startsWith("#") || bg.startsWith("rgb") ? bg : `oklch(${bg})`;
+  return next === "dark" ? "#121212" : "#fbf9f6";
 }
+
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
