@@ -60,7 +60,7 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex items-center gap-6 font-mono text-[10px] font-semibold uppercase tracking-widest">
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-6">
             {sections.map((item, i) => (
               <div key={item.to} className="flex items-center gap-6">
                 {i > 0 && <span aria-hidden className="h-3 w-px bg-border" />}
@@ -75,7 +75,7 @@ export function SiteHeader() {
             ))}
           </div>
 
-          <span aria-hidden className="hidden md:inline-block h-3 w-px bg-border/90" />
+          <span aria-hidden className="hidden lg:inline-block h-3 w-px bg-border/90" />
 
           <LanguageSwitcher />
           <ThemeToggle />

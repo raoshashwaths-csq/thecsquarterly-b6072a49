@@ -546,10 +546,12 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
 
           <div className="flex items-center justify-between mb-6 pt-4 border-t border-border">
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">Witty mode</div>
-              <div className="text-xs text-foreground/55 mt-0.5">{witty ? "Wodehouse register" : "McKinsey register"}</div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">Voice</div>
+              <div className="text-xs text-foreground/55 mt-0.5">
+                {witty ? "Wodehouse — witty" : "McKinsey — analytical"}
+              </div>
             </div>
-            <Switch checked={witty} onCheckedChange={setWitty} aria-label="Toggle witty mode" />
+            <Switch checked={witty} onCheckedChange={setWitty} aria-label="Toggle witty voice" />
           </div>
 
           <button
