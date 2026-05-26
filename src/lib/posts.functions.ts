@@ -129,7 +129,7 @@ export const upsertPost = createServerFn({ method: "POST" })
     const { published_at, ...rest } = data;
     const payload: Record<string, unknown> = { ...rest, is_premium: data.tier === "premium" };
     if (published_at && published_at.trim()) payload.published_at = published_at;
-    const { error } = await supabaseAdmin.from("posts").upsert(payload, { onConflict: "slug" });
+    const { error } = await supabaseAdmin.from("posts").upsert(payload as never, { onConflict: "slug" });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
