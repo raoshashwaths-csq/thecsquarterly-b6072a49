@@ -178,11 +178,19 @@ export function QAgentButton() {
               <Link
                 to="/pricing"
                 onClick={() => setOpen(false)}
-                className="block text-center mb-6 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
+                className="block text-center mb-3 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
               >
                 Unlock unlimited Q · Vanguard
               </Link>
             )}
+
+            <Link
+              to="/agent/framework"
+              onClick={() => setOpen(false)}
+              className="block text-center mb-6 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+            >
+              Open the Canvas →
+            </Link>
 
             <div className="border-t border-border pt-5">
               <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-4">
