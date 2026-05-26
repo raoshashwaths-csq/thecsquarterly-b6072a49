@@ -9,6 +9,9 @@ import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { runQNode } from "@/lib/q-agent.functions";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   TREES, NODES, nodesForTree, getNode, breadcrumbFor, type TreeId, type TreeNode,
 } from "@/lib/q-trees";
@@ -30,7 +33,6 @@ function AgentFrameworkPage() {
   const { user, loading } = useAuth();
   const [hasVanguard, setHasVanguard] = useState<boolean | null>(null);
   const [activeTree, setActiveTree] = useState<TreeId>("T1");
-  const [openL2, setOpenL2] = useState<string | null>(null);
   const [runTerminal, setRunTerminal] = useState<TreeNode | null>(null);
 
   useEffect(() => {
@@ -58,70 +60,76 @@ function AgentFrameworkPage() {
 
   const treeNodes = nodesForTree(activeTree);
   const tree = TREES.find((t) => t.id === activeTree)!;
+  const terminals = treeNodes.filter((n) => n.level === 3);
 
   return (
     <CanvasShell>
-      <div className="mb-10">
+      <header className="mb-12 animate-fade-up">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
           Operator Canvas · Q.
         </div>
         <h1 className="font-display text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance max-w-3xl">
-          What decision are you running today?
+          What decision are you running today<span className="text-accent">?</span>
         </h1>
         <p className="font-body text-base text-foreground/70 mt-4 max-w-2xl">
           Pick a tree. Walk the path. Q returns a 3-zone response: diagnosis, playbook, executable.
         </p>
-      </div>
+      </header>
 
       {/* Tree picker rail */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-        {TREES.map((t) => {
-          const active = t.id === activeTree;
-          return (
-            <button
-              key={t.id}
-              onClick={() => { setActiveTree(t.id); setOpenL2(null); }}
-              className={`text-left p-4 border transition-colors ${
-                active
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border hover:border-foreground"
-              }`}
-            >
-              <div className={`font-mono text-[9px] uppercase tracking-[0.25em] mb-1.5 ${active ? "text-background/70" : "text-accent"}`}>
-                {t.eyebrow}
-              </div>
-              <div className="font-display text-base leading-tight">{t.title}</div>
-            </button>
-          );
-        })}
-      </div>
+      <RevealBlock>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-14">
+          {TREES.map((t) => {
+            const active = t.id === activeTree;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActiveTree(t.id)}
+                className={`text-left p-4 border transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:-translate-y-0.5 ${
+                  active
+                    ? "border-foreground bg-foreground text-background shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]"
+                    : "border-border hover:border-foreground"
+                }`}
+              >
+                <div className={`font-mono text-[9px] uppercase tracking-[0.25em] mb-1.5 ${active ? "text-background/70" : "text-accent"}`}>
+                  {t.eyebrow}
+                </div>
+                <div className="font-display text-base leading-tight">{t.title}</div>
+              </button>
+            );
+          })}
+        </div>
+      </RevealBlock>
 
       {/* Selected tree header */}
-      <div className="border-t border-border pt-6 mb-6">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-2">
-          {tree.eyebrow}
+      <RevealBlock>
+        <div className="border-t border-border pt-6 mb-10">
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-2">
+            {tree.eyebrow}
+          </div>
+          <h2 className="font-display text-3xl md:text-4xl leading-tight">{tree.title}</h2>
+          <p className="font-body text-sm text-foreground/65 mt-2 max-w-2xl">{tree.blurb}</p>
         </div>
-        <h2 className="font-display text-3xl md:text-4xl leading-tight">{tree.title}</h2>
-        <p className="font-body text-sm text-foreground/65 mt-2 max-w-2xl">{tree.blurb}</p>
-      </div>
+      </RevealBlock>
 
-      {/* Desktop: SVG canvas. Mobile: accordion. */}
-      <div className="hidden md:block">
-        <TreeCanvas
-          nodes={treeNodes}
-          openL2={openL2}
-          onOpenL2={setOpenL2}
-          onTerminal={setRunTerminal}
-        />
-      </div>
-      <div className="md:hidden">
-        <TreeAccordion
-          nodes={treeNodes}
-          openL2={openL2}
-          onOpenL2={setOpenL2}
-          onTerminal={setRunTerminal}
-        />
-      </div>
+      {/* Desktop: circular wheel. Mobile: stacked cards. */}
+      <RevealBlock>
+        <div className="hidden md:block">
+          <TreeWheel
+            key={activeTree}
+            tree={tree}
+            terminals={terminals}
+            onTerminal={setRunTerminal}
+          />
+        </div>
+        <div className="md:hidden">
+          <TreeStack
+            tree={tree}
+            terminals={terminals}
+            onTerminal={setRunTerminal}
+          />
+        </div>
+      </RevealBlock>
 
       <RunDrawer node={runTerminal} onClose={() => setRunTerminal(null)} />
     </CanvasShell>
@@ -130,10 +138,19 @@ function AgentFrameworkPage() {
 
 function CanvasShell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-screen pt-32 pb-32">
-      <div className="container max-w-6xl mx-auto px-6 md:px-10">{children}</div>
-    </main>
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <main className="flex-1 pt-28 md:pt-32 pb-24">
+        <div className="container max-w-6xl mx-auto px-6 md:px-10">{children}</div>
+      </main>
+      <SiteFooter />
+    </div>
   );
+}
+
+function RevealBlock({ children, index = 0 }: { children: React.ReactNode; index?: number }) {
+  const ref = useScrollReveal<HTMLDivElement>(index);
+  return <div ref={ref} className="reveal-up">{children}</div>;
 }
 
 function Centered({ children }: { children: React.ReactNode }) {
@@ -142,7 +159,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 
 function GateCard({ kind }: { kind: "signin" | "vanguard" }) {
   return (
-    <div className="max-w-xl mx-auto border border-border p-10 md:p-14 mt-20">
+    <div className="max-w-xl mx-auto border border-border p-10 md:p-14 mt-12 animate-fade-up">
       <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">
         {kind === "signin" ? "Sign in required" : "Vanguard only"}
       </div>
@@ -172,141 +189,165 @@ function GateCard({ kind }: { kind: "signin" | "vanguard" }) {
   );
 }
 
-// ============ Canvas (SVG) ============
-function TreeCanvas({
-  nodes, openL2, onOpenL2, onTerminal,
+// ============ Circular tree wheel (desktop) ============
+function TreeWheel({
+  tree, terminals, onTerminal,
 }: {
-  nodes: TreeNode[];
-  openL2: string | null;
-  onOpenL2: (id: string | null) => void;
+  tree: { id: TreeId; title: string; eyebrow: string; blurb: string };
+  terminals: TreeNode[];
   onTerminal: (n: TreeNode) => void;
 }) {
-  const l1 = nodes.find((n) => n.level === 1)!;
-  const l2 = nodes.filter((n) => n.level === 2);
-  const visibleL3 = nodes.filter((n) => n.level === 3 && n.parentId === openL2);
-
-  // edges
-  const edges: Array<[TreeNode, TreeNode]> = [];
-  l2.forEach((n) => edges.push([l1, n]));
-  visibleL3.forEach((n) => {
-    const parent = l2.find((p) => p.id === n.parentId);
-    if (parent) edges.push([parent, n]);
-  });
+  const count = terminals.length;
+  // Geometry: cards arranged on an ellipse around a central hub.
+  // Container is 100% wide with a fixed aspect ratio.
+  const cardW = 230; // px
+  const cardH = 116; // px
+  const radiusX = 360;
+  const radiusY = 280;
+  const containerH = radiusY * 2 + cardH + 40;
+  const containerW = radiusX * 2 + cardW + 40;
 
   return (
-    <div className="relative w-full" style={{ height: "560px" }}>
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        preserveAspectRatio="none"
-        viewBox="0 0 100 100"
+    <div className="relative w-full overflow-hidden" style={{ height: `${containerH}px` }}>
+      <div
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: `${containerW}px`, height: `${containerH}px` }}
       >
-        {edges.map(([a, b], i) => (
-          <line
-            key={i}
-            x1={a.position.x} y1={a.position.y}
-            x2={b.position.x} y2={b.position.y}
-            stroke="currentColor"
-            strokeWidth="0.15"
-            className="text-border"
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
-      </svg>
+        {/* connecting lines (SVG) */}
+        <svg
+          className="absolute inset-0 w-full h-full text-border pointer-events-none"
+          viewBox={`0 0 ${containerW} ${containerH}`}
+          preserveAspectRatio="none"
+        >
+          {terminals.map((_, i) => {
+            const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+            const cx = containerW / 2;
+            const cy = containerH / 2;
+            const x = cx + Math.cos(angle) * radiusX;
+            const y = cy + Math.sin(angle) * radiusY;
+            return (
+              <line
+                key={i}
+                x1={cx} y1={cy} x2={x} y2={y}
+                stroke="currentColor" strokeWidth="1"
+                strokeDasharray="2 4"
+              />
+            );
+          })}
+        </svg>
 
-      {/* L1 */}
-      <NodePill node={l1} variant="root" />
-      {/* L2 */}
-      {l2.map((n) => (
-        <NodePill
-          key={n.id}
-          node={n}
-          variant={openL2 === n.id ? "branch-open" : "branch"}
-          onClick={() => onOpenL2(openL2 === n.id ? null : n.id)}
-        />
-      ))}
-      {/* L3 */}
-      {visibleL3.map((n) => (
-        <NodePill
-          key={n.id}
-          node={n}
-          variant="terminal"
-          onClick={() => onTerminal(n)}
-        />
-      ))}
+        {/* center hub */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background border border-foreground shadow-[0_20px_60px_-20px_rgba(0,0,0,0.35)] flex flex-col items-center justify-center text-center p-8"
+          style={{ width: 280, height: 280 }}
+        >
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+            {tree.eyebrow}
+          </div>
+          <div className="font-display text-xl leading-tight mb-3 text-balance">
+            {tree.title}
+          </div>
+          <div className="font-body text-[12px] text-foreground/60 leading-relaxed text-balance max-w-[200px]">
+            {tree.blurb}
+          </div>
+        </div>
+
+        {/* terminal nodes */}
+        {terminals.map((node, i) => {
+          const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+          const cx = containerW / 2;
+          const cy = containerH / 2;
+          const x = cx + Math.cos(angle) * radiusX;
+          const y = cy + Math.sin(angle) * radiusY;
+          const parent = node.parentId ? getNode(node.parentId) : undefined;
+          return (
+            <button
+              key={node.id}
+              type="button"
+              onClick={() => onTerminal(node)}
+              className="group absolute -translate-x-1/2 -translate-y-1/2 text-left bg-background border border-border hover:border-foreground hover:-translate-y-[calc(50%+3px)] transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] rounded-md p-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.35)] reveal-up is-revealed"
+              style={{
+                left: `${x}px`,
+                top: `${y}px`,
+                width: `${cardW}px`,
+                minHeight: `${cardH}px`,
+                animation: `fade-up 0.6s var(--ease-out-expo, cubic-bezier(0.22, 0.61, 0.36, 1)) ${i * 70}ms both`,
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent shrink-0 mt-0.5">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0">
+                  {parent && (
+                    <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/45 mb-1 truncate">
+                      {parent.label}
+                    </div>
+                  )}
+                  <div className="font-display text-[15px] leading-snug text-foreground group-hover:text-accent transition-colors">
+                    {node.label}
+                  </div>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-function NodePill({
-  node, variant, onClick,
+// ============ Mobile stack ============
+function TreeStack({
+  tree, terminals, onTerminal,
 }: {
-  node: TreeNode;
-  variant: "root" | "branch" | "branch-open" | "terminal";
-  onClick?: () => void;
-}) {
-  const base = "absolute -translate-x-1/2 -translate-y-1/2 px-4 py-2 font-display text-sm md:text-[15px] leading-tight whitespace-nowrap transition-all duration-200 ease-[cubic-bezier(0.22,0.61,0.36,1)]";
-  const styles: Record<string, string> = {
-    root: "bg-foreground text-background border border-foreground",
-    branch: "bg-background border border-border hover:border-foreground hover:-translate-y-[calc(50%+2px)] cursor-pointer",
-    "branch-open": "bg-background border border-foreground shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)] cursor-pointer",
-    terminal: "bg-background border border-accent text-foreground hover:bg-accent hover:text-background cursor-pointer font-mono text-[11px] uppercase tracking-[0.15em]",
-  };
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={variant === "root"}
-      className={`${base} ${styles[variant]}`}
-      style={{ left: `${node.position.x}%`, top: `${node.position.y}%` }}
-    >
-      {variant === "terminal" ? <>◉ {node.label}</> : node.label}
-    </button>
-  );
-}
-
-// ============ Mobile accordion ============
-function TreeAccordion({
-  nodes, openL2, onOpenL2, onTerminal,
-}: {
-  nodes: TreeNode[];
-  openL2: string | null;
-  onOpenL2: (id: string | null) => void;
+  tree: { id: TreeId; title: string; eyebrow: string; blurb: string };
+  terminals: TreeNode[];
   onTerminal: (n: TreeNode) => void;
 }) {
-  const l2 = nodes.filter((n) => n.level === 2);
   return (
-    <div className="border-t border-border">
-      {l2.map((branch) => {
-        const open = openL2 === branch.id;
-        const children = nodes.filter((n) => n.level === 3 && n.parentId === branch.id);
-        return (
-          <div key={branch.id} className="border-b border-border">
-            <button
-              onClick={() => onOpenL2(open ? null : branch.id)}
-              className="w-full text-left py-4 flex items-center justify-between"
-            >
-              <span className="font-display text-lg">{branch.label}</span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50">
-                {open ? "Close" : `${children.length} options`}
-              </span>
-            </button>
-            {open && (
-              <ul className="pb-4 space-y-2">
-                {children.map((c) => (
-                  <li key={c.id}>
-                    <button
-                      onClick={() => onTerminal(c)}
-                      className="w-full text-left px-4 py-3 border border-border hover:border-accent hover:bg-accent hover:text-background font-mono text-[11px] uppercase tracking-[0.15em] transition-colors"
-                    >
-                      ◉ {c.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        );
-      })}
+    <div className="space-y-6">
+      <div className="rounded-full border border-foreground bg-background p-6 text-center mx-auto max-w-xs aspect-square flex flex-col items-center justify-center">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
+          {tree.eyebrow}
+        </div>
+        <div className="font-display text-lg leading-tight mb-2 text-balance">
+          {tree.title}
+        </div>
+        <div className="font-body text-xs text-foreground/60 leading-relaxed text-balance">
+          {tree.blurb}
+        </div>
+      </div>
+      <ul className="space-y-3">
+        {terminals.map((node, i) => {
+          const parent = node.parentId ? getNode(node.parentId) : undefined;
+          return (
+            <li key={node.id}>
+              <button
+                onClick={() => onTerminal(node)}
+                className="w-full text-left bg-background border border-border hover:border-foreground rounded-md p-4 transition-colors"
+                style={{ animation: `fade-up 0.5s cubic-bezier(0.22,0.61,0.36,1) ${i * 50}ms both` }}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent shrink-0 mt-0.5">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0">
+                    {parent && (
+                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/45 mb-1">
+                        {parent.label}
+                      </div>
+                    )}
+                    <div className="font-display text-base leading-snug">
+                      {node.label}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
