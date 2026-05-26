@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.grant_pending_vanguard() FROM PUBLIC, anon, authenticated;
