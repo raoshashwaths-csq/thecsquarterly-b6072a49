@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Check } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { Reveal } from "@/components/site/Reveal";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, startSubscriptionPlaceholder } from "@/lib/auth.functions";
 
@@ -184,11 +185,12 @@ function PricingPage() {
         {/* Tier matrix */}
         <section className="max-w-7xl mx-auto px-6 pb-20">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {TIERS.map((t) => (
-              <div
+            {TIERS.map((t, i) => (
+              <Reveal
                 key={t.slug}
+                index={i}
                 className={
-                  "flex flex-col p-8 border " +
+                  "flex flex-col p-8 border card-lift " +
                   (t.emphasis
                     ? "border-2 border-accent bg-card relative"
                     : "border-border bg-card/60")
@@ -242,7 +244,7 @@ function PricingPage() {
                 >
                   {t.cta}
                 </button>
-              </div>
+              </Reveal>
             ))}
           </div>
         </section>

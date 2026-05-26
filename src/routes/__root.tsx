@@ -140,12 +140,23 @@ function AuthInvalidator() {
   return null;
 }
 
+function PageTransition() {
+  // Re-key on pathname so each route mount replays the cinematic page-enter.
+  const router = useRouter();
+  const pathname = router.state.location.pathname;
+  return (
+    <div key={pathname} className="page-enter">
+      <Outlet />
+    </div>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
       <AuthInvalidator />
-      <Outlet />
+      <PageTransition />
       <QAgentButton />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
