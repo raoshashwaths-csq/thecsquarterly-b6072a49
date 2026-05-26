@@ -206,6 +206,36 @@ export type Database = {
         }
         Relationships: []
       }
+      q_runs: {
+        Row: {
+          context: Json
+          created_at: string
+          id: string
+          node_id: string
+          user_id: string
+          witty: boolean
+          zones: Json
+        }
+        Insert: {
+          context?: Json
+          created_at?: string
+          id?: string
+          node_id: string
+          user_id: string
+          witty?: boolean
+          zones: Json
+        }
+        Update: {
+          context?: Json
+          created_at?: string
+          id?: string
+          node_id?: string
+          user_id?: string
+          witty?: boolean
+          zones?: Json
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
