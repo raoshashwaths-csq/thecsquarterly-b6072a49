@@ -712,3 +712,114 @@ function PlaybooksAdmin() {
     </section>
   );
 }
+
+// ============== Q. — Operator Agent ==============
+
+function QAgentAdmin() {
+  const fetchStats = useServerFn(getQAdminStats);
+  const fetchRuns = useServerFn(listQRunsAdmin);
+  const fetchEnts = useServerFn(listQEntitlementsAdmin);
+  const stats = useQuery({ queryKey: ["q-admin-stats"], queryFn: () => fetchStats() });
+  const runs = useQuery({ queryKey: ["q-admin-runs"], queryFn: () => fetchRuns() });
+  const ents = useQuery({ queryKey: ["q-admin-ents"], queryFn: () => fetchEnts() });
+  const s = stats.data;
+
+  const treeRows = TREES.map((t) => ({
+    id: t.id,
+    title: t.title,
+    blurb: t.blurb,
+    count: s?.perTree30?.[t.id] ?? 0,
+  })).sort((a, b) => b.count - a.count);
+
+  const wittyPct = s && s.total > 0 ? Math.round((s.wittyCount / s.total) * 100) : 0;
+
+  return (
+    <div className="space-y-10">
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Operator agent</div>
+        <h2 className="font-display text-4xl mb-2"><QMark /> Control Room</h2>
+        <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
+          Every canvas run, every voice toggle, every shared response. <QMark /> is gated to admins and active Vanguard subscribers — manage them here.
+        </p>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard label="Total runs" value={s?.total ?? "—"} />
+        <StatCard label="Last 7 days" value={s?.last7 ?? "—"} />
+        <StatCard label="Last 30 days" value={s?.last30 ?? "—"} hint={`${s?.uniqueOperators30 ?? 0} unique operators`} />
+        <StatCard label="Witty voice" value={s ? `${wittyPct}%` : "—"} hint="Wodehouse register share" />
+        <StatCard label="Shared runs" value={s?.sharedCount ?? "—"} hint="Marked shareable by operators" />
+        <StatCard label="Entitled operators" value={ents.data?.length ?? "—"} hint="Admins + active Vanguard" />
+      </div>
+
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">Trees · last 30 days</div>
+        <div className="border border-border divide-y divide-border">
+          {treeRows.map((t) => {
+            const max = Math.max(1, ...treeRows.map((r) => r.count));
+            const pct = (t.count / max) * 100;
+            return (
+              <div key={t.id} className="px-4 py-3 grid grid-cols-[60px_1fr_auto] items-center gap-4">
+                <div className="font-mono text-[10px] text-accent">{t.id}</div>
+                <div>
+                  <div className="font-display text-base leading-tight">{t.title}</div>
+                  <div className="text-xs text-muted-foreground">{t.blurb}</div>
+                  <div className="mt-1.5 h-1 bg-muted/50">
+                    <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+                <div className="font-mono text-sm tabular-nums">{t.count}</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">Recent runs</div>
+        <DataTable
+          rows={runs.data ?? []}
+          empty="No Q. runs yet."
+          cols={[
+            { key: "created_at", label: "When", render: (r) => new Date(r.created_at).toLocaleString() },
+            { key: "operator_email", label: "Operator" },
+            { key: "node_id", label: "Decision", render: (r) => {
+              const n = getNode(r.node_id);
+              return (
+                <div>
+                  <div className="text-sm">{n?.label ?? r.node_id}</div>
+                  <div className="text-[10px] font-mono text-muted-foreground">{breadcrumbFor(r.node_id).join(" › ")}</div>
+                </div>
+              );
+            }},
+            { key: "witty", label: "Voice", render: (r) => (
+              <span className="font-mono text-[10px] uppercase tracking-widest">
+                {r.witty ? "Witty" : "Analytical"}
+              </span>
+            )},
+            { key: "shared", label: "Shared", render: (r) => r.shared ? <span className="text-accent">●</span> : <span className="text-muted-foreground">—</span> },
+            { key: "id", label: "Run", render: (r) => (
+              <a href={`/agent/response/${r.id}`} className="font-mono text-[10px] uppercase tracking-widest underline">Open</a>
+            )},
+          ]}
+        />
+      </div>
+
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">Entitled operators</div>
+        <DataTable
+          rows={ents.data ?? []}
+          empty="No entitled operators yet."
+          cols={[
+            { key: "email", label: "Email" },
+            { key: "is_admin", label: "Admin", render: (r) => r.is_admin ? <span className="font-mono text-[10px] uppercase tracking-widest text-accent">Admin</span> : "—" },
+            { key: "has_vanguard", label: "Vanguard", render: (r) => r.has_vanguard ? <span className="font-mono text-[10px] uppercase tracking-widest">Active</span> : "—" },
+            { key: "since", label: "Since", render: (r) => fmtDate(r.since) },
+            { key: "renews", label: "Renews", render: (r) => fmtDate(r.renews) },
+          ]}
+        />
+      </div>
+    </div>
+  );
+}
+
