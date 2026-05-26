@@ -11,13 +11,14 @@ import {
 
 /**
  * Q — floating agent entry point.
- * Typographic wordmark "Q." (no circular chip). The period carries a subtle
- * bounce to signal the agent is alive. Visual-only for now.
+ * Visual-only for now. Opens a 35%-width right drawer (per PRD v3 layout grid).
+ * Logic trees (Escalation / Champion / Upsell / Career) wire up later.
  */
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
+  // Hide on admin and inside the future /agent/* workspace (which will own its own UI).
   if (pathname.startsWith("/admin") || pathname.startsWith("/agent")) return null;
 
   return (
@@ -26,16 +27,13 @@ export function QAgentButton() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Open Q, the CS operator agent"
-        className="group fixed bottom-5 right-5 sm:bottom-7 sm:right-7 z-40 inline-flex items-end leading-none font-display text-foreground hover:text-accent transition-colors duration-300 select-none [text-shadow:0_1px_0_var(--background),0_2px_18px_color-mix(in_oklab,var(--background)_75%,transparent)]"
-        style={{ fontSize: "clamp(56px, 9vw, 88px)" }}
+        className="group fixed bottom-6 right-6 z-40 h-16 w-16 rounded-full bg-background border border-foreground/20 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.5)] hover:border-accent transition-all duration-300 flex items-center justify-center"
       >
-        <span className="italic font-medium tracking-tight">Q</span>
-        <span
-          aria-hidden
-          className="ml-[0.04em] inline-block text-accent animate-q-bounce"
-        >
-          .
-        </span>
+        <img
+          src={qMark}
+          alt=""
+          className="h-10 w-10 object-contain transition-transform duration-300 group-hover:scale-110 dark:invert"
+        />
         <span className="sr-only">Open Q</span>
       </button>
 

@@ -110,19 +110,6 @@
   100% { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
-@keyframes q-bounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  15% { transform: translateY(-22%); }
-  30% { transform: translateY(0); }
-  42% { transform: translateY(-10%); }
-}
-
-.animate-q-bounce {
-  display: inline-block;
-  animation: q-bounce 2.4s var(--ease-out-expo) infinite;
-}
-
-
 .animate-reveal-line {
   transform-origin: left;
   animation: reveal-line 1.2s var(--ease-out-expo) both;
