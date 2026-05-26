@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { runQNode, listMyQRuns } from "@/lib/q-agent.functions";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { QMark } from "@/components/site/QMark";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import {
   TREES, NODES, nodesForTree, getNode, breadcrumbFor, type TreeId, type TreeNode,
@@ -72,13 +73,13 @@ function AgentFrameworkPage() {
     <CanvasShell>
       <header className="mb-10 animate-fade-up">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
-          Operator Canvas · Q.
+          Operator Canvas · <QMark periodClassName="text-foreground" />
         </div>
         <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance max-w-3xl">
           What decision are you running today<span className="text-accent">?</span>
         </h1>
         <p className="font-body text-base text-foreground/70 mt-4 max-w-2xl">
-          Pick a tree. Walk the path. Q returns a 3-zone response: diagnosis, playbook, executable.
+          Pick a tree. Walk the path. <QMark /> returns a 3-zone response: diagnosis, playbook, executable.
         </p>
 
         {/* Global voice toggle */}
@@ -181,12 +182,12 @@ function GateCard({ kind }: { kind: "signin" | "vanguard" }) {
         {kind === "signin" ? "Sign in required" : "Vanguard only"}
       </div>
       <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight mb-4">
-        Q's canvas is reserved for Vanguard subscribers<span className="text-accent">.</span>
+        <QMark />'s canvas is reserved for Vanguard subscribers<span className="text-accent">.</span>
       </h1>
       <p className="font-body text-foreground/70 mb-8">
         {kind === "signin"
           ? "Sign in to your Vanguard account to open the operator canvas."
-          : "The decision graph, structured prompt injection, and 3-zone response engine ship with Vanguard. Free readers keep the single-question trial via the floating Q. button."}
+          : <>The decision graph, structured prompt injection, and 3-zone response engine ship with Vanguard. Free readers keep the single-question trial via the floating <QMark /> button.</>}
       </p>
       <div className="flex gap-3">
         <Link
@@ -511,7 +512,7 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
               </h2>
             </SheetTitle>
             <SheetDescription className="font-body text-sm text-foreground/65 pt-2">
-              Give Q the operator context. The response lands in three zones.
+              Give <QMark /> the operator context. The response lands in three zones.
             </SheetDescription>
           </SheetHeader>
 
@@ -559,7 +560,7 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
             disabled={!canSubmit || submitting}
             className="w-full py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {submitting ? "Q is working…" : "Run Q"}
+            {submitting ? <><QMark periodClassName="text-accent-foreground/70" /> is working…</> : <>Run <QMark periodClassName="text-accent-foreground/70" /></>}
           </button>
         </div>
       </SheetContent>

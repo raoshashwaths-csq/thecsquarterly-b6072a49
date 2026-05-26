@@ -13,6 +13,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
+import { QMark } from "@/components/site/QMark";
 
 const TRIAL_KEY = "q.trial.used";
 const SEEN_KEY = "q.attention.seen";
@@ -152,14 +153,8 @@ export function QAgentButton() {
         aria-label="Open Q, the CS operator agent"
         className={`group fixed bottom-20 right-5 md:bottom-28 md:right-8 z-40 flex items-end gap-0 pl-4 pr-3 py-2.5 md:pl-5 md:pr-4 md:py-3 bg-foreground text-background border border-foreground shadow-[0_12px_40px_-12px_rgba(0,0,0,0.55)] hover:shadow-[0_18px_50px_-12px_rgba(0,0,0,0.7)] transition-all duration-300 ${attention ? "q-attention" : ""}`}
       >
-        <span className="font-display leading-none text-3xl md:text-4xl tracking-tight">Q</span>
-        <span
-          aria-hidden
-          className="font-display leading-none text-3xl md:text-4xl text-accent ml-0.5 q-period"
-        >
-          .
-        </span>
-        <span className="sr-only">Ask Q</span>
+        <QMark className="font-display leading-none text-3xl md:text-4xl tracking-tight" periodClassName="text-accent ml-0.5 q-period" />
+        <span className="sr-only">Ask Q.</span>
       </button>
 
       {hint && (
@@ -173,7 +168,7 @@ export function QAgentButton() {
         >
           <div className="relative bg-foreground text-background px-3.5 py-2 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)]">
             <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-background/70">
-              Meet Q
+              Meet <QMark periodClassName="text-accent" />
             </div>
             <div className="font-display text-sm leading-tight mt-0.5">
               Your operator agent is ready<span className="text-accent">.</span>
@@ -199,7 +194,7 @@ export function QAgentButton() {
               </div>
               <SheetTitle asChild>
                 <h2 className="font-display text-5xl md:text-6xl leading-[0.9] tracking-tight">
-                  Meet Q<span className="text-accent">.</span>
+                  Meet <QMark />
                 </h2>
               </SheetTitle>
               <SheetDescription className="font-body text-base text-foreground/75 leading-relaxed pt-3">
@@ -223,7 +218,7 @@ export function QAgentButton() {
             {/* Single-question trial (unlimited for admins + Vanguard) */}
             <form onSubmit={handleAsk} className="mb-6">
               <label className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 block mb-2">
-                {unlimited ? "Ask Q · unlimited" : gated ? "Trial used" : "Ask Q · 1 free question"}
+                {unlimited ? <>Ask <QMark periodClassName="text-accent" /> · unlimited</> : gated ? "Trial used" : <>Ask <QMark periodClassName="text-accent" /> · 1 free question</>}
               </label>
               <textarea
                 ref={inputRef}
@@ -244,14 +239,14 @@ export function QAgentButton() {
                 disabled={loading || gated || !question.trim()}
                 className="w-full mt-2 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {loading ? "Q is thinking…" : gated ? "Trial used" : "Ask Q"}
+                {loading ? <><QMark periodClassName="text-accent-foreground/70" /> is thinking…</> : gated ? "Trial used" : <>Ask <QMark periodClassName="text-accent-foreground/70" /></>}
               </button>
             </form>
 
             {answer && (
               <div className={`mb-6 border-l-2 ${witty ? "border-secondary-accent" : "border-accent"} pl-4 py-1`}>
                 <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-2">
-                  Q replies · {witty ? "witty" : "analytical"}
+                  <QMark /> replies · {witty ? "witty" : "analytical"}
                 </div>
                 <div className="font-body text-[15px] text-foreground/85 leading-relaxed whitespace-pre-wrap">
                   {answer}
@@ -265,7 +260,7 @@ export function QAgentButton() {
                 onClick={() => setOpen(false)}
                 className="block text-center mb-3 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
               >
-                Unlock unlimited Q · Vanguard
+                Unlock unlimited <QMark periodClassName="text-accent-foreground/70" /> · Vanguard
               </Link>
             )}
 

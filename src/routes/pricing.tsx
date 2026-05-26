@@ -6,6 +6,8 @@ import { Check } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Reveal } from "@/components/site/Reveal";
+import { QMark } from "@/components/site/QMark";
+import type { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, startSubscriptionPlaceholder } from "@/lib/auth.functions";
 
@@ -29,10 +31,10 @@ type Tier = {
   price: string;
   cadence: string;
   altPrice?: string;
-  blurb: string;
+  blurb: ReactNode;
   highlights: string[];
   seats: string;
-  sessions: string;
+  sessions: ReactNode;
   cta: string;
   emphasis?: boolean;
 };
@@ -51,7 +53,7 @@ const TIERS: Tier[] = [
       "Public archive access",
     ],
     seats: "1 seat",
-    sessions: "0 Q sessions",
+    sessions: <>0 <QMark /> sessions</>,
     cta: "Subscribe free",
   },
   {
@@ -60,7 +62,7 @@ const TIERS: Tier[] = [
     price: "$29",
     cadence: "/ month",
     altPrice: "or $290 / year",
-    blurb: "Full archive, the entire Codex, and Q for solo operators.",
+    blurb: <>Full archive, the entire Codex, and <QMark /> for solo operators.</>,
     highlights: [
       "Everything in Free Briefing",
       "Full premium archive + two-voice toggle",
@@ -68,7 +70,7 @@ const TIERS: Tier[] = [
       "Job board talent profile",
     ],
     seats: "1 seat",
-    sessions: "50 Q sessions / month",
+    sessions: <>50 <QMark /> sessions / month</>,
     cta: "Join the Vanguard",
     emphasis: true,
   },
@@ -78,7 +80,7 @@ const TIERS: Tier[] = [
     price: "$49",
     cadence: "/ month",
     altPrice: "or $490 / year",
-    blurb: "For senior operators who run their week through Q.",
+    blurb: <>For senior operators who run their week through <QMark />.</>,
     highlights: [
       "Everything in Individual",
       "Early-access Codex alerts",
@@ -86,7 +88,7 @@ const TIERS: Tier[] = [
       "Senior Executive sub-channels",
     ],
     seats: "1 seat",
-    sessions: "150 Q sessions / month",
+    sessions: <>150 <QMark /> sessions / month</>,
     cta: "Go Pro",
   },
   {
@@ -102,7 +104,7 @@ const TIERS: Tier[] = [
       "Priority support queue",
     ],
     seats: "Up to 5 seats",
-    sessions: "500 pooled Q sessions / month",
+    sessions: <>500 pooled <QMark /> sessions / month</>,
     cta: "Start a team",
   },
   {
@@ -118,7 +120,7 @@ const TIERS: Tier[] = [
       "Team analytics dashboard",
     ],
     seats: "Up to 15 seats",
-    sessions: "1,500 pooled Q sessions / month",
+    sessions: <>1,500 pooled <QMark /> sessions / month</>,
     cta: "Scale the team",
   },
   {
@@ -134,7 +136,7 @@ const TIERS: Tier[] = [
       "Priority editorial response window",
     ],
     seats: "Up to 50 seats",
-    sessions: "5,000 pooled Q sessions / month",
+    sessions: <>5,000 pooled <QMark /> sessions / month</>,
     cta: "Talk to editorial",
   },
 ];
@@ -178,7 +180,7 @@ function PricingPage() {
             Six tiers. <span className="italic">One discipline.</span>
           </h1>
           <p className="text-lg text-foreground/70 max-w-2xl mx-auto text-pretty">
-            From a free weekly briefing to a 50-seat Enterprise license with Q&nbsp;agent sessions and white-labeled benchmarks.
+            From a free weekly briefing to a 50-seat Enterprise license with <QMark />&nbsp;agent sessions and white-labeled benchmarks.
           </p>
         </section>
 
@@ -219,7 +221,7 @@ function PricingPage() {
                     <div className="text-sm font-medium">{t.seats}</div>
                   </div>
                   <div>
-                    <div className="font-mono text-[9px] uppercase tracking-widest text-foreground/50 mb-1">Q sessions</div>
+                    <div className="font-mono text-[9px] uppercase tracking-widest text-foreground/50 mb-1"><QMark /> sessions</div>
                     <div className="text-sm font-medium">{t.sessions}</div>
                   </div>
                 </div>
