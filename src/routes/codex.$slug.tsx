@@ -81,13 +81,24 @@ function PlaybookPage() {
         {unlocked ? (
           <div className="prose-content border-t border-border pt-10">
             <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Unlocked</div>
-            {pb.body.split("\n\n").map((para, i) => {
-              if (para.startsWith("## ")) return <h2 key={i} className="font-display text-3xl mt-10 mb-4">{para.replace(/^##\s+/, "")}</h2>;
-              if (para.startsWith("- ")) {
-                return <ul key={i} className="list-disc pl-6 my-4 space-y-2">{para.split("\n").map((l, j) => <li key={j} className="text-lg leading-relaxed">{l.replace(/^-\s+/, "")}</li>)}</ul>;
-              }
-              return <p key={i} className="text-lg leading-relaxed my-5 text-foreground/85">{para}</p>;
-            })}
+            {(() => {
+              const normalized = pb.body
+                .replace(/\r\n/g, "\n")
+                .replace(/([^\n])\n(#{1,6}[^#\n])/g, "$1\n\n$2")
+                .replace(/(^|\n)(#{1,6}[^\n]*?)\n(?!\n)/g, "$1$2\n\n");
+              return normalized.split(/\n{2,}/).map((raw, i) => {
+                const para = raw.trim().replace(/\s*#+\s*$/, "").trim();
+                if (!para) return null;
+                const h3 = para.match(/^###\s*(.+)$/);
+                if (h3) return <h3 key={i} className="font-display text-2xl mt-8 mb-3">{h3[1].trim()}</h3>;
+                const h2 = para.match(/^##\s*(.+)$/);
+                if (h2) return <h2 key={i} className="font-display text-3xl mt-10 mb-4">{h2[1].trim()}</h2>;
+                if (para.startsWith("- ")) {
+                  return <ul key={i} className="list-disc pl-6 my-4 space-y-2">{para.split("\n").map((l, j) => <li key={j} className="text-lg leading-relaxed">{l.replace(/^-\s+/, "")}</li>)}</ul>;
+                }
+                return <p key={i} className="text-lg leading-relaxed my-5 text-foreground/85">{para}</p>;
+              });
+            })()}
           </div>
         ) : (
           <>
