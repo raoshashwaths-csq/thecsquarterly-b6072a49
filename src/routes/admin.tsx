@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { QMark } from "@/components/site/QMark";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe } from "@/lib/auth.functions";
 import {
@@ -17,7 +18,9 @@ import {
 } from "@/lib/posts.functions";
 import {
   getAdminStats, listSubscribers, listSubscriptions, listPurchases, listSurveyResponses,
+  getQAdminStats, listQRunsAdmin, listQEntitlementsAdmin,
 } from "@/lib/admin.functions";
+import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
@@ -27,7 +30,7 @@ export const Route = createFileRoute("/admin")({
 type SectionKey =
   | "dashboard" | "posts" | "conversations" | "playbooks"
   | "subscribers" | "subscriptions" | "purchases" | "payment-links"
-  | "diagnostic" | "community" | "ai-agent" | "search" | "email";
+  | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
@@ -42,7 +45,8 @@ const NAV: NavItem[] = [
   { key: "community", label: "Community", icon: UsersRound, soon: true, group: "Audience" },
   { key: "purchases", label: "Purchases", icon: ShoppingBag, group: "Commerce" },
   { key: "payment-links", label: "Payment Links", icon: LinkIcon, soon: true, group: "Commerce" },
-  { key: "ai-agent", label: "AI Agent", icon: Sparkles, soon: true, group: "Operations" },
+  { key: "q-agent", label: "Q. Operator Agent", icon: Sparkles, group: "Operations" },
+  { key: "ai-agent", label: "Editorial AI Agent", icon: Sparkles, soon: true, group: "Operations" },
   { key: "search", label: "Global Search", icon: SearchIcon, soon: true, group: "Operations" },
   { key: "email", label: "Editorial Email", icon: CreditCard, soon: true, group: "Operations" },
 ];
