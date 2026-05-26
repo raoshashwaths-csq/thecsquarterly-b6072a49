@@ -9,9 +9,7 @@ function getInitialTheme(): "light" | "dark" {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-// Read the resolved background color of the *next* theme by briefly toggling the
-// dark class on <html>, sampling, then reverting. CSS vars are defined on :root,
-// so a hidden probe with a class won't work — we must flip the real root.
+// Resolve the *next* theme's background by briefly flipping the root class.
 function getThemeBg(next: "light" | "dark"): string {
   const root = document.documentElement;
   const wasDark = root.classList.contains("dark");
@@ -19,11 +17,22 @@ function getThemeBg(next: "light" | "dark"): string {
   if (wasDark !== shouldBeDark) root.classList.toggle("dark", shouldBeDark);
   const bg = getComputedStyle(root).getPropertyValue("--background").trim();
   if (wasDark !== shouldBeDark) root.classList.toggle("dark", wasDark);
-  // --background is a raw oklch(...) string. Wrap it back into a valid color.
   if (bg) return bg.startsWith("oklch") || bg.startsWith("#") || bg.startsWith("rgb") ? bg : `oklch(${bg})`;
   return next === "dark" ? "#121212" : "#fbf9f6";
 }
 
+// Disable any global CSS transitions on color/background tokens during the
+// reveal so the underlying page doesn't cross-fade and fight the mask.
+function suppressGlobalTransitions(): () => void {
+  const style = document.createElement("style");
+  style.setAttribute("data-theme-suppress", "");
+  style.textContent =
+    "*,*::before,*::after{transition:none!important;animation-duration:0s!important}";
+  document.head.appendChild(style);
+  return () => {
+    requestAnimationFrame(() => style.remove());
+  };
+}
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -63,44 +72,73 @@ export function ThemeToggle() {
     const rect = btnRef.current?.getBoundingClientRect();
     const cx = rect ? rect.left + rect.width / 2 : window.innerWidth - 40;
     const cy = rect ? rect.top + rect.height / 2 : 40;
-    const dx = Math.max(cx, window.innerWidth - cx);
-    const dy = Math.max(cy, window.innerHeight - cy);
-    const radius = Math.hypot(dx, dy);
-
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const dx = Math.max(cx, vw - cx);
+    const dy = Math.max(cy, vh - cy);
+    // Pad for organic displacement spill.
+    const radius = Math.hypot(dx, dy) * 1.15 + 120;
     const nextBg = getThemeBg(next);
 
-    const overlay = document.createElement("div");
-    overlay.style.cssText = [
+    // Stable, namespace-safe id per invocation.
+    const fid = `csq-ink-${Math.random().toString(36).slice(2, 8)}`;
+
+    // SVG overlay: a single filled circle with a turbulence + displacement
+    // filter so the expanding edge reads as an organic ink/fabric front,
+    // not a geometric ring. The whole svg is GPU-composited via will-change.
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", String(vw));
+    svg.setAttribute("height", String(vh));
+    svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.style.cssText = [
       "position:fixed",
       "inset:0",
       "z-index:9999",
       "pointer-events:none",
-      `background:${nextBg}`,
-      `clip-path:circle(0px at ${cx}px ${cy}px)`,
-      "will-change:clip-path",
+      "will-change:transform,opacity",
+      "contain:strict",
     ].join(";");
-    document.body.appendChild(overlay);
 
+    svg.innerHTML = `
+      <defs>
+        <filter id="${fid}" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.018" numOctaves="2" seed="${Math.floor(Math.random() * 100)}" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="140" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <circle cx="${cx}" cy="${cy}" r="0" fill="${nextBg}" filter="url(#${fid})"></circle>
+    `;
+
+    document.body.appendChild(svg);
+    const circle = svg.querySelector("circle") as SVGCircleElement;
+
+    const restoreTransitions = suppressGlobalTransitions();
     animatingRef.current = true;
-    const anim = overlay.animate(
-      [
-        { clipPath: `circle(0px at ${cx}px ${cy}px)` },
-        { clipPath: `circle(${radius}px at ${cx}px ${cy}px)` },
-      ],
-      { duration: 750, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)", fill: "forwards" },
+
+    const anim = circle.animate(
+      [{ r: "0" }, { r: String(radius) }],
+      {
+        duration: 350,
+        easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+        fill: "forwards",
+      },
     );
 
+    // Apply the theme just before the mask fully covers the viewport so the
+    // swap happens under cover. With duration=350ms, swap at ~55% (when the
+    // ink front has already passed every pixel after displacement).
+    const swapAt = window.setTimeout(apply, 200);
+
     anim.onfinish = () => {
-      // Swap theme under the cover, then fade the overlay out.
-      apply();
-      const fade = overlay.animate(
-        [{ opacity: 1 }, { opacity: 0 }],
-        { duration: 220, easing: "ease-out", fill: "forwards" },
-      );
-      fade.onfinish = () => {
-        overlay.remove();
-        animatingRef.current = false;
-      };
+      window.clearTimeout(swapAt);
+      // Ensure theme is applied (in case onfinish fires before the timeout).
+      document.documentElement.classList.toggle("dark", next === "dark");
+      setTheme(next);
+      svg.remove();
+      restoreTransitions();
+      animatingRef.current = false;
     };
   }
 
