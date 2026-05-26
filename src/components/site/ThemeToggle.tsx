@@ -9,44 +9,11 @@ function getInitialTheme(): "light" | "dark" {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-// Resolve the *next* theme's --background as a computed rgb() string.
-// We briefly flip the dark class on <html>, paint a hidden probe with
-// background:var(--background), then read its computed backgroundColor —
-// which the browser normalizes to rgb()/rgba(), safe for SVG fill.
-function getThemeBgRgb(next: "light" | "dark"): string {
-  const root = document.documentElement;
-  const wasDark = root.classList.contains("dark");
-  const shouldBeDark = next === "dark";
-  if (wasDark !== shouldBeDark) root.classList.toggle("dark", shouldBeDark);
-
-  const probe = document.createElement("div");
-  probe.style.cssText =
-    "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;background:var(--background)";
-  document.body.appendChild(probe);
-  const rgb = getComputedStyle(probe).backgroundColor;
-  probe.remove();
-
-  if (wasDark !== shouldBeDark) root.classList.toggle("dark", wasDark);
-  return rgb || (next === "dark" ? "rgb(18,18,18)" : "rgb(251,249,246)");
-}
-
-// Inject a style tag that disables transitions on color/background tokens
-// during the reveal so the page doesn't cross-fade under the mask.
-function suppressGlobalTransitions(): () => void {
-  const style = document.createElement("style");
-  style.setAttribute("data-theme-suppress", "");
-  style.textContent =
-    "*,*::before,*::after{transition:none!important}";
-  document.head.appendChild(style);
-  return () => {
-    requestAnimationFrame(() => style.remove());
+type DocWithVT = Document & {
+  startViewTransition?: (cb: () => void | Promise<void>) => {
+    ready: Promise<void>;
+    finished: Promise<void>;
   };
-}
-
-const EASE = (t: number) => {
-  // cubic-bezier(0.65, 0, 0.35, 1) approximated via the standard
-  // ease-in-out cubic formula. Matches the requested luxury feel.
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 };
 
 export function ThemeToggle() {
@@ -69,98 +36,63 @@ export function ThemeToggle() {
 
   const isDark = theme === "dark";
 
+  function applyTheme(next: "light" | "dark") {
+    document.documentElement.classList.toggle("dark", next === "dark");
+    setTheme(next);
+  }
+
   function toggle() {
     if (animatingRef.current) return;
     const next: "light" | "dark" = isDark ? "light" : "dark";
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-    const apply = () => {
-      document.documentElement.classList.toggle("dark", next === "dark");
-      setTheme(next);
-    };
-
-    if (reduce) {
-      apply();
+    const doc = document as DocWithVT;
+    if (reduce || typeof doc.startViewTransition !== "function") {
+      applyTheme(next);
       return;
     }
 
     const rect = btnRef.current?.getBoundingClientRect();
     const cx = rect ? rect.left + rect.width / 2 : window.innerWidth - 40;
     const cy = rect ? rect.top + rect.height / 2 : 40;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const dx = Math.max(cx, vw - cx);
-    const dy = Math.max(cy, vh - cy);
-    // Pad to account for the displacement spill, so the mask fully covers
-    // the viewport even after the turbulence pushes the edge inward.
-    const radius = Math.hypot(dx, dy) * 1.25 + 200;
-    const nextBg = getThemeBgRgb(next);
+    const radius = Math.hypot(
+      Math.max(cx, window.innerWidth - cx),
+      Math.max(cy, window.innerHeight - cy),
+    );
 
-    const fid = `csq-ink-${Math.random().toString(36).slice(2, 8)}`;
-    const seed = Math.floor(Math.random() * 1000);
-
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", String(vw));
-    svg.setAttribute("height", String(vh));
-    svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
-    svg.setAttribute("preserveAspectRatio", "none");
-    svg.style.cssText = [
-      "position:fixed",
-      "left:0",
-      "top:0",
-      "width:100vw",
-      "height:100vh",
-      "z-index:2147483647",
-      "pointer-events:none",
-      "will-change:transform",
-      "contain:strict",
-    ].join(";");
-
-    svg.innerHTML = `
-      <defs>
-        <filter id="${fid}" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves="2" seed="${seed}" result="noise"/>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="180" xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-      </defs>
-      <circle cx="${cx}" cy="${cy}" r="0" fill="${nextBg}" filter="url(#${fid})"></circle>
-    `;
-
-    document.body.appendChild(svg);
-    const circle = svg.querySelector("circle") as SVGCircleElement;
-
-    const restoreTransitions = suppressGlobalTransitions();
     animatingRef.current = true;
+    const root = document.documentElement;
+    root.style.setProperty("--theme-x", `${cx}px`);
+    root.style.setProperty("--theme-y", `${cy}px`);
+    root.style.setProperty("--theme-r", `${radius}px`);
 
-    const duration = 350;
-    const start = performance.now();
-    let swapped = false;
+    const transition = doc.startViewTransition!(() => {
+      applyTheme(next);
+    });
 
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const t = Math.min(1, elapsed / duration);
-      const eased = EASE(t);
-      circle.setAttribute("r", String(eased * radius));
+    transition.ready
+      .then(() => {
+        document.documentElement.animate(
+          {
+            clipPath: [
+              `circle(0px at ${cx}px ${cy}px)`,
+              `circle(${radius}px at ${cx}px ${cy}px)`,
+            ],
+          },
+          {
+            duration: 520,
+            easing: "cubic-bezier(0.65, 0, 0.35, 1)",
+            pseudoElement: "::view-transition-new(root)",
+          },
+        );
+      })
+      .catch(() => {
+        /* unsupported — already applied */
+      });
 
-      // Swap the actual theme once the ink front has clearly passed
-      // every pixel of the viewport. ~60% covers safely with displacement.
-      if (!swapped && t >= 0.6) {
-        swapped = true;
-        apply();
-      }
-
-      if (t < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        if (!swapped) apply();
-        svg.remove();
-        restoreTransitions();
-        animatingRef.current = false;
-      }
-    };
-
-    requestAnimationFrame(tick);
+    transition.finished.finally(() => {
+      animatingRef.current = false;
+    });
   }
 
   return (
