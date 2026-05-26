@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
+import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 
 const sections = [
   { to: "/vanguard", label: "Vanguard" },
