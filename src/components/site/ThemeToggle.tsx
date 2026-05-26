@@ -9,14 +9,25 @@ function getInitialTheme(): "light" | "dark" {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-type ViewTransitionDocument = Document & {
-  startViewTransition?: (cb: () => void) => { ready: Promise<void> };
-};
+// Read the resolved background color of the given theme by toggling the class
+// on a hidden probe element, so the reveal overlay matches the real palette.
+function getThemeBg(next: "light" | "dark"): string {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;";
+  probe.className = next === "dark" ? "dark" : "";
+  // Inherit the bg token from the next theme.
+  probe.style.background = "var(--background)";
+  document.body.appendChild(probe);
+  const bg = getComputedStyle(probe).backgroundColor;
+  document.body.removeChild(probe);
+  return bg || (next === "dark" ? "#121212" : "#fbf9f6");
+}
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
   const btnRef = useRef<HTMLButtonElement | null>(null);
+  const animatingRef = useRef(false);
 
   useEffect(() => {
     const initial = getInitialTheme();
@@ -25,7 +36,6 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
-  // Persist + apply class. The actual DOM swap happens inside the view transition below.
   useEffect(() => {
     if (!mounted) return;
     window.localStorage.setItem(STORAGE_KEY, theme);
@@ -34,8 +44,8 @@ export function ThemeToggle() {
   const isDark = theme === "dark";
 
   function toggle() {
+    if (animatingRef.current) return;
     const next: "light" | "dark" = isDark ? "light" : "dark";
-    const doc = document as ViewTransitionDocument;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
     const apply = () => {
@@ -43,12 +53,11 @@ export function ThemeToggle() {
       setTheme(next);
     };
 
-    if (reduce || typeof doc.startViewTransition !== "function") {
+    if (reduce) {
       apply();
       return;
     }
 
-    // Anchor the reveal at the button center.
     const rect = btnRef.current?.getBoundingClientRect();
     const cx = rect ? rect.left + rect.width / 2 : window.innerWidth - 40;
     const cy = rect ? rect.top + rect.height / 2 : 40;
@@ -56,27 +65,41 @@ export function ThemeToggle() {
     const dy = Math.max(cy, window.innerHeight - cy);
     const radius = Math.hypot(dx, dy);
 
-    document.documentElement.style.setProperty("--csq-theme-x", `${cx}px`);
-    document.documentElement.style.setProperty("--csq-theme-y", `${cy}px`);
-    document.documentElement.style.setProperty("--csq-theme-r", `${radius}px`);
+    const nextBg = getThemeBg(next);
 
-    const transition = doc.startViewTransition!(apply);
-    transition.ready.then(() => {
-      // The incoming layer (next theme) sweeps out from the button as an asymmetric circle.
-      document.documentElement.animate(
-        {
-          clipPath: [
-            `circle(0px at ${cx}px ${cy}px)`,
-            `circle(${radius}px at ${cx}px ${cy}px)`,
-          ],
-        },
-        {
-          duration: 720,
-          easing: "cubic-bezier(0.22, 0.61, 0.36, 1)",
-          pseudoElement: "::view-transition-new(root)",
-        },
+    const overlay = document.createElement("div");
+    overlay.style.cssText = [
+      "position:fixed",
+      "inset:0",
+      "z-index:9999",
+      "pointer-events:none",
+      `background:${nextBg}`,
+      `clip-path:circle(0px at ${cx}px ${cy}px)`,
+      "will-change:clip-path",
+    ].join(";");
+    document.body.appendChild(overlay);
+
+    animatingRef.current = true;
+    const anim = overlay.animate(
+      [
+        { clipPath: `circle(0px at ${cx}px ${cy}px)` },
+        { clipPath: `circle(${radius}px at ${cx}px ${cy}px)` },
+      ],
+      { duration: 750, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)", fill: "forwards" },
+    );
+
+    anim.onfinish = () => {
+      // Swap theme under the cover, then fade the overlay out.
+      apply();
+      const fade = overlay.animate(
+        [{ opacity: 1 }, { opacity: 0 }],
+        { duration: 220, easing: "ease-out", fill: "forwards" },
       );
-    });
+      fade.onfinish = () => {
+        overlay.remove();
+        animatingRef.current = false;
+      };
+    };
   }
 
   return (
