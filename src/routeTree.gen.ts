@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VanguardRouteImport } from './routes/vanguard'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -27,15 +28,24 @@ import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as CodexIndexRouteImport } from './routes/codex.index'
 import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
   path: '/vanguard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubscribeRoute = SubscribeRouteImport.update({
@@ -123,6 +133,11 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => InsightsRoute,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CodexSlugRoute = CodexSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -138,11 +153,28 @@ const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
   path: '/agent/framework',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
   id: '/agent/response/$runId',
   path: '/agent/response/$runId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -164,16 +196,21 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -186,16 +223,21 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -212,16 +254,21 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -239,16 +286,21 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retention-protocol'
     | '/subscribe'
+    | '/unsubscribe'
     | '/vanguard'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
+    | '/email/unsubscribe'
     | '/insights/$slug'
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
     | '/agent/response/$runId'
+    | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -261,16 +313,21 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retention-protocol'
     | '/subscribe'
+    | '/unsubscribe'
     | '/vanguard'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
+    | '/email/unsubscribe'
     | '/insights/$slug'
     | '/ai-readiness'
     | '/codex'
     | '/insights'
     | '/agent/response/$runId'
+    | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -286,16 +343,21 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retention-protocol'
     | '/subscribe'
+    | '/unsubscribe'
     | '/vanguard'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
+    | '/email/unsubscribe'
     | '/insights/$slug'
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
     | '/agent/response/$runId'
+    | '/lovable/email/suppression'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -312,10 +374,15 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   RetentionProtocolRoute: typeof RetentionProtocolRoute
   SubscribeRoute: typeof SubscribeRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   VanguardRoute: typeof VanguardRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -325,6 +392,13 @@ declare module '@tanstack/react-router' {
       path: '/vanguard'
       fullPath: '/vanguard'
       preLoaderRoute: typeof VanguardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/subscribe': {
@@ -446,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsSlugRouteImport
       parentRoute: typeof InsightsRoute
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/codex/$slug': {
       id: '/codex/$slug'
       path: '/$slug'
@@ -467,11 +548,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentFrameworkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/agent/response/$runId': {
       id: '/agent/response/$runId'
       path: '/agent/response/$runId'
       fullPath: '/agent/response/$runId'
       preLoaderRoute: typeof AgentResponseRunIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
@@ -538,10 +640,15 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   RetentionProtocolRoute: RetentionProtocolRoute,
   SubscribeRoute: SubscribeRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   VanguardRoute: VanguardRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AgentResponseRunIdRoute: AgentResponseRunIdRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
