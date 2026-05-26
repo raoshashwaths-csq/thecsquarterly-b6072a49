@@ -143,6 +143,32 @@ export function QAgentButton() {
         <span className="sr-only">Ask Q</span>
       </button>
 
+      {hint && (
+        <div
+          role="status"
+          aria-live="polite"
+          data-leaving={hintLeaving ? "true" : "false"}
+          onClick={dismissAttention}
+          className="q-hint fixed z-40 bottom-[6.25rem] right-[5.5rem] md:bottom-[8.25rem] md:right-[6.75rem] cursor-pointer select-none"
+          style={{ transform: "translateY(-50%)" }}
+        >
+          <div className="relative bg-foreground text-background px-3.5 py-2 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)]">
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-background/70">
+              Meet Q
+            </div>
+            <div className="font-display text-sm leading-tight mt-0.5">
+              Your operator agent is ready<span className="text-accent">.</span>
+            </div>
+            {/* Tail pointing at the Q button */}
+            <span
+              aria-hidden
+              className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-foreground rotate-45"
+            />
+          </div>
+        </div>
+      )}
+
+
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="right"
