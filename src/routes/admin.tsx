@@ -527,6 +527,30 @@ function PostEditor({ editing, setEditing, onCancel, onSubmit }: {
                   </label>
                 </Field>
               </div>
+
+              <div className="pt-4 mt-2 border-t border-border space-y-3">
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">Scheduling & series</div>
+                <Field label="Publish at" hint="ISO timestamp. Blank = publish immediately. Future = scheduled release.">
+                  <input type="text" placeholder="2026-06-02T12:00:00+00:00" value={editing.published_at ?? ""} onChange={(e) => setEditing({ ...editing, published_at: e.target.value })} className={inputCls} />
+                </Field>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Field label="Series slug" hint="lowercase-with-dashes. Leave blank for standalone dispatch.">
+                    <input value={editing.series_slug ?? ""} onChange={(e) => setEditing({ ...editing, series_slug: e.target.value })} className={inputCls} />
+                  </Field>
+                  <Field label="Series title">
+                    <input value={editing.series_title ?? ""} onChange={(e) => setEditing({ ...editing, series_title: e.target.value })} className={inputCls} />
+                  </Field>
+                  <Field label="Part #">
+                    <input type="number" min={1} max={99} value={editing.series_part ?? ""} onChange={(e) => setEditing({ ...editing, series_part: e.target.value === "" ? null : parseInt(e.target.value) })} className={inputCls} />
+                  </Field>
+                  <Field label="Total parts">
+                    <input type="number" min={1} max={99} value={editing.series_total ?? ""} onChange={(e) => setEditing({ ...editing, series_total: e.target.value === "" ? null : parseInt(e.target.value) })} className={inputCls} />
+                  </Field>
+                </div>
+                <Field label="Sources" hint="One per line. Rendered as a list at the foot of the article.">
+                  <textarea value={editing.sources ?? ""} onChange={(e) => setEditing({ ...editing, sources: e.target.value })} rows={5} className={`${inputCls} font-mono text-xs leading-relaxed`} />
+                </Field>
+              </div>
             </div>
           )}
 
