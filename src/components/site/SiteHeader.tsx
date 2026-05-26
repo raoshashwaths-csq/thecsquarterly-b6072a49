@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
+import { useSmartNav } from "@/hooks/useSmartNav";
+import { cn } from "@/lib/utils";
 
 const sections = [
   { to: "/vanguard", label: "Vanguard" },
@@ -38,8 +40,15 @@ export function SiteHeader() {
     .map((s) => s[0]?.toUpperCase())
     .join("");
 
+  const { scrolled, visible } = useSmartNav();
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+    <header
+      className={cn(
+        "smart-nav",
+        scrolled && "smart-nav-frost",
+        !visible && "smart-nav-hidden",
+      )}
+    >
       <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3 md:gap-8">
         <Link to="/" className="group leading-none shrink min-w-0">
           <span className="font-display tracking-tight leading-none text-lg md:text-2xl whitespace-nowrap truncate block">
