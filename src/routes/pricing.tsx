@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Check } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { Reveal } from "@/components/site/Reveal";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, startSubscriptionPlaceholder } from "@/lib/auth.functions";
 
@@ -243,7 +244,7 @@ function PricingPage() {
                 >
                   {t.cta}
                 </button>
-              </div>
+              </Reveal>
             ))}
           </div>
         </section>
