@@ -2,8 +2,11 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { getQRun, type RunZones } from "@/lib/q-agent.functions";
+import { getQRun, setQRunShared, type RunZones } from "@/lib/q-agent.functions";
 import { getNode, breadcrumbFor } from "@/lib/q-trees";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/agent/response/$runId")({
   head: () => ({
@@ -17,15 +20,18 @@ export const Route = createFileRoute("/agent/response/$runId")({
 
 type Run = {
   id: string; node_id: string; context: Record<string, string>;
-  witty: boolean; zones: RunZones; created_at: string;
+  witty: boolean; zones: RunZones; shared: boolean;
+  isOwner: boolean; created_at: string;
 };
 
 function ResponsePage() {
   const { runId } = Route.useParams();
   const fetchRun = useServerFn(getQRun);
+  const updateShared = useServerFn(setQRunShared);
   const navigate = useNavigate();
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -39,61 +45,111 @@ function ResponsePage() {
   const node = run ? getNode(run.node_id) : null;
   const crumb = run ? breadcrumbFor(run.node_id) : [];
 
+  async function toggleShared(next: boolean) {
+    if (!run || sharing) return;
+    setSharing(true);
+    try {
+      await updateShared({ data: { runId: run.id, shared: next } });
+      setRun({ ...run, shared: next });
+      if (next) {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Share link copied to clipboard");
+      } else {
+        toast.success("Sharing disabled");
+      }
+    } catch (e) {
+      toast.error((e as Error).message || "Couldn't update sharing");
+    } finally {
+      setSharing(false);
+    }
+  }
+
+  async function copyLink() {
+    await navigator.clipboard.writeText(window.location.href);
+    toast.success("Link copied");
+  }
+
   return (
-    <main className="min-h-screen pt-32 pb-32">
-      <div className="container max-w-4xl mx-auto px-6 md:px-10">
-        {error && (
-          <div className="border border-border p-8 max-w-xl mx-auto">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">Error</div>
-            <p className="font-body text-foreground/80 mb-6">{error}</p>
-            <Link to="/agent/framework" className="font-mono text-[10px] uppercase tracking-[0.25em] underline">
-              Back to canvas
-            </Link>
-          </div>
-        )}
-
-        {!run && !error && (
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50 text-center mt-24">
-            Q is composing the response…
-          </div>
-        )}
-
-        {run && (
-          <>
-            <div className="mb-12">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
-                Q Response · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
-              </div>
-              <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3">
-                {node?.label ?? "Decision"}<span className="text-accent">.</span>
-              </h1>
-              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55">
-                {crumb.join(" › ")}
-              </div>
-            </div>
-
-            <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
-            <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
-            <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
-
-            <div className="flex flex-wrap gap-3 pt-10 border-t border-border mt-12">
-              <button
-                onClick={() => navigate({ to: "/agent/framework" })}
-                className="px-6 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
-              >
-                New decision
-              </button>
-              <Link
-                to="/agent/framework"
-                className="px-6 py-3 border border-border font-mono text-[10px] uppercase tracking-[0.25em] hover:border-foreground transition-colors"
-              >
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <main className="flex-1 pt-28 md:pt-32 pb-24">
+        <div className="container max-w-4xl mx-auto px-5 sm:px-6 md:px-10">
+          {error && (
+            <div className="border border-border p-8 max-w-xl mx-auto">
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">Error</div>
+              <p className="font-body text-foreground/80 mb-6">{error}</p>
+              <Link to="/agent/framework" className="font-mono text-[10px] uppercase tracking-[0.25em] underline">
                 Back to canvas
               </Link>
             </div>
-          </>
-        )}
-      </div>
-    </main>
+          )}
+
+          {!run && !error && (
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50 text-center mt-24">
+              Q is composing the response…
+            </div>
+          )}
+
+          {run && (
+            <>
+              <div className="mb-10">
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+                  Q Response · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
+                </div>
+                <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3 break-words">
+                  {node?.label ?? "Decision"}<span className="text-accent">.</span>
+                </h1>
+                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55 break-words">
+                  {crumb.join(" › ")}
+                </div>
+              </div>
+
+              {run.isOwner && (
+                <div className="flex flex-wrap items-center justify-between gap-4 border border-border rounded-md px-5 py-4 mb-10">
+                  <div className="min-w-0">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">Share link</div>
+                    <div className="text-xs text-foreground/55 mt-0.5">
+                      {run.shared ? "Anyone with the link can read this response." : "Only you can see this response."}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Switch checked={run.shared} onCheckedChange={toggleShared} aria-label="Toggle public sharing" disabled={sharing} />
+                    {run.shared && (
+                      <button
+                        onClick={copyLink}
+                        className="font-mono text-[10px] uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
+                      >
+                        Copy link
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+              <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+              <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+
+              <div className="flex flex-wrap gap-3 pt-10 border-t border-border mt-12">
+                <button
+                  onClick={() => navigate({ to: "/agent/framework" })}
+                  className="px-6 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+                >
+                  New decision
+                </button>
+                <Link
+                  to="/agent/framework"
+                  className="px-6 py-3 border border-border font-mono text-[10px] uppercase tracking-[0.25em] hover:border-foreground transition-colors"
+                >
+                  Back to canvas
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }
 
@@ -119,7 +175,7 @@ function Zone({
           </button>
         )}
       </div>
-      <div className="font-body text-[15px] md:text-base leading-[1.7] text-foreground/85 whitespace-pre-wrap">
+      <div className="font-body text-[15px] md:text-base leading-[1.7] text-foreground/85 whitespace-pre-wrap break-words">
         {body}
       </div>
     </section>

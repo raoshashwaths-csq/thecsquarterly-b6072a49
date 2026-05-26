@@ -8,7 +8,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { runQNode } from "@/lib/q-agent.functions";
+import { runQNode, listMyQRuns } from "@/lib/q-agent.functions";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -29,11 +29,17 @@ export const Route = createFileRoute("/agent/framework")({
   component: AgentFrameworkPage,
 });
 
+// Strip the "T1 · " prefix from a tree eyebrow.
+function cleanEyebrow(eyebrow: string): string {
+  return eyebrow.replace(/^T\d+\s*[·•]\s*/i, "").trim();
+}
+
 function AgentFrameworkPage() {
   const { user, loading } = useAuth();
   const [hasVanguard, setHasVanguard] = useState<boolean | null>(null);
   const [activeTree, setActiveTree] = useState<TreeId>("T1");
   const [runTerminal, setRunTerminal] = useState<TreeNode | null>(null);
+  const [witty, setWitty] = useState(false);
 
   useEffect(() => {
     if (loading || !user) { setHasVanguard(user ? false : null); return; }
@@ -64,21 +70,30 @@ function AgentFrameworkPage() {
 
   return (
     <CanvasShell>
-      <header className="mb-12 animate-fade-up">
+      <header className="mb-10 animate-fade-up">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
           Operator Canvas · Q.
         </div>
-        <h1 className="font-display text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance max-w-3xl">
+        <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance max-w-3xl">
           What decision are you running today<span className="text-accent">?</span>
         </h1>
         <p className="font-body text-base text-foreground/70 mt-4 max-w-2xl">
           Pick a tree. Walk the path. Q returns a 3-zone response: diagnosis, playbook, executable.
         </p>
+
+        {/* Global voice toggle */}
+        <div className="mt-6 inline-flex items-center gap-4 border border-border rounded-full px-4 py-2">
+          <div className="flex flex-col leading-tight">
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">Voice</span>
+            <span className="text-xs text-foreground/55">{witty ? "Wodehouse — witty" : "McKinsey — analytical"}</span>
+          </div>
+          <Switch checked={witty} onCheckedChange={setWitty} aria-label="Toggle witty voice" />
+        </div>
       </header>
 
       {/* Tree picker rail */}
       <RevealBlock>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-14">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
           {TREES.map((t) => {
             const active = t.id === activeTree;
             return (
@@ -91,10 +106,10 @@ function AgentFrameworkPage() {
                     : "border-border hover:border-foreground"
                 }`}
               >
-                <div className={`font-mono text-[9px] uppercase tracking-[0.25em] mb-1.5 ${active ? "text-background/70" : "text-accent"}`}>
-                  {t.eyebrow}
+                <div className={`font-mono text-[9px] uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
+                  {cleanEyebrow(t.eyebrow)}
                 </div>
-                <div className="font-display text-base leading-tight">{t.title}</div>
+                <div className="font-display text-base leading-tight break-words">{t.title}</div>
               </button>
             );
           })}
@@ -105,16 +120,16 @@ function AgentFrameworkPage() {
       <RevealBlock>
         <div className="border-t border-border pt-6 mb-10">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-2">
-            {tree.eyebrow}
+            {cleanEyebrow(tree.eyebrow)}
           </div>
           <h2 className="font-display text-3xl md:text-4xl leading-tight">{tree.title}</h2>
           <p className="font-body text-sm text-foreground/65 mt-2 max-w-2xl">{tree.blurb}</p>
         </div>
       </RevealBlock>
 
-      {/* Desktop: circular wheel. Mobile: stacked cards. */}
+      {/* Desktop (lg+): circular wheel. Tablet & mobile: stacked cards. */}
       <RevealBlock>
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <TreeWheel
             key={activeTree}
             tree={tree}
@@ -122,7 +137,7 @@ function AgentFrameworkPage() {
             onTerminal={setRunTerminal}
           />
         </div>
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <TreeStack
             tree={tree}
             terminals={terminals}
@@ -131,7 +146,9 @@ function AgentFrameworkPage() {
         </div>
       </RevealBlock>
 
-      <RunDrawer node={runTerminal} onClose={() => setRunTerminal(null)} />
+      <RunHistory />
+
+      <RunDrawer node={runTerminal} witty={witty} setWitty={setWitty} onClose={() => setRunTerminal(null)} />
     </CanvasShell>
   );
 }
@@ -141,7 +158,7 @@ function CanvasShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 pt-28 md:pt-32 pb-24">
-        <div className="container max-w-6xl mx-auto px-6 md:px-10">{children}</div>
+        <div className="container max-w-6xl mx-auto px-5 sm:px-6 md:px-10">{children}</div>
       </main>
       <SiteFooter />
     </div>
@@ -189,7 +206,81 @@ function GateCard({ kind }: { kind: "signin" | "vanguard" }) {
   );
 }
 
-// ============ Circular tree wheel (desktop) ============
+// ============ Terminal card with expand-on-hover / long-press ============
+function TerminalCard({
+  node, index, onActivate, layout,
+}: {
+  node: TreeNode;
+  index: number;
+  onActivate: (n: TreeNode) => void;
+  layout: "wheel" | "stack";
+}) {
+  const [open, setOpen] = useState(false);
+  const parent = node.parentId ? getNode(node.parentId) : undefined;
+  const pressTimer = useState<{ id: number | null }>({ id: null })[0];
+
+  function startPress() {
+    if (pressTimer.id) window.clearTimeout(pressTimer.id);
+    pressTimer.id = window.setTimeout(() => setOpen(true), 380) as unknown as number;
+  }
+  function cancelPress() {
+    if (pressTimer.id) { window.clearTimeout(pressTimer.id); pressTimer.id = null; }
+  }
+
+  const base =
+    "group relative text-left bg-background border rounded-md p-4 transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] shadow-[0_8px_24px_-16px_rgba(0,0,0,0.35)] hover:border-foreground hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.45)] focus:outline-none focus-visible:border-foreground";
+  const stateBorder = open ? "border-foreground" : "border-border";
+
+  return (
+    <button
+      type="button"
+      onClick={() => (open ? onActivate(node) : setOpen(true))}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
+      onTouchMove={cancelPress}
+      onTouchCancel={cancelPress}
+      className={`${base} ${stateBorder} ${layout === "wheel" ? "w-full" : "w-full"}`}
+      style={layout === "wheel"
+        ? { animation: `fade-up 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) ${index * 70}ms both` }
+        : { animation: `fade-up 0.5s cubic-bezier(0.22,0.61,0.36,1) ${index * 50}ms both` }}
+    >
+      <div className="flex items-start gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent shrink-0 mt-0.5">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <div className="min-w-0 flex-1">
+          {parent && (
+            <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/45 mb-1 break-words">
+              {parent.label}
+            </div>
+          )}
+          <div className="font-display text-[15px] leading-snug text-foreground group-hover:text-accent transition-colors break-words">
+            {node.label}
+          </div>
+          <div
+            className={`grid transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
+              open ? "grid-rows-[1fr] opacity-100 mt-3" : "grid-rows-[0fr] opacity-0 mt-0"
+            }`}
+          >
+            <div className="overflow-hidden">
+              <p className="font-body text-[12.5px] leading-relaxed text-foreground/70 break-words">
+                {node.promptTemplate?.slice(0, 220) ?? ""}
+                {node.promptTemplate && node.promptTemplate.length > 220 ? "…" : ""}
+              </p>
+              <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-accent">
+                Tap to open →
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+// ============ Circular tree wheel (desktop ≥ lg) ============
 function TreeWheel({
   tree, terminals, onTerminal,
 }: {
@@ -198,14 +289,12 @@ function TreeWheel({
   onTerminal: (n: TreeNode) => void;
 }) {
   const count = terminals.length;
-  // Geometry: cards arranged on an ellipse around a central hub.
-  // Container is 100% wide with a fixed aspect ratio.
-  const cardW = 230; // px
-  const cardH = 116; // px
-  const radiusX = 360;
-  const radiusY = 280;
-  const containerH = radiusY * 2 + cardH + 40;
-  const containerW = radiusX * 2 + cardW + 40;
+  const cardW = 240;
+  const cardH = 150;
+  const radiusX = 340;
+  const radiusY = 260;
+  const containerH = radiusY * 2 + cardH + 60;
+  const containerW = radiusX * 2 + cardW + 60;
 
   return (
     <div className="relative w-full overflow-hidden" style={{ height: `${containerH}px` }}>
@@ -213,7 +302,6 @@ function TreeWheel({
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: `${containerW}px`, height: `${containerH}px` }}
       >
-        {/* connecting lines (SVG) */}
         <svg
           className="absolute inset-0 w-full h-full text-border pointer-events-none"
           viewBox={`0 0 ${containerW} ${containerH}`}
@@ -241,55 +329,31 @@ function TreeWheel({
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background border border-foreground shadow-[0_20px_60px_-20px_rgba(0,0,0,0.35)] flex flex-col items-center justify-center text-center p-8"
           style={{ width: 280, height: 280 }}
         >
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
-            {tree.eyebrow}
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3 break-words">
+            {cleanEyebrow(tree.eyebrow)}
           </div>
-          <div className="font-display text-xl leading-tight mb-3 text-balance">
+          <div className="font-display text-xl leading-tight mb-3 text-balance break-words">
             {tree.title}
           </div>
-          <div className="font-body text-[12px] text-foreground/60 leading-relaxed text-balance max-w-[200px]">
+          <div className="font-body text-[12px] text-foreground/60 leading-relaxed text-balance max-w-[210px] break-words">
             {tree.blurb}
           </div>
         </div>
 
-        {/* terminal nodes */}
         {terminals.map((node, i) => {
           const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
           const cx = containerW / 2;
           const cy = containerH / 2;
           const x = cx + Math.cos(angle) * radiusX;
           const y = cy + Math.sin(angle) * radiusY;
-          const parent = node.parentId ? getNode(node.parentId) : undefined;
           return (
-            <button
+            <div
               key={node.id}
-              type="button"
-              onClick={() => onTerminal(node)}
-              className="group absolute -translate-x-1/2 -translate-y-1/2 text-left bg-background border border-border hover:border-foreground hover:-translate-y-[calc(50%+3px)] transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] rounded-md p-4 shadow-[0_8px_24px_-16px_rgba(0,0,0,0.35)] reveal-up is-revealed"
-              style={{
-                left: `${x}px`,
-                top: `${y}px`,
-                width: `${cardW}px`,
-                minHeight: `${cardH}px`,
-                animation: `fade-up 0.6s var(--ease-out-expo, cubic-bezier(0.22, 0.61, 0.36, 1)) ${i * 70}ms both`,
-              }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
+              style={{ left: `${x}px`, top: `${y}px`, width: `${cardW}px` }}
             >
-              <div className="flex items-start gap-3">
-                <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent shrink-0 mt-0.5">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="min-w-0">
-                  {parent && (
-                    <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/45 mb-1 truncate">
-                      {parent.label}
-                    </div>
-                  )}
-                  <div className="font-display text-[15px] leading-snug text-foreground group-hover:text-accent transition-colors">
-                    {node.label}
-                  </div>
-                </div>
-              </div>
-            </button>
+              <TerminalCard node={node} index={i} onActivate={onTerminal} layout="wheel" />
+            </div>
           );
         })}
       </div>
@@ -297,7 +361,7 @@ function TreeWheel({
   );
 }
 
-// ============ Mobile stack ============
+// ============ Tablet/Mobile stack ============
 function TreeStack({
   tree, terminals, onTerminal,
 }: {
@@ -308,55 +372,100 @@ function TreeStack({
   return (
     <div className="space-y-6">
       <div className="rounded-full border border-foreground bg-background p-6 text-center mx-auto max-w-xs aspect-square flex flex-col items-center justify-center">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
-          {tree.eyebrow}
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 break-words">
+          {cleanEyebrow(tree.eyebrow)}
         </div>
-        <div className="font-display text-lg leading-tight mb-2 text-balance">
+        <div className="font-display text-lg leading-tight mb-2 text-balance break-words">
           {tree.title}
         </div>
-        <div className="font-body text-xs text-foreground/60 leading-relaxed text-balance">
+        <div className="font-body text-xs text-foreground/60 leading-relaxed text-balance break-words">
           {tree.blurb}
         </div>
       </div>
-      <ul className="space-y-3">
-        {terminals.map((node, i) => {
-          const parent = node.parentId ? getNode(node.parentId) : undefined;
-          return (
-            <li key={node.id}>
-              <button
-                onClick={() => onTerminal(node)}
-                className="w-full text-left bg-background border border-border hover:border-foreground rounded-md p-4 transition-colors"
-                style={{ animation: `fade-up 0.5s cubic-bezier(0.22,0.61,0.36,1) ${i * 50}ms both` }}
-              >
-                <div className="flex items-start gap-3">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent shrink-0 mt-0.5">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="min-w-0">
-                    {parent && (
-                      <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/45 mb-1">
-                        {parent.label}
-                      </div>
-                    )}
-                    <div className="font-display text-base leading-snug">
-                      {node.label}
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </li>
-          );
-        })}
+      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {terminals.map((node, i) => (
+          <li key={node.id}>
+            <TerminalCard node={node} index={i} onActivate={onTerminal} layout="stack" />
+          </li>
+        ))}
       </ul>
     </div>
   );
 }
 
+// ============ Recent runs (history) ============
+function RunHistory() {
+  const list = useServerFn(listMyQRuns);
+  const [runs, setRuns] = useState<Array<{ id: string; node_id: string; created_at: string; witty: boolean; shared: boolean }> | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    list({}).then((r) => { if (alive) setRuns(r.runs); }).catch(() => { if (alive) setRuns([]); });
+    return () => { alive = false; };
+  }, [list]);
+
+  if (!runs || runs.length === 0) return null;
+
+  return (
+    <RevealBlock>
+      <section className="mt-20 border-t border-border pt-10">
+        <div className="flex items-baseline justify-between mb-6">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
+              Run history
+            </div>
+            <h3 className="font-display text-2xl md:text-3xl tracking-tight">Your recent decisions</h3>
+          </div>
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/45">
+            Last {runs.length}
+          </span>
+        </div>
+        <ul className="divide-y divide-border border-t border-b border-border">
+          {runs.map((r) => {
+            const node = getNode(r.node_id);
+            const date = new Date(r.created_at);
+            return (
+              <li key={r.id}>
+                <Link
+                  to="/agent/response/$runId"
+                  params={{ runId: r.id }}
+                  className="flex items-center justify-between gap-4 py-4 hover:bg-foreground/[0.03] px-2 -mx-2 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="font-display text-base leading-tight truncate">
+                      {node?.label ?? "Decision"}
+                    </div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/50 mt-1 truncate">
+                      {node ? breadcrumbFor(node.id).join(" › ") : r.node_id}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55">
+                      {date.toLocaleDateString()}
+                    </div>
+                    <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/40 mt-1">
+                      {r.witty ? "Witty" : "Analytical"}{r.shared ? " · Shared" : ""}
+                    </div>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </RevealBlock>
+  );
+}
+
 // ============ Run drawer ============
-function RunDrawer({ node, onClose }: { node: TreeNode | null; onClose: () => void }) {
+function RunDrawer({ node, witty, setWitty, onClose }: {
+  node: TreeNode | null;
+  witty: boolean;
+  setWitty: (v: boolean) => void;
+  onClose: () => void;
+}) {
   const navigate = useNavigate();
   const run = useServerFn(runQNode);
-  const [witty, setWitty] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
 
@@ -391,11 +500,11 @@ function RunDrawer({ node, onClose }: { node: TreeNode | null; onClose: () => vo
       <SheetContent side="right" className="w-full sm:max-w-[460px] md:max-w-[40vw] bg-background border-l border-border p-0 overflow-y-auto">
         <div className="p-7 md:p-9">
           <SheetHeader className="text-left mb-6">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">
+            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4 break-words">
               {breadcrumb.join(" › ")}
             </div>
             <SheetTitle asChild>
-              <h2 className="font-display text-3xl md:text-4xl leading-tight tracking-tight">
+              <h2 className="font-display text-3xl md:text-4xl leading-tight tracking-tight break-words">
                 {node?.label}<span className="text-accent">.</span>
               </h2>
             </SheetTitle>
@@ -454,5 +563,4 @@ function RunDrawer({ node, onClose }: { node: TreeNode | null; onClose: () => vo
   );
 }
 
-// re-export so unused linter doesn't complain about NODES helper usage
 void NODES;
