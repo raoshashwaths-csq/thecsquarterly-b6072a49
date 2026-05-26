@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouterState, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { askQ } from "@/lib/q-agent.functions";
+import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
+import { TREES } from "@/lib/q-trees";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Sheet,
@@ -28,15 +29,13 @@ export function QAgentButton() {
   const [answer, setAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trialUsed, setTrialUsed] = useState(false);
+  const [unlimited, setUnlimited] = useState(false);
   const ask = useServerFn(askQ);
+  const fetchEntitlement = useServerFn(getQEntitlement);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { user } = useAuth();
   const prevUserIdRef = useRef<string | null>(null);
-
-  // Login-triggered hint: when the user transitions from signed-out → signed-in,
-  // pulse the button and float a one-line label next to it for ~6s. Once per
-  // logged-in user per browser (keyed by uid) so it never nags.
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -51,17 +50,35 @@ export function QAgentButton() {
     }
   }, []);
 
+  // Resolve entitlement whenever the user changes. Admins + active Vanguard
+  // subscribers get unlimited Q and bypass the trial gate entirely.
+  useEffect(() => {
+    if (!user) {
+      setUnlimited(false);
+      return;
+    }
+    let cancelled = false;
+    fetchEntitlement()
+      .then((r) => {
+        if (!cancelled) setUnlimited(!!r.unlimited);
+      })
+      .catch(() => {
+        if (!cancelled) setUnlimited(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user, fetchEntitlement]);
+
   useEffect(() => {
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
-  // Watch for sign-in transition (null → user). Trigger attention + hint.
   useEffect(() => {
     const prev = prevUserIdRef.current;
     const current = user?.id ?? null;
     prevUserIdRef.current = current;
     if (!current || prev === current) return;
-    // prev was null and we now have a user → just signed in.
     try {
       const key = `${LOGIN_HINT_KEY}.${current}`;
       if (localStorage.getItem(key) === "1") return;
@@ -99,22 +116,25 @@ export function QAgentButton() {
     dismissAttention();
   };
 
+  const gated = trialUsed && !unlimited;
 
   const handleAsk = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim() || loading) return;
-    if (trialUsed) return;
+    if (gated) return;
     setLoading(true);
     setAnswer(null);
     try {
       const { reply } = await ask({ data: { question, witty } });
       setAnswer(reply);
-      try {
-        localStorage.setItem(TRIAL_KEY, "1");
-      } catch {
-        // ignore
+      if (!unlimited) {
+        try {
+          localStorage.setItem(TRIAL_KEY, "1");
+        } catch {
+          // ignore
+        }
+        setTrialUsed(true);
       }
-      setTrialUsed(true);
     } catch (err) {
       toast.error((err as Error).message || "Q couldn't reply.");
     } finally {
@@ -126,7 +146,6 @@ export function QAgentButton() {
 
   return (
     <>
-      {/* Floating Q. — wordmark style, not a circular avatar */}
       <button
         type="button"
         onClick={handleOpen}
@@ -159,7 +178,6 @@ export function QAgentButton() {
             <div className="font-display text-sm leading-tight mt-0.5">
               Your operator agent is ready<span className="text-accent">.</span>
             </div>
-            {/* Tail pointing at the Q button */}
             <span
               aria-hidden
               className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-foreground rotate-45"
@@ -177,7 +195,7 @@ export function QAgentButton() {
           <div className="p-7 md:p-9">
             <SheetHeader className="text-left mb-6">
               <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-5">
-                Operator Agent · Preview
+                Operator Agent · Beta
               </div>
               <SheetTitle asChild>
                 <h2 className="font-display text-5xl md:text-6xl leading-[0.9] tracking-tight">
@@ -185,14 +203,14 @@ export function QAgentButton() {
                 </h2>
               </SheetTitle>
               <SheetDescription className="font-body text-base text-foreground/75 leading-relaxed pt-3">
-                Your operator-grade canvas for the four moments that decide a Customer Success quarter.
+                Your operator-grade canvas for the eight moments that decide a Customer Success quarter.
               </SheetDescription>
 
-              {/* Witty mode toggle — sits right under the description */}
+              {/* Voice register toggle */}
               <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
                 <div>
                   <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">
-                    Witty mode
+                    {witty ? "Witty voice" : "Analytical voice"}
                   </div>
                   <div className="text-xs text-foreground/55 mt-0.5">
                     {witty ? "Wodehouse register" : "McKinsey register"}
@@ -202,20 +220,20 @@ export function QAgentButton() {
               </div>
             </SheetHeader>
 
-            {/* Single-question trial */}
+            {/* Single-question trial (unlimited for admins + Vanguard) */}
             <form onSubmit={handleAsk} className="mb-6">
               <label className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 block mb-2">
-                {trialUsed ? "Trial used" : "Ask Q · 1 free question"}
+                {unlimited ? "Ask Q · unlimited" : gated ? "Trial used" : "Ask Q · 1 free question"}
               </label>
               <textarea
                 ref={inputRef}
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                disabled={loading || trialUsed}
+                disabled={loading || gated}
                 rows={3}
                 maxLength={1000}
                 placeholder={
-                  trialUsed
+                  gated
                     ? "Subscribe to Vanguard to keep talking to Q."
                     : "How do I contain a board-level escalation in 24 hours?"
                 }
@@ -223,10 +241,10 @@ export function QAgentButton() {
               />
               <button
                 type="submit"
-                disabled={loading || trialUsed || !question.trim()}
+                disabled={loading || gated || !question.trim()}
                 className="w-full mt-2 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {loading ? "Q is thinking…" : trialUsed ? "Trial used" : "Ask Q"}
+                {loading ? "Q is thinking…" : gated ? "Trial used" : "Ask Q"}
               </button>
             </form>
 
@@ -241,7 +259,7 @@ export function QAgentButton() {
               </div>
             )}
 
-            {trialUsed && (
+            {gated && (
               <Link
                 to="/pricing"
                 onClick={() => setOpen(false)}
@@ -261,15 +279,17 @@ export function QAgentButton() {
 
             <div className="border-t border-border pt-5">
               <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-4">
-                The Four Trees
+                The Eight Trees
               </div>
               <ul className="space-y-3.5">
-                {TREES.map((t) => (
-                  <li key={t.code} className="flex gap-4">
-                    <span className="font-mono text-[11px] text-accent pt-1 shrink-0 w-7">{t.code}</span>
+                {TREES.map((t, i) => (
+                  <li key={t.id} className="flex gap-4">
+                    <span className="font-mono text-[11px] text-accent pt-1 shrink-0 w-7">
+                      {(i + 1).toFixed(1)}
+                    </span>
                     <div>
                       <div className="font-display text-base leading-tight">{t.title}</div>
-                      <div className="text-xs text-foreground/55 mt-0.5">{t.sub}</div>
+                      <div className="text-xs text-foreground/55 mt-0.5">{t.blurb}</div>
                     </div>
                   </li>
                 ))}
@@ -281,10 +301,3 @@ export function QAgentButton() {
     </>
   );
 }
-
-const TREES = [
-  { code: "1.0", title: "Manage an Escalation", sub: "Boardroom temperature, 24-hour containment." },
-  { code: "2.0", title: "Handle Champion Change", sub: "Departed evangelist, hostile incoming heir." },
-  { code: "3.0", title: "Qualify an Upsell", sub: "True Health Index, churn-safe expansion." },
-  { code: "4.0", title: "Career & Alignment", sub: "Appraisals, stretch burden, CFT conflict." },
-];

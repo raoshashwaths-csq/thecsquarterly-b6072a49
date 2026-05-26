@@ -37,6 +37,27 @@ export const askQ = createServerFn({ method: "POST" })
     return { reply: json.choices?.[0]?.message?.content ?? "" };
   });
 
+export const getQEntitlement = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: roles } = await supabase
+      .from("user_roles").select("role").eq("user_id", userId);
+    const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+    let hasVanguard = false;
+    if (!isAdmin) {
+      const { data: sub } = await supabase
+        .from("subscriptions")
+        .select("status, tier")
+        .eq("user_id", userId)
+        .eq("status", "active")
+        .eq("tier", "vanguard")
+        .maybeSingle();
+      hasVanguard = !!sub;
+    }
+    return { unlimited: isAdmin || hasVanguard, isAdmin };
+  });
+
 export type RunZones = { diagnosis: string; playbook: string; executable: string };
 
 function buildSystem(witty: boolean) {
