@@ -3,6 +3,7 @@ import { useRouterState, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { askQ } from "@/lib/q-agent.functions";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Sheet,
   SheetContent,
@@ -14,6 +15,8 @@ import { Switch } from "@/components/ui/switch";
 
 const TRIAL_KEY = "q.trial.used";
 const SEEN_KEY = "q.attention.seen";
+const LOGIN_HINT_KEY = "q.hint.login";
+
 
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
