@@ -368,6 +368,8 @@ function PostsAdmin() {
     title_wodehouse: "", body_wodehouse: "",
     category: "Vanguard", section: "vanguard", author: "The Editors",
     read_minutes: 7, tier: "free", published: true, cover_image_url: "",
+    published_at: "",
+    series_slug: "", series_title: "", series_part: null, series_total: null, sources: "",
   });
 
   const submit = async () => {
