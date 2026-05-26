@@ -293,11 +293,13 @@ function TreeWheel({
   const cardH = 150;
   const radiusX = 340;
   const radiusY = 260;
-  const containerH = radiusY * 2 + cardH + 60;
+  // Add generous vertical breathing room so the top + bottom cards have space to expand on hover.
+  const expandSlack = 220;
+  const containerH = radiusY * 2 + cardH + 60 + expandSlack;
   const containerW = radiusX * 2 + cardW + 60;
 
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: `${containerH}px` }}>
+    <div className="relative w-full" style={{ height: `${containerH}px` }}>
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ width: `${containerW}px`, height: `${containerH}px` }}

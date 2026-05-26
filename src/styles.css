@@ -297,6 +297,16 @@
   transition-duration: 90ms;
 }
 
+/* Theme switch reveal — the incoming layer sweeps out from the toggle button as a circle.
+   The old layer stays put so the new theme appears to flood over it asymmetrically. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
 @media (prefers-reduced-motion: reduce) {
   .q-period, .q-attention { animation: none; }
   .page-enter { animation: none; }
