@@ -211,6 +211,26 @@
   animation: q-attention-pulse 1.6s ease-out infinite;
 }
 
+/* Login hint label that floats next to the Q button to draw the eye. */
+@keyframes q-hint-in {
+  0%   { opacity: 0; transform: translateY(-50%) translateX(8px); }
+  100% { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+@keyframes q-hint-out {
+  0%   { opacity: 1; transform: translateY(-50%) translateX(0); }
+  100% { opacity: 0; transform: translateY(-50%) translateX(8px); }
+}
+.q-hint {
+  animation: q-hint-in 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.q-hint[data-leaving="true"] {
+  animation: q-hint-out 300ms ease-in both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-hint, .q-hint[data-leaving="true"] { animation: none; }
+}
+
+
 /* ---------------------------------------------------------------
    Cinematic page + scroll motion system
    - .page-enter      → fade + 20px upward drift on route mount
