@@ -378,9 +378,15 @@ function PostsAdmin() {
       if (!payload.id) delete payload.id;
       if (!payload.cover_image_url) delete payload.cover_image_url;
       if (!payload.subtitle) delete payload.subtitle;
-      // Nullify empty tone variants so they don't render an empty toggle.
-      (["title_mckinsey","body_mckinsey","title_wodehouse","body_wodehouse"] as const).forEach((k) => {
+      (["title_mckinsey","body_mckinsey","title_wodehouse","body_wodehouse",
+        "series_slug","series_title","sources","published_at"] as const).forEach((k) => {
         if (!payload[k] || !String(payload[k]).trim()) payload[k] = null;
+      });
+      // series_part / series_total: blank → null, else coerce to number
+      (["series_part","series_total"] as const).forEach((k) => {
+        const v = payload[k];
+        if (v === "" || v === null || v === undefined) payload[k] = null;
+        else payload[k] = typeof v === "number" ? v : parseInt(String(v), 10) || null;
       });
       await save({ data: payload });
       toast.success("Saved.");
