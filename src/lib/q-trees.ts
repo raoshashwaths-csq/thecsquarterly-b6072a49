@@ -53,7 +53,7 @@ const ARR_FIELD: ContextField = {
   key: "arr",
   label: "Account ARR",
   kind: "select",
-  options: ["< $100k", "$100k–$500k", "$500k–$2M", "$2M–$10M", "> $10M"],
+  options: ["< $100k", "$100k–$500k", "Growth ($500k–$2M)", "Midmarket ($2M–$10M)", "> $10M"],
   required: true,
 };
 const TIMING_FIELD: ContextField = {
