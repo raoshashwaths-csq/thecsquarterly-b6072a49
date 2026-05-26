@@ -191,3 +191,25 @@
     color: var(--color-accent-foreground);
   }
 }
+
+/* Q agent — period bounce + attention pulse */
+@keyframes q-period-bounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+  55% { transform: translateY(-2px); }
+}
+.q-period {
+  display: inline-block;
+  animation: q-period-bounce 2.2s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+@keyframes q-attention-pulse {
+  0%, 100% { box-shadow: 0 12px 40px -12px rgba(0,0,0,0.55), 0 0 0 0 var(--color-accent); }
+  50%      { box-shadow: 0 12px 40px -12px rgba(0,0,0,0.55), 0 0 0 14px transparent; }
+}
+.q-attention {
+  animation: q-attention-pulse 1.6s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .q-period, .q-attention { animation: none; }
+}
