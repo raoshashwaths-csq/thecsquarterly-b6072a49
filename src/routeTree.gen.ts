@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VanguardRouteImport } from './routes/vanguard'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
 import { Route as PricingRouteImport } from './routes/pricing'
@@ -40,6 +41,11 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
   path: '/vanguard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubscribeRoute = SubscribeRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/subscribe': typeof SubscribeRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
@@ -277,6 +286,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retention-protocol'
     | '/subscribe'
+    | '/unsubscribe'
     | '/vanguard'
     | '/agent/framework'
     | '/ai-readiness/survey'
@@ -303,6 +313,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retention-protocol'
     | '/subscribe'
+    | '/unsubscribe'
     | '/vanguard'
     | '/agent/framework'
     | '/ai-readiness/survey'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/retention-protocol'
     | '/subscribe'
+    | '/unsubscribe'
     | '/vanguard'
     | '/agent/framework'
     | '/ai-readiness/survey'
@@ -362,6 +374,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   RetentionProtocolRoute: typeof RetentionProtocolRoute
   SubscribeRoute: typeof SubscribeRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   VanguardRoute: typeof VanguardRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       path: '/vanguard'
       fullPath: '/vanguard'
       preLoaderRoute: typeof VanguardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/subscribe': {
@@ -620,6 +640,7 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   RetentionProtocolRoute: RetentionProtocolRoute,
   SubscribeRoute: SubscribeRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   VanguardRoute: VanguardRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
@@ -632,3 +653,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
