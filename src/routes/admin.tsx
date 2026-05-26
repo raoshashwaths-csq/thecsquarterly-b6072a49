@@ -368,6 +368,8 @@ function PostsAdmin() {
     title_wodehouse: "", body_wodehouse: "",
     category: "Vanguard", section: "vanguard", author: "The Editors",
     read_minutes: 7, tier: "free", published: true, cover_image_url: "",
+    published_at: "",
+    series_slug: "", series_title: "", series_part: null, series_total: null, sources: "",
   });
 
   const submit = async () => {
@@ -376,9 +378,15 @@ function PostsAdmin() {
       if (!payload.id) delete payload.id;
       if (!payload.cover_image_url) delete payload.cover_image_url;
       if (!payload.subtitle) delete payload.subtitle;
-      // Nullify empty tone variants so they don't render an empty toggle.
-      (["title_mckinsey","body_mckinsey","title_wodehouse","body_wodehouse"] as const).forEach((k) => {
+      (["title_mckinsey","body_mckinsey","title_wodehouse","body_wodehouse",
+        "series_slug","series_title","sources","published_at"] as const).forEach((k) => {
         if (!payload[k] || !String(payload[k]).trim()) payload[k] = null;
+      });
+      // series_part / series_total: blank → null, else coerce to number
+      (["series_part","series_total"] as const).forEach((k) => {
+        const v = payload[k];
+        if (v === "" || v === null || v === undefined) payload[k] = null;
+        else payload[k] = typeof v === "number" ? v : parseInt(String(v), 10) || null;
       });
       await save({ data: payload });
       toast.success("Saved.");
@@ -517,6 +525,30 @@ function PostEditor({ editing, setEditing, onCancel, onSubmit }: {
                     <input type="checkbox" checked={editing.published} onChange={(e) => setEditing({ ...editing, published: e.target.checked })} className="accent-accent" />
                     <span className="text-sm">Published</span>
                   </label>
+                </Field>
+              </div>
+
+              <div className="pt-4 mt-2 border-t border-border space-y-3">
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">Scheduling & series</div>
+                <Field label="Publish at" hint="ISO timestamp. Blank = publish immediately. Future = scheduled release.">
+                  <input type="text" placeholder="2026-06-02T12:00:00+00:00" value={editing.published_at ?? ""} onChange={(e) => setEditing({ ...editing, published_at: e.target.value })} className={inputCls} />
+                </Field>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Field label="Series slug" hint="lowercase-with-dashes. Leave blank for standalone dispatch.">
+                    <input value={editing.series_slug ?? ""} onChange={(e) => setEditing({ ...editing, series_slug: e.target.value })} className={inputCls} />
+                  </Field>
+                  <Field label="Series title">
+                    <input value={editing.series_title ?? ""} onChange={(e) => setEditing({ ...editing, series_title: e.target.value })} className={inputCls} />
+                  </Field>
+                  <Field label="Part #">
+                    <input type="number" min={1} max={99} value={editing.series_part ?? ""} onChange={(e) => setEditing({ ...editing, series_part: e.target.value === "" ? null : parseInt(e.target.value) })} className={inputCls} />
+                  </Field>
+                  <Field label="Total parts">
+                    <input type="number" min={1} max={99} value={editing.series_total ?? ""} onChange={(e) => setEditing({ ...editing, series_total: e.target.value === "" ? null : parseInt(e.target.value) })} className={inputCls} />
+                  </Field>
+                </div>
+                <Field label="Sources" hint="One per line. Rendered as a list at the foot of the article.">
+                  <textarea value={editing.sources ?? ""} onChange={(e) => setEditing({ ...editing, sources: e.target.value })} rows={5} className={`${inputCls} font-mono text-xs leading-relaxed`} />
                 </Field>
               </div>
             </div>

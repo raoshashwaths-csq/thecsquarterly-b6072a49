@@ -108,7 +108,13 @@ const PostSchema = z.object({
   read_minutes: z.number().int().min(1).max(120).default(7),
   tier: z.enum(["free", "premium"]).default("free"),
   published: z.boolean().default(true),
+  published_at: z.string().trim().max(40).optional().nullable(),
   cover_image_url: z.string().trim().max(500).optional().nullable(),
+  series_slug: z.string().trim().max(80).regex(/^[a-z0-9-]+$/).optional().nullable(),
+  series_title: z.string().trim().max(200).optional().nullable(),
+  series_part: z.number().int().min(1).max(99).optional().nullable(),
+  series_total: z.number().int().min(1).max(99).optional().nullable(),
+  sources: z.string().trim().max(8000).optional().nullable(),
 });
 
 
@@ -116,16 +122,14 @@ export const upsertPost = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => PostSchema.parse(input))
   .handler(async ({ data, context }) => {
-    // Admin check (RLS will also enforce, but fail fast with a clear error).
     const { data: roles } = await supabaseAdmin
       .from("user_roles").select("role").eq("user_id", context.userId);
     if (!(roles ?? []).some((r) => r.role === "admin")) throw new Error("Forbidden");
 
-    const payload = {
-      ...data,
-      is_premium: data.tier === "premium",
-    };
-    const { error } = await supabaseAdmin.from("posts").upsert(payload, { onConflict: "slug" });
+    const { published_at, ...rest } = data;
+    const payload: Record<string, unknown> = { ...rest, is_premium: data.tier === "premium" };
+    if (published_at && published_at.trim()) payload.published_at = published_at;
+    const { error } = await supabaseAdmin.from("posts").upsert(payload as never, { onConflict: "slug" });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
