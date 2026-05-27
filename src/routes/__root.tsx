@@ -162,6 +162,7 @@ function RootComponent() {
       <AuthInvalidator />
       <PageTransition />
       <QAgentButton />
+      <CommandPalette />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
