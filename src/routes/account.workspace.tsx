@@ -258,7 +258,7 @@ function DailyBriefing() {
 }
 
 // ---------- A. History ----------
-function HistoryPanel() {
+function HistoryPanel({ query = "" }: { query?: string }) {
   const { user } = useAuth();
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
@@ -277,7 +277,8 @@ function HistoryPanel() {
   });
 
   if (runs.isLoading) return <p className="text-muted-foreground">Loading transcripts…</p>;
-  const items = runs.data ?? [];
+  const q = query.trim().toLowerCase();
+  const items = (runs.data ?? []).filter((r) => !q || r.node_id.toLowerCase().includes(q) || JSON.stringify(r.context).toLowerCase().includes(q));
   if (items.length === 0) {
     return (
       <div className="border border-dashed border-border p-10 text-center">
@@ -332,9 +333,13 @@ function HistoryPanel() {
 }
 
 // ---------- B. Highlights ----------
-function HighlightsPanel() {
-  const [items, setItems] = useState<Annotation[]>([]);
-  useEffect(() => { setItems(loadAllAnnotations()); }, []);
+function HighlightsPanel({ query = "" }: { query?: string }) {
+  const [allItems, setAllItems] = useState<Annotation[]>([]);
+  useEffect(() => { setAllItems(loadAllAnnotations()); }, []);
+  const q = query.trim().toLowerCase();
+  const items = q
+    ? allItems.filter((a) => a.text.toLowerCase().includes(q) || (a.note ?? "").toLowerCase().includes(q) || a.slug.toLowerCase().includes(q))
+    : allItems;
 
   const exportPDF = async () => {
     if (items.length === 0) {
