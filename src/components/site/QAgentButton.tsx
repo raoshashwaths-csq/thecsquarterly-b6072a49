@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { QMark } from "@/components/site/QMark";
+import { ForYou } from "@/components/site/ForYou";
 
 const TRIAL_KEY = "q.trial.used";
 const SEEN_KEY = "q.attention.seen";
@@ -289,6 +290,10 @@ export function QAgentButton() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            <div className="border-t border-border mt-8 pt-6 -mx-7 md:-mx-9 px-1 md:px-2">
+              <ForYou />
             </div>
           </div>
         </SheetContent>
