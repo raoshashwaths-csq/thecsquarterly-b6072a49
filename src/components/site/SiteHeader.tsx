@@ -14,6 +14,7 @@ import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
+import { Search } from "lucide-react";
 
 const sections = [
   { to: "/vanguard", label: "Vanguard" },
