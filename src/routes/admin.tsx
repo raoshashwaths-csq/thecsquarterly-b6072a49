@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, FileText, MessageSquare, BookOpen, Users, CreditCard,
   ShoppingBag, BarChart3, Sparkles, Search as SearchIcon, UsersRound, Mail, Link as LinkIcon,
+  Download, Upload, ScrollText,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -20,6 +21,7 @@ import {
   getAdminStats, listSubscribers, listSubscriptions, listPurchases, listSurveyResponses,
   getQAdminStats, listQRunsAdmin, listQEntitlementsAdmin,
 } from "@/lib/admin.functions";
+import { exportDataset, importArticles, listAuditLog } from "@/lib/admin-ops.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/admin")({
