@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Highlighter, MessageSquare, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  listAnnotations,
+  createAnnotation,
+  deleteAnnotation,
+  bulkImportWorkspace,
+} from "@/lib/workspace.functions";
 
 type Annotation = {
   id: string;
@@ -11,7 +19,10 @@ type Annotation = {
 };
 
 const KEY = (slug: string) => `csq.annotations.${slug}`;
+const MIGRATED_FLAG = "csq.annotations.migrated.v1";
 
+/** Backwards-compatible reader for the PDF exporter — reads localStorage cache.
+ *  Authed users hydrate this cache from the DB on workspace mount. */
 export function loadAnnotations(slug: string): Annotation[] {
   if (typeof window === "undefined") return [];
   try {
@@ -21,29 +32,75 @@ export function loadAnnotations(slug: string): Annotation[] {
   }
 }
 
-function saveAnnotations(slug: string, list: Annotation[]) {
-  localStorage.setItem(KEY(slug), JSON.stringify(list));
+function saveLocal(slug: string, list: Annotation[]) {
+  try { localStorage.setItem(KEY(slug), JSON.stringify(list)); } catch { /* */ }
 }
 
 export function AnnotationBar({ slug }: { slug: string }) {
+  const { user } = useAuth();
+  const fetchList = useServerFn(listAnnotations);
+  const create = useServerFn(createAnnotation);
+  const remove = useServerFn(deleteAnnotation);
+  const bulkImport = useServerFn(bulkImportWorkspace);
+
   const [sel, setSel] = useState<{ text: string; x: number; y: number } | null>(null);
   const [noteOpen, setNoteOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [items, setItems] = useState<Annotation[]>([]);
   const pendingRef = useRef<string>("");
 
+  // Hydrate: anon → localStorage; authed → DB (with one-time import of local).
   useEffect(() => {
-    setItems(loadAnnotations(slug));
-  }, [slug]);
+    let cancelled = false;
+    (async () => {
+      if (!user) {
+        setItems(loadAnnotations(slug));
+        return;
+      }
+      try {
+        // One-time migration of any local annotations for this slug
+        if (typeof window !== "undefined" && !localStorage.getItem(MIGRATED_FLAG)) {
+          const local: Annotation[] = [];
+          for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (!k?.startsWith("csq.annotations.")) continue;
+            try {
+              const arr = JSON.parse(localStorage.getItem(k) || "[]") as Annotation[];
+              if (Array.isArray(arr)) local.push(...arr);
+            } catch { /* */ }
+          }
+          if (local.length) {
+            await bulkImport({
+              data: {
+                annotations: local.slice(0, 500).map((a) => ({
+                  slug: a.slug, kind: a.kind, text: a.text, note: a.note ?? null,
+                })),
+                items: [],
+              },
+            });
+          }
+          localStorage.setItem(MIGRATED_FLAG, "1");
+        }
+        const res = await fetchList({ data: { slug } });
+        if (cancelled) return;
+        const mapped: Annotation[] = (res.annotations ?? []).map((r) => ({
+          id: r.id, slug: r.slug, kind: r.kind as "highlight" | "note",
+          text: r.text, note: r.note ?? undefined, createdAt: new Date(r.created_at).getTime(),
+        }));
+        setItems(mapped);
+        saveLocal(slug, mapped); // keep local cache in sync for PDF exporter
+      } catch {
+        setItems(loadAnnotations(slug));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [slug, user, fetchList, bulkImport]);
 
   useEffect(() => {
     const onUp = () => {
       const s = window.getSelection();
       const text = s?.toString().trim();
-      if (!text || text.length < 3) {
-        setSel(null);
-        return;
-      }
+      if (!text || text.length < 3) { setSel(null); return; }
       const range = s!.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       setSel({
@@ -53,20 +110,42 @@ export function AnnotationBar({ slug }: { slug: string }) {
       });
     };
     document.addEventListener("mouseup", onUp);
-    return () => document.removeEventListener("mouseup", onUp);
+    document.addEventListener("touchend", onUp);
+    return () => {
+      document.removeEventListener("mouseup", onUp);
+      document.removeEventListener("touchend", onUp);
+    };
   }, []);
 
   const persist = (next: Annotation[]) => {
     setItems(next);
-    saveAnnotations(slug, next);
+    saveLocal(slug, next);
+  };
+
+  const addAnnotation = async (kind: "highlight" | "note", text: string, note?: string) => {
+    const optimistic: Annotation = {
+      id: crypto.randomUUID(), slug, kind, text, note, createdAt: Date.now(),
+    };
+    persist([...items, optimistic]);
+    if (!user) return;
+    try {
+      const res = await create({ data: { slug, kind, text, note: note ?? null } });
+      if (res?.annotation) {
+        persist([
+          ...items.filter((a) => a.id !== optimistic.id),
+          {
+            id: res.annotation.id, slug, kind, text,
+            note: res.annotation.note ?? undefined,
+            createdAt: new Date(res.annotation.created_at).getTime(),
+          },
+        ]);
+      }
+    } catch { /* keep optimistic; will reconcile on next hydrate */ }
   };
 
   const addHighlight = () => {
     if (!sel) return;
-    persist([
-      ...items,
-      { id: crypto.randomUUID(), slug, kind: "highlight", text: sel.text, createdAt: Date.now() },
-    ]);
+    void addAnnotation("highlight", sel.text);
     setSel(null);
     window.getSelection()?.removeAllRanges();
   };
@@ -80,22 +159,17 @@ export function AnnotationBar({ slug }: { slug: string }) {
 
   const saveNote = () => {
     if (!pendingRef.current || !noteText.trim()) return setNoteOpen(false);
-    persist([
-      ...items,
-      {
-        id: crypto.randomUUID(),
-        slug,
-        kind: "note",
-        text: pendingRef.current,
-        note: noteText.trim(),
-        createdAt: Date.now(),
-      },
-    ]);
+    void addAnnotation("note", pendingRef.current, noteText.trim());
     setNoteText("");
     setNoteOpen(false);
   };
 
-  const remove = (id: string) => persist(items.filter((a) => a.id !== id));
+  const removeOne = async (id: string) => {
+    persist(items.filter((a) => a.id !== id));
+    if (user) {
+      try { await remove({ data: { id } }); } catch { /* */ }
+    }
+  };
 
   return (
     <>
@@ -106,13 +180,13 @@ export function AnnotationBar({ slug }: { slug: string }) {
         >
           <button
             onClick={addHighlight}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono uppercase tracking-wider hover:bg-accent/10 rounded"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono uppercase tracking-wider hover:bg-accent/10 rounded min-h-[44px]"
           >
             <Highlighter className="w-3.5 h-3.5" /> Highlight
           </button>
           <button
             onClick={openNote}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono uppercase tracking-wider hover:bg-accent/10 rounded"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-mono uppercase tracking-wider hover:bg-accent/10 rounded min-h-[44px]"
           >
             <MessageSquare className="w-3.5 h-3.5" /> Note
           </button>
@@ -139,13 +213,13 @@ export function AnnotationBar({ slug }: { slug: string }) {
             <div className="flex gap-2 justify-end mt-4">
               <button
                 onClick={() => setNoteOpen(false)}
-                className="text-xs font-mono uppercase tracking-wider px-3 py-2 text-muted-foreground"
+                className="text-xs font-mono uppercase tracking-wider px-3 py-2 text-muted-foreground min-h-[44px]"
               >
                 Cancel
               </button>
               <button
                 onClick={saveNote}
-                className="text-xs font-mono uppercase tracking-wider px-3 py-2 bg-accent text-accent-foreground rounded"
+                className="text-xs font-mono uppercase tracking-wider px-3 py-2 bg-accent text-accent-foreground rounded min-h-[44px]"
               >
                 Save note
               </button>
@@ -157,7 +231,7 @@ export function AnnotationBar({ slug }: { slug: string }) {
       {items.length > 0 && (
         <aside className="mt-16 border-t border-border pt-8">
           <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6">
-            Your margin
+            Your margin {user ? "· synced" : "· local only — sign in to sync"}
           </p>
           <ul className="space-y-5">
             {items.map((a) => (
@@ -172,8 +246,8 @@ export function AnnotationBar({ slug }: { slug: string }) {
                   {a.note && <p className="mt-1 text-sm">{a.note}</p>}
                 </div>
                 <button
-                  onClick={() => remove(a.id)}
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-accent"
+                  onClick={() => removeOne(a.id)}
+                  className="md:opacity-0 md:group-hover:opacity-100 text-muted-foreground hover:text-accent min-h-[44px] min-w-[44px] flex items-center justify-center"
                   aria-label="Remove"
                 >
                   <X className="w-3.5 h-3.5" />
