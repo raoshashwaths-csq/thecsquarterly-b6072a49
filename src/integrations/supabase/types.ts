@@ -735,6 +735,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_annotations: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          note: string | null
+          slug: string
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          note?: string | null
+          slug: string
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          slug?: string
+          text?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -752,6 +782,42 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_workspace_items: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          mime_type: string | null
+          size_bytes: number | null
+          tag: string
+          title: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          tag?: string
+          title: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          tag?: string
+          title?: string
+          url?: string | null
           user_id?: string
         }
         Relationships: []
