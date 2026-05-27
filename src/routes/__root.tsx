@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
+import { ClientOnly } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
   Outlet,
@@ -11,7 +12,9 @@ import { Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { QAgentButton } from "@/components/site/QAgentButton";
-import { CommandPalette } from "@/components/site/CommandPalette";
+const CommandPalette = lazy(() =>
+  import("@/components/site/CommandPalette").then((m) => ({ default: m.CommandPalette })),
+);
 import { useHeadlineReveal } from "@/hooks/useHeadlineReveal";
 
 
@@ -163,7 +166,11 @@ function RootComponent() {
       <AuthInvalidator />
       <PageTransition />
       <QAgentButton />
-      <CommandPalette />
+      <ClientOnly fallback={null}>
+        <Suspense fallback={null}>
+          <CommandPalette />
+        </Suspense>
+      </ClientOnly>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
