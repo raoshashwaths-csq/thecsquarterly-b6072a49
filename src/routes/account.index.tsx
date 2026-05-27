@@ -44,7 +44,11 @@ function AccountPage() {
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">Members</div>
         <h1 className="font-display text-5xl mb-8">Your account</h1>
 
+        {/* Recruiter / leader: tools surface BEFORE billing */}
+        {isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
+
         {me.data && (
+
           <div className="space-y-8">
             <section className="border border-border p-8">
               <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Identity</div>
