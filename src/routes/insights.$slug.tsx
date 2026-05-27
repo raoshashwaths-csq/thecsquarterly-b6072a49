@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { SeriesRail } from "@/components/site/SeriesRail";
+import { AnnotationBar } from "@/components/site/AnnotationBar";
+import { AudioBar } from "@/components/site/AudioBar";
 import { useAuth } from "@/hooks/useAuth";
 import { getPost } from "@/lib/posts.functions";
 
@@ -232,6 +234,8 @@ function PostPage() {
 
       <div key={`body-${tone}`} className="prose-content mt-12 animate-tone-swap">{renderMarkdownLite(body)}</div>
 
+      <AnnotationBar slug={slug} />
+
       {sources.length > 0 && (
         <section className="mt-20 pt-10 border-t border-border">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-5">
@@ -300,6 +304,7 @@ function PostPage() {
       </div>
 
       <SiteFooter />
+      <AudioBar text={body} title={post.title} />
     </div>
   );
 }
