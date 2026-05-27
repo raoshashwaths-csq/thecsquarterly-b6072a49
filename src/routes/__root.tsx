@@ -11,6 +11,7 @@ import { Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { QAgentButton } from "@/components/site/QAgentButton";
+import { CommandPalette } from "@/components/site/CommandPalette";
 import { useHeadlineReveal } from "@/hooks/useHeadlineReveal";
 
 
@@ -162,6 +163,7 @@ function RootComponent() {
       <AuthInvalidator />
       <PageTransition />
       <QAgentButton />
+      <CommandPalette />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
