@@ -97,9 +97,17 @@ function AdminPage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 max-w-[1500px] mx-auto px-6 py-10 w-full">
-        <div className="mb-8">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Editorial dashboard</div>
-          <h1 className="font-display text-5xl">The Newsroom</h1>
+        <div className="mb-8 flex items-end justify-between gap-6">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Editorial dashboard</div>
+            <h1 className="font-display text-5xl">The Newsroom</h1>
+          </div>
+          <Link
+            to="/admin/control-panel"
+            className="font-mono text-[11px] uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
+          >
+            Open Control Panel →
+          </Link>
         </div>
 
         {me.data?.isAdmin && (
