@@ -353,7 +353,7 @@ function SubscriptionsList() {
   const q = useQuery({ queryKey: ["admin-subscriptions"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Members</h2>
+      <SectionHeader title="Members" dataset="subscriptions" />
       <DataTable
         rows={q.data ?? []}
         empty="No members yet."
