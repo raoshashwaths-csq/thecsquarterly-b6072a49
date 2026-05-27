@@ -83,7 +83,11 @@ function PlaybookPage() {
         </h1>
         <p className="text-xl text-foreground/75 mb-10 text-pretty">{pb.summary}</p>
 
-        {unlocked ? (
+        {entitlementLoading ? (
+          <div className="border-t border-border pt-10 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Checking access…
+          </div>
+        ) : unlocked ? (
           <div className="prose-content border-t border-border pt-10">
             <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Unlocked</div>
             {(() => {
