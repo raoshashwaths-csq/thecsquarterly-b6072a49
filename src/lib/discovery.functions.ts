@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { TREES } from "@/lib/q-trees";
 
 export type SearchHit = {
-  kind: "article" | "playbook" | "qtree";
+  kind: "article" | "playbook" | "qtree" | "workspace" | "annotation";
   id: string;
   title: string;
   excerpt: string;
