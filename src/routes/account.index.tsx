@@ -27,6 +27,8 @@ function AccountPage() {
   const fetchMe = useServerFn(getMe);
   const fetchPurchases = useServerFn(listMyPurchases);
   const startSub = useServerFn(startSubscriptionPlaceholder);
+  const { group, isRecruiterOrLead } = usePersona();
+
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
