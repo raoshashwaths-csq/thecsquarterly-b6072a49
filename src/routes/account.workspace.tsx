@@ -17,7 +17,6 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
-import jsPDF from "jspdf";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useAuth } from "@/hooks/useAuth";
@@ -282,7 +281,7 @@ function HighlightsPanel() {
   const [items, setItems] = useState<Annotation[]>([]);
   useEffect(() => { setItems(loadAllAnnotations()); }, []);
 
-  const exportPDF = () => {
+  const exportPDF = async () => {
     if (items.length === 0) {
       toast.error("Nothing to export yet.");
       return;
