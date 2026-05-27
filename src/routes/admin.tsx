@@ -40,6 +40,7 @@ type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ cla
 const NAV: NavItem[] = [
   { key: "dashboard", label: "Overview", icon: LayoutDashboard, group: "Editorial" },
   { key: "posts", label: "Articles", icon: FileText, group: "Editorial" },
+  { key: "import-articles", label: "Import Articles", icon: Upload, group: "Editorial" },
   { key: "conversations", label: "1:1 Conversations", icon: MessageSquare, soon: true, group: "Editorial" },
   { key: "playbooks", label: "Codex Playbooks", icon: BookOpen, group: "Editorial" },
   { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
@@ -49,6 +50,7 @@ const NAV: NavItem[] = [
   { key: "purchases", label: "Purchases", icon: ShoppingBag, group: "Commerce" },
   { key: "payment-links", label: "Payment Links", icon: LinkIcon, soon: true, group: "Commerce" },
   { key: "q-agent", label: "Q. Operator Agent", icon: Sparkles, group: "Operations" },
+  { key: "audit-log", label: "Audit Log", icon: ScrollText, group: "Operations" },
   { key: "ai-agent", label: "Editorial AI Agent", icon: Sparkles, soon: true, group: "Operations" },
   { key: "search", label: "Global Search", icon: SearchIcon, soon: true, group: "Operations" },
   { key: "email", label: "Editorial Email", icon: CreditCard, soon: true, group: "Operations" },
