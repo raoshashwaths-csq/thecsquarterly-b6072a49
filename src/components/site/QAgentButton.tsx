@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { QMark } from "@/components/site/QMark";
-import { ForYou } from "@/components/site/ForYou";
 
 const TRIAL_KEY = "q.trial.used";
 const SEEN_KEY = "q.attention.seen";
@@ -265,13 +264,24 @@ export function QAgentButton() {
               </Link>
             )}
 
-            <Link
-              to="/agent/framework"
-              onClick={() => setOpen(false)}
-              className="block text-center mb-6 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
-            >
-              Open the Canvas →
-            </Link>
+            <div className="grid grid-cols-1 gap-2 mb-6">
+              <Link
+                to="/agent/framework"
+                onClick={() => setOpen(false)}
+                className="block text-center py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+              >
+                Open the Canvas →
+              </Link>
+              {user && (
+                <Link
+                  to="/account/workspace"
+                  onClick={() => setOpen(false)}
+                  className="block text-center py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-colors"
+                >
+                  Your Workspace →
+                </Link>
+              )}
+            </div>
 
             <div className="border-t border-border pt-5">
               <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-4">
@@ -290,10 +300,6 @@ export function QAgentButton() {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            <div className="border-t border-border mt-8 pt-6 -mx-7 md:-mx-9 px-1 md:px-2">
-              <ForYou />
             </div>
           </div>
         </SheetContent>
