@@ -410,6 +410,8 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          persona: Database["public"]["Enums"]["user_persona"] | null
+          seniority: string | null
           updated_at: string
         }
         Insert: {
@@ -417,6 +419,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id: string
+          persona?: Database["public"]["Enums"]["user_persona"] | null
+          seniority?: string | null
           updated_at?: string
         }
         Update: {
@@ -424,6 +428,8 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          persona?: Database["public"]["Enums"]["user_persona"] | null
+          seniority?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -794,6 +800,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "subscriber"
+      user_persona:
+        | "csm"
+        | "senior_csm"
+        | "manager"
+        | "director"
+        | "vp"
+        | "recruiter"
+        | "team_lead"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -922,6 +936,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "subscriber"],
+      user_persona: [
+        "csm",
+        "senior_csm",
+        "manager",
+        "director",
+        "vp",
+        "recruiter",
+        "team_lead",
+      ],
     },
   },
 } as const

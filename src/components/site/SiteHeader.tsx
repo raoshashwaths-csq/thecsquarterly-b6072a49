@@ -1,5 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { usePersona } from "@/hooks/usePersona";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,8 +28,11 @@ const sections = [
 
 export function SiteHeader() {
   const { user } = useAuth();
+  const { canUniversalSearch, canWorkspace } = useEntitlements();
+  const { isRecruiterOrLead } = usePersona();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+
 
   const meta = (user?.user_metadata ?? {}) as {
     avatar_url?: string;
@@ -84,18 +89,20 @@ export function SiteHeader() {
 
           {!isHome && (
             <>
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new Event("csq:open-command-palette"))}
-                aria-label="Open search"
-                title="Search (⌘K)"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px]"
-              >
-                <Search size={13} strokeWidth={2.75} />
-                <span className="hidden md:inline text-[10px] tracking-widest">⌘K</span>
-              </button>
+              {canUniversalSearch && (
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new Event("csq:open-command-palette"))}
+                  aria-label="Open search"
+                  title="Universal search (⌘K)"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px]"
+                >
+                  <Search size={13} strokeWidth={2.75} />
+                  <span className="hidden md:inline text-[10px] tracking-widest">⌘K</span>
+                </button>
+              )}
 
-              {user && (
+              {user && canWorkspace && (
                 <Link
                   to="/account/workspace"
                   aria-label="Your Workspace"
@@ -108,6 +115,7 @@ export function SiteHeader() {
               )}
             </>
           )}
+
 
           <LanguageSwitcher />
           <ThemeToggle />

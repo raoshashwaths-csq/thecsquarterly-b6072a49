@@ -3,8 +3,11 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
+import { OperatorTools } from "@/components/site/OperatorTools";
+import { usePersona } from "@/hooks/usePersona";
 
 import { listPosts } from "@/lib/posts.functions";
+
 
 
 const postsQuery = queryOptions({
@@ -48,6 +51,8 @@ function HomePage() {
   const { data: posts } = useSuspenseQuery(postsQuery);
   const featured = posts[0];
   const rest = posts.slice(1, 5);
+  const { group, isRecruiterOrLead } = usePersona();
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -100,10 +105,13 @@ function HomePage() {
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
 
+      {/* Recruiter / leader: tools surface BEFORE the editorial */}
+      {isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
       {/* Featured + Sidebar */}
       {featured && (
         <main className="max-w-7xl w-full mx-auto px-6 py-20 animate-fade-up [animation-delay:400ms]">
+
           <div className="grid lg:grid-cols-12 gap-16">
             <div className="lg:col-span-7">
               <div className="mb-8 font-mono text-[11px] text-accent font-medium">
@@ -200,9 +208,11 @@ function HomePage() {
         </section>
       )}
 
-      
+      {/* Operator / unknown: tools surface AFTER the editorial */}
+      {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
       <SiteFooter />
     </div>
   );
 }
+

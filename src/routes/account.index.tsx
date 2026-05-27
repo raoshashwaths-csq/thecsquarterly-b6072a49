@@ -5,8 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { OperatorTools } from "@/components/site/OperatorTools";
+import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth.functions";
+
 
 export const Route = createFileRoute("/account/")({
   head: () => ({
@@ -24,6 +27,8 @@ function AccountPage() {
   const fetchMe = useServerFn(getMe);
   const fetchPurchases = useServerFn(listMyPurchases);
   const startSub = useServerFn(startSubscriptionPlaceholder);
+  const { group, isRecruiterOrLead } = usePersona();
+
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -39,7 +44,11 @@ function AccountPage() {
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">Members</div>
         <h1 className="font-display text-5xl mb-8">Your account</h1>
 
+        {/* Recruiter / leader: tools surface BEFORE billing */}
+        {isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
+
         {me.data && (
+
           <div className="space-y-8">
             <section className="border border-border p-8">
               <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Identity</div>
@@ -104,6 +113,10 @@ function AccountPage() {
             )}
           </div>
         )}
+
+        {/* Operator: tools surface AFTER billing */}
+        {!isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
+
       </main>
       <SiteFooter />
     </div>
