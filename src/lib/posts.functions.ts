@@ -38,6 +38,50 @@ const SELECT_COLS =
   "id, slug, title, subtitle, excerpt, body, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse, category, section, author, read_minutes, hero_prompt, cover_image_url, is_premium, tier, published, published_at, series_slug, series_title, series_part, series_total, sources";
 
 
+// Strip premium body content from a post for callers without entitlement.
+const PREVIEW_CHARS = 1200;
+function gatePremiumBody<T extends Partial<Post>>(post: T, entitled: boolean): T {
+  if (!post?.is_premium || entitled) return post;
+  return {
+    ...post,
+    body: (post.body ?? "").slice(0, PREVIEW_CHARS),
+    body_mckinsey: post.body_mckinsey ? post.body_mckinsey.slice(0, PREVIEW_CHARS) : post.body_mckinsey,
+    body_wodehouse: post.body_wodehouse ? post.body_wodehouse.slice(0, PREVIEW_CHARS) : post.body_wodehouse,
+  };
+}
+
+// Non-throwing token check for optional auth on public reads.
+async function getOptionalUserId(): Promise<string | null> {
+  const req = getRequest();
+  const auth = req?.headers.get("authorization");
+  if (!auth || !auth.startsWith("Bearer ")) return null;
+  const token = auth.slice(7);
+  if (!token) return null;
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) return null;
+  const sb = createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+  const { data, error } = await sb.auth.getClaims(token);
+  if (error || !data?.claims?.sub) return null;
+  return data.claims.sub as string;
+}
+
+async function isVanguardEntitled(userId: string | null): Promise<boolean> {
+  if (!userId) return false;
+  const { data: roles } = await supabaseAdmin
+    .from("user_roles").select("role").eq("user_id", userId);
+  if ((roles ?? []).some((r) => r.role === "admin")) return true;
+  const { data: sub } = await supabaseAdmin
+    .from("subscriptions")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("status", "active")
+    .maybeSingle();
+  return !!sub;
+}
+
 export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
     .from("posts")
@@ -45,7 +89,9 @@ export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
     .eq("published", true)
     .order("published_at", { ascending: false });
   if (error) throw new Error(error.message);
-  return (data ?? []) as Post[];
+  const userId = await getOptionalUserId();
+  const entitled = await isVanguardEntitled(userId);
+  return (data ?? []).map((p) => gatePremiumBody(p as Post, entitled)) as Post[];
 });
 
 export const listPostsBySection = createServerFn({ method: "GET" })
@@ -60,7 +106,9 @@ export const listPostsBySection = createServerFn({ method: "GET" })
       .eq("published", true)
       .order("published_at", { ascending: false });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as Post[];
+    const userId = await getOptionalUserId();
+    const entitled = await isVanguardEntitled(userId);
+    return (rows ?? []).map((p) => gatePremiumBody(p as Post, entitled)) as Post[];
   });
 
 export const getPost = createServerFn({ method: "GET" })
@@ -68,13 +116,18 @@ export const getPost = createServerFn({ method: "GET" })
     z.object({ slug: z.string().min(1).max(200) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const { data: post, error } = await supabaseAdmin
-      .from("posts")
-      .select(SELECT_COLS)
-      .eq("slug", data.slug)
-      .maybeSingle();
+    const userId = await getOptionalUserId();
+    const entitled = await isVanguardEntitled(userId);
+    let query = supabaseAdmin.from("posts").select(SELECT_COLS).eq("slug", data.slug);
+    if (!entitled) {
+      // Non-entitled (anon or free) callers only see published posts whose
+      // publication date has arrived. Admins/subscribers can preview drafts.
+      query = query.eq("published", true).lte("published_at", new Date().toISOString());
+    }
+    const { data: post, error } = await query.maybeSingle();
     if (error) throw new Error(error.message);
-    return (post ?? null) as Post | null;
+    if (!post) return null;
+    return gatePremiumBody(post as Post, entitled) as Post;
   });
 
 export const listSeriesParts = createServerFn({ method: "GET" })
