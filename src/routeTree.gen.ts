@@ -26,12 +26,12 @@ import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AccountRouteImport } from './routes/account'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as CodexIndexRouteImport } from './routes/codex.index'
 import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
+import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
@@ -132,11 +132,6 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountRoute = AccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -161,6 +156,11 @@ const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AiReadinessRoute,
+} as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
@@ -193,9 +193,9 @@ const AdminControlPanelRoute = AdminControlPanelRouteImport.update({
   getParentRoute: () => AdminRoute,
 } as any)
 const AccountWorkspaceRoute = AccountWorkspaceRouteImport.update({
-  id: '/workspace',
-  path: '/workspace',
-  getParentRoute: () => AccountRoute,
+  id: '/account/workspace',
+  path: '/account/workspace',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
@@ -240,7 +240,6 @@ const ApiV1BenchmarksNrrRoute = ApiV1BenchmarksNrrRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
@@ -265,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/codex/$slug': typeof CodexSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/account/': typeof AccountIndexRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -279,7 +279,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
@@ -301,6 +300,7 @@ export interface FileRoutesByTo {
   '/codex/$slug': typeof CodexSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/account': typeof AccountIndexRoute
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
@@ -316,7 +316,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
@@ -341,6 +340,7 @@ export interface FileRoutesById {
   '/codex/$slug': typeof CodexSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/account/': typeof AccountIndexRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -357,7 +357,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/account'
     | '/admin'
     | '/ai-readiness'
     | '/benchmarks'
@@ -382,6 +381,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/account/'
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
@@ -396,7 +396,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/account'
     | '/admin'
     | '/benchmarks'
     | '/calculator'
@@ -418,6 +417,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/account'
     | '/ai-readiness'
     | '/codex'
     | '/insights'
@@ -432,7 +432,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/account'
     | '/admin'
     | '/ai-readiness'
     | '/benchmarks'
@@ -457,6 +456,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/account/'
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
@@ -472,7 +472,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AccountRoute: typeof AccountRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
   BenchmarksRoute: typeof BenchmarksRoute
@@ -490,8 +489,10 @@ export interface RootRouteChildren {
   TeamsRoute: typeof TeamsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VanguardRoute: typeof VanguardRoute
+  AccountWorkspaceRoute: typeof AccountWorkspaceRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  AccountIndexRoute: typeof AccountIndexRoute
   AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
@@ -622,13 +623,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account': {
-      id: '/account'
-      path: '/account'
-      fullPath: '/account'
-      preLoaderRoute: typeof AccountRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -663,6 +657,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ai-readiness/'
       preLoaderRoute: typeof AiReadinessIndexRouteImport
       parentRoute: typeof AiReadinessRoute
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/insights/$slug': {
       id: '/insights/$slug'
@@ -708,10 +709,10 @@ declare module '@tanstack/react-router' {
     }
     '/account/workspace': {
       id: '/account/workspace'
-      path: '/workspace'
+      path: '/account/workspace'
       fullPath: '/account/workspace'
       preLoaderRoute: typeof AccountWorkspaceRouteImport
-      parentRoute: typeof AccountRoute
+      parentRoute: typeof rootRouteImport
     }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
@@ -764,17 +765,6 @@ declare module '@tanstack/react-router' {
     }
   }
 }
-
-interface AccountRouteChildren {
-  AccountWorkspaceRoute: typeof AccountWorkspaceRoute
-}
-
-const AccountRouteChildren: AccountRouteChildren = {
-  AccountWorkspaceRoute: AccountWorkspaceRoute,
-}
-
-const AccountRouteWithChildren =
-  AccountRoute._addFileChildren(AccountRouteChildren)
 
 interface AdminRouteChildren {
   AdminControlPanelRoute: typeof AdminControlPanelRoute
@@ -829,7 +819,6 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AccountRoute: AccountRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   AiReadinessRoute: AiReadinessRouteWithChildren,
   BenchmarksRoute: BenchmarksRoute,
@@ -847,8 +836,10 @@ const rootRouteChildren: RootRouteChildren = {
   TeamsRoute: TeamsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VanguardRoute: VanguardRoute,
+  AccountWorkspaceRoute: AccountWorkspaceRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  AccountIndexRoute: AccountIndexRoute,
   AgentResponseRunIdRoute: AgentResponseRunIdRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,

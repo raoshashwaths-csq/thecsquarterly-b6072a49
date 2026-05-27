@@ -8,6 +8,7 @@ import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { SeriesRail } from "@/components/site/SeriesRail";
 import { AnnotationBar } from "@/components/site/AnnotationBar";
 import { AudioBar } from "@/components/site/AudioBar";
+import { HighlightedBody } from "@/components/site/HighlightedBody";
 import { useAuth } from "@/hooks/useAuth";
 import { getPost } from "@/lib/posts.functions";
 
@@ -125,6 +126,7 @@ function PostPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [showToneHint, setShowToneHint] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const hasMck = !!(post?.title_mckinsey && post?.body_mckinsey);
   const hasWod = !!(post?.title_wodehouse && post?.body_wodehouse);
@@ -188,7 +190,7 @@ function PostPage() {
       <p className="text-2xl text-foreground/70 italic leading-snug mb-6 text-pretty">
         {post.excerpt}
       </p>
-      <AudioBar text={body} title={post.title} inline />
+      <AudioBar text={body} title={post.title} inline onProgress={setProgress} />
       <div className="flex flex-wrap items-center justify-between gap-4 pb-10 border-b border-border font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
         <div className="flex items-center gap-4">
           <span>By {post.author}</span>
@@ -235,7 +237,7 @@ function PostPage() {
         )}
       </div>
 
-      <div key={`body-${tone}`} className="prose-content mt-12 animate-tone-swap">{renderMarkdownLite(body)}</div>
+      <HighlightedBody body={body} progress={progress} className="prose-content mt-12 animate-tone-swap" key={`body-${tone}`} />
 
       <AnnotationBar slug={slug} />
 

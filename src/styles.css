@@ -407,3 +407,21 @@
     transition: none;
   }
 }
+
+/* Karaoke-style highlight for the audio narrator */
+.csq-word {
+  transition: background-color 180ms ease, color 180ms ease;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.csq-word-active {
+  background-color: color-mix(in oklab, var(--accent) 28%, transparent);
+  color: var(--foreground);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 40%, transparent);
+}
+.csq-word-read {
+  color: color-mix(in oklab, var(--foreground) 60%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .csq-word { transition: none; }
+}

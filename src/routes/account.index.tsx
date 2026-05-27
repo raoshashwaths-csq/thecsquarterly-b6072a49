@@ -8,7 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth.functions";
 
-export const Route = createFileRoute("/account")({
+export const Route = createFileRoute("/account/")({
   head: () => ({
     meta: [
       { title: "Your account, The CS Quarterly" },
