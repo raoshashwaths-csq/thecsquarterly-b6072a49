@@ -271,16 +271,16 @@ function OverviewTab() {
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.series} margin={{ top: 8, right: 20, bottom: 0, left: -10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
-                <XAxis dataKey="date" tickFormatter={fmtDateShort} stroke="hsl(var(--muted-foreground))" fontSize={10} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.4} />
+                <XAxis dataKey="date" tickFormatter={fmtDateShort} stroke="var(--muted-foreground)" fontSize={10} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={10} />
                 <RTooltip
-                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", fontSize: 12 }}
+                  contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", fontSize: 12 }}
                   labelFormatter={(l) => fmtDateShort(String(l))}
                 />
                 <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Line type="monotone" dataKey="sessions" name="Q. sessions" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} />
-                <Line type="monotone" dataKey="registrations" name="Registrations" stroke="hsl(var(--foreground))" strokeWidth={1.5} dot={false} />
+                <Line type="monotone" dataKey="sessions" name="Q. sessions" stroke="var(--accent)" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="registrations" name="Registrations" stroke="var(--foreground)" strokeWidth={1.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           )}
@@ -408,11 +408,11 @@ function DiagnosticsTab() {
           {isLoading || !data ? <Skeleton className="h-full w-full" /> : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.treeFrequency} margin={{ top: 8, right: 12, bottom: 0, left: -10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
-                <XAxis dataKey="tree" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
-                <RTooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", fontSize: 12 }} />
-                <Bar dataKey="count" fill="hsl(var(--accent))" radius={[2, 2, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.4} />
+                <XAxis dataKey="tree" stroke="var(--muted-foreground)" fontSize={11} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={10} />
+                <RTooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", fontSize: 12 }} />
+                <Bar dataKey="count" fill="var(--accent)" radius={[2, 2, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
