@@ -685,7 +685,7 @@ function PlaybooksAdmin() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-3xl">Codex Playbooks</h2>
+        <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Codex Playbooks</h2><ExportButton dataset="playbooks" /></div>
         <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New playbook</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
