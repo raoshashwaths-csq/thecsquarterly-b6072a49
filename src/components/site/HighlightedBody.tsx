@@ -74,8 +74,10 @@ function splitWords(text: string): string[] {
 }
 
 function countWords(b: Block): number {
-  if (b.type === "p" || b.type === "h2" || b.type === "h3") return splitWords(b.text).length;
-  return b.items.reduce((n, it) => n + splitWords(it).length, 0);
+  if (b.type === "ul" || b.type === "ol") {
+    return b.items.reduce((n: number, it: string) => n + splitWords(it).length, 0);
+  }
+  return splitWords(b.text).length;
 }
 
 function renderInlineWords(text: string, startIndex: number, activeIndex: number): ReactNode {
