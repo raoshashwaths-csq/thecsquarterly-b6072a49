@@ -374,7 +374,7 @@ function PurchasesList() {
   const q = useQuery({ queryKey: ["admin-purchases"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Purchases</h2>
+      <SectionHeader title="Purchases" dataset="purchases" />
       <DataTable
         rows={q.data ?? []}
         empty="No purchases yet."
