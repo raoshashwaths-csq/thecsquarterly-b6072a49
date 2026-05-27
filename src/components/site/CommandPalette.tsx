@@ -29,6 +29,8 @@ export function CommandPalette() {
   const debouncedQ = useDebounced(q, 180);
   const navigate = useNavigate();
   const search = useServerFn(globalSearch);
+  const searchWs = useServerFn(searchUserWorkspace);
+  const { user } = useAuth();
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -57,10 +59,19 @@ export function CommandPalette() {
     staleTime: 30_000,
   });
 
-  const hits: SearchHit[] = data?.hits ?? [];
+  const { data: wsData } = useQuery({
+    queryKey: ["workspace-search", debouncedQ, user?.id ?? null],
+    queryFn: () => searchWs({ data: { q: debouncedQ } }),
+    enabled: !!user && debouncedQ.trim().length > 0,
+    staleTime: 30_000,
+  });
+
+  const hits: SearchHit[] = [...(wsData?.hits ?? []), ...(data?.hits ?? [])];
   const articles = hits.filter((h) => h.kind === "article");
   const playbooks = hits.filter((h) => h.kind === "playbook");
   const trees = hits.filter((h) => h.kind === "qtree");
+  const workspace = hits.filter((h) => h.kind === "workspace");
+  const annotations = hits.filter((h) => h.kind === "annotation");
 
   const go = (href: string) => {
     setOpen(false);
