@@ -208,9 +208,11 @@ function HomePage() {
         </section>
       )}
 
-      
+      {/* Operator / unknown: tools surface AFTER the editorial */}
+      {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
       <SiteFooter />
     </div>
   );
 }
+
