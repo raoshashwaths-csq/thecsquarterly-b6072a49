@@ -10,13 +10,24 @@ export function AudioBar({ text, title, inline = false }: { text: string; title:
   const uttRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
-    setSupported(typeof window !== "undefined" && "speechSynthesis" in window);
+    const ok = typeof window !== "undefined" && "speechSynthesis" in window;
+    setSupported(ok);
+    if (ok) {
+      try {
+        setHintDismissed(localStorage.getItem("csq.hint.audio") === "1");
+      } catch { /* ignore */ }
+    }
     return () => {
       if (typeof window !== "undefined" && "speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
     };
   }, []);
+
+  const dismissHint = () => {
+    setHintDismissed(true);
+    try { localStorage.setItem("csq.hint.audio", "1"); } catch { /* ignore */ }
+  };
 
   if (!supported) return null;
 
