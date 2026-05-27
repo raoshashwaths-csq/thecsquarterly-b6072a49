@@ -396,7 +396,7 @@ function DiagnosticList() {
   const q = useQuery({ queryKey: ["admin-surveys"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Diagnostic Responses</h2>
+      <SectionHeader title="Diagnostic Responses" dataset="survey_responses" />
       <DataTable
         rows={q.data ?? []}
         empty="No diagnostic responses yet."
