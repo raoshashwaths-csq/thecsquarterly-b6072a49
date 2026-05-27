@@ -105,10 +105,13 @@ function HomePage() {
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
 
+      {/* Recruiter / leader: tools surface BEFORE the editorial */}
+      {isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
       {/* Featured + Sidebar */}
       {featured && (
         <main className="max-w-7xl w-full mx-auto px-6 py-20 animate-fade-up [animation-delay:400ms]">
+
           <div className="grid lg:grid-cols-12 gap-16">
             <div className="lg:col-span-7">
               <div className="mb-8 font-mono text-[11px] text-accent font-medium">
