@@ -51,6 +51,8 @@ function HomePage() {
   const { data: posts } = useSuspenseQuery(postsQuery);
   const featured = posts[0];
   const rest = posts.slice(1, 5);
+  const { group, isRecruiterOrLead } = usePersona();
+
 
   return (
     <div className="min-h-screen flex flex-col">
