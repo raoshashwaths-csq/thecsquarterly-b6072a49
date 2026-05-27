@@ -35,8 +35,7 @@ export function HighlightedBody({
 }
 
 type Block =
-  | { type: "h2" | "h3"; text: string }
-  | { type: "p"; text: string }
+  | { type: "h2" | "h3" | "p"; text: string }
   | { type: "ul" | "ol"; items: string[] };
 
 function parseBlocks(body: string): Block[] {
