@@ -64,6 +64,8 @@ function AdminPage() {
   const fetchMe = useServerFn(getMe);
   const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe(), enabled: !!user });
   const [active, setActive] = useState<SectionKey>("dashboard");
+  const childMatches = useChildMatches();
+  if (childMatches.length > 0) return <Outlet />;
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
