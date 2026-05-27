@@ -470,7 +470,7 @@ function HighlightsPanel({ query = "" }: { query?: string }) {
 }
 
 // ---------- C. Ledger ----------
-function LedgerPanel() {
+function LedgerPanel({ query = "" }: { query?: string }) {
   const [links, setLinks] = useState<SavedLink[]>([]);
   const [assets, setAssets] = useState<SavedAsset[]>([]);
   const [url, setUrl] = useState("");
