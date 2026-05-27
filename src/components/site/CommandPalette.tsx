@@ -76,7 +76,11 @@ export function CommandPalette() {
   const go = (href: string) => {
     setOpen(false);
     setQ("");
-    navigate({ to: href });
+    if (href.startsWith("http")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      navigate({ to: href });
+    }
   };
 
   return (
@@ -84,7 +88,7 @@ export function CommandPalette() {
       <CommandInput
         value={q}
         onValueChange={setQ}
-        placeholder="Search articles, playbooks, Q operator trees…"
+        placeholder={user ? "Search articles, playbooks, your Workspace…" : "Search articles, playbooks, Q operator trees…"}
       />
       <CommandList className="max-h-[60vh]">
         {debouncedQ.trim().length === 0 ? (
@@ -104,6 +108,20 @@ export function CommandPalette() {
           <CommandEmpty>No matches for "{debouncedQ}".</CommandEmpty>
         ) : (
           <>
+            {workspace.length > 0 && (
+              <CommandGroup heading="Your Workspace">
+                {workspace.map((h) => (
+                  <HitItem key={h.id} hit={h} icon={Bookmark} onSelect={() => go(h.href)} />
+                ))}
+              </CommandGroup>
+            )}
+            {annotations.length > 0 && (
+              <CommandGroup heading="Your Highlights">
+                {annotations.map((h) => (
+                  <HitItem key={h.id} hit={h} icon={Highlighter} onSelect={() => go(h.href)} />
+                ))}
+              </CommandGroup>
+            )}
             {articles.length > 0 && (
               <CommandGroup heading="Articles">
                 {articles.map((h) => (
