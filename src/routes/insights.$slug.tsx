@@ -126,6 +126,7 @@ function PostPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [showToneHint, setShowToneHint] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const hasMck = !!(post?.title_mckinsey && post?.body_mckinsey);
   const hasWod = !!(post?.title_wodehouse && post?.body_wodehouse);
