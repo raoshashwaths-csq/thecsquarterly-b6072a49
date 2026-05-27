@@ -89,18 +89,20 @@ export function SiteHeader() {
 
           {!isHome && (
             <>
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new Event("csq:open-command-palette"))}
-                aria-label="Open search"
-                title="Search (⌘K)"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px]"
-              >
-                <Search size={13} strokeWidth={2.75} />
-                <span className="hidden md:inline text-[10px] tracking-widest">⌘K</span>
-              </button>
+              {canUniversalSearch && (
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new Event("csq:open-command-palette"))}
+                  aria-label="Open search"
+                  title="Universal search (⌘K)"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px]"
+                >
+                  <Search size={13} strokeWidth={2.75} />
+                  <span className="hidden md:inline text-[10px] tracking-widest">⌘K</span>
+                </button>
+              )}
 
-              {user && (
+              {user && canWorkspace && (
                 <Link
                   to="/account/workspace"
                   aria-label="Your Workspace"
@@ -113,6 +115,7 @@ export function SiteHeader() {
               )}
             </>
           )}
+
 
           <LanguageSwitcher />
           <ThemeToggle />
