@@ -324,6 +324,74 @@
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* ---------------------------------------------------------------
+   Headline typeface reveal (h1/h2): each line rises from behind
+   a hidden overflow mask on mount. Wrappers are injected at
+   runtime by useHeadlineReveal so existing components are not
+   modified.
+   --------------------------------------------------------------- */
+.headline-wrapper {
+  overflow: hidden;
+}
+
+.headline-line {
+  display: block;
+  transform: translateY(100%);
+  opacity: 0;
+  animation: revealUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.headline-line:nth-child(1) { animation-delay: 0ms; }
+.headline-line:nth-child(2) { animation-delay: 80ms; }
+.headline-line:nth-child(3) { animation-delay: 160ms; }
+.headline-line:nth-child(4) { animation-delay: 240ms; }
+
+@keyframes revealUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headline-line {
+    transform: none;
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Nav link gold underline: draws L→R on hover, retracts R→L on
+   mouse-out. Applies only to elements that opt in via .nav-link.
+   --------------------------------------------------------------- */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #C4A45A;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.nav-link:not(:hover)::after {
+  transform-origin: right;
+}
+
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) { z-index: 2; }
 
