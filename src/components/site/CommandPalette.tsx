@@ -40,8 +40,13 @@ export function CommandPalette() {
         setOpen(false);
       }
     };
+    const onOpen = () => setOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("csq:open-command-palette", onOpen);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("csq:open-command-palette", onOpen);
+    };
   }, [open]);
 
   const { data, isFetching } = useQuery({

@@ -10,10 +10,14 @@ const SECTIONS = [
 
 const RESOURCES = [
   { label: "AI Readiness Diagnostic", path: "/ai-readiness" },
-  { label: "Pricing", path: "/pricing" },
+  { label: "ROI Calculator", path: "/calculator" },
+  { label: "NRR Benchmarks", path: "/benchmarks" },
+  { label: "Operator Directory", path: "/directory" },
+  { label: "Teams", path: "/teams" },
+  { label: "Reading Sequencer", path: "/sequencer" },
   { label: "Job Board", path: "/job-board" },
+  { label: "Pricing", path: "/pricing" },
   { label: "Subscribe", path: "/subscribe" },
-  { label: "Account", path: "/account" },
 ] as const;
 
 const COMPANY = [
