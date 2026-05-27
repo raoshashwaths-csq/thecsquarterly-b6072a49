@@ -147,6 +147,8 @@ function AdminPage() {
               {active === "purchases" && <PurchasesList />}
               {active === "diagnostic" && <DiagnosticList />}
               {active === "q-agent" && <QAgentAdmin />}
+              {active === "import-articles" && <ImportArticlesAdmin />}
+              {active === "audit-log" && <AuditLogAdmin />}
               {active === "conversations" && <ComingSoon
                 title="1:1 Conversations with Leaders"
                 blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."
