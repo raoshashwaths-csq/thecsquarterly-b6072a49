@@ -75,7 +75,7 @@ function ControlPanelPage() {
 
   useEffect(() => {
     if (!user) return;
-    getMe().then((me) => setIsAdmin(!!me?.roles?.includes("admin"))).catch(() => setIsAdmin(false));
+    getMe().then((me) => setIsAdmin(!!me?.isAdmin)).catch(() => setIsAdmin(false));
   }, [user]);
 
   if (loading || isAdmin === null) {
@@ -891,7 +891,7 @@ function UsersTab() {
     });
   }, [data, search, tierFilter]);
 
-  const act = async (user_id: string, action: Parameters<typeof mgrFn>[0]["data"]["action"]) => {
+  const act = async (user_id: string, action: "grant-vanguard" | "revoke-vanguard" | "grant-admin" | "revoke-admin" | "revoke-sessions") => {
     try {
       await mgrFn({ data: { user_id, action } });
       toast.success("Updated");
