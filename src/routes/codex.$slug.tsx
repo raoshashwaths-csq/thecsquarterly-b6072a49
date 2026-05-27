@@ -82,7 +82,9 @@ function PlaybookPage() {
         <h1 className="font-display text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance mb-6">
           {pb.title}
         </h1>
-        <p className="text-xl text-foreground/75 mb-10 text-pretty">{pb.summary}</p>
+        <p className="text-xl text-foreground/75 mb-6 text-pretty">{pb.summary}</p>
+        {unlocked && <AudioBar text={pb.body} title={pb.title} inline />}
+
 
         {entitlementLoading ? (
           <div className="border-t border-border pt-10 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
