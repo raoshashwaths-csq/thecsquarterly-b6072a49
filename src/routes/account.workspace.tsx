@@ -286,6 +286,7 @@ function HighlightsPanel() {
       toast.error("Nothing to export yet.");
       return;
     }
+    const { default: jsPDF } = await import("jspdf");
     const doc = new jsPDF({ unit: "pt", format: "letter" });
     const W = doc.internal.pageSize.getWidth();
     const H = doc.internal.pageSize.getHeight();
