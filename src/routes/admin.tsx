@@ -279,6 +279,55 @@ function DataTable<T extends Record<string, any>>({ rows, cols, empty }: {
 
 const fmtDate = (s?: string | null) => (s ? new Date(s).toLocaleDateString() : "—");
 
+type ExportDataset =
+  | "posts" | "playbooks" | "subscribers" | "subscriptions" | "purchases"
+  | "survey_responses" | "q_runs" | "admin_audit_log" | "profiles" | "user_roles" | "email_send_log";
+
+function ExportButton({ dataset, label = "Export CSV" }: { dataset: ExportDataset; label?: string }) {
+  const run = useServerFn(exportDataset);
+  const [busy, setBusy] = useState(false);
+  const onClick = async () => {
+    try {
+      setBusy(true);
+      const res = await run({ data: { dataset } });
+      const blob = new Blob([res.csv || ""], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `csq-${dataset}-${stamp}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success(`Exported ${res.count} row${res.count === 1 ? "" : "s"}.`);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      onClick={onClick}
+      disabled={busy}
+      className="inline-flex items-center gap-2 px-3 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40 transition-colors disabled:opacity-50"
+    >
+      <Download className="h-3.5 w-3.5" />
+      {busy ? "Exporting…" : label}
+    </button>
+  );
+}
+
+function SectionHeader({ title, dataset }: { title: string; dataset?: ExportDataset }) {
+  return (
+    <div className="flex items-center justify-between gap-3 flex-wrap">
+      <h2 className="font-display text-3xl">{title}</h2>
+      {dataset && <ExportButton dataset={dataset} />}
+    </div>
+  );
+}
+
 function SubscribersList() {
   const fn = useServerFn(listSubscribers);
   const q = useQuery({ queryKey: ["admin-subscribers"], queryFn: () => fn() });
