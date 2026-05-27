@@ -237,7 +237,7 @@ function PostPage() {
         )}
       </div>
 
-      <div key={`body-${tone}`} className="prose-content mt-12 animate-tone-swap">{renderMarkdownLite(body)}</div>
+      <HighlightedBody body={body} progress={progress} className="prose-content mt-12 animate-tone-swap" key={`body-${tone}`} />
 
       <AnnotationBar slug={slug} />
 
