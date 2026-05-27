@@ -215,7 +215,7 @@ export const getQRunTranscript = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!run) throw new Error("Not found");
 
-    // Scrub: drop any free-text values longer than 1k chars; keep structure.
+    // Scrub long free-text and serialize to JSON string for safe transport.
     const scrub = (val: unknown): unknown => {
       if (val === null || val === undefined) return val;
       if (typeof val === "string") return val.length > 2000 ? val.slice(0, 2000) + "…[truncated]" : val;
@@ -228,12 +228,12 @@ export const getQRunTranscript = createServerFn({ method: "POST" })
       return val;
     };
     return {
-      id: run.id,
-      node_id: run.node_id,
+      id: run.id as string,
+      node_id: run.node_id as string,
       witty: !!run.witty,
-      created_at: run.created_at,
-      input: scrub(run.context ?? {}),
-      output: scrub(run.zones ?? {}),
+      created_at: run.created_at as string,
+      input_json: JSON.stringify(scrub(run.context ?? {}), null, 2),
+      output_json: JSON.stringify(scrub(run.zones ?? {}), null, 2),
     };
   });
 
@@ -292,7 +292,10 @@ export const updateJobFlags = createServerFn({ method: "POST" })
     if (data.pinned !== undefined) patch.pinned = data.pinned;
     if (data.featured !== undefined) patch.featured = data.featured;
     if (data.status !== undefined) patch.status = data.status;
-    const { error } = await supabaseAdmin.from("job_listings").update(patch).eq("id", data.id);
+    const { error } = await supabaseAdmin
+      .from("job_listings")
+      .update(patch as never)
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
