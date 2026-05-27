@@ -3,8 +3,11 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
+import { OperatorTools } from "@/components/site/OperatorTools";
+import { usePersona } from "@/hooks/usePersona";
 
 import { listPosts } from "@/lib/posts.functions";
+
 
 
 const postsQuery = queryOptions({
