@@ -574,88 +574,6 @@ function HighlightsPanel({ query = "" }: { query?: string }) {
     ? allItems.filter((a) => a.text.toLowerCase().includes(q) || (a.note ?? "").toLowerCase().includes(q) || a.slug.toLowerCase().includes(q))
     : allItems;
 
-  const exportPDF = async () => {
-    if (items.length === 0) {
-      toast.error("Nothing to export yet.");
-      return;
-    }
-    const { default: jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ unit: "pt", format: "letter" });
-    const W = doc.internal.pageSize.getWidth();
-    const H = doc.internal.pageSize.getHeight();
-    const M = 56;
-    let y = M;
-
-    // Brand header
-    doc.setFillColor(20, 20, 20);
-    doc.rect(0, 0, W, 72, "F");
-    doc.setTextColor(245, 240, 230);
-    doc.setFont("times", "bold");
-    doc.setFontSize(22);
-    doc.text("The CS Quarterly", M, 44);
-    doc.setTextColor(208, 106, 76);
-    doc.text(".", M + doc.getTextWidth("The CS Quarterly"), 44);
-    doc.setFont("courier", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(245, 240, 230);
-    doc.text("WORKSPACE EXPORT", W - M, 44, { align: "right" });
-
-    y = 110;
-    doc.setTextColor(20, 20, 20);
-    doc.setFont("times", "bold");
-    doc.setFontSize(28);
-    doc.text("Your margin.", M, y);
-    y += 20;
-    doc.setFont("courier", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(120, 120, 120);
-    doc.text(`${items.length} ENTRIES · ${new Date().toLocaleDateString()}`, M, y);
-    y += 30;
-
-    doc.setDrawColor(208, 106, 76);
-    doc.setLineWidth(1);
-    doc.line(M, y, W - M, y);
-    y += 24;
-
-    items.forEach((a) => {
-      if (y > H - 100) {
-        doc.addPage();
-        y = M;
-      }
-      doc.setFont("courier", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(208, 106, 76);
-      doc.text(`${a.kind.toUpperCase()} · ${new Date(a.createdAt).toLocaleDateString()} · ${a.slug}`, M, y);
-      y += 14;
-      doc.setFont("times", "italic");
-      doc.setFontSize(11);
-      doc.setTextColor(40, 40, 40);
-      const quoted = doc.splitTextToSize(`"${a.text}"`, W - 2 * M);
-      doc.text(quoted, M, y);
-      y += quoted.length * 14 + 4;
-      if (a.note) {
-        doc.setFont("times", "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(60, 60, 60);
-        const note = doc.splitTextToSize(`Note: ${a.note}`, W - 2 * M);
-        doc.text(note, M, y);
-        y += note.length * 13;
-      }
-      y += 16;
-      doc.setDrawColor(230, 225, 215);
-      doc.line(M, y - 8, W - M, y - 8);
-    });
-
-    // Footer on last page
-    doc.setFont("courier", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(140, 140, 140);
-    doc.text("thecsquarterly.com · Operator-grade Customer Success", M, H - 30);
-
-    doc.save(`csq-workspace-${new Date().toISOString().slice(0, 10)}.pdf`);
-    toast.success("Workspace exported.");
-  };
-
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
@@ -663,12 +581,13 @@ function HighlightsPanel({ query = "" }: { query?: string }) {
           {items.length} entries across the site
         </p>
         <button
-          onClick={exportPDF}
+          onClick={() => exportWorkspacePDF()}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors min-h-[44px]"
         >
           <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
         </button>
       </div>
+
 
       {items.length === 0 ? (
         <div className="border border-dashed border-border p-10 text-center">
