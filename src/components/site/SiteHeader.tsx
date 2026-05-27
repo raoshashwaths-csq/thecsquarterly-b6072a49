@@ -127,6 +127,36 @@ export function SiteHeader() {
                     Admin
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/calculator" className="font-mono text-[11px] uppercase tracking-widest">
+                    ROI Calculator
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/benchmarks" className="font-mono text-[11px] uppercase tracking-widest">
+                    Benchmarks
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/directory" className="font-mono text-[11px] uppercase tracking-widest">
+                    Directory
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/teams" className="font-mono text-[11px] uppercase tracking-widest">
+                    Teams
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/sequencer" className="font-mono text-[11px] uppercase tracking-widest">
+                    Sequencer
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/admin/control-panel" className="font-mono text-[11px] uppercase tracking-widest">
+                    Control Panel
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => {
