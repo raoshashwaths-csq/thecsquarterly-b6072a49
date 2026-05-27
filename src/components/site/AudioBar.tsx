@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, Square, Gauge } from "lucide-react";
+import { Play, Pause, Square, Gauge, Headphones } from "lucide-react";
 
-export function AudioBar({ text, title }: { text: string; title: string }) {
+export function AudioBar({ text, title, inline = false }: { text: string; title: string; inline?: boolean }) {
   const [supported, setSupported] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
   const [rate, setRate] = useState(1);
+  const [hintDismissed, setHintDismissed] = useState(true);
   const uttRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
