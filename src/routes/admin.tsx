@@ -32,7 +32,8 @@ export const Route = createFileRoute("/admin")({
 type SectionKey =
   | "dashboard" | "posts" | "conversations" | "playbooks"
   | "subscribers" | "subscriptions" | "purchases" | "payment-links"
-  | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email";
+  | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
+  | "import-articles" | "audit-log";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
