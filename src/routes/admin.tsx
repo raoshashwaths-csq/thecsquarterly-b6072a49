@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, FileText, MessageSquare, BookOpen, Users, CreditCard,
   ShoppingBag, BarChart3, Sparkles, Search as SearchIcon, UsersRound, Mail, Link as LinkIcon,
+  Download, Upload, ScrollText,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -20,6 +21,7 @@ import {
   getAdminStats, listSubscribers, listSubscriptions, listPurchases, listSurveyResponses,
   getQAdminStats, listQRunsAdmin, listQEntitlementsAdmin,
 } from "@/lib/admin.functions";
+import { exportDataset, importArticles, listAuditLog } from "@/lib/admin-ops.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/admin")({
@@ -30,13 +32,15 @@ export const Route = createFileRoute("/admin")({
 type SectionKey =
   | "dashboard" | "posts" | "conversations" | "playbooks"
   | "subscribers" | "subscriptions" | "purchases" | "payment-links"
-  | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email";
+  | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
+  | "import-articles" | "audit-log";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
 const NAV: NavItem[] = [
   { key: "dashboard", label: "Overview", icon: LayoutDashboard, group: "Editorial" },
   { key: "posts", label: "Articles", icon: FileText, group: "Editorial" },
+  { key: "import-articles", label: "Import Articles", icon: Upload, group: "Editorial" },
   { key: "conversations", label: "1:1 Conversations", icon: MessageSquare, soon: true, group: "Editorial" },
   { key: "playbooks", label: "Codex Playbooks", icon: BookOpen, group: "Editorial" },
   { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
@@ -46,6 +50,7 @@ const NAV: NavItem[] = [
   { key: "purchases", label: "Purchases", icon: ShoppingBag, group: "Commerce" },
   { key: "payment-links", label: "Payment Links", icon: LinkIcon, soon: true, group: "Commerce" },
   { key: "q-agent", label: "Q. Operator Agent", icon: Sparkles, group: "Operations" },
+  { key: "audit-log", label: "Audit Log", icon: ScrollText, group: "Operations" },
   { key: "ai-agent", label: "Editorial AI Agent", icon: Sparkles, soon: true, group: "Operations" },
   { key: "search", label: "Global Search", icon: SearchIcon, soon: true, group: "Operations" },
   { key: "email", label: "Editorial Email", icon: CreditCard, soon: true, group: "Operations" },
@@ -142,6 +147,8 @@ function AdminPage() {
               {active === "purchases" && <PurchasesList />}
               {active === "diagnostic" && <DiagnosticList />}
               {active === "q-agent" && <QAgentAdmin />}
+              {active === "import-articles" && <ImportArticlesAdmin />}
+              {active === "audit-log" && <AuditLogAdmin />}
               {active === "conversations" && <ComingSoon
                 title="1:1 Conversations with Leaders"
                 blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."
@@ -272,12 +279,61 @@ function DataTable<T extends Record<string, any>>({ rows, cols, empty }: {
 
 const fmtDate = (s?: string | null) => (s ? new Date(s).toLocaleDateString() : "—");
 
+type ExportDataset =
+  | "posts" | "playbooks" | "subscribers" | "subscriptions" | "purchases"
+  | "survey_responses" | "q_runs" | "admin_audit_log" | "profiles" | "user_roles" | "email_send_log";
+
+function ExportButton({ dataset, label = "Export CSV" }: { dataset: ExportDataset; label?: string }) {
+  const run = useServerFn(exportDataset);
+  const [busy, setBusy] = useState(false);
+  const onClick = async () => {
+    try {
+      setBusy(true);
+      const res = await run({ data: { dataset } });
+      const blob = new Blob([res.csv || ""], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `csq-${dataset}-${stamp}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success(`Exported ${res.count} row${res.count === 1 ? "" : "s"}.`);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      onClick={onClick}
+      disabled={busy}
+      className="inline-flex items-center gap-2 px-3 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40 transition-colors disabled:opacity-50"
+    >
+      <Download className="h-3.5 w-3.5" />
+      {busy ? "Exporting…" : label}
+    </button>
+  );
+}
+
+function SectionHeader({ title, dataset }: { title: string; dataset?: ExportDataset }) {
+  return (
+    <div className="flex items-center justify-between gap-3 flex-wrap">
+      <h2 className="font-display text-3xl">{title}</h2>
+      {dataset && <ExportButton dataset={dataset} />}
+    </div>
+  );
+}
+
 function SubscribersList() {
   const fn = useServerFn(listSubscribers);
   const q = useQuery({ queryKey: ["admin-subscribers"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Newsletter Subscribers</h2>
+      <SectionHeader title="Newsletter Subscribers" dataset="subscribers" />
       <DataTable
         rows={q.data ?? []}
         empty="No subscribers yet."
@@ -297,7 +353,7 @@ function SubscriptionsList() {
   const q = useQuery({ queryKey: ["admin-subscriptions"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Members</h2>
+      <SectionHeader title="Members" dataset="subscriptions" />
       <DataTable
         rows={q.data ?? []}
         empty="No members yet."
@@ -318,7 +374,7 @@ function PurchasesList() {
   const q = useQuery({ queryKey: ["admin-purchases"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Purchases</h2>
+      <SectionHeader title="Purchases" dataset="purchases" />
       <DataTable
         rows={q.data ?? []}
         empty="No purchases yet."
@@ -340,7 +396,7 @@ function DiagnosticList() {
   const q = useQuery({ queryKey: ["admin-surveys"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Diagnostic Responses</h2>
+      <SectionHeader title="Diagnostic Responses" dataset="survey_responses" />
       <DataTable
         rows={q.data ?? []}
         empty="No diagnostic responses yet."
@@ -403,7 +459,7 @@ function PostsAdmin() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-3xl">Articles</h2>
+        <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Articles</h2><ExportButton dataset="posts" /></div>
         <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-foreground/90 transition-colors">+ New article</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto bg-background">
@@ -629,7 +685,7 @@ function PlaybooksAdmin() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-3xl">Codex Playbooks</h2>
+        <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Codex Playbooks</h2><ExportButton dataset="playbooks" /></div>
         <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New playbook</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
@@ -823,3 +879,188 @@ function QAgentAdmin() {
   );
 }
 
+
+// ============== Import Articles ==============
+
+function ImportArticlesAdmin() {
+  const run = useServerFn(importArticles);
+  const [text, setText] = useState("");
+  const [mode, setMode] = useState<"upsert" | "skip-existing">("upsert");
+  const [busy, setBusy] = useState(false);
+  const [results, setResults] = useState<{ slug: string; status: string; error?: string }[] | null>(null);
+
+  const parseCsv = (raw: string): Record<string, unknown>[] => {
+    const lines: string[][] = [];
+    let cur: string[] = [];
+    let cell = "";
+    let inQ = false;
+    for (let i = 0; i < raw.length; i++) {
+      const c = raw[i];
+      if (inQ) {
+        if (c === '"' && raw[i + 1] === '"') { cell += '"'; i++; }
+        else if (c === '"') inQ = false;
+        else cell += c;
+      } else {
+        if (c === '"') inQ = true;
+        else if (c === ",") { cur.push(cell); cell = ""; }
+        else if (c === "\n" || c === "\r") {
+          if (c === "\r" && raw[i + 1] === "\n") i++;
+          cur.push(cell); lines.push(cur); cur = []; cell = "";
+        } else cell += c;
+      }
+    }
+    if (cell.length || cur.length) { cur.push(cell); lines.push(cur); }
+    const nonEmpty = lines.filter((l) => l.some((v) => v.trim() !== ""));
+    if (nonEmpty.length < 2) return [];
+    const headers = nonEmpty[0].map((h) => h.trim());
+    return nonEmpty.slice(1).map((row) => {
+      const o: Record<string, unknown> = {};
+      headers.forEach((h, i) => { o[h] = row[i] ?? ""; });
+      return o;
+    });
+  };
+
+  const submit = async () => {
+    try {
+      setBusy(true);
+      setResults(null);
+      const trimmed = text.trim();
+      if (!trimmed) { toast.error("Paste CSV or JSON first."); return; }
+      let articles: Record<string, unknown>[];
+      if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
+        const parsed = JSON.parse(trimmed);
+        articles = Array.isArray(parsed) ? parsed : [parsed];
+      } else {
+        articles = parseCsv(trimmed);
+      }
+      if (!articles.length) { toast.error("No rows detected."); return; }
+      const res = await run({ data: { articles, mode } });
+      setResults(res.results);
+      toast.success(`Imported ${res.ok}, skipped ${res.skipped}, errored ${res.errored}.`);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onFile = async (f: File) => {
+    setText(await f.text());
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Bulk import</div>
+        <h2 className="font-display text-4xl mb-2">Import Articles</h2>
+        <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
+          Upload a CSV or paste JSON. Required columns: <code>slug, title, excerpt, body</code>.
+          Optional: <code>subtitle, category, section, author, read_minutes, tier, published,
+          published_at, cover_image_url, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse,
+          series_slug, series_title, series_part, series_total, sources</code>.
+        </p>
+      </div>
+
+      <div className="border border-border p-5 space-y-4">
+        <div className="flex flex-wrap gap-3 items-center">
+          <label className="inline-flex items-center gap-2 px-3 py-2 border border-border text-xs font-mono uppercase tracking-widest cursor-pointer hover:bg-muted/40">
+            <Upload className="h-3.5 w-3.5" /> Choose file
+            <input type="file" accept=".csv,.json,text/csv,application/json" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
+          </label>
+          <div className="inline-flex border border-border text-xs font-mono uppercase tracking-widest">
+            {(["upsert", "skip-existing"] as const).map((m) => (
+              <button key={m} onClick={() => setMode(m)}
+                className={`px-3 py-2 ${mode === m ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                {m === "upsert" ? "Upsert" : "Skip existing"}
+              </button>
+            ))}
+          </div>
+          <button onClick={submit} disabled={busy}
+            className="ml-auto px-4 py-2 bg-foreground text-background text-xs font-mono uppercase tracking-widest disabled:opacity-50">
+            {busy ? "Importing…" : "Import"}
+          </button>
+        </div>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Paste CSV (with header row) or a JSON array of article objects…"
+          rows={14}
+          className="w-full border border-border bg-background text-foreground px-3 py-2 font-mono text-xs leading-relaxed focus:outline-none focus:border-accent"
+        />
+      </div>
+
+      {results && (
+        <div className="border border-border">
+          <div className="px-4 py-3 border-b border-border font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Results · {results.length}
+          </div>
+          <div className="max-h-[400px] overflow-auto divide-y divide-border">
+            {results.map((r, i) => (
+              <div key={i} className="px-4 py-2 flex items-start gap-3 text-sm">
+                <span className={`font-mono text-[10px] uppercase tracking-widest shrink-0 ${
+                  r.status === "ok" ? "text-accent" : r.status === "skipped" ? "text-muted-foreground" : "text-destructive"
+                }`}>{r.status}</span>
+                <span className="font-mono text-xs">{r.slug}</span>
+                {r.error && <span className="text-xs text-destructive">{r.error}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============== Audit Log ==============
+
+function AuditLogAdmin() {
+  const fn = useServerFn(listAuditLog);
+  const [filterAction, setFilterAction] = useState("");
+  const [filterEmail, setFilterEmail] = useState("");
+  const q = useQuery({
+    queryKey: ["admin-audit-log", filterAction, filterEmail],
+    queryFn: () => fn({ data: { limit: 200, action: filterAction || undefined, actor_email: filterEmail || undefined } }),
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Activity</div>
+          <h2 className="font-display text-4xl">Audit Log</h2>
+        </div>
+        <ExportButton dataset="admin_audit_log" />
+      </div>
+      <div className="flex gap-3 flex-wrap">
+        <input
+          placeholder="Filter action (e.g. export.csv)"
+          value={filterAction}
+          onChange={(e) => setFilterAction(e.target.value)}
+          className="border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:border-accent w-64"
+        />
+        <input
+          placeholder="Filter actor email"
+          value={filterEmail}
+          onChange={(e) => setFilterEmail(e.target.value)}
+          className="border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:border-accent w-64"
+        />
+        <button onClick={() => q.refetch()} className="px-3 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40">
+          Refresh
+        </button>
+      </div>
+      <DataTable
+        rows={q.data ?? []}
+        empty="No admin actions recorded yet."
+        cols={[
+          { key: "created_at", label: "When", render: (r) => new Date(r.created_at).toLocaleString() },
+          { key: "actor_email", label: "Actor", render: (r) => r.actor_email ?? <code className="text-xs">{String(r.actor_id ?? "").slice(0, 8)}</code> },
+          { key: "action", label: "Action", render: (r) => <span className="font-mono text-xs">{r.action}</span> },
+          { key: "target_table", label: "Target", render: (r) => r.target_table ? <span className="font-mono text-xs">{r.target_table}{r.target_id ? `/${String(r.target_id).slice(0, 8)}` : ""}</span> : "—" },
+          { key: "details", label: "Details", render: (r) => <code className="text-[10px] text-muted-foreground">{r.details ? JSON.stringify(r.details) : ""}</code> },
+          { key: "ip", label: "IP", render: (r) => <span className="font-mono text-[10px] text-muted-foreground">{r.ip ?? "—"}</span> },
+        ]}
+      />
+    </div>
+  );
+}
