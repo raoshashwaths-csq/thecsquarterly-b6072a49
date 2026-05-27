@@ -1,5 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { usePersona } from "@/hooks/usePersona";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -26,8 +28,11 @@ const sections = [
 
 export function SiteHeader() {
   const { user } = useAuth();
+  const { canUniversalSearch, canWorkspace } = useEntitlements();
+  const { isRecruiterOrLead } = usePersona();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+
 
   const meta = (user?.user_metadata ?? {}) as {
     avatar_url?: string;
