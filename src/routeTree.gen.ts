@@ -38,6 +38,7 @@ import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
+import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -191,6 +192,11 @@ const AdminControlPanelRoute = AdminControlPanelRouteImport.update({
   path: '/control-panel',
   getParentRoute: () => AdminRoute,
 } as any)
+const AccountWorkspaceRoute = AccountWorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
+  getParentRoute: () => AccountRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -234,7 +240,7 @@ const ApiV1BenchmarksNrrRoute = ApiV1BenchmarksNrrRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
@@ -252,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
@@ -272,7 +279,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
@@ -308,7 +316,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/account': typeof AccountRoute
+  '/account': typeof AccountRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
@@ -326,6 +334,7 @@ export interface FileRoutesById {
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/unsubscribe'
     | '/vanguard'
+    | '/account/workspace'
     | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
@@ -401,6 +411,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/unsubscribe'
     | '/vanguard'
+    | '/account/workspace'
     | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
@@ -439,6 +450,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/unsubscribe'
     | '/vanguard'
+    | '/account/workspace'
     | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
@@ -460,7 +472,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AccountRoute: typeof AccountRoute
+  AccountRoute: typeof AccountRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
   BenchmarksRoute: typeof BenchmarksRoute
@@ -694,6 +706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminControlPanelRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/account/workspace': {
+      id: '/account/workspace'
+      path: '/workspace'
+      fullPath: '/account/workspace'
+      preLoaderRoute: typeof AccountWorkspaceRouteImport
+      parentRoute: typeof AccountRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -745,6 +764,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AccountRouteChildren {
+  AccountWorkspaceRoute: typeof AccountWorkspaceRoute
+}
+
+const AccountRouteChildren: AccountRouteChildren = {
+  AccountWorkspaceRoute: AccountWorkspaceRoute,
+}
+
+const AccountRouteWithChildren =
+  AccountRoute._addFileChildren(AccountRouteChildren)
 
 interface AdminRouteChildren {
   AdminControlPanelRoute: typeof AdminControlPanelRoute
@@ -799,7 +829,7 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AccountRoute: AccountRoute,
+  AccountRoute: AccountRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   AiReadinessRoute: AiReadinessRouteWithChildren,
   BenchmarksRoute: BenchmarksRoute,
