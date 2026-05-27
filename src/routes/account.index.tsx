@@ -5,8 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { OperatorTools } from "@/components/site/OperatorTools";
+import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth.functions";
+
 
 export const Route = createFileRoute("/account/")({
   head: () => ({
