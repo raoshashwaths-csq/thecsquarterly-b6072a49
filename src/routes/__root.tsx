@@ -11,7 +11,9 @@ import { Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { QAgentButton } from "@/components/site/QAgentButton";
-import { CommandPalette } from "@/components/site/CommandPalette";
+const CommandPalette = React.lazy(() =>
+  import("@/components/site/CommandPalette").then((m) => ({ default: m.CommandPalette })),
+);
 import { useHeadlineReveal } from "@/hooks/useHeadlineReveal";
 
 
