@@ -93,16 +93,12 @@ export function AudioBar({
   const [hintDismissed, setHintDismissed] = useState(true);
   const [charIndex, setCharIndex] = useState(0);
   const [currentWord, setCurrentWord] = useState("");
-  const startedAtRef = useRef<number>(0);
-  const pausedAccumRef = useRef<number>(0);
-  const pausedAtRef = useRef<number | null>(null);
   const uttRef = useRef<SpeechSynthesisUtterance | null>(null);
   const onProgressRef = useRef(onProgress);
   onProgressRef.current = onProgress;
 
   const spoken = buildSpeechText(text, title);
   const total = spoken.length;
-  // Approx duration: ~14 chars/sec at rate 1.0
   const estDuration = (total / (14 * rate)) || 1;
 
   useEffect(() => {
@@ -124,26 +120,17 @@ export function AudioBar({
     };
   }, []);
 
-  // Smooth progress ticker — onBoundary fires per word but interp keeps UI fluid
-  useEffect(() => {
-    if (!playing || paused) return;
-    let raf = 0;
-    const tick = () => {
-      const elapsed = (performance.now() - startedAtRef.current - pausedAccumRef.current) / 1000;
-      const ratio = Math.min(1, elapsed / estDuration);
-      onProgressRef.current?.(ratio);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [playing, paused, estDuration]);
-
   const dismissHint = () => {
     setHintDismissed(true);
     try { localStorage.setItem("csq.hint.audio", "1"); } catch { /* */ }
   };
 
   if (!supported) return null;
+
+  const emit = (idx: number) => {
+    const r = total ? Math.min(1, Math.max(0, idx / total)) : 0;
+    onProgressRef.current?.(r);
+  };
 
   const buildUtterance = (body: string, r: number) => {
     const u = new SpeechSynthesisUtterance(body);
@@ -154,8 +141,11 @@ export function AudioBar({
     if (voice) u.voice = voice;
     u.onboundary = (e) => {
       if (e.name && e.name !== "word") return;
+      // Drive highlight ratio directly from the synthesizer's reported char
+      // index. No RAF interpolation — that was the drift source.
       setCharIndex(e.charIndex);
-      const slice = body.slice(e.charIndex, e.charIndex + 40);
+      emit(e.charIndex);
+      const slice = body.slice(e.charIndex, e.charIndex + 60);
       const word = slice.match(/^\W*([\w'-]+)/)?.[1] ?? "";
       setCurrentWord(word);
     };
@@ -172,10 +162,8 @@ export function AudioBar({
     window.speechSynthesis.cancel();
     const u = buildUtterance(spoken, rate);
     uttRef.current = u;
-    startedAtRef.current = performance.now();
-    pausedAccumRef.current = 0;
-    pausedAtRef.current = null;
     setCharIndex(0);
+    emit(0);
     window.speechSynthesis.speak(u);
     setPlaying(true);
     setPaused(false);
@@ -185,14 +173,9 @@ export function AudioBar({
     if (!playing) return start();
     if (paused) {
       window.speechSynthesis.resume();
-      if (pausedAtRef.current) {
-        pausedAccumRef.current += performance.now() - pausedAtRef.current;
-        pausedAtRef.current = null;
-      }
       setPaused(false);
     } else {
       window.speechSynthesis.pause();
-      pausedAtRef.current = performance.now();
       setPaused(true);
     }
   };
@@ -212,8 +195,6 @@ export function AudioBar({
       window.speechSynthesis.cancel();
       const u = buildUtterance(spoken, next);
       uttRef.current = u;
-      startedAtRef.current = performance.now();
-      pausedAccumRef.current = 0;
       window.speechSynthesis.speak(u);
     }
   };
@@ -260,7 +241,6 @@ export function AudioBar({
         </span>
       </div>
 
-      {/* Timeline */}
       <div className="mt-2 h-1 w-full bg-border/60 rounded-full overflow-hidden">
         <div
           className="h-full bg-accent transition-[width] duration-150 ease-linear"
