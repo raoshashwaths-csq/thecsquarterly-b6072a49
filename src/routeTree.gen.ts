@@ -19,6 +19,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobBoardRouteImport } from './routes/job-board'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as CodexRouteImport } from './routes/codex'
+import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
@@ -87,6 +88,11 @@ const InsightsRoute = InsightsRouteImport.update({
 const CodexRoute = CodexRouteImport.update({
   id: '/codex',
   path: '/codex',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiReadinessRoute = AiReadinessRouteImport.update({
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
@@ -224,6 +231,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/calculator': typeof CalculatorRoute
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
@@ -287,6 +296,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/calculator'
     | '/codex'
     | '/insights'
     | '/job-board'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/admin'
+    | '/calculator'
     | '/job-board'
     | '/login'
     | '/outcome-forum'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/calculator'
     | '/codex'
     | '/insights'
     | '/job-board'
@@ -378,6 +390,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
+  CalculatorRoute: typeof CalculatorRoute
   CodexRoute: typeof CodexRouteWithChildren
   InsightsRoute: typeof InsightsRouteWithChildren
   JobBoardRoute: typeof JobBoardRoute
@@ -467,6 +480,13 @@ declare module '@tanstack/react-router' {
       path: '/codex'
       fullPath: '/codex'
       preLoaderRoute: typeof CodexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai-readiness': {
@@ -661,6 +681,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
   AiReadinessRoute: AiReadinessRouteWithChildren,
+  CalculatorRoute: CalculatorRoute,
   CodexRoute: CodexRouteWithChildren,
   InsightsRoute: InsightsRouteWithChildren,
   JobBoardRoute: JobBoardRoute,
