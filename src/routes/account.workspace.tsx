@@ -540,19 +540,22 @@ function LedgerPanel({ query = "" }: { query?: string }) {
   };
 
   const tagGroups = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const fLinks = q ? links.filter((l) => l.title.toLowerCase().includes(q) || l.url.toLowerCase().includes(q) || l.tag.toLowerCase().includes(q)) : links;
+    const fAssets = q ? assets.filter((a) => a.name.toLowerCase().includes(q) || a.tag.toLowerCase().includes(q)) : assets;
     const map = new Map<string, { links: SavedLink[]; assets: SavedAsset[] }>();
-    links.forEach((l) => {
+    fLinks.forEach((l) => {
       if (!map.has(l.tag)) map.set(l.tag, { links: [], assets: [] });
       map.get(l.tag)!.links.push(l);
     });
-    assets.forEach((a) => {
+    fAssets.forEach((a) => {
       if (!map.has(a.tag)) map.set(a.tag, { links: [], assets: [] });
       map.get(a.tag)!.assets.push(a);
     });
     return [...map.entries()].sort((a, b) =>
       (b[1].links.length + b[1].assets.length) - (a[1].links.length + a[1].assets.length),
     );
-  }, [links, assets]);
+  }, [links, assets, query]);
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
