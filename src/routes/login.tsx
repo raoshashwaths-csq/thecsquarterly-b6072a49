@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { PERSONA_OPTIONS, type Persona } from "@/hooks/usePersona";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -20,6 +21,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [persona, setPersona] = useState<Persona | "">("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -28,15 +30,28 @@ function LoginPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        if (!persona) {
+          toast.error("Pick the role that best describes you.");
+          setLoading(false);
+          return;
+        }
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/account`,
-            data: { display_name: name },
+            data: { display_name: name, persona },
           },
         });
         if (error) throw error;
+        // Best-effort upsert so persona is queryable immediately (covers the
+        // case where the user is auto-signed-in without email confirmation).
+        if (data.user) {
+          await supabase.from("profiles").upsert(
+            { id: data.user.id, email, display_name: name, persona },
+            { onConflict: "id" },
+          );
+        }
         toast.success("Account created. Check your inbox to confirm your email.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -76,14 +91,47 @@ function LoginPage() {
           </div>
           <form onSubmit={onSubmit} className="space-y-4">
             {mode === "signup" && (
-              <input
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                className="w-full border border-border bg-background px-4 py-3 font-body"
-              />
+              <>
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full border border-border bg-background px-4 py-3 font-body"
+                />
+                <div>
+                  <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+                    Your role in the CS hierarchy
+                  </label>
+                  <select
+                    value={persona}
+                    onChange={(e) => setPersona(e.target.value as Persona)}
+                    required
+                    className="w-full border border-border bg-background px-4 py-3 font-body text-sm"
+                  >
+                    <option value="">Select your role…</option>
+                    <optgroup label="Operators (IC track)">
+                      {PERSONA_OPTIONS.filter((o) => o.group === "operator").map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Leaders">
+                      {PERSONA_OPTIONS.filter((o) => o.group === "leader").map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Talent">
+                      {PERSONA_OPTIONS.filter((o) => o.group === "recruiter").map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    Recruiters & team leads see tools first; operators see articles first.
+                  </p>
+                </div>
+              </>
             )}
             <input
               type="email"
@@ -120,3 +168,4 @@ function LoginPage() {
     </div>
   );
 }
+
