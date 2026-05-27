@@ -166,7 +166,11 @@ function RootComponent() {
       <AuthInvalidator />
       <PageTransition />
       <QAgentButton />
-      <CommandPalette />
+      <ClientOnly fallback={null}>
+        <React.Suspense fallback={null}>
+          <CommandPalette />
+        </React.Suspense>
+      </ClientOnly>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
