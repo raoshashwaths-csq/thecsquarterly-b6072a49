@@ -132,9 +132,17 @@ function WorkspacePage() {
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
           Members · Workspace
         </div>
-        <h1 className="font-display text-4xl md:text-6xl tracking-tight mb-2">
-          Your Workspace<span className="text-accent">.</span>
-        </h1>
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-2">
+          <h1 className="font-display text-4xl md:text-6xl tracking-tight">
+            Your Workspace<span className="text-accent">.</span>
+          </h1>
+          <button
+            onClick={() => exportWorkspacePDF()}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors min-h-[44px]"
+          >
+            <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
+          </button>
+        </div>
         <p className="text-foreground/65 mb-6 max-w-2xl">
           Your transcripts, annotations, and saved intel — in one operator-grade ledger.
         </p>
@@ -207,54 +215,279 @@ function WorkspacePage() {
   );
 }
 
+// ---------- Briefing generator ----------
+type Briefing = { today: string; list: string[]; meta: { total: number; fresh: number; stale: number; topTag?: string } };
+
+function generateBriefing(links: SavedLink[], assets: SavedAsset[], annotations: Annotation[]): Briefing {
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  const all: { tag: string; createdAt: number }[] = [
+    ...links.map((l) => ({ tag: l.tag, createdAt: l.createdAt })),
+    ...assets.map((a) => ({ tag: a.tag, createdAt: a.createdAt })),
+  ];
+  const total = all.length;
+  if (total === 0 && annotations.length === 0) {
+    return {
+      today,
+      meta: { total: 0, fresh: 0, stale: 0 },
+      list: [
+        "Your Knowledge Ledger is empty. Drop a URL or file to start building operator memory.",
+        "Pinned reading: this week's dispatch covers the 105% → 128% NRR rebuild.",
+        "Run your first Q diagnostic to unlock a tailored briefing tomorrow.",
+      ],
+    };
+  }
+  const now = Date.now();
+  const DAY = 86_400_000;
+  const fresh = all.filter((x) => now - x.createdAt < 7 * DAY).length;
+  const stale = all.filter((x) => now - x.createdAt > 30 * DAY).length;
+  const tagCounts = new Map<string, number>();
+  all.forEach((x) => tagCounts.set(x.tag, (tagCounts.get(x.tag) ?? 0) + 1));
+  const ranked = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
+  const top = ranked[0];
+  const concentration = top && total > 0 ? top[1] / total : 0;
+  const recentHighlights = annotations.filter((a) => now - a.createdAt < 14 * DAY);
+  const slugs = new Set(annotations.map((a) => a.slug));
+
+  const out: string[] = [];
+  out.push(
+    `Ledger holds ${total} item${total === 1 ? "" : "s"} across ${ranked.length} theme${ranked.length === 1 ? "" : "s"}` +
+      (fresh ? ` — ${fresh} added this week.` : "."),
+  );
+  if (top && concentration >= 0.5) {
+    out.push(`Concentration alert: ${Math.round(concentration * 100)}% of saves cluster under "${top[0]}". Broaden the next pull to avoid a single-narrative blind spot.`);
+  } else if (top) {
+    out.push(`Dominant theme this cycle: "${top[0]}" (${top[1]} item${top[1] === 1 ? "" : "s"})${ranked[1] ? `, trailed by "${ranked[1][0]}".` : "."}`);
+  }
+  if (recentHighlights.length > 0) {
+    out.push(`You marked ${recentHighlights.length} highlight${recentHighlights.length === 1 ? "" : "s"} across ${slugs.size} dispatch${slugs.size === 1 ? "" : "es"} recently — worth synthesizing into one playbook note.`);
+  }
+  if (stale >= 3) {
+    out.push(`${stale} item${stale === 1 ? " is" : "s are"} over 30 days old. Triage or archive before your next QBR block.`);
+  }
+  if (out.length < 4) {
+    out.push("Open one saved link and turn it into a 3-sentence brief — that is today's compounding action.");
+  }
+  return { today, meta: { total, fresh, stale, topTag: top?.[0] }, list: out.slice(0, 5) };
+}
+
 // ---------- Daily Briefing ----------
 function DailyBriefing() {
   const [links, setLinks] = useState<SavedLink[]>([]);
   const [assets, setAssets] = useState<SavedAsset[]>([]);
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   useEffect(() => {
+    // Re-read on every mount so a fresh visit regenerates the briefing
     setLinks(loadJSON<SavedLink[]>(LINKS_KEY, []));
     setAssets(loadJSON<SavedAsset[]>(ASSETS_KEY, []));
+    setAnnotations(loadAllAnnotations());
   }, []);
 
-  const insights = useMemo(() => {
-    const tagCounts = new Map<string, number>();
-    [...links, ...assets].forEach((x) => tagCounts.set(x.tag, (tagCounts.get(x.tag) ?? 0) + 1));
-    const top = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 2);
-    const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
-    const out: string[] = [];
-    if (links.length === 0 && assets.length === 0) {
-      out.push("Your Knowledge Ledger is empty. Drop a URL or file to start building your operator memory.");
-      out.push("Pinned reading: this week's dispatch covers the 105% to 128% NRR rebuild.");
-      out.push("Run your first diagnostic to unlock a tailored briefing.");
-      return { today, list: out };
-    }
-    out.push(`You have ${links.length} link${links.length === 1 ? "" : "s"} and ${assets.length} asset${assets.length === 1 ? "" : "s"} in your ledger.`);
-    if (top[0]) out.push(`Concentration risk: ${top[0][1]} item${top[0][1] === 1 ? "" : "s"} clustered under "${top[0][0]}" — consider broadening.`);
-    if (top[1]) out.push(`Secondary theme: "${top[1][0]}". Worth a Tuesday block to consolidate.`);
-    out.push("Open a saved link to refresh context before your next QBR.");
-    return { today, list: out.slice(0, 4) };
-  }, [links, assets]);
+  const briefing = useMemo(() => generateBriefing(links, assets, annotations), [links, assets, annotations]);
 
   return (
     <section className="mt-8 border-2 border-accent bg-accent/5 p-6 md:p-8">
       <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 font-semibold">
         <Sparkles className="w-3 h-3" />
-        Daily Operational Briefing · {insights.today}
+        Daily Operational Briefing · {briefing.today}
       </div>
       <h2 className="font-display text-2xl md:text-3xl mb-4 tracking-tight">
         What to focus on today.
       </h2>
       <ul className="space-y-2.5">
-        {insights.list.map((line, i) => (
+        {briefing.list.map((line, i) => (
           <li key={i} className="flex gap-3 text-sm md:text-base text-foreground/85">
             <span aria-hidden className="mt-1.5 inline-block w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
             <span>{line}</span>
           </li>
         ))}
       </ul>
+      {briefing.meta.total > 0 && (
+        <div className="mt-5 flex flex-wrap gap-4 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground border-t border-accent/30 pt-4">
+          <span>{briefing.meta.total} saved</span>
+          <span>· {briefing.meta.fresh} fresh (7d)</span>
+          <span>· {briefing.meta.stale} stale (30d+)</span>
+          {briefing.meta.topTag && <span>· top theme: <span className="text-accent">{briefing.meta.topTag}</span></span>}
+        </div>
+      )}
     </section>
   );
+}
+
+// ---------- Unified PDF export (lazy-loads jsPDF) ----------
+async function exportWorkspacePDF() {
+  const links = loadJSON<SavedLink[]>(LINKS_KEY, []);
+  const assets = loadJSON<SavedAsset[]>(ASSETS_KEY, []);
+  const annotations = loadAllAnnotations();
+  if (links.length === 0 && assets.length === 0 && annotations.length === 0) {
+    toast.error("Workspace is empty — add a link, file, or highlight first.");
+    return;
+  }
+  let jsPDFCtor: typeof import("jspdf").jsPDF;
+  try {
+    const mod = await import("jspdf");
+    jsPDFCtor = mod.jsPDF ?? (mod as unknown as { default: typeof import("jspdf").jsPDF }).default;
+  } catch (e) {
+    console.error(e);
+    toast.error("Could not load PDF engine. Check your connection and retry.");
+    return;
+  }
+  const briefing = generateBriefing(links, assets, annotations);
+  const doc = new jsPDFCtor({ unit: "pt", format: "letter" });
+  const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
+  const M = 56;
+  let y = 0;
+
+  const drawHeader = () => {
+    doc.setFillColor(20, 20, 20);
+    doc.rect(0, 0, W, 72, "F");
+    doc.setTextColor(245, 240, 230);
+    doc.setFont("times", "bold");
+    doc.setFontSize(22);
+    doc.text("The CS Quarterly", M, 44);
+    doc.setTextColor(208, 106, 76);
+    doc.text(".", M + doc.getTextWidth("The CS Quarterly"), 44);
+    doc.setFont("courier", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(245, 240, 230);
+    doc.text("WORKSPACE EXPORT", W - M, 44, { align: "right" });
+  };
+  const drawFooter = () => {
+    doc.setFont("courier", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(140, 140, 140);
+    doc.text("thecsquarterly.com · Operator-grade Customer Success", M, H - 30);
+    doc.text(`Page ${doc.getNumberOfPages()}`, W - M, H - 30, { align: "right" });
+  };
+  const ensureRoom = (need: number) => {
+    if (y > H - 80 - need) {
+      drawFooter();
+      doc.addPage();
+      drawHeader();
+      y = 100;
+    }
+  };
+  const sectionTitle = (label: string, eyebrow: string) => {
+    ensureRoom(60);
+    doc.setFont("courier", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(208, 106, 76);
+    doc.text(eyebrow.toUpperCase(), M, y);
+    y += 16;
+    doc.setFont("times", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(20, 20, 20);
+    doc.text(label, M, y);
+    y += 12;
+    doc.setDrawColor(208, 106, 76);
+    doc.setLineWidth(1);
+    doc.line(M, y, W - M, y);
+    y += 20;
+  };
+
+  drawHeader();
+  y = 110;
+  doc.setTextColor(20, 20, 20);
+  doc.setFont("times", "bold");
+  doc.setFontSize(28);
+  doc.text("Your margin.", M, y);
+  y += 22;
+  doc.setFont("courier", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(120, 120, 120);
+  doc.text(`${briefing.today.toUpperCase()} · ${links.length} LINKS · ${assets.length} ASSETS · ${annotations.length} ANNOTATIONS`, M, y);
+  y += 28;
+
+  // Briefing
+  sectionTitle("Daily Operational Briefing", "Section 01 · Briefing");
+  doc.setFont("times", "normal");
+  doc.setFontSize(11);
+  doc.setTextColor(40, 40, 40);
+  briefing.list.forEach((line) => {
+    const wrapped = doc.splitTextToSize(`•  ${line}`, W - 2 * M);
+    ensureRoom(wrapped.length * 14 + 6);
+    doc.text(wrapped, M, y);
+    y += wrapped.length * 14 + 6;
+  });
+  y += 10;
+
+  if (links.length > 0) {
+    sectionTitle("Saved Links", `Section 02 · ${links.length} items`);
+    links.forEach((l) => {
+      ensureRoom(40);
+      doc.setFont("courier", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(208, 106, 76);
+      doc.text(`${l.tag.toUpperCase()} · ${new Date(l.createdAt).toLocaleDateString()}`, M, y);
+      y += 12;
+      doc.setFont("times", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(20, 20, 20);
+      const t = doc.splitTextToSize(l.title, W - 2 * M);
+      doc.text(t, M, y);
+      y += t.length * 13;
+      doc.setFont("courier", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(110, 110, 110);
+      const u = doc.splitTextToSize(l.url, W - 2 * M);
+      doc.text(u, M, y);
+      y += u.length * 11 + 10;
+    });
+  }
+
+  if (assets.length > 0) {
+    sectionTitle("Saved Assets", `Section 03 · ${assets.length} items`);
+    assets.forEach((a) => {
+      ensureRoom(28);
+      doc.setFont("courier", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(208, 106, 76);
+      doc.text(`${a.tag.toUpperCase()} · ${(a.size / 1024).toFixed(1)} KB`, M, y);
+      y += 12;
+      doc.setFont("times", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(20, 20, 20);
+      const n = doc.splitTextToSize(a.name, W - 2 * M);
+      doc.text(n, M, y);
+      y += n.length * 13 + 8;
+    });
+  }
+
+  if (annotations.length > 0) {
+    sectionTitle("Highlights & Annotations", `Section 04 · ${annotations.length} marks`);
+    annotations.forEach((a) => {
+      ensureRoom(50);
+      doc.setFont("courier", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(208, 106, 76);
+      doc.text(`${a.kind.toUpperCase()} · ${new Date(a.createdAt).toLocaleDateString()} · ${a.slug}`, M, y);
+      y += 14;
+      doc.setFont("times", "italic");
+      doc.setFontSize(11);
+      doc.setTextColor(40, 40, 40);
+      const quoted = doc.splitTextToSize(`"${a.text}"`, W - 2 * M);
+      doc.text(quoted, M, y);
+      y += quoted.length * 14 + 4;
+      if (a.note) {
+        doc.setFont("times", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(60, 60, 60);
+        const note = doc.splitTextToSize(`Note: ${a.note}`, W - 2 * M);
+        ensureRoom(note.length * 13 + 8);
+        doc.text(note, M, y);
+        y += note.length * 13;
+      }
+      y += 10;
+      doc.setDrawColor(230, 225, 215);
+      doc.line(M, y - 4, W - M, y - 4);
+      y += 8;
+    });
+  }
+
+  drawFooter();
+  doc.save(`csq-workspace-${new Date().toISOString().slice(0, 10)}.pdf`);
+  toast.success("Workspace exported.");
 }
 
 // ---------- A. History ----------
