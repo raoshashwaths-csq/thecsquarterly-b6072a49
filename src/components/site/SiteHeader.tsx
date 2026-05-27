@@ -78,6 +78,17 @@ export function SiteHeader() {
 
           <span aria-hidden className="hidden lg:inline-block h-3 w-px bg-border/90" />
 
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event("csq:open-command-palette"))}
+            aria-label="Open search"
+            title="Search (⌘K)"
+            className="hidden md:inline-flex items-center gap-1.5 px-2 py-1 border border-border hover:border-accent hover:text-accent transition-colors"
+          >
+            <Search size={11} strokeWidth={2} />
+            <span className="text-[10px] tracking-widest">⌘K</span>
+          </button>
+
           <LanguageSwitcher />
           <ThemeToggle />
 
