@@ -15,7 +15,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing, The CS Quarterly" },
-      { name: "description", content: "Six tiers from the Free Briefing to a 50-seat Enterprise license. Q agent sessions, the full Codex, and the job board, priced for operators and teams." },
+      { name: "description", content: "Six tiers from the Free Briefing to a 50-seat Enterprise license. Q agent sessions, the full Codex, Workspace, universal search, and the job board — priced for operators and teams." },
       { property: "og:title", content: "The CS Quarterly, Pricing" },
       { property: "og:description", content: "Six tiers, from the Free Briefing to a 50-seat Enterprise license." },
       { property: "og:url", content: "/pricing" },
@@ -39,6 +39,9 @@ type Tier = {
   emphasis?: boolean;
 };
 
+// Capability matrix (read across to verify gating):
+//   Universal search  →  Vanguard Individual and up
+//   Your Workspace    →  Vanguard Pro and up
 const TIERS: Tier[] = [
   {
     slug: "free",
@@ -62,11 +65,12 @@ const TIERS: Tier[] = [
     price: "$29",
     cadence: "/ month",
     altPrice: "or $290 / year",
-    blurb: <>Full archive, the entire Codex, and <QMark /> for solo operators.</>,
+    blurb: <>Full archive, the entire Codex, and universal <QMark /> search across every dispatch.</>,
     highlights: [
       "Everything in Free Briefing",
       "Full premium archive + two-voice toggle",
       "Complete Codex of executive playbooks",
+      "Universal search across every CSQ source",
       "Job board talent profile",
     ],
     seats: "1 seat",
@@ -80,9 +84,11 @@ const TIERS: Tier[] = [
     price: "$49",
     cadence: "/ month",
     altPrice: "or $490 / year",
-    blurb: <>For senior operators who run their week through <QMark />.</>,
+    blurb: <>For senior operators who run their week through <QMark /> and a private Workspace.</>,
     highlights: [
       "Everything in Individual",
+      "Your Workspace — saved links, files, highlights",
+      "Local search across your saved intel only",
       "Early-access Codex alerts",
       "1 free Sponsored Job Posting / quarter",
       "Senior Executive sub-channels",
@@ -96,10 +102,11 @@ const TIERS: Tier[] = [
     name: "Team Starter",
     price: "$499",
     cadence: "/ month",
-    blurb: "A pod-sized rollout with shared compute and central billing.",
+    blurb: "A pod-sized rollout with shared compute, shared Workspaces, and central billing.",
     highlights: [
+      "Everything in Vanguard Pro, per seat",
       "Centralized billing panel",
-      "Shared team Codex workspace",
+      "Shared team Workspace + Codex",
       "Collaborative download library",
       "Priority support queue",
     ],
@@ -112,9 +119,10 @@ const TIERS: Tier[] = [
     name: "Team Growth",
     price: "$999",
     cadence: "/ month",
-    blurb: "Scaled CS orgs with shared benchmarks and hiring leverage.",
+    blurb: "Scaled CS orgs with shared benchmarks, hiring leverage, and team-wide Workspace search.",
     highlights: [
       "Everything in Team Starter",
+      "Team-wide Workspace search + admin",
       "Quarterly Benchmark PDFs (NRR, Payback, GRR)",
       "3 active Featured job listings / year",
       "Team analytics dashboard",
@@ -128,11 +136,12 @@ const TIERS: Tier[] = [
     name: "Enterprise License",
     price: "$2,500",
     cadence: "/ month",
-    blurb: "A direct line to the editorial team and a dedicated channel.",
+    blurb: "A direct line to the editorial team, a dedicated channel, and a custom corpus.",
     highlights: [
+      "Everything in Team Growth",
       "Custom onboarding modules",
       "Dedicated Slack channel",
-      "Custom RAG corpus extensions",
+      "Custom RAG corpus extensions inside Workspace",
       "Priority editorial response window",
     ],
     seats: "Up to 50 seats",
@@ -173,18 +182,20 @@ function PricingPage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1">
-        {/* Hero */}
         <section className="max-w-6xl mx-auto px-6 pt-20 pb-12 text-center">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">Membership Matrix</div>
           <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-6">
             Six tiers. <span className="italic">One discipline.</span>
           </h1>
           <p className="text-lg text-foreground/70 max-w-2xl mx-auto text-pretty">
-            From a free weekly briefing to a 50-seat Enterprise license with <QMark />&nbsp;agent sessions and white-labeled benchmarks.
+            From a free weekly briefing to a 50-seat Enterprise license — with <QMark />&nbsp;agent sessions, universal search, and a private Workspace gated by tier.
           </p>
+          <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/60">
+            <span className="px-2 py-1 border border-border">Universal search · Vanguard +</span>
+            <span className="px-2 py-1 border border-border">Your Workspace · Pro +</span>
+          </div>
         </section>
 
-        {/* Tier matrix */}
         <section className="max-w-7xl mx-auto px-6 pb-20">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {TIERS.map((t, i) => (

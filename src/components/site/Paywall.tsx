@@ -51,9 +51,11 @@ export function Paywall({
           to="/pricing"
           className="bg-secondary-accent text-secondary-accent-foreground py-4 px-6 hover:opacity-90 transition-all"
         >
-          <div className="font-mono text-[10px] uppercase tracking-widest mb-1">Vanguard</div>
-          <div className="font-display text-2xl">$49 <span className="text-sm opacity-80">/ month</span></div>
-          <div className="text-xs mt-1 opacity-90">Unlimited witty + analytical articles, the full Codex, every premium dispatch.</div>
+          <div className="font-mono text-[10px] uppercase tracking-widest mb-1">Vanguard, from $29</div>
+          <div className="font-display text-2xl">Unlock everything</div>
+          <div className="text-xs mt-1 opacity-90">
+            Full archive + universal search from Vanguard. Your Workspace + local saved-intel search from Pro upwards.
+          </div>
         </Link>
       </div>
     </div>
