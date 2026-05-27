@@ -2,7 +2,7 @@ import * as React from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, BookOpen, Sparkles } from "lucide-react";
+import { FileText, BookOpen, Sparkles, Bookmark, Highlighter } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -11,7 +11,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
+import { globalSearch, searchUserWorkspace, type SearchHit } from "@/lib/discovery.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 function useDebounced<T>(value: T, ms = 180) {
   const [debounced, setDebounced] = React.useState(value);
@@ -28,6 +29,8 @@ export function CommandPalette() {
   const debouncedQ = useDebounced(q, 180);
   const navigate = useNavigate();
   const search = useServerFn(globalSearch);
+  const searchWs = useServerFn(searchUserWorkspace);
+  const { user } = useAuth();
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -56,15 +59,28 @@ export function CommandPalette() {
     staleTime: 30_000,
   });
 
-  const hits: SearchHit[] = data?.hits ?? [];
+  const { data: wsData } = useQuery({
+    queryKey: ["workspace-search", debouncedQ, user?.id ?? null],
+    queryFn: () => searchWs({ data: { q: debouncedQ } }),
+    enabled: !!user && debouncedQ.trim().length > 0,
+    staleTime: 30_000,
+  });
+
+  const hits: SearchHit[] = [...(wsData?.hits ?? []), ...(data?.hits ?? [])];
   const articles = hits.filter((h) => h.kind === "article");
   const playbooks = hits.filter((h) => h.kind === "playbook");
   const trees = hits.filter((h) => h.kind === "qtree");
+  const workspace = hits.filter((h) => h.kind === "workspace");
+  const annotations = hits.filter((h) => h.kind === "annotation");
 
   const go = (href: string) => {
     setOpen(false);
     setQ("");
-    navigate({ to: href });
+    if (href.startsWith("http")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      navigate({ to: href });
+    }
   };
 
   return (
@@ -72,7 +88,7 @@ export function CommandPalette() {
       <CommandInput
         value={q}
         onValueChange={setQ}
-        placeholder="Search articles, playbooks, Q operator trees…"
+        placeholder={user ? "Search articles, playbooks, your Workspace…" : "Search articles, playbooks, Q operator trees…"}
       />
       <CommandList className="max-h-[60vh]">
         {debouncedQ.trim().length === 0 ? (
@@ -92,6 +108,20 @@ export function CommandPalette() {
           <CommandEmpty>No matches for "{debouncedQ}".</CommandEmpty>
         ) : (
           <>
+            {workspace.length > 0 && (
+              <CommandGroup heading="Your Workspace">
+                {workspace.map((h) => (
+                  <HitItem key={h.id} hit={h} icon={Bookmark} onSelect={() => go(h.href)} />
+                ))}
+              </CommandGroup>
+            )}
+            {annotations.length > 0 && (
+              <CommandGroup heading="Your Highlights">
+                {annotations.map((h) => (
+                  <HitItem key={h.id} hit={h} icon={Highlighter} onSelect={() => go(h.href)} />
+                ))}
+              </CommandGroup>
+            )}
             {articles.length > 0 && (
               <CommandGroup heading="Articles">
                 {articles.map((h) => (

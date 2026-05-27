@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { TREES } from "@/lib/q-trees";
 
 export type SearchHit = {
-  kind: "article" | "playbook" | "qtree";
+  kind: "article" | "playbook" | "qtree" | "workspace" | "annotation";
   id: string;
   title: string;
   excerpt: string;
@@ -189,3 +190,67 @@ export const getForYou = createServerFn({ method: "GET" })
       })),
     };
   });
+
+// Search the signed-in user's saved Workspace items (links, files, assets)
+// AND their highlights/notes. Scoped via RLS — each user only sees their own.
+export const searchUserWorkspace = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ q: z.string().min(1).max(120) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const q = data.q.trim();
+    if (!q) return { hits: [] as SearchHit[] };
+    const { supabase } = context;
+
+    const pattern = `%${q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+
+    const [wsRes, annRes] = await Promise.all([
+      supabase
+        .from("user_workspace_items")
+        .select("id, kind, title, tag, url, created_at")
+        .or(`title.ilike.${pattern},tag.ilike.${pattern}`)
+        .order("created_at", { ascending: false })
+        .limit(40),
+      supabase
+        .from("user_annotations")
+        .select("id, slug, kind, text, note, created_at")
+        .or(`text.ilike.${pattern},note.ilike.${pattern}`)
+        .order("created_at", { ascending: false })
+        .limit(40),
+    ]);
+
+    const hits: SearchHit[] = [];
+
+    for (const it of wsRes.data ?? []) {
+      const blob = [it.title, it.tag, it.url].filter(Boolean).join(" ");
+      const s = scoreMatch(blob, q);
+      hits.push({
+        kind: "workspace",
+        id: it.id,
+        title: it.title,
+        excerpt: it.tag ? `${it.kind} · ${it.tag}` : it.kind,
+        href: it.url && it.url.startsWith("http") ? it.url : "/account/workspace",
+        category: it.kind,
+        score: s + 10, // boost user's own content
+      });
+    }
+
+    for (const a of annRes.data ?? []) {
+      const blob = [a.text, a.note].filter(Boolean).join(" ");
+      const s = scoreMatch(blob, q);
+      hits.push({
+        kind: "annotation",
+        id: a.id,
+        title: (a.text ?? "Highlight").slice(0, 80),
+        excerpt: a.note ?? `Highlight from ${a.slug}`,
+        href: `/insights/${a.slug}`,
+        category: a.kind,
+        score: s + 8,
+      });
+    }
+
+    hits.sort((a, b) => b.score - a.score);
+    return { hits: hits.slice(0, 24) };
+  });
+
