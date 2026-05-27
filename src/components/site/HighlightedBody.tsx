@@ -76,7 +76,7 @@ function countWords(b: Block): number {
   if (b.type === "ul" || b.type === "ol") {
     return b.items.reduce((n: number, it: string) => n + splitWords(it).length, 0);
   }
-  return splitWords(b.text).length;
+  return splitWords((b as { text: string }).text).length;
 }
 
 function renderInlineWords(text: string, startIndex: number, activeIndex: number): ReactNode {
