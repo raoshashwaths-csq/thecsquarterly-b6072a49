@@ -127,9 +127,11 @@ function renderBlock(b: Block, key: number, startIndex: number, activeIndex: num
       </p>
     );
   }
+  // narrow to list
+  if (b.type !== "ul" && b.type !== "ol") return null;
   const items = b.items;
   let acc = startIndex;
-  const lis = items.map((it, j) => {
+  const lis = items.map((it: string, j: number) => {
     const node = (
       <li key={j}>{renderInlineWords(it, acc, activeIndex)}</li>
     );
