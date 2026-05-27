@@ -8,6 +8,7 @@ import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { SeriesRail } from "@/components/site/SeriesRail";
 import { AnnotationBar } from "@/components/site/AnnotationBar";
 import { AudioBar } from "@/components/site/AudioBar";
+import { HighlightedBody } from "@/components/site/HighlightedBody";
 import { useAuth } from "@/hooks/useAuth";
 import { getPost } from "@/lib/posts.functions";
 
