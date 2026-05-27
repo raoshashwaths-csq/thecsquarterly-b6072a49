@@ -40,7 +40,7 @@ export const Route = createFileRoute("/codex/$slug")({
 function PlaybookPage() {
   const { slug } = Route.useParams();
   const { data: pb } = useSuspenseQuery(playbookQuery(slug));
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const fetchMe = useServerFn(getMe);
   const fetchPurchases = useServerFn(listMyPurchases);
   const purchase = useServerFn(recordPurchasePlaceholder);
@@ -48,6 +48,11 @@ function PlaybookPage() {
   const purchases = useQuery({ queryKey: ["my-purchases"], queryFn: () => fetchPurchases(), enabled: !!user });
 
   if (!pb) return null;
+
+  // Resolve gate only after auth + entitlement queries have settled, so a
+  // logged-in Vanguard never sees a flash of paywall before `me` returns.
+  const entitlementLoading =
+    authLoading || (!!user && (me.isLoading || purchases.isLoading || !me.data));
 
   const unlocked =
     me.data?.isAdmin ||
@@ -78,7 +83,11 @@ function PlaybookPage() {
         </h1>
         <p className="text-xl text-foreground/75 mb-10 text-pretty">{pb.summary}</p>
 
-        {unlocked ? (
+        {entitlementLoading ? (
+          <div className="border-t border-border pt-10 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Checking access…
+          </div>
+        ) : unlocked ? (
           <div className="prose-content border-t border-border pt-10">
             <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Unlocked</div>
             {(() => {
