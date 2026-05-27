@@ -167,9 +167,9 @@ function RootComponent() {
       <PageTransition />
       <QAgentButton />
       <ClientOnly fallback={null}>
-        <React.Suspense fallback={null}>
+        <Suspense fallback={null}>
           <CommandPalette />
-        </React.Suspense>
+        </Suspense>
       </ClientOnly>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
