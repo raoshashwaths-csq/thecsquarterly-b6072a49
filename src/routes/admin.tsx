@@ -333,7 +333,7 @@ function SubscribersList() {
   const q = useQuery({ queryKey: ["admin-subscribers"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
-      <h2 className="font-display text-3xl">Newsletter Subscribers</h2>
+      <SectionHeader title="Newsletter Subscribers" dataset="subscribers" />
       <DataTable
         rows={q.data ?? []}
         empty="No subscribers yet."
