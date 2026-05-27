@@ -113,6 +113,10 @@ function AccountPage() {
             )}
           </div>
         )}
+
+        {/* Operator: tools surface AFTER billing */}
+        {!isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
+
       </main>
       <SiteFooter />
     </div>
