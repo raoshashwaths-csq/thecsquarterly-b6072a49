@@ -53,6 +53,84 @@ export type Database = {
         }
         Relationships: []
       }
+      benchmark_drops: {
+        Row: {
+          created_at: string
+          id: string
+          metric: string
+          notes: string | null
+          period: string
+          published: boolean
+          segment: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric: string
+          notes?: string | null
+          period: string
+          published?: boolean
+          segment?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric?: string
+          notes?: string | null
+          period?: string
+          published?: boolean
+          segment?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
+      directory_profiles: {
+        Row: {
+          bio: string | null
+          company: string | null
+          created_at: string
+          credentials: string[]
+          headshot_url: string | null
+          id: string
+          name: string
+          public: boolean
+          title: string | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          bio?: string | null
+          company?: string | null
+          created_at?: string
+          credentials?: string[]
+          headshot_url?: string | null
+          id?: string
+          name: string
+          public?: boolean
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          bio?: string | null
+          company?: string | null
+          created_at?: string
+          credentials?: string[]
+          headshot_url?: string | null
+          id?: string
+          name?: string
+          public?: boolean
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -416,6 +494,44 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_sequences: {
+        Row: {
+          created_at: string
+          id: string
+          items: Json
+          name: string
+          owner_id: string
+          team_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          items?: Json
+          name: string
+          owner_id: string
+          team_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          items?: Json
+          name?: string
+          owner_id?: string
+          team_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_sequences_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -557,6 +673,62 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          id: string
+          joined_at: string
+          role: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          role?: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          role?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -596,6 +768,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_team_member: {
+        Args: { _team: string; _user: string }
         Returns: boolean
       }
       move_to_dlq: {

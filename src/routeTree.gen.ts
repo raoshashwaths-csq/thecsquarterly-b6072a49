@@ -11,14 +11,19 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VanguardRouteImport } from './routes/vanguard'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as SequencerRouteImport } from './routes/sequencer'
 import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobBoardRouteImport } from './routes/job-board'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as DirectoryRouteImport } from './routes/directory'
 import { Route as CodexRouteImport } from './routes/codex'
+import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as BenchmarksRouteImport } from './routes/benchmarks'
 import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AccountRouteImport } from './routes/account'
@@ -38,6 +43,8 @@ import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.retention-ledger.ticker'
+import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
@@ -49,9 +56,19 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
   path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeamsRoute = TeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SequencerRoute = SequencerRouteImport.update({
+  id: '/sequencer',
+  path: '/sequencer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RetentionProtocolRoute = RetentionProtocolRouteImport.update({
@@ -84,9 +101,24 @@ const InsightsRoute = InsightsRouteImport.update({
   path: '/insights',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DirectoryRoute = DirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CodexRoute = CodexRouteImport.update({
   id: '/codex',
   path: '/codex',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BenchmarksRoute = BenchmarksRouteImport.update({
+  id: '/benchmarks',
+  path: '/benchmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiReadinessRoute = AiReadinessRouteImport.update({
@@ -187,6 +219,17 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1RetentionLedgerTickerRoute =
+  ApiV1RetentionLedgerTickerRouteImport.update({
+    id: '/api/v1/retention-ledger/ticker',
+    path: '/api/v1/retention-ledger/ticker',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1BenchmarksNrrRoute = ApiV1BenchmarksNrrRouteImport.update({
+  id: '/api/v1/benchmarks/nrr',
+  path: '/api/v1/benchmarks/nrr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -194,14 +237,19 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/benchmarks': typeof BenchmarksRoute
+  '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
+  '/directory': typeof DirectoryRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
+  '/sequencer': typeof SequencerRoute
   '/subscribe': typeof SubscribeRoute
+  '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
@@ -215,6 +263,8 @@ export interface FileRoutesByFullPath {
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
+  '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -224,12 +274,17 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
+  '/benchmarks': typeof BenchmarksRoute
+  '/calculator': typeof CalculatorRoute
+  '/directory': typeof DirectoryRoute
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
+  '/sequencer': typeof SequencerRoute
   '/subscribe': typeof SubscribeRoute
+  '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
@@ -243,6 +298,8 @@ export interface FileRoutesByTo {
   '/insights': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
+  '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -254,14 +311,19 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
+  '/benchmarks': typeof BenchmarksRoute
+  '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
+  '/directory': typeof DirectoryRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
+  '/sequencer': typeof SequencerRoute
   '/subscribe': typeof SubscribeRoute
+  '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
@@ -275,6 +337,8 @@ export interface FileRoutesById {
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
+  '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -287,14 +351,19 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/benchmarks'
+    | '/calculator'
     | '/codex'
+    | '/directory'
     | '/insights'
     | '/job-board'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
     | '/retention-protocol'
+    | '/sequencer'
     | '/subscribe'
+    | '/teams'
     | '/unsubscribe'
     | '/vanguard'
     | '/admin/control-panel'
@@ -308,6 +377,8 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/agent/response/$runId'
     | '/lovable/email/suppression'
+    | '/api/v1/benchmarks/nrr'
+    | '/api/v1/retention-ledger/ticker'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -317,12 +388,17 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/admin'
+    | '/benchmarks'
+    | '/calculator'
+    | '/directory'
     | '/job-board'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
     | '/retention-protocol'
+    | '/sequencer'
     | '/subscribe'
+    | '/teams'
     | '/unsubscribe'
     | '/vanguard'
     | '/admin/control-panel'
@@ -336,6 +412,8 @@ export interface FileRouteTypes {
     | '/insights'
     | '/agent/response/$runId'
     | '/lovable/email/suppression'
+    | '/api/v1/benchmarks/nrr'
+    | '/api/v1/retention-ledger/ticker'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -346,14 +424,19 @@ export interface FileRouteTypes {
     | '/account'
     | '/admin'
     | '/ai-readiness'
+    | '/benchmarks'
+    | '/calculator'
     | '/codex'
+    | '/directory'
     | '/insights'
     | '/job-board'
     | '/login'
     | '/outcome-forum'
     | '/pricing'
     | '/retention-protocol'
+    | '/sequencer'
     | '/subscribe'
+    | '/teams'
     | '/unsubscribe'
     | '/vanguard'
     | '/admin/control-panel'
@@ -367,6 +450,8 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/agent/response/$runId'
     | '/lovable/email/suppression'
+    | '/api/v1/benchmarks/nrr'
+    | '/api/v1/retention-ledger/ticker'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -378,20 +463,27 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   AdminRoute: typeof AdminRouteWithChildren
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
+  BenchmarksRoute: typeof BenchmarksRoute
+  CalculatorRoute: typeof CalculatorRoute
   CodexRoute: typeof CodexRouteWithChildren
+  DirectoryRoute: typeof DirectoryRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JobBoardRoute: typeof JobBoardRoute
   LoginRoute: typeof LoginRoute
   OutcomeForumRoute: typeof OutcomeForumRoute
   PricingRoute: typeof PricingRoute
   RetentionProtocolRoute: typeof RetentionProtocolRoute
+  SequencerRoute: typeof SequencerRoute
   SubscribeRoute: typeof SubscribeRoute
+  TeamsRoute: typeof TeamsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VanguardRoute: typeof VanguardRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
+  ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
@@ -413,11 +505,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teams': {
+      id: '/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof TeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subscribe': {
       id: '/subscribe'
       path: '/subscribe'
       fullPath: '/subscribe'
       preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sequencer': {
+      id: '/sequencer'
+      path: '/sequencer'
+      fullPath: '/sequencer'
+      preLoaderRoute: typeof SequencerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/retention-protocol': {
@@ -462,11 +568,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/directory': {
+      id: '/directory'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof DirectoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/codex': {
       id: '/codex'
       path: '/codex'
       fullPath: '/codex'
       preLoaderRoute: typeof CodexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/benchmarks': {
+      id: '/benchmarks'
+      path: '/benchmarks'
+      fullPath: '/benchmarks'
+      preLoaderRoute: typeof BenchmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ai-readiness': {
@@ -602,6 +729,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/retention-ledger/ticker': {
+      id: '/api/v1/retention-ledger/ticker'
+      path: '/api/v1/retention-ledger/ticker'
+      fullPath: '/api/v1/retention-ledger/ticker'
+      preLoaderRoute: typeof ApiV1RetentionLedgerTickerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/benchmarks/nrr': {
+      id: '/api/v1/benchmarks/nrr'
+      path: '/api/v1/benchmarks/nrr'
+      fullPath: '/api/v1/benchmarks/nrr'
+      preLoaderRoute: typeof ApiV1BenchmarksNrrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -661,20 +802,27 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   AdminRoute: AdminRouteWithChildren,
   AiReadinessRoute: AiReadinessRouteWithChildren,
+  BenchmarksRoute: BenchmarksRoute,
+  CalculatorRoute: CalculatorRoute,
   CodexRoute: CodexRouteWithChildren,
+  DirectoryRoute: DirectoryRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JobBoardRoute: JobBoardRoute,
   LoginRoute: LoginRoute,
   OutcomeForumRoute: OutcomeForumRoute,
   PricingRoute: PricingRoute,
   RetentionProtocolRoute: RetentionProtocolRoute,
+  SequencerRoute: SequencerRoute,
   SubscribeRoute: SubscribeRoute,
+  TeamsRoute: TeamsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VanguardRoute: VanguardRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AgentResponseRunIdRoute: AgentResponseRunIdRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
+  ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
