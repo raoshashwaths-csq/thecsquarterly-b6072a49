@@ -200,6 +200,8 @@ function HomePage() {
         </section>
       )}
 
+      <ForYou />
+
       <SiteFooter />
     </div>
   );
