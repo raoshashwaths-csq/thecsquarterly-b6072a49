@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronDown,
   ChevronRight,
@@ -21,6 +22,14 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  listAnnotations,
+  listWorkspaceItems,
+  createWorkspaceItem,
+  deleteWorkspaceItem,
+  deleteAnnotation,
+  bulkImportWorkspace,
+} from "@/lib/workspace.functions";
 
 export const Route = createFileRoute("/account/workspace")({
   head: () => ({
@@ -44,7 +53,7 @@ export const Route = createFileRoute("/account/workspace")({
   ),
 });
 
-// ---------- types & storage ----------
+// ---------- types ----------
 type Annotation = {
   id: string;
   slug: string;
@@ -57,18 +66,11 @@ type SavedLink = { id: string; url: string; title: string; tag: string; createdA
 type SavedAsset = { id: string; name: string; size: number; type: string; tag: string; createdAt: number };
 type QRun = { id: string; node_id: string; created_at: string; context: Record<string, unknown> };
 
-const LINKS_KEY = "csq.workspace.links";
-const ASSETS_KEY = "csq.workspace.assets";
 const HINT_KEY = "csq.hint.workspace.knowledge";
 const SEARCH_HINT_KEY = "csq.hint.workspace.search";
-
-const loadJSON = <T,>(k: string, fallback: T): T => {
-  if (typeof window === "undefined") return fallback;
-  try { return JSON.parse(localStorage.getItem(k) || "null") ?? fallback; } catch { return fallback; }
-};
-const saveJSON = (k: string, v: unknown) => {
-  try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* ignore */ }
-};
+const MIGRATED_FLAG = "csq.workspace.migrated.v1";
+const LEGACY_LINKS_KEY = "csq.workspace.links";
+const LEGACY_ASSETS_KEY = "csq.workspace.assets";
 
 // ---------- auto-tagging ----------
 const TAG_RULES: Array<{ tag: string; match: RegExp }> = [
@@ -84,18 +86,107 @@ function autoTag(text: string): string {
   return "General";
 }
 
-function loadAllAnnotations(): Annotation[] {
-  if (typeof window === "undefined") return [];
-  const out: Annotation[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (!key?.startsWith("csq.annotations.")) continue;
-    try {
-      const arr = JSON.parse(localStorage.getItem(key) || "[]");
-      if (Array.isArray(arr)) out.push(...arr);
-    } catch { /* ignore */ }
-  }
-  return out.sort((a, b) => b.createdAt - a.createdAt);
+// ---------- shared query hooks (single source of truth: the DB) ----------
+function useWorkspaceData() {
+  const { user } = useAuth();
+  const fetchItems = useServerFn(listWorkspaceItems);
+  const fetchAnns = useServerFn(listAnnotations);
+
+  const itemsQ = useQuery({
+    queryKey: ["workspace-items", user?.id],
+    enabled: !!user,
+    queryFn: () => fetchItems(),
+    staleTime: 30_000,
+  });
+  const annsQ = useQuery({
+    queryKey: ["workspace-annotations", user?.id],
+    enabled: !!user,
+    queryFn: () => fetchAnns({ data: {} }),
+    staleTime: 30_000,
+  });
+
+  const links: SavedLink[] = useMemo(
+    () => (itemsQ.data?.items ?? [])
+      .filter((i) => i.kind === "link")
+      .map((i) => ({
+        id: i.id, url: i.url ?? "", title: i.title, tag: i.tag,
+        createdAt: new Date(i.created_at).getTime(),
+      })),
+    [itemsQ.data],
+  );
+  const assets: SavedAsset[] = useMemo(
+    () => (itemsQ.data?.items ?? [])
+      .filter((i) => i.kind === "asset")
+      .map((i) => ({
+        id: i.id, name: i.title, size: Number(i.size_bytes ?? 0),
+        type: i.mime_type ?? "file", tag: i.tag,
+        createdAt: new Date(i.created_at).getTime(),
+      })),
+    [itemsQ.data],
+  );
+  const annotations: Annotation[] = useMemo(
+    () => (annsQ.data?.annotations ?? []).map((a) => ({
+      id: a.id, slug: a.slug, kind: a.kind as "highlight" | "note",
+      text: a.text, note: a.note ?? undefined,
+      createdAt: new Date(a.created_at).getTime(),
+    })),
+    [annsQ.data],
+  );
+
+  return { links, assets, annotations, loading: itemsQ.isLoading || annsQ.isLoading };
+}
+
+// ---------- one-time migration of legacy localStorage entries ----------
+function useLegacyMigration() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const bulkImport = useServerFn(bulkImportWorkspace);
+  useEffect(() => {
+    if (!user || typeof window === "undefined") return;
+    if (localStorage.getItem(MIGRATED_FLAG)) return;
+    const legacyLinks: SavedLink[] = (() => { try { return JSON.parse(localStorage.getItem(LEGACY_LINKS_KEY) || "[]"); } catch { return []; } })();
+    const legacyAssets: SavedAsset[] = (() => { try { return JSON.parse(localStorage.getItem(LEGACY_ASSETS_KEY) || "[]"); } catch { return []; } })();
+    const legacyAnns: Annotation[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k?.startsWith("csq.annotations.")) continue;
+      try {
+        const arr = JSON.parse(localStorage.getItem(k) || "[]");
+        if (Array.isArray(arr)) legacyAnns.push(...arr);
+      } catch { /* */ }
+    }
+    if (!legacyLinks.length && !legacyAssets.length && !legacyAnns.length) {
+      localStorage.setItem(MIGRATED_FLAG, "1");
+      return;
+    }
+    (async () => {
+      try {
+        await bulkImport({
+          data: {
+            annotations: legacyAnns.slice(0, 500).map((a) => ({
+              slug: a.slug, kind: a.kind, text: a.text, note: a.note ?? null,
+            })),
+            items: [
+              ...legacyLinks.slice(0, 250).map((l) => ({
+                kind: "link" as const, title: l.title, url: l.url,
+                tag: l.tag || "General", size_bytes: null, mime_type: null,
+              })),
+              ...legacyAssets.slice(0, 250).map((a) => ({
+                kind: "asset" as const, title: a.name, url: null,
+                size_bytes: a.size, mime_type: a.type || null, tag: a.tag || "General",
+              })),
+            ],
+          },
+        });
+        localStorage.setItem(MIGRATED_FLAG, "1");
+        qc.invalidateQueries({ queryKey: ["workspace-items"] });
+        qc.invalidateQueries({ queryKey: ["workspace-annotations"] });
+        toast.success("Your previous highlights and saves were imported to your profile.");
+      } catch {
+        // leave flag unset so we retry next mount
+      }
+    })();
+  }, [user, qc, bulkImport]);
 }
 
 // ---------- main page ----------
@@ -113,6 +204,9 @@ function WorkspacePage() {
   useEffect(() => {
     try { setSearchHintDismissed(localStorage.getItem(SEARCH_HINT_KEY) === "1"); } catch { /* */ }
   }, []);
+
+  useLegacyMigration();
+  const { links, assets, annotations } = useWorkspaceData();
 
   const dismissSearchHint = () => {
     setSearchHintDismissed(true);
@@ -137,14 +231,14 @@ function WorkspacePage() {
             Your Workspace<span className="text-accent">.</span>
           </h1>
           <button
-            onClick={() => exportWorkspacePDF()}
+            onClick={() => exportWorkspacePDF({ links, assets, annotations })}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors min-h-[44px]"
           >
             <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
           </button>
         </div>
         <p className="text-foreground/65 mb-6 max-w-2xl">
-          Your transcripts, annotations, and saved intel — in one operator-grade ledger.
+          Your transcripts, annotations, and saved intel — synced to your profile, accessible on every device.
         </p>
 
         {/* Workspace-only search bar */}
@@ -156,11 +250,11 @@ function WorkspacePage() {
               value={query}
               onChange={(e) => { setQuery(e.target.value); dismissSearchHint(); }}
               placeholder="Search your saved links, files, highlights, and transcripts…"
-              className="w-full bg-transparent focus:outline-none text-sm font-body"
+              className="w-full bg-transparent focus:outline-none text-sm font-body min-h-[44px]"
               aria-label="Search your Workspace"
             />
             {query && (
-              <button onClick={() => setQuery("")} aria-label="Clear" className="text-muted-foreground hover:text-foreground">
+              <button onClick={() => setQuery("")} aria-label="Clear" className="text-muted-foreground hover:text-foreground min-h-[44px] min-w-[44px] flex items-center justify-center">
                 <X size={14} />
               </button>
             )}
@@ -178,7 +272,7 @@ function WorkspacePage() {
           )}
         </div>
 
-        <DailyBriefing />
+        <DailyBriefing links={links} assets={assets} annotations={annotations} />
 
         {/* tabs — swipe-bar on mobile */}
         <div className="mt-10 -mx-4 md:mx-0 overflow-x-auto scroll-smooth snap-x snap-mandatory">
@@ -206,8 +300,8 @@ function WorkspacePage() {
 
         <div className="mt-8 will-change-transform">
           {tab === "history" && <HistoryPanel query={query} />}
-          {tab === "highlights" && <HighlightsPanel query={query} />}
-          {tab === "ledger" && <LedgerPanel query={query} />}
+          {tab === "highlights" && <HighlightsPanel query={query} annotations={annotations} links={links} assets={assets} />}
+          {tab === "ledger" && <LedgerPanel query={query} links={links} assets={assets} />}
         </div>
       </main>
       <SiteFooter />
@@ -271,18 +365,7 @@ function generateBriefing(links: SavedLink[], assets: SavedAsset[], annotations:
 }
 
 // ---------- Daily Briefing ----------
-function DailyBriefing() {
-  const [links, setLinks] = useState<SavedLink[]>([]);
-  const [assets, setAssets] = useState<SavedAsset[]>([]);
-  const [annotations, setAnnotations] = useState<Annotation[]>([]);
-
-  useEffect(() => {
-    // Re-read on every mount so a fresh visit regenerates the briefing
-    setLinks(loadJSON<SavedLink[]>(LINKS_KEY, []));
-    setAssets(loadJSON<SavedAsset[]>(ASSETS_KEY, []));
-    setAnnotations(loadAllAnnotations());
-  }, []);
-
+function DailyBriefing({ links, assets, annotations }: { links: SavedLink[]; assets: SavedAsset[]; annotations: Annotation[] }) {
   const briefing = useMemo(() => generateBriefing(links, assets, annotations), [links, assets, annotations]);
 
   return (
@@ -315,10 +398,7 @@ function DailyBriefing() {
 }
 
 // ---------- Unified PDF export (lazy-loads jsPDF) ----------
-async function exportWorkspacePDF() {
-  const links = loadJSON<SavedLink[]>(LINKS_KEY, []);
-  const assets = loadJSON<SavedAsset[]>(ASSETS_KEY, []);
-  const annotations = loadAllAnnotations();
+async function exportWorkspacePDF({ links, assets, annotations }: { links: SavedLink[]; assets: SavedAsset[]; annotations: Annotation[] }) {
   if (links.length === 0 && assets.length === 0 && annotations.length === 0) {
     toast.error("Workspace is empty — add a link, file, or highlight first.");
     return;
@@ -399,7 +479,6 @@ async function exportWorkspacePDF() {
   doc.text(`${briefing.today.toUpperCase()} · ${links.length} LINKS · ${assets.length} ASSETS · ${annotations.length} ANNOTATIONS`, M, y);
   y += 28;
 
-  // Briefing
   sectionTitle("Daily Operational Briefing", "Section 01 · Briefing");
   doc.setFont("times", "normal");
   doc.setFontSize(11);
@@ -566,13 +645,27 @@ function HistoryPanel({ query = "" }: { query?: string }) {
 }
 
 // ---------- B. Highlights ----------
-function HighlightsPanel({ query = "" }: { query?: string }) {
-  const [allItems, setAllItems] = useState<Annotation[]>([]);
-  useEffect(() => { setAllItems(loadAllAnnotations()); }, []);
+function HighlightsPanel({
+  query = "",
+  annotations,
+  links,
+  assets,
+}: { query?: string; annotations: Annotation[]; links: SavedLink[]; assets: SavedAsset[] }) {
+  const qc = useQueryClient();
+  const remove = useServerFn(deleteAnnotation);
   const q = query.trim().toLowerCase();
   const items = q
-    ? allItems.filter((a) => a.text.toLowerCase().includes(q) || (a.note ?? "").toLowerCase().includes(q) || a.slug.toLowerCase().includes(q))
-    : allItems;
+    ? annotations.filter((a) => a.text.toLowerCase().includes(q) || (a.note ?? "").toLowerCase().includes(q) || a.slug.toLowerCase().includes(q))
+    : annotations;
+
+  const onDelete = async (id: string) => {
+    try {
+      await remove({ data: { id } });
+      qc.invalidateQueries({ queryKey: ["workspace-annotations"] });
+    } catch (e) {
+      toast.error("Could not remove highlight.");
+    }
+  };
 
   return (
     <div>
@@ -581,17 +674,16 @@ function HighlightsPanel({ query = "" }: { query?: string }) {
           {items.length} entries across the site
         </p>
         <button
-          onClick={() => exportWorkspacePDF()}
+          onClick={() => exportWorkspacePDF({ links, assets, annotations })}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors min-h-[44px]"
         >
           <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
         </button>
       </div>
 
-
       {items.length === 0 ? (
         <div className="border border-dashed border-border p-10 text-center">
-          <p className="text-foreground/70">Highlight any passage on a dispatch — it lands here.</p>
+          <p className="text-foreground/70">Highlight any passage on a dispatch — it lands here, on every device you sign in from.</p>
         </div>
       ) : (
         <ul className="divide-y divide-border border border-border">
@@ -599,20 +691,27 @@ function HighlightsPanel({ query = "" }: { query?: string }) {
             <li key={a.id} className="p-4 flex gap-3">
               <span className={`mt-1.5 inline-block w-1.5 h-1.5 rounded-full shrink-0 ${a.kind === "highlight" ? "bg-secondary-accent" : "bg-accent"}`} />
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
                   <span>{a.kind}</span>
                   <Link
                     to="/insights/$slug"
                     params={{ slug: a.slug }}
-                    className="text-accent hover:underline truncate"
+                    className="text-accent hover:underline truncate max-w-[50%]"
                   >
                     {a.slug}
                   </Link>
                   <span className="ml-auto opacity-60">{new Date(a.createdAt).toLocaleDateString()}</span>
                 </div>
-                <p className="text-sm italic text-foreground/80">&ldquo;{a.text}&rdquo;</p>
-                {a.note && <p className="mt-1.5 text-sm">{a.note}</p>}
+                <p className="text-sm italic text-foreground/80 break-words">&ldquo;{a.text}&rdquo;</p>
+                {a.note && <p className="mt-1.5 text-sm break-words">{a.note}</p>}
               </div>
+              <button
+                onClick={() => onDelete(a.id)}
+                aria-label="Remove"
+                className="text-muted-foreground hover:text-accent min-h-[44px] min-w-[44px] flex items-center justify-center"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
             </li>
           ))}
         </ul>
@@ -622,73 +721,78 @@ function HighlightsPanel({ query = "" }: { query?: string }) {
 }
 
 // ---------- C. Ledger ----------
-function LedgerPanel({ query = "" }: { query?: string }) {
-  const [links, setLinks] = useState<SavedLink[]>([]);
-  const [assets, setAssets] = useState<SavedAsset[]>([]);
+function LedgerPanel({
+  query = "",
+  links,
+  assets,
+}: { query?: string; links: SavedLink[]; assets: SavedAsset[] }) {
+  const qc = useQueryClient();
+  const create = useServerFn(createWorkspaceItem);
+  const remove = useServerFn(deleteWorkspaceItem);
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
   const [drag, setDrag] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
-    const l = loadJSON<SavedLink[]>(LINKS_KEY, []);
-    const a = loadJSON<SavedAsset[]>(ASSETS_KEY, []);
-    setLinks(l);
-    setAssets(a);
     try {
       const seen = localStorage.getItem(HINT_KEY) === "1";
-      if (!seen && l.length === 0 && a.length === 0) setShowHint(true);
-    } catch { /* ignore */ }
-  }, []);
+      if (!seen && links.length === 0 && assets.length === 0) setShowHint(true);
+    } catch { /* */ }
+  }, [links.length, assets.length]);
 
   const dismissHint = () => {
     setShowHint(false);
-    try { localStorage.setItem(HINT_KEY, "1"); } catch { /* ignore */ }
+    try { localStorage.setItem(HINT_KEY, "1"); } catch { /* */ }
   };
 
-  const addLink = (e: React.FormEvent) => {
+  const addLink = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!url.trim()) return;
     const t = title.trim() || url.trim();
-    const next: SavedLink = {
-      id: crypto.randomUUID(),
-      url: url.trim(),
-      title: t,
-      tag: autoTag(`${t} ${url}`),
-      createdAt: Date.now(),
-    };
-    const updated = [next, ...links];
-    setLinks(updated);
-    saveJSON(LINKS_KEY, updated);
-    setUrl(""); setTitle("");
-    toast.success(`Saved under "${next.tag}"`);
-    dismissHint();
+    const tag = autoTag(`${t} ${url}`);
+    try {
+      await create({ data: { kind: "link", title: t, url: url.trim(), tag, size_bytes: null, mime_type: null } });
+      qc.invalidateQueries({ queryKey: ["workspace-items"] });
+      setUrl(""); setTitle("");
+      toast.success(`Saved under "${tag}"`);
+      dismissHint();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not save link.");
+    }
   };
 
-  const onFiles = (files: FileList | null) => {
+  const onFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
-    const adds: SavedAsset[] = Array.from(files).map((f) => ({
-      id: crypto.randomUUID(),
-      name: f.name,
-      size: f.size,
-      type: f.type || "file",
-      tag: autoTag(f.name),
-      createdAt: Date.now(),
-    }));
-    const updated = [...adds, ...assets];
-    setAssets(updated);
-    saveJSON(ASSETS_KEY, updated);
-    toast.success(`Added ${adds.length} asset${adds.length === 1 ? "" : "s"}`);
-    dismissHint();
+    let ok = 0;
+    for (const f of Array.from(files)) {
+      try {
+        await create({
+          data: {
+            kind: "asset", title: f.name, url: null,
+            size_bytes: f.size, mime_type: f.type || "file",
+            tag: autoTag(f.name),
+          },
+        });
+        ok++;
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Could not save file.");
+      }
+    }
+    if (ok) {
+      qc.invalidateQueries({ queryKey: ["workspace-items"] });
+      toast.success(`Added ${ok} asset${ok === 1 ? "" : "s"}`);
+      dismissHint();
+    }
   };
 
-  const removeLink = (id: string) => {
-    const u = links.filter((l) => l.id !== id);
-    setLinks(u); saveJSON(LINKS_KEY, u);
-  };
-  const removeAsset = (id: string) => {
-    const u = assets.filter((a) => a.id !== id);
-    setAssets(u); saveJSON(ASSETS_KEY, u);
+  const removeOne = async (id: string) => {
+    try {
+      await remove({ data: { id } });
+      qc.invalidateQueries({ queryKey: ["workspace-items"] });
+    } catch {
+      toast.error("Could not remove item.");
+    }
   };
 
   const tagGroups = useMemo(() => {
@@ -741,7 +845,7 @@ function LedgerPanel({ query = "" }: { query?: string }) {
         <label
           onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
           onDragLeave={() => setDrag(false)}
-          onDrop={(e) => { e.preventDefault(); setDrag(false); onFiles(e.dataTransfer.files); }}
+          onDrop={(e) => { e.preventDefault(); setDrag(false); void onFiles(e.dataTransfer.files); }}
           className={`relative mt-4 block border-2 border-dashed p-6 text-center cursor-pointer transition-colors ${
             drag ? "border-accent bg-accent/5"
               : showHint ? "border-accent bg-accent/10 animate-pulse"
@@ -752,7 +856,7 @@ function LedgerPanel({ query = "" }: { query?: string }) {
             type="file"
             multiple
             className="sr-only"
-            onChange={(e) => onFiles(e.target.files)}
+            onChange={(e) => void onFiles(e.target.files)}
           />
           <Upload className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -797,7 +901,7 @@ function LedgerPanel({ query = "" }: { query?: string }) {
                       <a href={l.url} target="_blank" rel="noreferrer noopener" className="flex-1 min-w-0 truncate underline-offset-4 hover:underline">
                         {l.title}
                       </a>
-                      <button onClick={() => removeLink(l.id)} aria-label="Remove" className="text-muted-foreground hover:text-accent">
+                      <button onClick={() => removeOne(l.id)} aria-label="Remove" className="text-muted-foreground hover:text-accent min-h-[44px] min-w-[44px] flex items-center justify-center">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </li>
@@ -811,7 +915,7 @@ function LedgerPanel({ query = "" }: { query?: string }) {
                           {(a.size / 1024).toFixed(1)} KB
                         </div>
                       </div>
-                      <button onClick={() => removeAsset(a.id)} aria-label="Remove" className="text-muted-foreground hover:text-accent">
+                      <button onClick={() => removeOne(a.id)} aria-label="Remove" className="text-muted-foreground hover:text-accent min-h-[44px] min-w-[44px] flex items-center justify-center">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </li>
