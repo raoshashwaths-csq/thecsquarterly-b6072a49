@@ -140,6 +140,57 @@ export type Database = {
         }
         Relationships: []
       }
+      job_listings: {
+        Row: {
+          apply_url: string | null
+          click_count: number
+          created_at: string
+          description: string | null
+          employer_name: string
+          featured: boolean
+          id: string
+          job_title: string
+          package_tier: number
+          pinned: boolean
+          status: string
+          submitted_by: string | null
+          submitted_email: string | null
+          updated_at: string
+        }
+        Insert: {
+          apply_url?: string | null
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          employer_name: string
+          featured?: boolean
+          id?: string
+          job_title: string
+          package_tier?: number
+          pinned?: boolean
+          status?: string
+          submitted_by?: string | null
+          submitted_email?: string | null
+          updated_at?: string
+        }
+        Update: {
+          apply_url?: string | null
+          click_count?: number
+          created_at?: string
+          description?: string | null
+          employer_name?: string
+          featured?: boolean
+          id?: string
+          job_title?: string
+          package_tier?: number
+          pinned?: boolean
+          status?: string
+          submitted_by?: string | null
+          submitted_email?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       playbooks: {
         Row: {
           body: string

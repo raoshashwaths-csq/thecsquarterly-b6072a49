@@ -32,6 +32,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
+import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -153,6 +154,11 @@ const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
   path: '/agent/framework',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminControlPanelRoute = AdminControlPanelRouteImport.update({
+  id: '/control-panel',
+  path: '/control-panel',
+  getParentRoute: () => AdminRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -186,7 +192,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/subscribe': typeof SubscribeRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
@@ -216,7 +223,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/subscribe': typeof SubscribeRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
@@ -244,7 +252,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/codex': typeof CodexRouteWithChildren
   '/insights': typeof InsightsRouteWithChildren
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/subscribe': typeof SubscribeRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/subscribe'
     | '/unsubscribe'
     | '/vanguard'
+    | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
@@ -315,6 +325,7 @@ export interface FileRouteTypes {
     | '/subscribe'
     | '/unsubscribe'
     | '/vanguard'
+    | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/subscribe'
     | '/unsubscribe'
     | '/vanguard'
+    | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
@@ -364,7 +376,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AiReadinessRoute: typeof AiReadinessRouteWithChildren
   CodexRoute: typeof CodexRouteWithChildren
   InsightsRoute: typeof InsightsRouteWithChildren
@@ -548,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentFrameworkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/control-panel': {
+      id: '/admin/control-panel'
+      path: '/control-panel'
+      fullPath: '/admin/control-panel'
+      preLoaderRoute: typeof AdminControlPanelRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -585,6 +604,16 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminControlPanelRoute: typeof AdminControlPanelRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminControlPanelRoute: AdminControlPanelRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AiReadinessRouteChildren {
   AiReadinessSurveyRoute: typeof AiReadinessSurveyRoute
@@ -630,7 +659,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AiReadinessRoute: AiReadinessRouteWithChildren,
   CodexRoute: CodexRouteWithChildren,
   InsightsRoute: InsightsRouteWithChildren,
