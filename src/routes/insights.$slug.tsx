@@ -190,7 +190,7 @@ function PostPage() {
       <p className="text-2xl text-foreground/70 italic leading-snug mb-6 text-pretty">
         {post.excerpt}
       </p>
-      <AudioBar text={body} title={post.title} inline />
+      <AudioBar text={body} title={post.title} inline onProgress={setProgress} />
       <div className="flex flex-wrap items-center justify-between gap-4 pb-10 border-b border-border font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
         <div className="flex items-center gap-4">
           <span>By {post.author}</span>
