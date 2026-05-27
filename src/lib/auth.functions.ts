@@ -37,11 +37,20 @@ export const getMe = createServerFn({ method: "GET" })
     };
   });
 
-// Placeholder "start subscription", until Stripe is wired, this just activates
-// the Vanguard tier for the signed-in user so the gated UX is testable.
+async function assertAdmin(userId: string) {
+  const { data: roles } = await supabaseAdmin
+    .from("user_roles").select("role").eq("user_id", userId);
+  if (!(roles ?? []).some((r) => r.role === "admin")) {
+    throw new Error("Checkout required — Stripe wires up next release.");
+  }
+}
+
+// Placeholder "start subscription". ADMIN-ONLY until Stripe is wired —
+// prevents regular users from self-granting Vanguard access.
 export const startSubscriptionPlaceholder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
     const userId = context.userId;
     const periodEnd = new Date();
     periodEnd.setMonth(periodEnd.getMonth() + 1);
@@ -58,7 +67,7 @@ export const startSubscriptionPlaceholder = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// Placeholder one-off purchase, records the purchase row so the gated content unlocks.
+// Placeholder one-off purchase. ADMIN-ONLY until real checkout is wired.
 export const recordPurchasePlaceholder = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => {
@@ -69,6 +78,7 @@ export const recordPurchasePlaceholder = createServerFn({ method: "POST" })
     return { itemType: o.itemType, itemId: o.itemId, amountCents: o.amountCents };
   })
   .handler(async ({ data, context }) => {
+    await assertAdmin(context.userId);
     const { error } = await supabaseAdmin.from("purchases").insert({
       user_id: context.userId,
       item_type: data.itemType,
