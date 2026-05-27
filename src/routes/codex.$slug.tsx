@@ -6,6 +6,7 @@ import { Lock } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Paywall, BlurredTeaser } from "@/components/site/Paywall";
+import { AudioBar } from "@/components/site/AudioBar";
 import { getPlaybook } from "@/lib/playbooks.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, recordPurchasePlaceholder } from "@/lib/auth.functions";
