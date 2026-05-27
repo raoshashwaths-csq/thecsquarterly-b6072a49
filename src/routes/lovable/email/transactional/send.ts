@@ -59,6 +59,16 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        // Admin-only: any signed-in user could otherwise send templated emails
+        // to arbitrary recipients and burn through the Mailgun quota.
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+        if (!(roles ?? []).some((r) => r.role === 'admin')) {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
         // Parse request body
         let templateName: string
         let recipientEmail: string
