@@ -14,6 +14,7 @@ import {
   Highlighter,
   FolderOpen,
   X,
+  Search,
 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -59,6 +60,7 @@ type QRun = { id: string; node_id: string; created_at: string; context: Record<s
 const LINKS_KEY = "csq.workspace.links";
 const ASSETS_KEY = "csq.workspace.assets";
 const HINT_KEY = "csq.hint.workspace.knowledge";
+const SEARCH_HINT_KEY = "csq.hint.workspace.search";
 
 const loadJSON = <T,>(k: string, fallback: T): T => {
   if (typeof window === "undefined") return fallback;
@@ -101,10 +103,21 @@ function WorkspacePage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState<"history" | "highlights" | "ledger">("history");
+  const [query, setQuery] = useState("");
+  const [searchHintDismissed, setSearchHintDismissed] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    try { setSearchHintDismissed(localStorage.getItem(SEARCH_HINT_KEY) === "1"); } catch { /* */ }
+  }, []);
+
+  const dismissSearchHint = () => {
+    setSearchHintDismissed(true);
+    try { localStorage.setItem(SEARCH_HINT_KEY, "1"); } catch { /* */ }
+  };
 
   const tabs = [
     { id: "history" as const, label: "Interaction History", icon: MessageSquare },
@@ -122,9 +135,40 @@ function WorkspacePage() {
         <h1 className="font-display text-4xl md:text-6xl tracking-tight mb-2">
           Your Workspace<span className="text-accent">.</span>
         </h1>
-        <p className="text-foreground/65 mb-8 max-w-2xl">
+        <p className="text-foreground/65 mb-6 max-w-2xl">
           Your transcripts, annotations, and saved intel — in one operator-grade ledger.
         </p>
+
+        {/* Workspace-only search bar */}
+        <div className="relative mb-8" onClick={!searchHintDismissed ? dismissSearchHint : undefined}>
+          <div className="flex items-center gap-2 border-2 border-border focus-within:border-accent bg-background px-3 py-2.5">
+            <Search size={16} strokeWidth={2.75} className="text-muted-foreground shrink-0" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); dismissSearchHint(); }}
+              placeholder="Search your saved links, files, highlights, and transcripts…"
+              className="w-full bg-transparent focus:outline-none text-sm font-body"
+              aria-label="Search your Workspace"
+            />
+            {query && (
+              <button onClick={() => setQuery("")} aria-label="Clear" className="text-muted-foreground hover:text-foreground">
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            Scope · saved Workspace items only — does not query the CSQ corpus.
+          </p>
+          {!searchHintDismissed && (
+            <div className="mt-2 inline-flex items-center gap-2 px-2 py-1 bg-accent text-accent-foreground font-mono text-[10px] uppercase tracking-[0.25em] animate-pulse">
+              <Sparkles className="w-3 h-3" /> New · search across your saved intel
+              <button type="button" onClick={(e) => { e.stopPropagation(); dismissSearchHint(); }} className="ml-1 opacity-80 hover:opacity-100" aria-label="Dismiss">
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+        </div>
 
         <DailyBriefing />
 
@@ -153,9 +197,9 @@ function WorkspacePage() {
         </div>
 
         <div className="mt-8 will-change-transform">
-          {tab === "history" && <HistoryPanel />}
-          {tab === "highlights" && <HighlightsPanel />}
-          {tab === "ledger" && <LedgerPanel />}
+          {tab === "history" && <HistoryPanel query={query} />}
+          {tab === "highlights" && <HighlightsPanel query={query} />}
+          {tab === "ledger" && <LedgerPanel query={query} />}
         </div>
       </main>
       <SiteFooter />
