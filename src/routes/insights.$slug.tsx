@@ -122,7 +122,7 @@ function PostPage() {
   const { slug } = Route.useParams();
   const { data: post } = useSuspenseQuery(postQuery(slug));
   const [tone, setTone] = useState<Tone>("mckinsey");
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [showToneHint, setShowToneHint] = useState(false);
 
@@ -131,8 +131,10 @@ function PostPage() {
   const hasBothTones = hasMck && hasWod;
 
   // Track distinct articles viewed. Allow 3 free, then paywall on a 4th new article.
+  // CRITICAL: wait for auth to resolve so a logged-in Vanguard is never bounced.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (authLoading) return;
     const key = "cs_articles_seen";
     let seen: string[] = [];
     try { seen = JSON.parse(window.localStorage.getItem(key) ?? "[]"); } catch { seen = []; }
@@ -149,7 +151,7 @@ function PostPage() {
       const t = window.setTimeout(() => setShowToneHint(true), 600);
       return () => window.clearTimeout(t);
     }
-  }, [slug, user, hasBothTones, navigate]);
+  }, [slug, user, authLoading, hasBothTones, navigate]);
 
   const { title, body } = useMemo(() => {
     if (!post) return { title: "", body: "" };
