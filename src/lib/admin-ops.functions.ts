@@ -34,7 +34,7 @@ async function logAudit(args: {
       action: args.action,
       target_table: args.target_table ?? null,
       target_id: args.target_id ?? null,
-      details: args.details ?? {},
+      details: (args.details ?? {}) as never,
       ip,
       user_agent: ua,
     });
