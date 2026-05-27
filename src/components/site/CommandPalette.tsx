@@ -2,7 +2,7 @@ import * as React from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, BookOpen, Sparkles } from "lucide-react";
+import { FileText, BookOpen, Sparkles, Bookmark, Highlighter } from "lucide-react";
 import {
   CommandDialog,
   CommandEmpty,
@@ -11,7 +11,8 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
+import { globalSearch, searchUserWorkspace, type SearchHit } from "@/lib/discovery.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 function useDebounced<T>(value: T, ms = 180) {
   const [debounced, setDebounced] = React.useState(value);
