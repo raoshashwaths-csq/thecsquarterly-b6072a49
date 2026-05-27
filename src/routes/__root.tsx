@@ -11,6 +11,8 @@ import { Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { QAgentButton } from "@/components/site/QAgentButton";
+import { useHeadlineReveal } from "@/hooks/useHeadlineReveal";
+
 
 import appCss from "../styles.css?url";
 
