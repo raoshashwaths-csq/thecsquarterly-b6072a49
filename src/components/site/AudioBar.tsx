@@ -1,26 +1,68 @@
 import { useEffect, useRef, useState } from "react";
 import { Play, Pause, Square, Gauge, Headphones } from "lucide-react";
 
+// Best-effort selection of a natural-sounding Indian English voice with sensible fallbacks.
+function pickIndianVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
+  if (!voices.length) return null;
+  const inEn = voices.filter((v) => /en[-_]IN/i.test(v.lang));
+  const preferredNames = [
+    /Rishi/i,        // Apple en-IN
+    /Veena/i,        // Apple en-IN
+    /Neerja/i,       // Microsoft en-IN
+    /Prabhat/i,      // Microsoft en-IN
+    /Heera/i,        // Microsoft en-IN
+    /Ravi/i,         // Microsoft en-IN
+    /Google.*Indian/i,
+    /Google.*English.*India/i,
+  ];
+  for (const re of preferredNames) {
+    const v = inEn.find((x) => re.test(x.name)) ?? voices.find((x) => re.test(x.name));
+    if (v) return v;
+  }
+  if (inEn[0]) return inEn[0];
+  // Fallback: any "natural"/"neural"/"premium" English voice for less robotic output
+  const natural = voices.find((v) =>
+    /en[-_]/i.test(v.lang) && /(natural|neural|premium|enhanced|google)/i.test(v.name),
+  );
+  return natural ?? voices.find((v) => /en[-_]/i.test(v.lang)) ?? null;
+}
+
+// Insert micro-pauses and break long sentences for more natural cadence.
+function humanize(text: string): string {
+  return text
+    .replace(/\s+/g, " ")
+    .replace(/([.!?])\s+/g, "$1  ")   // longer pause at sentence boundaries
+    .replace(/([,;:])\s+/g, "$1 ")    // small breath at commas
+    .replace(/\s+—\s+/g, " — ")
+    .trim();
+}
+
 export function AudioBar({ text, title, inline = false }: { text: string; title: string; inline?: boolean }) {
   const [supported, setSupported] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [rate, setRate] = useState(1);
+  const [rate, setRate] = useState(0.95);
+  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [hintDismissed, setHintDismissed] = useState(true);
   const uttRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
     const ok = typeof window !== "undefined" && "speechSynthesis" in window;
     setSupported(ok);
-    if (ok) {
-      try {
-        setHintDismissed(localStorage.getItem("csq.hint.audio") === "1");
-      } catch { /* ignore */ }
-    }
+    if (!ok) return;
+    try { setHintDismissed(localStorage.getItem("csq.hint.audio") === "1"); } catch { /* ignore */ }
+
+    const loadVoices = () => {
+      const v = window.speechSynthesis.getVoices();
+      const picked = pickIndianVoice(v);
+      if (picked) setVoice(picked);
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+
     return () => {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-      }
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.onvoiceschanged = null;
     };
   }, []);
 
@@ -31,22 +73,27 @@ export function AudioBar({ text, title, inline = false }: { text: string; title:
 
   if (!supported) return null;
 
-  const plain = text
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/[#*_>`]/g, "")
-    .replace(/\[(.*?)\]\(.*?\)/g, "$1")
-    .replace(/\s+/g, " ")
-    .trim();
+  const plain = humanize(
+    text
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/[#*_>`]/g, "")
+      .replace(/\[(.*?)\]\(.*?\)/g, "$1"),
+  );
+
+  const buildUtterance = (body: string, r: number) => {
+    const u = new SpeechSynthesisUtterance(body);
+    u.rate = r;
+    u.pitch = 1.02;
+    u.volume = 1;
+    u.lang = voice?.lang ?? "en-IN";
+    if (voice) u.voice = voice;
+    u.onend = () => { setPlaying(false); setPaused(false); };
+    return u;
+  };
 
   const start = () => {
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(`${title}. ${plain}`);
-    u.rate = rate;
-    u.pitch = 1;
-    u.onend = () => {
-      setPlaying(false);
-      setPaused(false);
-    };
+    const u = buildUtterance(`${title}. ${plain}`, rate);
     uttRef.current = u;
     window.speechSynthesis.speak(u);
     setPlaying(true);
@@ -55,13 +102,8 @@ export function AudioBar({ text, title, inline = false }: { text: string; title:
 
   const toggle = () => {
     if (!playing) return start();
-    if (paused) {
-      window.speechSynthesis.resume();
-      setPaused(false);
-    } else {
-      window.speechSynthesis.pause();
-      setPaused(true);
-    }
+    if (paused) { window.speechSynthesis.resume(); setPaused(false); }
+    else { window.speechSynthesis.pause(); setPaused(true); }
   };
 
   const stop = () => {
@@ -71,17 +113,11 @@ export function AudioBar({ text, title, inline = false }: { text: string; title:
   };
 
   const cycleRate = () => {
-    const next = rate === 1 ? 1.25 : rate === 1.25 ? 1.5 : rate === 1.5 ? 0.85 : 1;
+    const next = rate === 0.95 ? 1.1 : rate === 1.1 ? 1.25 : rate === 1.25 ? 0.85 : 0.95;
     setRate(next);
-    if (playing && uttRef.current) {
-      // Web Speech can't change mid-utterance reliably; restart at new rate.
+    if (playing) {
       window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(plain);
-      u.rate = next;
-      u.onend = () => {
-        setPlaying(false);
-        setPaused(false);
-      };
+      const u = buildUtterance(plain, next);
       uttRef.current = u;
       window.speechSynthesis.speak(u);
     }
@@ -95,7 +131,7 @@ export function AudioBar({ text, title, inline = false }: { text: string; title:
     <div className={container} onClick={!hintDismissed ? dismissHint : undefined}>
       <Headphones className="w-3.5 h-3.5 text-muted-foreground" />
       <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground pr-1">
-        Listen
+        Listen{voice && /en[-_]IN/i.test(voice.lang) ? " · IN" : ""}
       </span>
       <button
         onClick={(e) => { e.stopPropagation(); dismissHint(); toggle(); }}

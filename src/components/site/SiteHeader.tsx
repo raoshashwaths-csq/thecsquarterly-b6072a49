@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,6 +26,9 @@ const sections = [
 
 export function SiteHeader() {
   const { user } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isHome = pathname === "/";
+
   const meta = (user?.user_metadata ?? {}) as {
     avatar_url?: string;
     picture?: string;
@@ -51,8 +54,8 @@ export function SiteHeader() {
       )}
     >
       <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3 md:gap-8">
-        <Link to="/" className="group leading-none shrink min-w-0">
-          <span className="font-display tracking-tight leading-none text-lg md:text-2xl whitespace-nowrap truncate block">
+        <Link to="/" className="group leading-none shrink-0 min-w-0">
+          <span className="font-display tracking-tight leading-none text-lg md:text-2xl whitespace-nowrap block">
             The CS Quarterly<span
               aria-hidden
               className="text-secondary-accent group-hover:text-accent transition-colors font-bold"
@@ -60,45 +63,50 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-6 font-mono text-[10px] font-semibold uppercase tracking-widest">
-          <div className="hidden lg:flex items-center gap-6">
-            {sections.map((item, i) => (
-              <div key={item.to} className="flex items-center gap-6">
-                {i > 0 && <span aria-hidden className="h-3 w-px bg-border" />}
+        <div className="flex items-center gap-4 md:gap-6 font-mono text-[10px] font-semibold uppercase tracking-widest">
+          {isHome && (
+            <div className="hidden lg:flex items-center gap-6">
+              {sections.map((item, i) => (
+                <div key={item.to} className="flex items-center gap-6">
+                  {i > 0 && <span aria-hidden className="h-3 w-px bg-border" />}
+                  <Link
+                    to={item.to}
+                    className="hover:text-accent transition-colors"
+                    activeProps={{ className: "text-accent" }}
+                  >
+                    {item.label}
+                  </Link>
+                </div>
+              ))}
+              <span aria-hidden className="h-3 w-px bg-border/90" />
+            </div>
+          )}
+
+          {!isHome && (
+            <>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event("csq:open-command-palette"))}
+                aria-label="Open search"
+                title="Search (⌘K)"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px]"
+              >
+                <Search size={13} strokeWidth={2.75} />
+                <span className="hidden md:inline text-[10px] tracking-widest">⌘K</span>
+              </button>
+
+              {user && (
                 <Link
-                  to={item.to}
-                  className="hover:text-accent transition-colors"
-                  activeProps={{ className: "text-accent" }}
+                  to="/account/workspace"
+                  aria-label="Your Workspace"
+                  title="Your Workspace"
+                  className="inline-flex items-center justify-center gap-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px] px-2.5 py-1.5"
                 >
-                  {item.label}
+                  <LayoutGrid size={13} strokeWidth={2.75} />
+                  <span className="hidden md:inline text-[10px] tracking-widest">Workspace</span>
                 </Link>
-              </div>
-            ))}
-          </div>
-
-          <span aria-hidden className="hidden lg:inline-block h-3 w-px bg-border/90" />
-
-          <button
-            type="button"
-            onClick={() => window.dispatchEvent(new Event("csq:open-command-palette"))}
-            aria-label="Open search"
-            title="Search (⌘K)"
-            className="hidden md:inline-flex items-center gap-1.5 px-2 py-1 border border-border hover:border-accent hover:text-accent transition-colors"
-          >
-            <Search size={11} strokeWidth={2} />
-            <span className="text-[10px] tracking-widest">⌘K</span>
-          </button>
-
-          {user && (
-            <Link
-              to="/account/workspace"
-              aria-label="Your Workspace"
-              title="Your Workspace"
-              className="inline-flex items-center justify-center gap-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px] min-w-[36px] md:min-w-0 md:px-2.5 md:py-1"
-            >
-              <LayoutGrid size={12} strokeWidth={2} />
-              <span className="hidden md:inline text-[10px] tracking-widest">Your Workspace</span>
-            </Link>
+              )}
+            </>
           )}
 
           <LanguageSwitcher />
@@ -129,6 +137,11 @@ export function SiteHeader() {
                   )}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/account/workspace" className="font-mono text-[11px] uppercase tracking-widest">
+                    Your Workspace
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/account" className="font-mono text-[11px] uppercase tracking-widest">
                     Account

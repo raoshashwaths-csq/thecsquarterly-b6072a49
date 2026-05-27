@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import {
   ChevronDown,
   ChevronRight,
@@ -30,6 +29,18 @@ export const Route = createFileRoute("/account/workspace")({
     ],
   }),
   component: WorkspacePage,
+  errorComponent: ({ error, reset }) => (
+    <div className="min-h-screen flex flex-col">
+      <SiteHeader />
+      <main className="flex-1 max-w-3xl mx-auto px-6 py-20 w-full">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">Workspace · Error</div>
+        <h1 className="font-display text-4xl tracking-tight mb-3">Something snagged.</h1>
+        <p className="text-foreground/70 mb-6">{error?.message || "An unexpected error occurred."}</p>
+        <button onClick={reset} className="px-5 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">Retry</button>
+      </main>
+      <SiteFooter />
+    </div>
+  ),
 });
 
 // ---------- types & storage ----------
