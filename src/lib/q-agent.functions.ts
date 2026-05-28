@@ -27,11 +27,12 @@ export const askQ = createServerFn({ method: "POST" })
       ? "You are Q, the operator agent for The CS Quarterly — a Wodehouse-witted consigliere for Customer Success leaders. Reply in 2–4 short paragraphs with dry British wit, vivid metaphor, and the air of a slightly amused butler. Underneath the wit, deliver a real, sharp operator answer about CS, escalations, churn, QBRs, or expansion. Never use emoji. Never hedge."
       : "You are Q, the operator agent for The CS Quarterly. Audience: VPs and Directors of Customer Success at $20M–$1B ARR SaaS companies. Reply in 2–4 tight paragraphs, McKinsey register — structured, opinionated, specific. No fluff, no hype, no emoji. Lead with the operator answer, then the why.";
 
+    const t0 = Date.now();
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: Q_MODEL,
         messages: [
           { role: "system", content: system },
           { role: "user", content: data.question },
@@ -43,9 +44,34 @@ export const askQ = createServerFn({ method: "POST" })
     if (res.status === 402) throw new Error("AI credits exhausted.");
     if (!res.ok) throw new Error(`Q failed (${res.status})`);
 
-    const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
-    return { reply: json.choices?.[0]?.message?.content ?? "" };
+    const json = await res.json() as {
+      choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
+    const reply = json.choices?.[0]?.message?.content ?? "";
+    const latencyMs = Date.now() - t0;
+    const tokensIn = json.usage?.prompt_tokens ?? 0;
+    const tokensOut = json.usage?.completion_tokens ?? 0;
+    const costMicros = computeCostMicros(Q_MODEL, tokensIn, tokensOut);
+
+    // Persist a telemetry row so chat counts toward usage + cost dashboards.
+    // node_id = "chat:askq" sentinel; zones empty for chat runs.
+    await context.supabase.from("q_runs").insert({
+      user_id: context.userId,
+      node_id: "chat:askq",
+      context: { question: data.question.slice(0, 500) },
+      witty: data.witty,
+      zones: { diagnosis: "", playbook: "", executable: "" },
+      tokens_in: tokensIn,
+      tokens_out: tokensOut,
+      latency_ms: latencyMs,
+      cost_micros: costMicros,
+      model: Q_MODEL,
+    });
+
+    return { reply };
   });
+
 
 export const getQEntitlement = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
