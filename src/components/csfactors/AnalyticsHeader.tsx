@@ -145,7 +145,7 @@ export function AnalyticsHeader({ accounts }: { accounts: CSAccount[] }) {
   const sentiment = useMemo(() => computeSentimentIndex(accounts), [accounts]);
 
   return (
-    <MetricGrid cols={2}>
+    <MetricGrid cols={2} className="gap-4 md:gap-px">
       <HoverCard openDelay={120} closeDelay={80}>
         <HoverCardTrigger asChild>
           <div className="cursor-help transition-transform hover:-translate-y-0.5">
@@ -170,7 +170,7 @@ export function AnalyticsHeader({ accounts }: { accounts: CSAccount[] }) {
             />
           </div>
         </HoverCardTrigger>
-        <HoverCardContent align="start" className="w-[420px] p-5 border-border">
+        <HoverCardContent align="start" className="w-[calc(100vw-2rem)] sm:w-[420px] p-5 border-border">
           <ExpandedNPS accounts={accounts} />
         </HoverCardContent>
       </HoverCard>
@@ -199,7 +199,7 @@ export function AnalyticsHeader({ accounts }: { accounts: CSAccount[] }) {
             />
           </div>
         </HoverCardTrigger>
-        <HoverCardContent align="start" className="w-[440px] p-5 border-border">
+        <HoverCardContent align="start" className="w-[calc(100vw-2rem)] sm:w-[440px] p-5 border-border">
           <ExpandedSentiment accounts={accounts} />
         </HoverCardContent>
       </HoverCard>
