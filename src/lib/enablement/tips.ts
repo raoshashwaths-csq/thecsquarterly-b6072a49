@@ -108,7 +108,7 @@ export const TIP_GROUPS: TipGroup[] = [
       {
         id: "home-ai-readiness",
         title: "Start with the diagnostic",
-        body: "The 5-minute AI Readiness Audit places you on a band (Reactive → Operational → Predictive), surfaces your weakest of 11 dimensions, and names the one fix that moves the band. Take it before anything else — it frames every other tool here.",
+        body: "The 5-minute AI Readiness Audit places you on a band (Reactive → Operational → Predictive), surfaces your weakest of 8 dimensions, and names the one fix that moves the band. Take it before anything else — it frames every other tool here.",
         cta: { label: "Take the audit", to: "/ai-readiness" },
       },
       {
@@ -150,7 +150,7 @@ export const TIP_GROUPS: TipGroup[] = [
       {
         id: "home-section-diagnostic",
         title: "Diagnostic — benchmark your team",
-        body: "11 dimensions, 44 metrics. Use the Diagnostic to compare your org against the cohort and identify the single transition that unlocks the next band.",
+        body: "8 dimensions, 32 metrics. Use the Diagnostic to compare your org against the cohort and identify the single transition that unlocks the next band.",
         cta: { label: "Run Diagnostic", to: "/ai-readiness" },
       },
     ],

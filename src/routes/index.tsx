@@ -23,7 +23,7 @@ const SECTIONS = [
   { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically.", hint: "Q: pick one playbook per quarter and run it end-to-end across the book." },
   { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts.", hint: "Q: bring receipts here when you need numbers for a board or stakeholder argument." },
   { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators.", hint: "Q: use it like a dictionary — jump in, grab the framework, leave." },
-  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 11 dimensions, 44 metrics.", hint: "Q: the single transition that unlocks your next band is the one to fund first." },
+  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 8 dimensions, 32 metrics.", hint: "Q: the single transition that unlocks your next band is the one to fund first." },
 ] as const;
 
 
@@ -106,13 +106,13 @@ function HomePage() {
                 Benchmark your CS org in 5 minutes
               </div>
               <p className="text-sm text-foreground/70 leading-snug mb-2">
-                11 dimensions, 44 metrics. See where you sit between Reactive, Operational and Predictive — and what to fix first.
+                8 dimensions, 32 metrics. See where you sit between Reactive, Operational and Predictive — and what to fix first.
               </p>
               <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
                 Take the free diagnostic →
               </div>
               <QHint>
-                Q: the 5-min audit pinpoints your weakest of 11 dimensions and names the single fix that moves your band.
+                Q: the 5-min audit pinpoints your weakest of 8 dimensions and names the single fix that moves your band.
               </QHint>
             </div>
           </Link>
