@@ -45,13 +45,13 @@ const ROLLING_PROMPTS = [
 
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
-  const [scope, setScope] = useState<"universal" | "workspace">("universal");
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trialUsed, setTrialUsed] = useState(false);
   const [unlimited, setUnlimited] = useState(false);
   const [gateModal, setGateModal] = useState(false);
+  const [panel, setPanel] = useState<"tips" | "glossary" | null>(null);
 
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -61,10 +61,10 @@ export function QAgentButton() {
   const fetchEntitlement = useServerFn(getQEntitlement);
   const fetchUsage = useServerFn(getMonthlyQUsage);
   const runUniversal = useServerFn(globalSearch);
-  const runWorkspace = useServerFn(searchUserWorkspace);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const tour = useTour();
   const speech = useElevenLabsSpeechInput({
     onTranscript: (text) => {
       setQuery((current) => (current ? `${current} ${text}` : text));
