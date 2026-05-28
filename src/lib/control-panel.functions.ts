@@ -343,15 +343,20 @@ export const listMasterUsers = createServerFn({ method: "GET" })
         .select("id, email, display_name, created_at")
         .order("created_at", { ascending: false })
         .limit(1000),
-      supabaseAdmin.from("subscriptions").select("user_id, tier, status, current_period_end"),
+      supabaseAdmin.from("subscriptions").select("user_id, tier, designation, status, current_period_end"),
       supabaseAdmin.from("user_roles").select("user_id, role"),
       supabaseAdmin.from("q_runs").select("user_id"),
     ]);
 
-    const subMap: Record<string, { tier: string; status: string }> = {};
+    const subMap: Record<string, { tier: string; designation: string | null; status: string; current_period_end: string | null }> = {};
     (subsRes.data ?? []).forEach((s) => {
       if (!subMap[s.user_id] || s.status === "active") {
-        subMap[s.user_id] = { tier: s.tier, status: s.status };
+        subMap[s.user_id] = {
+          tier: s.tier,
+          designation: (s as { designation?: string | null }).designation ?? null,
+          status: s.status,
+          current_period_end: (s as { current_period_end?: string | null }).current_period_end ?? null,
+        };
       }
     });
     const roleSet: Record<string, string[]> = {};
@@ -363,17 +368,24 @@ export const listMasterUsers = createServerFn({ method: "GET" })
       qUsage[r.user_id] = (qUsage[r.user_id] ?? 0) + 1;
     });
 
-    return (profilesRes.data ?? []).map((p) => ({
-      id: p.id as string,
-      email: (p.email as string) ?? "—",
-      display_name: (p.display_name as string) ?? "",
-      created_at: p.created_at as string,
-      tier: subMap[p.id]?.tier ?? "free",
-      status: subMap[p.id]?.status ?? "inactive",
-      is_admin: (roleSet[p.id] ?? []).includes("admin"),
-      sessions_used: qUsage[p.id] ?? 0,
-      seat_cap: 50, // default cap — wire to per-user override later
-    }));
+    return (profilesRes.data ?? []).map((p) => {
+      const sub = subMap[p.id];
+      const n = normalizeTier({ tier: sub?.tier ?? null, designation: sub?.designation ?? null });
+      return {
+        id: p.id as string,
+        email: (p.email as string) ?? "—",
+        display_name: (p.display_name as string) ?? "",
+        created_at: p.created_at as string,
+        tier: n.designation,
+        tier_label: n.label,
+        status: sub?.status ?? "inactive",
+        current_period_end: sub?.current_period_end ?? null,
+        is_admin: (roleSet[p.id] ?? []).includes("admin"),
+        sessions_used: qUsage[p.id] ?? 0,
+        seat_cap: TIER_SEAT_CAP[n.designation] ?? 1,
+        q_cap: TIER_Q_CAP[n.designation] ?? 0,
+      };
+    });
   });
 
 export const manageUser = createServerFn({ method: "POST" })
