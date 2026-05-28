@@ -5,11 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
 import { getMonthlyQUsage } from "@/lib/q-usage.functions";
-import { globalSearch, searchUserWorkspace, type SearchHit } from "@/lib/discovery.functions";
+import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
 import { SUGGESTED_VECTORS } from "@/lib/q-vectors";
 import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
+import { useTour } from "@/hooks/useTour";
 import {
   Sheet,
   SheetContent,
@@ -19,8 +20,11 @@ import {
 } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { QMark } from "@/components/site/QMark";
-import { BookOpen, FileText, Highlighter, Bookmark, Mic, Sparkles, Square } from "lucide-react";
+import { BookOpen, Compass, FileText, Highlighter, Bookmark, Lightbulb, Mic, Sparkles, Square } from "lucide-react";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
+import { FeatureGlossary } from "@/components/enablement/FeatureGlossary";
+import { RouteTipsList } from "@/components/enablement/RouteTipsList";
+import { PlaybookTour } from "@/components/enablement/PlaybookTour";
 
 const TRIAL_KEY = "q.trial.used";
 const DRAFT_KEY = "q.draft.global";
@@ -41,13 +45,13 @@ const ROLLING_PROMPTS = [
 
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
-  const [scope, setScope] = useState<"universal" | "workspace">("universal");
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trialUsed, setTrialUsed] = useState(false);
   const [unlimited, setUnlimited] = useState(false);
   const [gateModal, setGateModal] = useState(false);
+  const [panel, setPanel] = useState<"tips" | "glossary" | null>(null);
 
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -57,10 +61,10 @@ export function QAgentButton() {
   const fetchEntitlement = useServerFn(getQEntitlement);
   const fetchUsage = useServerFn(getMonthlyQUsage);
   const runUniversal = useServerFn(globalSearch);
-  const runWorkspace = useServerFn(searchUserWorkspace);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
+  const tour = useTour();
   const speech = useElevenLabsSpeechInput({
     onTranscript: (text) => {
       setQuery((current) => (current ? `${current} ${text}` : text));
@@ -113,19 +117,15 @@ export function QAgentButton() {
   useEffect(() => {
     const q = query.trim();
     if (!q) { setHits([]); return; }
-    if (scope === "workspace" && !user) { setHits([]); return; }
     setSearchLoading(true);
     const t = setTimeout(() => {
-      const call = scope === "universal"
-        ? runUniversal({ data: { q } })
-        : runWorkspace({ data: { q } });
-      call
+      runUniversal({ data: { q } })
         .then((r) => setHits(r.hits ?? []))
         .catch(() => setHits([]))
         .finally(() => setSearchLoading(false));
     }, 200);
     return () => clearTimeout(t);
-  }, [query, scope, user, runUniversal, runWorkspace]);
+  }, [query, runUniversal]);
 
   const handleOpen = () => { setOpen(true); };
 
@@ -156,10 +156,7 @@ export function QAgentButton() {
     setLoading(true);
     setAnswer(null);
     try {
-      const prefix = scope === "workspace"
-        ? "Answer using ONLY the operator's saved Workspace context if relevant; otherwise say you have nothing on file.\n\nQuestion: "
-        : "";
-      const { reply } = await ask({ data: { question: prefix + query, witty: false } });
+      const { reply } = await ask({ data: { question: query, witty: false } });
       setAnswer(reply);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* */ }
       usage.refetch();
@@ -200,40 +197,57 @@ export function QAgentButton() {
           className="w-full sm:max-w-[460px] md:max-w-[42vw] bg-background border-l border-border p-0 overflow-y-auto"
         >
           <div className="p-7 md:p-9">
-            <SheetHeader className="text-left mb-7">
+            <SheetHeader className="text-left mb-6">
               <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-5">
                 Operator Agent · Beta
               </div>
               <SheetTitle asChild>
                 <h2 className="font-display text-5xl md:text-6xl leading-[0.9] tracking-tight">
-                  Ask <QMark />
+                  Meet <QMark />
                 </h2>
               </SheetTitle>
-              <SheetDescription className="font-body text-base text-foreground/75 leading-relaxed pt-3">
-                Type the question. <QMark /> searches as you type and reasons when you ask.
+              <SheetDescription className="sr-only">
+                Ask Q, take a guided tour of this page, browse quick tips, or open the feature glossary.
               </SheetDescription>
             </SheetHeader>
 
-            {/* Scope toggle — ABOVE the search bar */}
-            <div className="mb-3 inline-flex items-stretch border border-border">
+            {/* Action row — tour / tips / glossary */}
+            <div className="mb-5 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => { setScope("universal"); setHits([]); }}
-                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
-                  scope === "universal" ? "bg-foreground text-background" : "hover:bg-muted"
-                }`}
+                onClick={() => {
+                  if (!tour.hasTour) return;
+                  setOpen(false);
+                  tour.start();
+                }}
+                disabled={!tour.hasTour}
+                title={tour.hasTour ? "Tour this page" : "No tour for this page yet"}
+                className="inline-flex items-center gap-1.5 px-3 py-2 border border-border font-mono text-[10px] uppercase tracking-[0.25em] hover:border-accent hover:text-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Universal
+                <Compass className="h-3 w-3" />
+                {tour.hasTour ? "Tour page" : "No tour"}
               </button>
               <button
                 type="button"
-                onClick={() => { setScope("workspace"); setHits([]); }}
-                disabled={!user}
-                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                  scope === "workspace" ? "bg-foreground text-background" : "hover:bg-muted"
+                onClick={() => setPanel((p) => (p === "tips" ? null : "tips"))}
+                aria-pressed={panel === "tips"}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 border font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                  panel === "tips" ? "border-accent text-accent" : "border-border hover:border-accent hover:text-accent"
                 }`}
               >
-                Workspace
+                <Lightbulb className="h-3 w-3" />
+                Quick Tips
+              </button>
+              <button
+                type="button"
+                onClick={() => setPanel((p) => (p === "glossary" ? null : "glossary"))}
+                aria-pressed={panel === "glossary"}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 border font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                  panel === "glossary" ? "border-accent text-accent" : "border-border hover:border-accent hover:text-accent"
+                }`}
+              >
+                <BookOpen className="h-3 w-3" />
+                Glossary
               </button>
             </div>
 
@@ -272,47 +286,6 @@ export function QAgentButton() {
               </button>
             </form>
 
-            {/* Suggested Vectors — premium parchment pills, always visible */}
-            {!answer && (
-              <div className="mb-5">
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
-                  Suggested Vectors
-                </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
-                  {SUGGESTED_VECTORS.map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={() => { setQuery(v); inputRef.current?.focus(); }}
-                      className="snap-start shrink-0 max-w-[280px] text-left text-xs font-body leading-snug border border-border bg-card/70 px-3 py-2.5 hover:border-accent hover:text-accent transition-colors"
-                    >
-                      {v}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-
-            {/* Live search results */}
-            {query && (
-              <div className="mb-5 space-y-2">
-                {searchLoading && hits.length === 0 && (
-                  <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Searching…</div>
-                )}
-                {!searchLoading && hits.length === 0 && (
-                  <div className="text-sm text-foreground/60">
-                    {scope === "workspace"
-                      ? <>Nothing in your Workspace matches. <Link to="/account/workspace" onClick={() => setOpen(false)} className="underline">Open Workspace →</Link></>
-                      : <>No matches — ask <QMark /> directly instead.</>}
-                  </div>
-                )}
-                {hits.slice(0, 6).map((h) => (
-                  <ResultRow key={`${h.kind}-${h.id}`} hit={h} onClose={() => setOpen(false)} />
-                ))}
-              </div>
-            )}
-
             {/* Q replies */}
             {answer && (
               <div className="mb-5 border-l-2 border-accent pl-4 py-1">
@@ -323,6 +296,57 @@ export function QAgentButton() {
                   {answer}
                 </div>
               </div>
+            )}
+
+            {/* Inline panel (tips / glossary) — replaces vectors + results when open */}
+            {panel === "tips" ? (
+              <div className="mb-5 animate-fade-in">
+                <RouteTipsList onNavigate={() => setOpen(false)} />
+              </div>
+            ) : panel === "glossary" ? (
+              <div className="mb-5 animate-fade-in">
+                <FeatureGlossary />
+              </div>
+            ) : (
+              <>
+                {/* Suggested Vectors — premium parchment pills */}
+                {!answer && (
+                  <div className="mb-5">
+                    <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
+                      Suggested Vectors
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
+                      {SUGGESTED_VECTORS.map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => { setQuery(v); inputRef.current?.focus(); }}
+                          className="snap-start shrink-0 max-w-[280px] text-left text-xs font-body leading-snug border border-border bg-card/70 px-3 py-2.5 hover:border-accent hover:text-accent transition-colors"
+                        >
+                          {v}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Live search results */}
+                {query && (
+                  <div className="mb-5 space-y-2">
+                    {searchLoading && hits.length === 0 && (
+                      <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Searching…</div>
+                    )}
+                    {!searchLoading && hits.length === 0 && (
+                      <div className="text-sm text-foreground/60">
+                        No matches — ask <QMark /> directly instead.
+                      </div>
+                    )}
+                    {hits.slice(0, 6).map((h) => (
+                      <ResultRow key={`${h.kind}-${h.id}`} hit={h} onClose={() => setOpen(false)} />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
 
             {needsSignIn ? (
@@ -380,6 +404,16 @@ export function QAgentButton() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {tour.active && tour.step ? (
+        <PlaybookTour
+          step={tour.step}
+          index={tour.stepIndex}
+          total={tour.total}
+          onNext={tour.next}
+          onSkip={tour.skip}
+        />
+      ) : null}
     </>
   );
 }
