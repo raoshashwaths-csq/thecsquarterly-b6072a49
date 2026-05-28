@@ -14,6 +14,7 @@ const NAV: { to: string; label: string; icon: typeof Activity; hash?: string }[]
 export function CSFactorsSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const hash = useRouterState({ select: (r) => r.location.hash });
 
   return (
     <aside
@@ -50,7 +51,7 @@ export function CSFactorsSidebar() {
         <nav className="flex-1 px-2 py-4 space-y-1">
           {NAV.map((item) => {
             const isActive =
-              item.to === pathname && (!item.hash || item.hash === window?.location?.hash);
+              item.to === pathname && (!item.hash || item.hash === `#${hash}` || item.hash.slice(1) === hash);
             const Icon = item.icon;
             return (
               <a
