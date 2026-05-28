@@ -62,7 +62,7 @@ function b(v: string) {
 function parseCsv(text: string) {
   const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
   if (lines.length < 2) throw new Error("CSV is empty or only has a header.");
-  const headers = splitCsvLine(lines[0]).map((h) => h.trim());
+  const headers = splitCsvLine(lines[0]).map((h) => h.trim().replace(/\*+$/, ""));
   for (const r of ["name", "tier", "arr", "health", "qbr_status", "renewal_quarter"]) {
     if (!headers.includes(r)) throw new Error(`Missing required column: ${r}`);
   }
