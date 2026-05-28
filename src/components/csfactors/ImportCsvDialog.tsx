@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { bulkImportAccounts } from "@/lib/csfactors.functions";
 import { toast } from "sonner";
 
+const REQUIRED = new Set(["name","tier","arr","health","qbr_status","renewal_quarter"]);
+
 const HEADERS = [
   "name","tier","arr","health","qbr_status","renewal_quarter","champion","economic_buyer","blocker","notes",
   "ucc","account_manager","csm_name","associate_director","backup_owner","customer_success","key_account_manager",
@@ -18,9 +20,13 @@ const HEADERS = [
   "marquee_client","existing_erp","existing_crm","region","payroll_service_type","final_cs_nps","industry",
 ];
 
+// Header row in the CSV template marks required columns with a trailing asterisk
+// (e.g. `name*`). The parser strips the asterisk before validation.
+const TEMPLATE_HEADERS = HEADERS.map((h) => (REQUIRED.has(h) ? `${h}*` : h));
+
 const SAMPLE = [
-  HEADERS.join(","),
-  `Acme Corp,Enterprise,120000,84,Completed,Q3-2026,Jane Doe,John Smith,,Strong adoption,UCC-001,Maria K,David L,Priya S,Sam B,CS Team,Tom R,Anu G,2026-09-15,140000,120000,Adopted,2024-01-10,Boston,Positive,420,USA,Northeast,2024-03-01,2024-02-15,100,Lina P,Hari V,AWS us-east-1,prod-na-01,true,SAP,Salesforce,NA,Standard,9,Manufacturing`,
+  TEMPLATE_HEADERS.join(","),
+  `Acme Corp,Enterprise,120000,84,Completed,Q3-2026,Jane Doe,John Smith,,Strong adoption,UCC-001,Maria K,David L,Priya S,Sam B,CS Team,Tom R,2026-09-15,140000,120000,Adopted,2024-01-10,Boston,Positive,420,USA,Northeast,2024-03-01,2024-02-15,100,Lina P,Hari V,AWS us-east-1,prod-na-01,true,SAP,Salesforce,NA,Standard,9,Manufacturing`,
   `Stark Industries,Enterprise,450000,42,Overdue,Q2-2026,,,Champion left,At risk,UCC-002,Maria K,Jamie T,David L,,CS Team,,2026-06-30,500000,450000,Onboarding,2025-11-01,Malibu,Critical,1800,USA,West,,2026-04-01,55,Lina P,,Azure westus2,prod-na-02,true,Oracle,HubSpot,NA,Premium,4,Aerospace`,
 ].join("\n") + "\n";
 
@@ -56,7 +62,7 @@ function b(v: string) {
 function parseCsv(text: string) {
   const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
   if (lines.length < 2) throw new Error("CSV is empty or only has a header.");
-  const headers = splitCsvLine(lines[0]).map((h) => h.trim());
+  const headers = splitCsvLine(lines[0]).map((h) => h.trim().replace(/\*+$/, ""));
   for (const r of ["name", "tier", "arr", "health", "qbr_status", "renewal_quarter"]) {
     if (!headers.includes(r)) throw new Error(`Missing required column: ${r}`);
   }
@@ -172,15 +178,22 @@ export function ImportCsvDialog() {
         </DialogHeader>
         <div className="space-y-4 text-sm">
           <p className="text-foreground/70">
-            Combined template covers all 32+ account fields. Max 500 rows. Required: <code>name, tier, arr, health, qbr_status, renewal_quarter</code>. Everything else is optional.
+            Combined template covers all {HEADERS.length} account fields. Max 500 rows. Required columns are marked with an <span className="text-accent font-semibold">*</span> in the header row: <code>name*, tier*, arr*, health*, qbr_status*, renewal_quarter*</code>. Everything else is optional.
           </p>
           <details className="text-xs">
             <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               View full column list ({HEADERS.length})
             </summary>
-            <code className="block mt-2 text-[11px] font-mono bg-muted p-3 border border-border overflow-x-auto">
-              {HEADERS.join(", ")}
-            </code>
+            <div className="block mt-2 text-[11px] font-mono bg-muted p-3 border border-border overflow-x-auto leading-relaxed">
+              {HEADERS.map((h, i) => (
+                <span key={h}>
+                  {i > 0 && ", "}
+                  <span className={REQUIRED.has(h) ? "text-accent font-semibold" : ""}>
+                    {h}{REQUIRED.has(h) && <span aria-hidden>*</span>}
+                  </span>
+                </span>
+              ))}
+            </div>
           </details>
           <Button type="button" variant="outline" size="sm" onClick={downloadTemplate} className="gap-2">
             <FileDown className="h-4 w-4" /> Download template
