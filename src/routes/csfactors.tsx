@@ -17,6 +17,8 @@ import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { TierGateOverlay } from "@/components/site/TierGateOverlay";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 
 
@@ -48,8 +50,24 @@ function greeting() {
 
 function CSFactorsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { designation, loading: entLoading } = useEntitlements();
   const qc = useQueryClient();
   const list = useServerFn(listAccounts);
+
+  // Operator-tier gate: Practitioner / Reader hit the upgrade overlay.
+  if (!authLoading && !entLoading && user) {
+    const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
+    if (rank[designation] < rank.operator) {
+      return (
+        <TierGateOverlay
+          requiredTier="operator"
+          title="CSFactors is the Operator unlock."
+          description="Your personal CS command center — 32-field account matrix, stakeholder power-map, contract vault. Available from the Operator tier."
+          ctaLabel="Upgrade to Operator"
+        />
+      );
+    }
+  }
 
   const { data: accounts = [], isLoading } = useQuery({
     queryKey: ["cs-accounts"],
