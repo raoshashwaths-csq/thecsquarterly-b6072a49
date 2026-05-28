@@ -134,7 +134,7 @@ function NrrWaterfallPage() {
                 const baseH = c.delta ? Math.round((c.base / max) * 100) : 0;
                 return (
                   <div key={c.label} className="flex flex-col items-center h-full justify-end">
-                    <div className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest tabular-nums mb-1 text-center">
+                    <div className="font-mono text-[9px] md:uppercase tracking-widest text-xs tabular-nums mb-1 text-center">
                       {c.negative ? "−" : ""}{compact(c.value)}
                     </div>
                     <div className="relative w-full flex-1 flex items-end">
@@ -146,7 +146,7 @@ function NrrWaterfallPage() {
                         style={{ height: `${h}%`, marginBottom: c.delta ? `${baseH}%` : 0 }}
                       />
                     </div>
-                    <div className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-muted-foreground mt-2 text-center leading-tight">
+                    <div className="font-mono text-[9px] md:uppercase tracking-widest text-xs text-muted-foreground mt-2 text-center leading-tight">
                       {c.label}
                     </div>
                   </div>

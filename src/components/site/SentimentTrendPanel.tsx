@@ -41,7 +41,7 @@ export function SentimentTrendPanel() {
       </div>
 
       {isLoading ? (
-        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Loading…</div>
+        <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Loading…</div>
       ) : error ? (
         <div className="font-mono text-xs text-destructive">{(error as Error).message}</div>
       ) : total === 0 ? (
@@ -56,7 +56,7 @@ export function SentimentTrendPanel() {
               <div key={k} className="border border-border p-5">
                 <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/55 mb-2">{k}</div>
                 <div className="font-display text-4xl tracking-tight mb-1">{dist[k]}</div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/45">{pct}% of month</div>
+                <div className="font-mono uppercase tracking-widest text-xs text-foreground/45">{pct}% of month</div>
                 <div className="mt-3 h-1 bg-border">
                   <div className="h-full" style={{ width: `${pct}%`, background: COLORS[k] }} />
                 </div>

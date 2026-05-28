@@ -149,7 +149,7 @@ export function ContractVault({
         <p className="text-xs text-foreground/70">
           {uploading ? "Uploading…" : "Drop MSA / SOW / Amendment here, or click to choose a file"}
         </p>
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+        <p className="font-mono uppercase tracking-widest text-xs text-muted-foreground mt-1">
           PDF · DOCX · PNG · max 20MB
         </p>
         <input
@@ -226,7 +226,7 @@ export function ContractVault({
                     checked={r.auto_renewal}
                     onCheckedChange={(v) => patch(r, { auto_renewal: v })}
                   />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
                     Auto-renewal
                   </span>
                 </div>

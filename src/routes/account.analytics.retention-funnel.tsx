@@ -133,7 +133,7 @@ function RetentionFunnelPage() {
                         style={{ width: `${widthPct}%` }}
                       >
                         {widthPct > 15 && (
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-accent-foreground">
+                          <span className="font-mono uppercase tracking-widest text-xs text-accent-foreground">
                             {stageRetention}%
                           </span>
                         )}

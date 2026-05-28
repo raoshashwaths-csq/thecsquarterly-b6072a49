@@ -23,7 +23,7 @@ function SplitBar({
           />
         ))}
       </div>
-      <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+      <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground">
         {segments.map((s) => (
           <span key={s.label} className="tabular-nums">
             {s.label} {s.value}

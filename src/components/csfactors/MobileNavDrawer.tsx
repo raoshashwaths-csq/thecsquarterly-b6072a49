@@ -124,7 +124,7 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
           <Link
             to="/"
             onClick={close}
-            className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-accent"
+            className="block font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent"
           >
             ← The CS Quarterly
           </Link>

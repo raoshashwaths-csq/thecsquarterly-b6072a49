@@ -63,7 +63,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
               <div key={n.id} className="border-b border-border/60 pb-3">
                 <div className="text-sm leading-snug">{n.text}</div>
                 {n.note ? <div className="text-xs text-muted-foreground mt-1">{n.note}</div> : null}
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70 mt-1">
+                <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground/70 mt-1">
                   /{n.slug}
                 </div>
               </div>
@@ -74,7 +74,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
             {highlights.length === 0 ? <Empty /> : highlights.slice(0, 50).map((h) => (
               <div key={h.id} className="border-b border-border/60 pb-3">
                 <div className="text-sm leading-snug italic">"{h.text}"</div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70 mt-1">
+                <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground/70 mt-1">
                   /{h.slug}
                 </div>
               </div>

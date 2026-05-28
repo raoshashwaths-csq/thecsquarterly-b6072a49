@@ -131,7 +131,7 @@ function HomePage() {
           <div className="font-mono text-[11px] uppercase tracking-widest text-foreground font-semibold">
             The Sections
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
             {SECTIONS.length} disciplines
           </div>
         </div>
@@ -146,7 +146,7 @@ function HomePage() {
               <div className="font-mono text-[11px] text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
               <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">{s.name}</h2>
               <p className="text-sm text-foreground/65 text-pretty mb-4">{s.blurb}</p>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/60 group-hover:text-accent transition-colors">
+              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors">
                 Enter section →
               </div>
             </Link>
@@ -196,7 +196,7 @@ function HomePage() {
 
             <aside className="lg:col-span-5 flex flex-col gap-12 lg:border-l lg:border-border lg:pl-12">
               <div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
+                <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   The Thesis
                 </div>
                 <p className="text-lg italic leading-snug">
@@ -245,7 +245,7 @@ function HomePage() {
                 params={{ slug: p.slug }}
                 className="group block border-t border-border pt-6"
               >
-                <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
+                <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   <span>{p.category}</span>
                   <span>{p.read_minutes} min</span>
                 </div>

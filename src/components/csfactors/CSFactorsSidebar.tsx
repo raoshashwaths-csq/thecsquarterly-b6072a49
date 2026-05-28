@@ -185,7 +185,7 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
         <div className="p-3 border-t border-border">
           <Link
             to="/"
-            className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-accent text-center"
+            className="block font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent text-center"
           >
             {collapsed ? "←" : "← The CS Quarterly"}
           </Link>

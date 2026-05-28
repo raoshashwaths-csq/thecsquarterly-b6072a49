@@ -77,7 +77,7 @@ function AdminPage() {
         <SiteHeader />
         <main className="flex-1 flex items-center justify-center px-6 py-20 text-center">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Restricted</div>
+            <div className="font-mono uppercase tracking-widest text-xs text-accent mb-3">Restricted</div>
             <h1 className="font-display text-4xl mb-4">Editorial access only.</h1>
             <p className="text-muted-foreground max-w-md">Your account doesn't have admin privileges.</p>
           </div>
@@ -266,7 +266,7 @@ function DataTable<T extends Record<string, any>>({ rows, cols, empty }: {
       <table className="w-full text-sm">
         <thead className="bg-muted/40">
           <tr>{cols.map((c) => (
-            <th key={String(c.key)} className="text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground px-4 py-3">
+            <th key={String(c.key)} className="text-left font-mono uppercase tracking-widest text-xs text-muted-foreground px-4 py-3">
               {c.label}
             </th>
           ))}</tr>
@@ -470,14 +470,14 @@ function PostsAdmin() {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Articles</h2><ExportButton dataset="posts" /></div>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-foreground/90 transition-colors">+ New article</button>
+        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-foreground/90 transition-colors">+ New article</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto bg-background">
         {(list.data ?? []).map((p) => (
           <div key={p.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="font-display text-lg truncate">{p.title}</div>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
                 {p.section} · {p.tier} · {p.published ? "live" : "draft"}
               </div>
             </div>
@@ -696,14 +696,14 @@ function PlaybooksAdmin() {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Codex Playbooks</h2><ExportButton dataset="playbooks" /></div>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New playbook</button>
+        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-xs">+ New playbook</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
         {(list.data ?? []).map((p: any) => (
           <div key={p.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="font-display text-lg truncate">{p.title}</div>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
                 {p.category} · ${(p.price_cents / 100).toFixed(0)} · {p.pages}pp
               </div>
             </div>
@@ -859,13 +859,13 @@ function QAgentAdmin() {
               );
             }},
             { key: "witty", label: "Voice", render: (r) => (
-              <span className="font-mono text-[10px] uppercase tracking-widest">
+              <span className="font-mono uppercase tracking-widest text-xs">
                 {r.witty ? "Witty" : "Analytical"}
               </span>
             )},
             { key: "shared", label: "Shared", render: (r) => r.shared ? <span className="text-accent">●</span> : <span className="text-muted-foreground">—</span> },
             { key: "id", label: "Run", render: (r) => (
-              <a href={`/agent/response/${r.id}`} className="font-mono text-[10px] uppercase tracking-widest underline">Open</a>
+              <a href={`/agent/response/${r.id}`} className="font-mono uppercase tracking-widest text-xs underline">Open</a>
             )},
           ]}
         />
@@ -878,8 +878,8 @@ function QAgentAdmin() {
           empty="No entitled operators yet."
           cols={[
             { key: "email", label: "Email" },
-            { key: "is_admin", label: "Admin", render: (r) => r.is_admin ? <span className="font-mono text-[10px] uppercase tracking-widest text-accent">Admin</span> : "—" },
-            { key: "has_vanguard", label: "Vanguard", render: (r) => r.has_vanguard ? <span className="font-mono text-[10px] uppercase tracking-widest">Active</span> : "—" },
+            { key: "is_admin", label: "Admin", render: (r) => r.is_admin ? <span className="font-mono uppercase tracking-widest text-xs text-accent">Admin</span> : "—" },
+            { key: "has_vanguard", label: "Vanguard", render: (r) => r.has_vanguard ? <span className="font-mono uppercase tracking-widest text-xs">Active</span> : "—" },
             { key: "since", label: "Since", render: (r) => fmtDate(r.since) },
             { key: "renews", label: "Renews", render: (r) => fmtDate(r.renews) },
           ]}
@@ -1002,13 +1002,13 @@ function ImportArticlesAdmin() {
 
       {results && (
         <div className="border border-border">
-          <div className="px-4 py-3 border-b border-border font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <div className="px-4 py-3 border-b border-border font-mono uppercase tracking-widest text-xs text-muted-foreground">
             Results · {results.length}
           </div>
           <div className="max-h-[400px] overflow-auto divide-y divide-border">
             {results.map((r, i) => (
               <div key={i} className="px-4 py-2 flex items-start gap-3 text-sm">
-                <span className={`font-mono text-[10px] uppercase tracking-widest shrink-0 ${
+                <span className={`font-mono uppercase tracking-widest text-xs shrink-0 ${
                   r.status === "ok" ? "text-accent" : r.status === "skipped" ? "text-muted-foreground" : "text-destructive"
                 }`}>{r.status}</span>
                 <span className="font-mono text-xs">{r.slug}</span>

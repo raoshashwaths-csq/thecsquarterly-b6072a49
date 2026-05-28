@@ -43,7 +43,7 @@ export function Paywall({
           disabled={buyDisabled}
           className="border border-background/40 hover:bg-background hover:text-foreground transition-all py-4 px-6 text-left disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <div className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-1">A la carte</div>
+          <div className="font-mono uppercase tracking-widest text-xs opacity-60 mb-1">A la carte</div>
           <div className="font-display text-2xl">{formatPrice(oneOffPriceCents)} <span className="text-sm opacity-60">one-time</span></div>
           <div className="text-xs opacity-70 mt-1">Unlock this asset only.</div>
         </button>
@@ -51,7 +51,7 @@ export function Paywall({
           to="/pricing"
           className="bg-secondary-accent text-secondary-accent-foreground py-4 px-6 hover:opacity-90 transition-all"
         >
-          <div className="font-mono text-[10px] uppercase tracking-widest mb-1">Vanguard, from $29</div>
+          <div className="font-mono uppercase tracking-widest text-xs mb-1">Vanguard, from $29</div>
           <div className="font-display text-2xl">Unlock everything</div>
           <div className="text-xs mt-1 opacity-90">
             Full archive + universal search from Vanguard. Your Workspace + local saved-intel search from Pro upwards.

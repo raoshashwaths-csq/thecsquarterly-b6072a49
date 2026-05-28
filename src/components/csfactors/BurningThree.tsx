@@ -64,7 +64,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
           size="sm"
           onClick={onRewrite}
           disabled={busy}
-          className="gap-2 font-mono text-[10px] uppercase tracking-widest"
+          className="gap-2 font-mono uppercase tracking-widest text-xs"
         >
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
           Rewrite with Q.
@@ -88,7 +88,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
               <Link
                 to="/csfactors/$accountId"
                 params={{ accountId: it.accountId }}
-                className="mt-auto pt-2 font-mono text-[10px] uppercase tracking-widest text-accent hover:underline"
+                className="mt-auto pt-2 font-mono uppercase tracking-widest text-xs text-accent hover:underline"
               >
                 Open account →
               </Link>

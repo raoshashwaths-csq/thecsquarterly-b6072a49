@@ -155,7 +155,7 @@ function JobBoardPage() {
                   key={s}
                   onClick={() => setSegment(s)}
                   className={
-                    "px-3 py-2 font-mono text-[10px] uppercase tracking-widest border transition-all " +
+                    "px-3 py-2 font-mono uppercase tracking-widest text-xs border transition-all " +
                     (segment === s
                       ? "bg-foreground text-background border-foreground"
                       : "border-border hover:border-foreground")
@@ -170,7 +170,7 @@ function JobBoardPage() {
 
         {/* Listings */}
         <section className="max-w-7xl mx-auto px-6 pb-20">
-          <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-4">
+          <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-4">
             {filtered.length} open role{filtered.length === 1 ? "" : "s"}
           </div>
           <ul className="space-y-3">
@@ -210,14 +210,14 @@ function JobBoardPage() {
                     </div>
                     <div className="mt-3 flex gap-2 flex-wrap">
                       {j.stack.map((s) => (
-                        <span key={s} className="font-mono text-[10px] uppercase tracking-widest px-2 py-1 border border-border text-foreground/70">
+                        <span key={s} className="font-mono uppercase tracking-widest text-xs px-2 py-1 border border-border text-foreground/70">
                           {s}
                         </span>
                       ))}
                     </div>
                   </div>
                   <div className="text-left md:text-right shrink-0">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-1">Comp</div>
+                    <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-1">Comp</div>
                     <div className="font-display text-lg mb-3">{j.comp}</div>
                     <button className="px-5 py-2.5 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all">
                       View role
@@ -261,7 +261,7 @@ function JobBoardPage() {
                   }
                 >
                   <div className={
-                    "font-mono text-[10px] uppercase tracking-widest mb-3 " +
+                    "font-mono uppercase tracking-widest text-xs mb-3 " +
                     (p.rust ? "text-secondary-accent" : "text-foreground/60")
                   }>
                     {p.name}

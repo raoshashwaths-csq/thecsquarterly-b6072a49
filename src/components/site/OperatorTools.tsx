@@ -67,7 +67,7 @@ export function OperatorTools({
             The instruments<span className="text-accent">.</span>
           </h2>
         </div>
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <p className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
           {sorted.length} surfaces
         </p>
       </div>

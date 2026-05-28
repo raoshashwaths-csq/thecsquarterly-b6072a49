@@ -298,7 +298,7 @@ export function QAgentButton() {
             {query && (
               <div className="mb-5 space-y-2">
                 {searchLoading && hits.length === 0 && (
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Searching…</div>
+                  <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Searching…</div>
                 )}
                 {!searchLoading && hits.length === 0 && (
                   <div className="text-sm text-foreground/60">
@@ -316,7 +316,7 @@ export function QAgentButton() {
             {/* Q replies */}
             {answer && (
               <div className="mb-5 border-l-2 border-accent pl-4 py-1">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-2">
+                <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-2">
                   <QMark /> replies
                 </div>
                 <div className="font-body text-[15px] text-foreground/85 leading-relaxed whitespace-pre-wrap">

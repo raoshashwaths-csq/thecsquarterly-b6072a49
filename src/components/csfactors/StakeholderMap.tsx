@@ -162,7 +162,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
       {rows.length > 0 && (
         <div className="border border-border">
           <table className="w-full text-xs">
-            <thead className="bg-muted/40 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            <thead className="bg-muted/40 text-left font-mono uppercase tracking-widest text-xs text-muted-foreground">
               <tr>
                 <th className="px-3 py-2">Contact</th>
                 <th className="px-3 py-2">Title</th>
@@ -258,7 +258,7 @@ function Quadrant({
           : "border-l-border";
   return (
     <div className={cn("bg-card p-4 min-h-32 border-l-[3px]", border)}>
-      <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+      <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-2">
         {title} · {rows.length}
       </div>
       <div className="flex flex-wrap gap-1.5">

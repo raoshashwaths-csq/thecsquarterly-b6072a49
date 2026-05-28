@@ -57,7 +57,7 @@ export function SeriesRail({
                 isCurrent ? "text-foreground" : released ? "text-foreground/80 hover:text-accent" : "text-muted-foreground/60",
               ].join(" ")}
             >
-              <span className="font-mono text-[10px] uppercase tracking-widest pt-1 w-8 shrink-0 text-secondary-accent">
+              <span className="font-mono uppercase tracking-widest text-xs pt-1 w-8 shrink-0 text-secondary-accent">
                 {num}
               </span>
               <div className="flex-1 min-w-0">

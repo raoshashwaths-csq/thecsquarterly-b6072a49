@@ -85,7 +85,7 @@ function SentimentDot({ s }: { s: CSAccount["csm_sentiment"] }) {
         ? "bg-secondary-accent/15 text-secondary-accent border-secondary-accent/40"
         : "bg-destructive/15 text-destructive border-destructive/40";
   return (
-    <span className={cn("inline-flex px-2 py-0.5 border font-mono text-[10px] uppercase tracking-widest", cls)}>
+    <span className={cn("inline-flex px-2 py-0.5 border font-mono uppercase tracking-widest text-xs", cls)}>
       {s}
     </span>
   );
@@ -160,7 +160,7 @@ export function AccountsGrid({
     if (c.key === "csm_sentiment") return <SentimentDot s={a.csm_sentiment} />;
     if (c.key === "marquee_client") {
       return a.marquee_client ? (
-        <span className="font-mono text-[10px] uppercase tracking-widest text-accent">Yes</span>
+        <span className="font-mono uppercase tracking-widest text-xs text-accent">Yes</span>
       ) : (
         <span className="text-muted-foreground">—</span>
       );
@@ -193,7 +193,7 @@ export function AccountsGrid({
             className="pl-9 h-9 font-mono text-xs"
           />
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
           {filtered.length} of {accounts.length} accounts
         </span>
       </div>

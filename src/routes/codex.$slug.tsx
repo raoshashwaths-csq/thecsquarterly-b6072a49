@@ -74,7 +74,7 @@ function PlaybookPage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <article className="max-w-3xl mx-auto px-6 pt-16 pb-12 w-full animate-fade-up">
-        <Link to="/codex" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-accent">
+        <Link to="/codex" className="font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent">
           ← The Codex
         </Link>
         <div className="mt-8 font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4 flex items-center gap-3">
@@ -88,12 +88,12 @@ function PlaybookPage() {
 
 
         {entitlementLoading ? (
-          <div className="border-t border-border pt-10 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <div className="border-t border-border pt-10 font-mono uppercase tracking-widest text-xs text-muted-foreground">
             Checking access…
           </div>
         ) : unlocked ? (
           <div className="prose-content border-t border-border pt-10">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Unlocked</div>
+            <div className="font-mono uppercase tracking-widest text-xs text-accent mb-3">Unlocked</div>
             {(() => {
               const Interactive = PLAYBOOK_COMPONENTS[pb.slug];
               if (Interactive) return <Interactive />;

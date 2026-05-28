@@ -203,7 +203,7 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
           {tier.highlightLabel}
         </div>
       )}
-      <div className="font-mono text-[10px] uppercase tracking-widest text-secondary-accent mb-3">
+      <div className="font-mono uppercase tracking-widest text-xs text-secondary-accent mb-3">
         {tier.label}
       </div>
       <div className="flex items-baseline gap-2 mb-1">
@@ -291,7 +291,7 @@ function PartnerCard({ tier }: { tier: Tier }) {
   return (
     <div className="border-2 border-accent bg-card p-8 md:p-10 flex flex-col md:flex-row gap-8 md:items-center">
       <div className="flex-1">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-secondary-accent mb-3">
+        <div className="font-mono uppercase tracking-widest text-xs text-secondary-accent mb-3">
           {tier.label}
         </div>
         <h3 className="font-display text-3xl md:text-4xl leading-tight mb-3">
@@ -397,13 +397,13 @@ function ComparisonTable() {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-border">
-            <th className="text-left p-4 font-mono text-[10px] uppercase tracking-widest text-foreground/60 w-[28%]">
+            <th className="text-left p-4 font-mono uppercase tracking-widest text-xs text-foreground/60 w-[28%]">
               Capability
             </th>
             {headers.map((h) => (
               <th
                 key={h}
-                className="p-4 text-center font-mono text-[10px] uppercase tracking-widest text-foreground/70 whitespace-nowrap"
+                className="p-4 text-center font-mono uppercase tracking-widest text-xs text-foreground/70 whitespace-nowrap"
               >
                 {h}
               </th>

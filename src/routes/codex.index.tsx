@@ -47,7 +47,7 @@ function CodexPage() {
           {playbooks.map((p) => (
             <article key={p.id} className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors">
               <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
-                <div className="absolute top-4 left-4 flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest opacity-80">
+                <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
                   <Lock size={12} /> Premium
                 </div>
                 <div className="absolute top-4 right-4 font-mono text-[10px] opacity-50">{p.pages}pp</div>
@@ -63,12 +63,12 @@ function CodexPage() {
                   <Link
                     to="/codex/$slug"
                     params={{ slug: p.slug }}
-                    className="block w-full py-3 text-center bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors"
+                    className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
                   >
                     ${(p.price_cents / 100).toFixed(0)} · View playbook
                   </Link>
                   {p.included_in_vanguard && (
-                    <Link to="/pricing" className="block text-center text-[10px] uppercase tracking-widest font-mono text-secondary-accent hover:text-accent">
+                    <Link to="/pricing" className="block text-center uppercase tracking-widest text-xs font-mono text-secondary-accent hover:text-accent">
                       Or unlock instantly with Vanguard →
                     </Link>
                   )}

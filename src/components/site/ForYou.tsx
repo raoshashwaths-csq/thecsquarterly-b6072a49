@@ -74,7 +74,7 @@ export function ForYou() {
                 {p.excerpt && (
                   <p className="text-sm text-muted-foreground line-clamp-3">{withGlossary(p.excerpt)}</p>
                 )}
-                <div className="mt-auto font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                <div className="mt-auto font-mono uppercase tracking-widest text-xs text-muted-foreground">
                   {p.readMinutes} min read
                 </div>
               </Link>

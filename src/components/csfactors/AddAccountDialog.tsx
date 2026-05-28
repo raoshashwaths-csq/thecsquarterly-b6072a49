@@ -74,7 +74,7 @@ export function AddAccountDialog() {
           <div className="grid grid-cols-2 gap-3">
             <Field label="Account name" name="name" required maxLength={200} />
             <div className="space-y-1.5">
-              <Label htmlFor="tier" className="font-mono text-[10px] uppercase tracking-widest">Tier</Label>
+              <Label htmlFor="tier" className="font-mono uppercase tracking-widest text-xs">Tier</Label>
               <Select name="tier" defaultValue="Mid-Market">
                 <SelectTrigger id="tier"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -87,7 +87,7 @@ export function AddAccountDialog() {
             <Field label="ARR (USD)" name="arr" type="number" min={0} required defaultValue="50000" />
             <Field label="Health (0-100)" name="health" type="number" min={0} max={100} required defaultValue="70" />
             <div className="space-y-1.5">
-              <Label htmlFor="qbr_status" className="font-mono text-[10px] uppercase tracking-widest">QBR status</Label>
+              <Label htmlFor="qbr_status" className="font-mono uppercase tracking-widest text-xs">QBR status</Label>
               <Select name="qbr_status" defaultValue="Scheduled">
                 <SelectTrigger id="qbr_status"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -103,7 +103,7 @@ export function AddAccountDialog() {
           </div>
           <Field label="Blocker" name="blocker" />
           <div className="space-y-1.5">
-            <Label htmlFor="notes" className="font-mono text-[10px] uppercase tracking-widest">Notes</Label>
+            <Label htmlFor="notes" className="font-mono uppercase tracking-widest text-xs">Notes</Label>
             <Textarea id="notes" name="notes" maxLength={5000} rows={3} />
           </div>
           <DialogFooter>
@@ -125,7 +125,7 @@ function Field({
 }: { label: string; name: string; type?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={name} className="font-mono text-[10px] uppercase tracking-widest">
+      <Label htmlFor={name} className="font-mono uppercase tracking-widest text-xs">
         {label}
       </Label>
       <Input id={name} name={name} type={type} {...rest} />

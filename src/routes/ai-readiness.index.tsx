@@ -54,7 +54,7 @@ function AiReadinessLanding() {
         >
           Start the diagnostic
         </Link>
-        <p className="mt-6 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <p className="mt-6 font-mono uppercase tracking-widest text-xs text-muted-foreground">
           Block · Pilot · Scale · AI Native, find your tier instantly
         </p>
       </header>
@@ -94,7 +94,7 @@ function AiReadinessLanding() {
           <p className="font-display text-3xl md:text-4xl mb-10 leading-tight italic">
             "The median SaaS company loses 13% of ARR to churn and downsell every year. Top-decile retention orgs lose less than 4%."
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-12">, SaaS Capital Retention Benchmarks, 2024</p>
+          <p className="font-mono uppercase tracking-widest text-xs opacity-60 mb-12">, SaaS Capital Retention Benchmarks, 2024</p>
           <Link
             to="/ai-readiness/survey"
             className="inline-block px-10 py-5 bg-background text-foreground font-mono text-[11px] uppercase tracking-widest font-bold hover:bg-accent hover:text-accent-foreground transition-colors"

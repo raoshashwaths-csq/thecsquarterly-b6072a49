@@ -76,7 +76,7 @@ function AccountPage() {
   return (
     <Shell>
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 animate-fade-up">
-        <Link to="/csfactors" className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-accent mb-6">
+        <Link to="/csfactors" className="inline-flex items-center gap-2 font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent mb-6">
           <ArrowLeft className="h-3.5 w-3.5" /> All accounts
         </Link>
 
@@ -169,7 +169,7 @@ function AccountPage() {
 function Row({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="flex items-baseline justify-between gap-4 pb-2 border-b border-border/60 last:border-0">
-      <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{label}</dt>
+      <dt className="font-mono uppercase tracking-widest text-xs text-muted-foreground">{label}</dt>
       <dd className="text-foreground/85">{value || <span className="text-muted-foreground italic">—</span>}</dd>
     </div>
   );
