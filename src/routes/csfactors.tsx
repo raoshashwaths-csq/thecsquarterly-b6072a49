@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
-import { Maximize2, X } from "lucide-react";
+import { ArrowLeft, Maximize2, X } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
 import { MobileNavDrawer } from "@/components/csfactors/MobileNavDrawer";
 import { WorkspacePane } from "@/components/csfactors/WorkspacePane";
@@ -160,6 +160,14 @@ function CSFactorsPageInner() {
         </div>
 
         <div className="max-w-[1600px] mx-auto px-4 md:px-10 pt-4 md:pt-10 pb-32 animate-fade-up">
+          <Link
+            to="/"
+            className="mb-5 inline-flex items-center gap-2 font-mono uppercase tracking-[0.22em] text-xs text-muted-foreground hover:text-accent border-b border-transparent hover:border-accent pb-1 transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back to The CS Quarterly
+          </Link>
+
           {/* Active filter badge */}
           {filter ? (
             <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -333,7 +341,7 @@ function CSFactorsPageInner() {
 
       <WorkspacePane open={workspaceOpen} onOpenChange={setWorkspaceOpen} />
 
-      {/* Bottom-anchored Ask Q dock + deep drawer */}
+      {/* Inline Ask Q panel + deep drawer */}
       <QErrorBoundary label="Q · CSFactors">
         <QAgentDrawer open={qOpen} onOpenChange={setQOpen} />
       </QErrorBoundary>
