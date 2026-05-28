@@ -229,3 +229,66 @@ export function QAgentLauncher({ onClick }: { onClick: () => void }) {
     </button>
   );
 }
+
+const DOCK_PROMPTS = [
+  "Slice NRR by Enterprise segment",
+  "Show low-health accounts",
+  "Filter high-risk cohort",
+  "QBRs overdue this quarter",
+];
+
+export function QAgentDock({
+  onSubmit,
+  onChip,
+}: {
+  onSubmit: (text: string) => void;
+  onChip: (text: string) => void;
+}) {
+  const [value, setValue] = useState("");
+  return (
+    <div className="fixed bottom-0 inset-x-0 z-40 pointer-events-none px-3 pb-4">
+      <div className="max-w-2xl mx-auto pointer-events-auto">
+        <div className="flex flex-wrap gap-1.5 justify-center mb-2">
+          {DOCK_PROMPTS.map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => onChip(p)}
+              className="font-mono text-[10px] uppercase tracking-[0.18em] border border-border bg-card/95 backdrop-blur px-2.5 py-1.5 hover:border-accent hover:text-accent transition-colors"
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const v = value.trim();
+            if (!v) return;
+            onSubmit(v);
+            setValue("");
+          }}
+          className="flex items-center gap-2 bg-card border border-border shadow-lg px-3 py-2 focus-within:border-accent"
+        >
+          <span className="font-display text-lg leading-none shrink-0">
+            <QMark />
+          </span>
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="Ask Q about your portfolio…"
+            className="flex-1 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
+            aria-label="Ask Q"
+          />
+          <button
+            type="submit"
+            className="font-mono text-[10px] uppercase tracking-[0.2em] bg-accent text-accent-foreground px-3 py-1.5 hover:opacity-90 disabled:opacity-40"
+            disabled={!value.trim()}
+          >
+            Ask
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

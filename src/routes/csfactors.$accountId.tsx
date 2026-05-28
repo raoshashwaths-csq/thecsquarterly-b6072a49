@@ -178,7 +178,7 @@ function Row({ label, value }: { label: string; value: string | null }) {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex bg-background">
-      <CSFactorsSidebar />
+      <CSFactorsSidebar onOpenWorkspace={() => {}} />
       <main className="flex-1 min-w-0">{children}</main>
     </div>
   );

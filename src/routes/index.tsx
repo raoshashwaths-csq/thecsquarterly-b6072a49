@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LayoutGrid } from "lucide-react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -59,6 +60,25 @@ function HomePage() {
       <SiteHeader />
 
       <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center animate-fade-up">
+        {/* Workspace anchor — top-left in hero */}
+        <div className="flex justify-start mb-8">
+          <Link
+            to="/account/workspace"
+            className="group inline-flex items-center gap-3 bg-card border border-border hover:border-accent transition-colors pl-2 pr-4 py-2"
+            aria-label="Open your Workspace"
+          >
+            <span className="flex h-9 w-9 items-center justify-center bg-accent text-accent-foreground rounded-sm">
+              <LayoutGrid size={16} strokeWidth={2.5} />
+            </span>
+            <span className="text-left">
+              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground leading-tight">
+                Your Workspace
+              </span>
+              <span className="block font-display text-sm leading-tight">Notes · Highlights · Links →</span>
+            </span>
+          </Link>
+        </div>
+
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           Weekly Dispatch for the 1% of Customer Success Operators
         </div>
@@ -70,30 +90,37 @@ function HomePage() {
         </p>
         <NewsletterInline source="home-hero" />
 
-        {/* CSFactors entry */}
+        {/* Elevated CSF Command Centre card */}
         <div className="mt-12 flex justify-center">
           <Link
             to="/csfactors"
-            className="group relative inline-flex items-center gap-4 border border-border bg-card/60 hover:bg-card hover:border-accent transition-colors pl-4 pr-6 py-3"
-            aria-label="Open CSFactors Executive Pulse dashboard"
+            className="group relative w-full max-w-2xl bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 text-left flex flex-col md:flex-row md:items-center gap-5"
+            aria-label="Open CSFactors Command Centre"
           >
             <span
               aria-hidden
-              className="flex h-11 w-11 items-center justify-center bg-accent text-accent-foreground rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
+              className="flex h-14 w-14 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm font-mono text-base font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
             >
               CSF
             </span>
-            <span className="text-left">
-              <span className="block font-display text-base md:text-lg leading-tight">
-                CSFactors <span className="italic text-accent">Executive Pulse</span>
-              </span>
-              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mt-0.5">
-                Quarterly revenue protection console →
-              </span>
-            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
+                CSF · Command Centre
+              </div>
+              <div className="font-display text-xl md:text-2xl leading-tight mb-1">
+                Your personal CS dashboard
+              </div>
+              <p className="text-sm text-foreground/70 leading-snug mb-2">
+                Portfolio analytics, health, renewals and opportunities — in one operator-grade console.
+              </p>
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
+                Unlock at Operator tier →
+              </div>
+            </div>
           </Link>
         </div>
       </header>
+
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
 

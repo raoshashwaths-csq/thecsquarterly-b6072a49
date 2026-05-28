@@ -2,16 +2,21 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Maximize2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { Maximize2, X } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
+import { MobileNavDrawer } from "@/components/csfactors/MobileNavDrawer";
+import { WorkspacePane } from "@/components/csfactors/WorkspacePane";
+import { QFilterProvider, useQFilter, applyQFilter } from "@/components/csfactors/QFilterContext";
 import { AddAccountDialog } from "@/components/csfactors/AddAccountDialog";
 import { ImportCsvDialog } from "@/components/csfactors/ImportCsvDialog";
 import { BurningThree } from "@/components/csfactors/BurningThree";
 import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
 import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
 import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
-import { QAgentDrawer, QAgentLauncher } from "@/components/csfactors/QAgentDrawer";
+import { QAgentDrawer, QAgentDock } from "@/components/csfactors/QAgentDrawer";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
+import { QMark } from "@/components/site/QMark";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
@@ -21,6 +26,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { TierGateOverlay } from "@/components/site/TierGateOverlay";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
+import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
+import { toast } from "sonner";
 
 
 export const Route = createFileRoute("/csfactors")({
@@ -50,12 +57,23 @@ function greeting() {
 }
 
 function CSFactorsPage() {
+  return (
+    <QFilterProvider>
+      <CSFactorsPageInner />
+    </QFilterProvider>
+  );
+}
+
+function CSFactorsPageInner() {
   const { user, loading: authLoading } = useAuth();
   const { designation, loading: entLoading } = useEntitlements();
   const qc = useQueryClient();
   const list = useServerFn(listAccounts);
+  const ask = useServerFn(askCSFactorsQ);
+  const { filter, setFilter, applyPrompt } = useQFilter();
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
 
-  // Operator-tier gate: Practitioner / Reader hit the upgrade overlay.
+  // Operator-tier gate
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
     if (rank[designation] < rank.operator) {
@@ -70,11 +88,13 @@ function CSFactorsPage() {
     }
   }
 
-  const { data: accounts = [], isLoading } = useQuery({
+  const { data: allAccounts = [], isLoading } = useQuery({
     queryKey: ["cs-accounts"],
     queryFn: () => list(),
     enabled: !!user,
   });
+
+  const accounts = useMemo(() => applyQFilter(allAccounts, filter), [allAccounts, filter]);
 
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [fullscreen, setFullscreen] = useState(false);
@@ -83,7 +103,6 @@ function CSFactorsPage() {
     () => accounts.find((a) => a.id === drawerId) ?? null,
     [accounts, drawerId],
   );
-
 
   const totalARR = useMemo(() => accounts.reduce((s, a) => s + Number(a.arr), 0), [accounts]);
   const atRisk = useMemo(
@@ -99,34 +118,63 @@ function CSFactorsPage() {
   const firstName = (user?.user_metadata?.display_name || user?.email?.split("@")[0] || "operator")
     .split(" ")[0];
 
+  const dockAsk = useMutation({
+    mutationFn: async (q: string) => ask({ data: { question: q, history: [] } }),
+    onSuccess: (res) => {
+      toast.message("Q says", { description: res.reply?.slice(0, 280) ?? "(no reply)" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  function handleDockSubmit(text: string) {
+    const applied = applyPrompt(text);
+    if (applied) {
+      toast.success(`Filter applied: ${applied.label}`);
+    } else {
+      dockAsk.mutate(text);
+    }
+  }
+
+  function handleChip(text: string) {
+    const applied = applyPrompt(text);
+    if (applied) toast.success(`Filter applied: ${applied.label}`);
+    else setQOpen(true);
+  }
+
   function onRowClick(a: CSAccount) {
     setDrawerId(a.id);
   }
 
   return (
     <div className="min-h-screen flex bg-background">
-      <CSFactorsSidebar />
+      <CSFactorsSidebar onOpenWorkspace={() => setWorkspaceOpen(true)} />
       <main className="flex-1 min-w-0">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-10 pt-6 md:pt-10 pb-24 animate-fade-up">
-          {/* Mobile section nav */}
-          <nav className="md:hidden -mx-4 px-4 mb-6 overflow-x-auto border-b border-border">
-            <div className="flex gap-1 min-w-max pb-px">
-              {[
-                { href: "#reminders", label: "Pulse" },
-                { href: "#accounts", label: "Accounts" },
-                { href: "#renewals", label: "Renewals" },
-                { href: "/account/analytics", label: "Analytics" },
-              ].map((i) => (
-                <a
-                  key={i.label}
-                  href={i.href}
-                  className="font-mono text-[10px] uppercase tracking-[0.2em] px-3 py-2 border-b-2 border-transparent text-foreground/70 hover:text-accent hover:border-accent whitespace-nowrap"
+        {/* Mobile sticky header */}
+        <div className="md:hidden sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-3 py-2 flex items-center justify-between gap-2">
+          <MobileNavDrawer onOpenWorkspace={() => setWorkspaceOpen(true)} />
+          <Link to="/csfactors" className="flex items-center gap-1.5 font-display text-sm tracking-tight">
+            <QMark className="h-5 w-5" /> CSFactors
+          </Link>
+          <ThemeToggle />
+        </div>
+
+        <div className="max-w-[1600px] mx-auto px-4 md:px-10 pt-6 md:pt-10 pb-32 animate-fade-up">
+          {/* Active filter badge */}
+          {filter ? (
+            <div className="mb-4 flex items-center gap-2">
+              <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/40 text-accent px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em]">
+                Active filter: {filter.label}
+                <button
+                  type="button"
+                  onClick={() => setFilter(null)}
+                  className="hover:opacity-70"
+                  aria-label="Clear filter"
                 >
-                  {i.label}
-                </a>
-              ))}
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
             </div>
-          </nav>
+          ) : null}
 
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-8 md:mb-10 pb-6 border-b border-border">
@@ -143,13 +191,11 @@ function CSFactorsPage() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <ThemeToggle />
+              <span className="hidden md:inline-flex"><ThemeToggle /></span>
               <ImportCsvDialog />
               <AddAccountDialog />
             </div>
-
           </header>
-
 
           {!authLoading && !user ? (
             <div className="border border-dashed border-border bg-card p-10 text-center">
@@ -162,17 +208,14 @@ function CSFactorsPage() {
             </div>
           ) : (
             <>
-              {/* Burning Three */}
               <section className="mb-10" id="reminders">
                 <BurningThree accounts={accounts} />
               </section>
 
-              {/* Live analytics: NPS + CSM Sentiment */}
               <section className="mb-10">
                 <AnalyticsHeader accounts={accounts} />
               </section>
 
-              {/* Portfolio pillars */}
               <section className="mb-10" id="renewals">
                 <MetricGrid cols={3}>
                   <MetricCard
@@ -201,7 +244,6 @@ function CSFactorsPage() {
                 </MetricGrid>
               </section>
 
-              {/* Master grid */}
               <SectionCard
                 title="Master Account Matrix"
                 eyebrow="Accounts"
@@ -223,7 +265,9 @@ function CSFactorsPage() {
                   <p className="text-sm text-muted-foreground py-6">Loading…</p>
                 ) : accounts.length === 0 ? (
                   <div className="py-12 text-center" id="accounts">
-                    <p className="text-sm text-foreground/70 mb-4">No accounts yet. Add one or import a CSV.</p>
+                    <p className="text-sm text-foreground/70 mb-4">
+                      {filter ? "No accounts match the active filter." : "No accounts yet. Add one or import a CSV."}
+                    </p>
                     <div className="inline-flex gap-2">
                       <AddAccountDialog />
                       <ImportCsvDialog />
@@ -237,7 +281,6 @@ function CSFactorsPage() {
               </SectionCard>
             </>
           )}
-
         </div>
       </main>
 
@@ -252,7 +295,6 @@ function CSFactorsPage() {
         }}
       />
 
-      {/* Fullscreen account matrix */}
       <Dialog open={fullscreen} onOpenChange={setFullscreen}>
         <DialogContent className="max-w-[98vw] w-[98vw] h-[95vh] p-0 flex flex-col bg-background border-border">
           <header className="px-6 py-4 border-b border-border flex items-center justify-between">
@@ -269,12 +311,15 @@ function CSFactorsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Q agent — scoped to CSFactors data only, isolated under its own error boundary */}
+      <WorkspacePane open={workspaceOpen} onOpenChange={setWorkspaceOpen} />
+
+      {/* Bottom-anchored Ask Q dock + deep drawer */}
       <QErrorBoundary label="Q · CSFactors">
-        {user && !qOpen ? <QAgentLauncher onClick={() => setQOpen(true)} /> : null}
+        {user ? <QAgentDock onSubmit={handleDockSubmit} onChip={handleChip} /> : null}
         <QAgentDrawer open={qOpen} onOpenChange={setQOpen} />
       </QErrorBoundary>
     </div>
   );
 }
+
 
