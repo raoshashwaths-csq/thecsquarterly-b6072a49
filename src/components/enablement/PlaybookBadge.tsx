@@ -29,7 +29,7 @@ export function PlaybookBadge() {
         className={cn(
           // Desktop-only — Q owns the bottom-right on mobile.
           "hidden md:inline-flex",
-          "fixed z-40 h-11 w-11 items-center justify-center rounded-full",
+          "fixed z-40 h-10 w-10 items-center justify-center rounded-full",
           "border border-border bg-card/70 backdrop-blur-md shadow-elegant",
           "text-foreground transition-transform duration-200 ease-out",
           "hover:scale-105 active:scale-95 motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
@@ -37,7 +37,7 @@ export function PlaybookBadge() {
           "before:absolute before:inset-0 before:rounded-full before:ring-2 before:ring-accent/30",
           "before:animate-ping before:opacity-40 motion-reduce:before:animate-none",
           "right-6",
-          onCsfactors ? "top-4" : "top-20",
+          onCsfactors ? "top-[64px]" : "top-[72px]",
         )}
       >
         <Lightbulb className="h-5 w-5 text-accent" aria-hidden />
