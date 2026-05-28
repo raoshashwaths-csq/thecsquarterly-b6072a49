@@ -2,6 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import {
+  normalizeTier,
+  isPaid,
+  TIER_Q_CAP,
+  TIER_SEAT_CAP,
+  PAID_DESIGNATIONS,
+} from "@/lib/admin-tiers";
+import type { Designation } from "@/lib/tiers";
 
 async function assertAdmin(userId: string) {
   const { data: roles } = await supabaseAdmin
@@ -10,13 +18,6 @@ async function assertAdmin(userId: string) {
 }
 
 // =============== Overview ===============
-
-const TIER_PRICE_CENTS: Record<string, number> = {
-  vanguard: 2900,           // $29/mo proxy
-  "vanguard-pro": 9900,
-  enterprise: 49900,
-  free: 0,
-};
 
 export const getControlPanelOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
