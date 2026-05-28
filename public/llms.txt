@@ -1,22 +1,40 @@
 # The CS Quarterly
 
-> A weekly dispatch and content hub for Customer Success leaders and mid-level managers. Curated essays on stakeholder management, escalation, negotiation, sales qualification, and AI deployment, plus the CS Operating Maturity Diagnostic.
+> A weekly dispatch and content hub for Customer Success leaders and managers. Curated essays on stakeholder management, escalation, negotiation, sales qualification, and AI deployment, plus the CS Operating Maturity Diagnostic and the CSFactors operating cockpit.
 
-The CS Quarterly publishes one essay per week aimed at VPs, Directors, and Senior CSMs at SaaS companies between $20M and $1B ARR. The audience is operators running revenue retention, not generalist marketing readers.
+The CS Quarterly publishes one essay per Tuesday aimed at VPs, Directors, and Senior CSMs at SaaS companies between $20M and $1B ARR. The audience is operators running revenue retention, not generalist marketing readers. Every premium essay is published in two parallel voices — analytical and witty — toggled inline. Articles follow a 3-2-1 structure: three facts, two insights, one actionable.
 
-## Pages
+## Sections
 
-- [Home](/): The current dispatch, recent essays, and the diagnostic CTA.
+- [Home](/): Current dispatch, recent essays, diagnostic CTA.
 - [Insights](/insights): Filterable archive of all essays by category.
-- [CS Operating Maturity Diagnostic](/ai-readiness): A 6-minute diagnostic across 8 dimensions and 32 metrics, scoring CS orgs from Block to AI Native.
-- [About](/about): Editorial mission and audience.
+- [The CS Vanguard](/vanguard): News, field reports, and the paid premium archive.
+- [The Retention Protocol](/retention-protocol): Playbooks and frameworks for revenue retention.
+- [The Outcome Forum](/outcome-forum): Community essays and debate.
+- [The CS Codex](/codex): Reference material, definitions, and playbook library.
+- [CSFactors](/csfactors): Operating cockpit for live account portfolios (members).
+- [AI Readiness](/ai-readiness): CS Operating Maturity Diagnostic — 8 dimensions, 32 metrics, scoring CS orgs from Block to AI Native.
+- [Job Board](/job-board): Curated CS job listings.
+- [Benchmarks](/benchmarks): Quarterly NRR and Payback Period data drops.
+- [Pricing](/pricing): Free Briefing vs. Vanguard tiers.
 - [Subscribe](/subscribe): Newsletter signup.
+- [About](/about): Editorial mission and audience.
+
+## Feeds
+
+- [RSS](/rss.xml): Latest 50 published essays.
+- [Sitemap](/sitemap.xml): Full crawlable URL set.
 
 ## Insights
 
-- [Why high-touch Customer Success is a scaling liability](/insights/high-touch-cs-scaling-liability)
-- [The negotiator's dilemma: winning renewals without discounting](/insights/negotiators-dilemma-renewals)
-- [Structural stakeholders: mapping power dynamics in enterprise accounts](/insights/stakeholder-mapping-frameworks)
+- [The Structural Reckoning](/insights/structural-reckoning-part-1-the-structural-reckoning)
+- [The Structural Reckoning Begins](/insights/structural-reckoning-prologue)
+- [How Chargebee Rebuilt CS from Reactive to Predictive (And Cut Churn 40%)](/insights/chargebee-reactive-to-predictive)
+- [From 105% to 128% NRR: How Notion's CS Team Drove Expansion Through PLG](/insights/notion-105-to-128-nrr)
+- [NRR 120%+: The Expansion Playbook Elite CS Teams Use](/insights/nrr-120-expansion-playbook)
 - [Managing the C-suite during enterprise escalations](/insights/escalation-playbook-c-suite)
-- [Identifying churn risk before the contract is signed](/insights/qualification-bridge-sales-cs)
 - [Algorithmic orchestration: the new CS operating model](/insights/ai-orchestration-cs-org)
+- [Structural stakeholders: mapping power dynamics in enterprise accounts](/insights/stakeholder-mapping-frameworks)
+- [The negotiator's dilemma: winning renewals without discounting](/insights/negotiators-dilemma-renewals)
+- [Why high-touch Customer Success is a scaling liability](/insights/high-touch-cs-scaling-liability)
+- [Identifying churn risk before the contract is signed](/insights/qualification-bridge-sales-cs)
