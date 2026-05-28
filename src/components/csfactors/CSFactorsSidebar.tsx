@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronLeft, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { QMark } from "@/components/site/QMark";
+import { CSFLogo } from "./CSFLogo";
 import { TOP_LINKS, ANALYTICS_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
 
 const COLLAPSE_KEY = "csf.sidebar.collapsed";
@@ -49,17 +49,10 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
       )}
     >
       <div className="h-full flex flex-col">
-        <div className="px-3 py-5 border-b border-border flex items-center justify-between">
-          {!collapsed ? (
-            <Link to="/csfactors" className="flex items-center gap-2 min-w-0">
-              <QMark className="h-6 w-6 shrink-0" />
-              <span className="font-display text-sm tracking-tight truncate">CSFactors</span>
-            </Link>
-          ) : (
-            <Link to="/csfactors" className="mx-auto">
-              <QMark className="h-6 w-6" />
-            </Link>
-          )}
+        <div className="px-3 py-5 border-b border-border flex items-center justify-between gap-2">
+          <Link to="/csfactors" className="min-w-0 flex items-center" aria-label="CSFactors home">
+            <CSFLogo size={collapsed ? "md" : "md"} showWordmark={!collapsed} />
+          </Link>
           <button
             type="button"
             onClick={toggleCollapsed}
