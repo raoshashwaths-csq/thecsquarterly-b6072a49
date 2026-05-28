@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getNode, breadcrumbFor } from "./q-trees";
 
 export const askQ = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => {
     const o = input as { question?: string; witty?: boolean };
     if (!o.question || typeof o.question !== "string") throw new Error("Question required");

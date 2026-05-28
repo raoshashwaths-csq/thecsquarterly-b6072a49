@@ -10,11 +10,8 @@ export function ForYou() {
   const { user } = useAuth();
   const fetchForYou = useServerFn(getForYou);
   const { data, isLoading } = useQuery({
-    queryKey: ["for-you", user?.email ?? "anon"],
-    queryFn: () =>
-      fetchForYou({
-        data: { userEmail: user?.email ?? null, band: null },
-      }),
+    queryKey: ["for-you", user?.id ?? "anon"],
+    queryFn: () => fetchForYou({ data: { band: null } }),
     staleTime: 5 * 60_000,
   });
 
