@@ -158,6 +158,20 @@ function AccountPage() {
             </SectionCard>
 
             <SectionCard
+              eyebrow="Dashboards"
+              title="Four lenses on the portfolio"
+              description="Retention funnel, NRR waterfall, stakeholder radar, and team leaderboard — all built from your CSFactors data."
+              actions={
+                <Link to="/account/analytics" className="px-5 py-2.5 border border-foreground font-mono text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
+                  Open dashboards
+                </Link>
+              }
+            >
+              <div className="text-xs text-muted-foreground">Operator+ unlock. Click through to any of the four dashboard views.</div>
+            </SectionCard>
+
+
+            <SectionCard
               eyebrow="Enterprise · SSO"
               title="Single Sign-On (SAML)"
               description="Provision WorkOS-backed SAML SSO for your organization."
