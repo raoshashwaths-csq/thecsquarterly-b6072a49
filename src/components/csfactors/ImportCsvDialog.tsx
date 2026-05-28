@@ -3,28 +3,61 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import { Upload, FileDown } from "lucide-react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { bulkImportAccounts } from "@/lib/csfactors.functions";
 import { toast } from "sonner";
 
-const TEMPLATE = `name,tier,arr,health,qbr_status,renewal_quarter,champion,economic_buyer,blocker,notes
-Acme Corp,Enterprise,120000,84,Completed,Q3-2026,Jane Doe,John Smith,,Strong adoption
-Stark Industries,Enterprise,450000,42,Overdue,Q2-2026,,,Champion left,At risk
-`;
+const HEADERS = [
+  "name","tier","arr","health","qbr_status","renewal_quarter","champion","economic_buyer","blocker","notes",
+  "ucc","account_manager","csm_name","associate_director","backup_owner","customer_success","key_account_manager",
+  "contract_renewal_date","carr","invoiced_arr","journey_stage","cs_transition_start","customer_city",
+  "csm_sentiment","active_headcount","country","sub_region","actual_go_live","planned_go_live",
+  "implementation_progress","da_project_manager","project_manager_ii","server_location","server_name",
+  "marquee_client","existing_erp","existing_crm","region","payroll_service_type","final_cs_nps","industry",
+];
+
+const SAMPLE = [
+  HEADERS.join(","),
+  `Acme Corp,Enterprise,120000,84,Completed,Q3-2026,Jane Doe,John Smith,,Strong adoption,UCC-001,Maria K,David L,Priya S,Sam B,CS Team,Tom R,Anu G,2026-09-15,140000,120000,Adopted,2024-01-10,Boston,Positive,420,USA,Northeast,2024-03-01,2024-02-15,100,Lina P,Hari V,AWS us-east-1,prod-na-01,true,SAP,Salesforce,NA,Standard,9,Manufacturing`,
+  `Stark Industries,Enterprise,450000,42,Overdue,Q2-2026,,,Champion left,At risk,UCC-002,Maria K,Jamie T,David L,,CS Team,,2026-06-30,500000,450000,Onboarding,2025-11-01,Malibu,Critical,1800,USA,West,,2026-04-01,55,Lina P,,Azure westus2,prod-na-02,true,Oracle,HubSpot,NA,Premium,4,Aerospace`,
+].join("\n") + "\n";
+
+function splitCsvLine(line: string) {
+  const out: string[] = [];
+  let cur = "";
+  let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') {
+      if (inQ && line[i + 1] === '"') { cur += '"'; i++; } else { inQ = !inQ; }
+    } else if (c === "," && !inQ) { out.push(cur); cur = ""; }
+    else cur += c;
+  }
+  out.push(cur);
+  return out;
+}
+
+function s(v: string) { return v.trim() || null; }
+function n(v: string) { return v.trim() === "" ? null : Number(v); }
+function d(v: string) {
+  const x = v.trim();
+  if (!x) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(x)) return null;
+  return x;
+}
+function b(v: string) {
+  const x = v.trim().toLowerCase();
+  if (!x) return null;
+  return x === "true" || x === "yes" || x === "1";
+}
 
 function parseCsv(text: string) {
   const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
   if (lines.length < 2) throw new Error("CSV is empty or only has a header.");
-  const headers = lines[0].split(",").map((h) => h.trim());
-  const required = ["name", "tier", "arr", "health", "qbr_status", "renewal_quarter"];
-  for (const r of required) {
+  const headers = splitCsvLine(lines[0]).map((h) => h.trim());
+  for (const r of ["name", "tier", "arr", "health", "qbr_status", "renewal_quarter"]) {
     if (!headers.includes(r)) throw new Error(`Missing required column: ${r}`);
   }
   const rows = lines.slice(1).map((line, idx) => {
@@ -47,30 +80,47 @@ function parseCsv(text: string) {
       health: Math.round(health),
       qbr_status: row.qbr_status as "Completed" | "Scheduled" | "Overdue",
       renewal_quarter: row.renewal_quarter,
-      champion: row.champion || null,
-      economic_buyer: row.economic_buyer || null,
-      blocker: row.blocker || null,
-      notes: row.notes || null,
+      champion: s(row.champion ?? ""),
+      economic_buyer: s(row.economic_buyer ?? ""),
+      blocker: s(row.blocker ?? ""),
+      notes: s(row.notes ?? ""),
+      ucc: s(row.ucc ?? ""),
+      account_manager: s(row.account_manager ?? ""),
+      csm_name: s(row.csm_name ?? ""),
+      associate_director: s(row.associate_director ?? ""),
+      backup_owner: s(row.backup_owner ?? ""),
+      customer_success: s(row.customer_success ?? ""),
+      key_account_manager: s(row.key_account_manager ?? ""),
+      contract_renewal_date: d(row.contract_renewal_date ?? ""),
+      carr: n(row.carr ?? ""),
+      invoiced_arr: n(row.invoiced_arr ?? ""),
+      journey_stage: s(row.journey_stage ?? ""),
+      cs_transition_start: d(row.cs_transition_start ?? ""),
+      customer_city: s(row.customer_city ?? ""),
+      csm_sentiment: (["Positive", "Neutral", "Critical"].includes(row.csm_sentiment)
+        ? row.csm_sentiment
+        : null) as "Positive" | "Neutral" | "Critical" | null,
+      active_headcount: n(row.active_headcount ?? "") as number | null,
+      country: s(row.country ?? ""),
+      sub_region: s(row.sub_region ?? ""),
+      actual_go_live: d(row.actual_go_live ?? ""),
+      planned_go_live: d(row.planned_go_live ?? ""),
+      implementation_progress: n(row.implementation_progress ?? "") as number | null,
+      da_project_manager: s(row.da_project_manager ?? ""),
+      project_manager_ii: s(row.project_manager_ii ?? ""),
+      server_location: s(row.server_location ?? ""),
+      server_name: s(row.server_name ?? ""),
+      marquee_client: b(row.marquee_client ?? ""),
+      existing_erp: s(row.existing_erp ?? ""),
+      existing_crm: s(row.existing_crm ?? ""),
+      region: s(row.region ?? ""),
+      payroll_service_type: s(row.payroll_service_type ?? ""),
+      final_cs_nps: n(row.final_cs_nps ?? "") as number | null,
+      industry: s(row.industry ?? ""),
     };
   });
   if (rows.length > 500) throw new Error("Maximum 500 rows per import.");
   return rows;
-}
-
-function splitCsvLine(line: string) {
-  const out: string[] = [];
-  let cur = "";
-  let inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') {
-      if (inQ && line[i + 1] === '"') { cur += '"'; i++; } else { inQ = !inQ; }
-    } else if (c === "," && !inQ) {
-      out.push(cur); cur = "";
-    } else cur += c;
-  }
-  out.push(cur);
-  return out;
 }
 
 export function ImportCsvDialog() {
@@ -80,7 +130,7 @@ export function ImportCsvDialog() {
   const qc = useQueryClient();
 
   function downloadTemplate() {
-    const blob = new Blob([TEMPLATE], { type: "text/csv" });
+    const blob = new Blob([SAMPLE], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -92,10 +142,7 @@ export function ImportCsvDialog() {
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 1_000_000) {
-      toast.error("File too large (max 1MB)");
-      return;
-    }
+    if (f.size > 2_000_000) { toast.error("File too large (max 2MB)"); return; }
     setBusy(true);
     try {
       const text = await f.text();
@@ -125,18 +172,21 @@ export function ImportCsvDialog() {
         </DialogHeader>
         <div className="space-y-4 text-sm">
           <p className="text-foreground/70">
-            Upload a CSV with the columns below. Max 500 rows.
+            Combined template covers all 32+ account fields. Max 500 rows. Required: <code>name, tier, arr, health, qbr_status, renewal_quarter</code>. Everything else is optional.
           </p>
-          <code className="block text-xs font-mono bg-muted p-3 border border-border overflow-x-auto">
-            name, tier, arr, health, qbr_status, renewal_quarter, champion?, economic_buyer?, blocker?, notes?
-          </code>
+          <details className="text-xs">
+            <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              View full column list ({HEADERS.length})
+            </summary>
+            <code className="block mt-2 text-[11px] font-mono bg-muted p-3 border border-border overflow-x-auto">
+              {HEADERS.join(", ")}
+            </code>
+          </details>
           <Button type="button" variant="outline" size="sm" onClick={downloadTemplate} className="gap-2">
             <FileDown className="h-4 w-4" /> Download template
           </Button>
           <label className="block">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              CSV file
-            </span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">CSV file</span>
             <input
               type="file"
               accept=".csv,text/csv"
@@ -147,9 +197,7 @@ export function ImportCsvDialog() {
           </label>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
-            Close
-          </Button>
+          <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
