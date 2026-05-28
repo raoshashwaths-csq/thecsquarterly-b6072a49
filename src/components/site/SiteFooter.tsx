@@ -15,7 +15,7 @@ const RESOURCES = [
   { label: "Operator Directory", path: "/directory" },
   { label: "Teams", path: "/teams" },
   { label: "Reading Sequencer", path: "/sequencer" },
-  { label: "Job Board", path: "/job-board" },
+  { label: "Job Board", path: "/job-board", comingSoon: true },
   { label: "Pricing", path: "/pricing" },
   { label: "Subscribe", path: "/subscribe" },
 ] as const;
@@ -116,7 +116,7 @@ function FooterCol({
   links,
 }: {
   title: string;
-  links: ReadonlyArray<{ label: string; path: string }>;
+  links: ReadonlyArray<{ label: string; path: string; comingSoon?: boolean }>;
 }) {
   return (
     <div>
@@ -126,12 +126,21 @@ function FooterCol({
       <ul className="space-y-3">
         {links.map((l) => (
           <li key={l.label}>
-            <Link
-              to={l.path}
-              className="font-body text-sm text-background/70 hover:text-background transition-colors"
-            >
-              {l.label}
-            </Link>
+            {l.comingSoon ? (
+              <span className="inline-flex items-center gap-2 font-body text-sm">
+                <span className="text-background/40 blur-[1.5px] select-none">{l.label}</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
+                  Stay tuned ✨
+                </span>
+              </span>
+            ) : (
+              <Link
+                to={l.path}
+                className="font-body text-sm text-background/70 hover:text-background transition-colors"
+              >
+                {l.label}
+              </Link>
+            )}
           </li>
         ))}
       </ul>
