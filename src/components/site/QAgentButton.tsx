@@ -404,6 +404,16 @@ export function QAgentButton() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {tour.active && tour.step ? (
+        <PlaybookTour
+          step={tour.step}
+          index={tour.stepIndex}
+          total={tour.total}
+          onNext={tour.next}
+          onSkip={tour.skip}
+        />
+      ) : null}
     </>
   );
 }
