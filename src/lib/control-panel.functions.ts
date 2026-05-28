@@ -90,15 +90,17 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
     // Latest registrations w/ method + tier
     const latestProfiles = (profilesRes.data ?? []).slice(0, 25);
     const ids = latestProfiles.map((p) => p.id);
-    let subByUser: Record<string, string> = {};
-    let methodByUser: Record<string, string> = {};
+    const subByUser: Record<string, { designation: string; label: string }> = {};
+    const methodByUser: Record<string, string> = {};
     if (ids.length) {
       const [subs2, identitiesLikely] = await Promise.all([
-        supabaseAdmin.from("subscriptions").select("user_id, tier, status").in("user_id", ids),
+        supabaseAdmin.from("subscriptions").select("user_id, tier, designation, status").in("user_id", ids),
         Promise.resolve({ data: [] as Array<{ user_id: string; provider: string }> }),
       ]);
       (subs2.data ?? []).forEach((s) => {
-        if (s.status === "active" && s.tier !== "free") subByUser[s.user_id] = s.tier;
+        if (s.status !== "active") return;
+        const n = normalizeTier({ tier: s.tier, designation: s.designation });
+        if (isPaid(n.designation)) subByUser[s.user_id] = { designation: n.designation, label: n.label };
       });
       latestProfiles.forEach((p) => {
         methodByUser[p.id] = "Email";
@@ -112,12 +114,15 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
       display_name: (p.display_name as string) ?? "",
       created_at: p.created_at as string,
       method: methodByUser[p.id] ?? "Email",
-      tier: subByUser[p.id] ?? "free",
+      designation: subByUser[p.id]?.designation ?? "reader",
+      tier: subByUser[p.id]?.label ?? "Reader",
     }));
 
     return {
       mrrCents,
+      arrCents: mrrCents * 12,
       paidSubscribers: paidSubs.length,
+      tierBreakdown,
       activeJobs: jobsRes.count ?? 0,
       agentSessionsMTD: qMTDRes.count ?? 0,
       series: days,
