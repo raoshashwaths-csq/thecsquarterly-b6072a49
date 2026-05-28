@@ -147,7 +147,7 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
 
 // =============== Agent Observability ===============
 
-import { computeCostMicros, heuristicCostMicrosPerRun, microsToUsd, HEURISTIC_TOKENS_PER_RUN } from "@/lib/q-pricing";
+import { heuristicCostMicrosPerRun, microsToUsd, HEURISTIC_TOKENS_PER_RUN } from "@/lib/q-pricing";
 
 export const getAgentObservability = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
