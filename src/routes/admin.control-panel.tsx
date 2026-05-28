@@ -341,7 +341,7 @@ function OverviewTab() {
                       <Badge variant="outline" className="text-[10px]">{r.method}</Badge>
                     </td>
                     <td className="py-2 px-3">
-                      <Badge variant={r.tier === "free" ? "secondary" : "default"} className="text-[10px] capitalize">{r.tier}</Badge>
+                      <Badge variant={r.designation === "reader" ? "secondary" : "default"} className="text-[10px]">{r.tier}</Badge>
                     </td>
                   </tr>
                 ))
