@@ -3,6 +3,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getNode, breadcrumbFor } from "./q-trees";
 import { assertQUnderCap } from "./q-usage.functions";
+import { computeCostMicros } from "./q-pricing";
+
+const Q_MODEL = "google/gemini-2.5-flash";
+
 
 export const askQ = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
