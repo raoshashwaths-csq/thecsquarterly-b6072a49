@@ -32,12 +32,14 @@ import {
   DropdownMenuItem, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MetricCard as KitMetricCard } from "@/components/dashboard/MetricCard";
 import {
   getControlPanelOverview, getAgentObservability, getQRunTranscript,
   listJobListings, moderateJobListing, updateJobFlags, seedSampleJobs,
   listEmailTemplates, sendTestBroadcast, schedulePost,
   listMasterUsers, manageUser,
 } from "@/lib/control-panel.functions";
+
 
 export const Route = createFileRoute("/admin/control-panel")({
   head: () => ({
