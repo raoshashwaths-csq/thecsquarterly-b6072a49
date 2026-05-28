@@ -42,6 +42,7 @@ import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -214,6 +215,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiElevenlabsSttRoute = ApiElevenlabsSttRouteImport.update({
+  id: '/api/elevenlabs/stt',
+  path: '/api/elevenlabs/stt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
   id: '/agent/response/$runId',
   path: '/agent/response/$runId',
@@ -283,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -321,6 +328,7 @@ export interface FileRoutesByTo {
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -363,6 +371,7 @@ export interface FileRoutesById {
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
+  '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -406,6 +415,7 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/insights/'
     | '/agent/response/$runId'
+    | '/api/elevenlabs/stt'
     | '/lovable/email/suppression'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -444,6 +454,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/insights'
     | '/agent/response/$runId'
+    | '/api/elevenlabs/stt'
     | '/lovable/email/suppression'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -485,6 +496,7 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/insights/'
     | '/agent/response/$runId'
+    | '/api/elevenlabs/stt'
     | '/lovable/email/suppression'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -519,6 +531,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
+  ApiElevenlabsSttRoute: typeof ApiElevenlabsSttRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
   ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
@@ -760,6 +773,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/elevenlabs/stt': {
+      id: '/api/elevenlabs/stt'
+      path: '/api/elevenlabs/stt'
+      fullPath: '/api/elevenlabs/stt'
+      preLoaderRoute: typeof ApiElevenlabsSttRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/agent/response/$runId': {
       id: '/agent/response/$runId'
       path: '/agent/response/$runId'
@@ -893,6 +913,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AccountIndexRoute: AccountIndexRoute,
   AgentResponseRunIdRoute: AgentResponseRunIdRoute,
+  ApiElevenlabsSttRoute: ApiElevenlabsSttRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
   ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
