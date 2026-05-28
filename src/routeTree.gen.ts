@@ -37,6 +37,7 @@ import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.inde
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
 import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -202,6 +203,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Csfactors360Route = Csfactors360RouteImport.update({
+  id: '/360',
+  path: '/360',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
 const CsfactorsAccountIdRoute = CsfactorsAccountIdRouteImport.update({
   id: '/$accountId',
   path: '/$accountId',
@@ -364,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
+  '/csfactors/360': typeof Csfactors360Route
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -415,6 +422,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
+  '/csfactors/360': typeof Csfactors360Route
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account': typeof AccountIndexRoute
@@ -470,6 +478,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
+  '/csfactors/360': typeof Csfactors360Route
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -526,6 +535,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
+    | '/csfactors/360'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -577,6 +587,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
+    | '/csfactors/360'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account'
@@ -631,6 +642,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
+    | '/csfactors/360'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -900,6 +912,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/csfactors/360': {
+      id: '/csfactors/360'
+      path: '/360'
+      fullPath: '/csfactors/360'
+      preLoaderRoute: typeof Csfactors360RouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
     '/csfactors/$accountId': {
       id: '/csfactors/$accountId'
       path: '/$accountId'
@@ -1109,10 +1128,12 @@ const CodexRouteWithChildren = CodexRoute._addFileChildren(CodexRouteChildren)
 
 interface CsfactorsRouteChildren {
   CsfactorsAccountIdRoute: typeof CsfactorsAccountIdRoute
+  Csfactors360Route: typeof Csfactors360Route
 }
 
 const CsfactorsRouteChildren: CsfactorsRouteChildren = {
   CsfactorsAccountIdRoute: CsfactorsAccountIdRoute,
+  Csfactors360Route: Csfactors360Route,
 }
 
 const CsfactorsRouteWithChildren = CsfactorsRoute._addFileChildren(
