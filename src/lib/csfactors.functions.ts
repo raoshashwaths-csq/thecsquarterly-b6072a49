@@ -22,12 +22,14 @@ export type CSAccount = {
   updated_at: string;
 };
 
+export type Json = string | number | boolean | null | { [k: string]: Json } | Json[];
+
 export type CSAccountEvent = {
   id: string;
   account_id: string;
   user_id: string;
   kind: string;
-  payload: Record<string, unknown>;
+  payload: Json;
   occurred_at: string;
 };
 
