@@ -39,6 +39,10 @@ import {
   listEmailTemplates, sendTestBroadcast, schedulePost,
   listMasterUsers, manageUser,
 } from "@/lib/control-panel.functions";
+import { TIER_LABEL, ALL_DESIGNATIONS, PAID_DESIGNATIONS, isPaid } from "@/lib/admin-tiers";
+import {
+  DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, DropdownMenuPortal,
+} from "@/components/ui/dropdown-menu";
 
 
 export const Route = createFileRoute("/admin/control-panel")({
