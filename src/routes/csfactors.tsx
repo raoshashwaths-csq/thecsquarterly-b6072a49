@@ -73,6 +73,8 @@ function CSFactorsPageInner() {
   const ask = useServerFn(askCSFactorsQ);
   const { filter, setFilter, applyPrompt } = useQFilter();
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const [greet, setGreet] = useState("Hello");
+  useEffect(() => { setGreet(greeting()); }, []);
 
   // Operator-tier gate
   if (!authLoading && !entLoading && user) {
