@@ -28,19 +28,11 @@ class RO {
   unobserve() {}
   disconnect() {}
 }
-// @ts-expect-error jsdom polyfill
-globalThis.ResizeObserver = globalThis.ResizeObserver ?? RO;
-// @ts-expect-error jsdom polyfill
-globalThis.IntersectionObserver = globalThis.IntersectionObserver ?? RO;
+const g = globalThis as unknown as Record<string, unknown>;
+g.ResizeObserver = g.ResizeObserver ?? RO;
+g.IntersectionObserver = g.IntersectionObserver ?? RO;
 
-if (!Element.prototype.scrollIntoView) {
-  Element.prototype.scrollIntoView = vi.fn();
-}
-if (!Element.prototype.hasPointerCapture) {
-  // @ts-expect-error jsdom missing
-  Element.prototype.hasPointerCapture = () => false;
-}
-if (!Element.prototype.scrollTo) {
-  // @ts-expect-error jsdom missing
-  Element.prototype.scrollTo = () => {};
-}
+const ep = Element.prototype as unknown as Record<string, unknown>;
+if (!ep.scrollIntoView) ep.scrollIntoView = vi.fn();
+if (!ep.hasPointerCapture) ep.hasPointerCapture = () => false;
+if (!ep.scrollTo) ep.scrollTo = () => {};
