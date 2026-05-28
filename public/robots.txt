@@ -1,5 +1,13 @@
 User-agent: *
 Allow: /
 
-# Block survey form page from index (results & forms aren't useful in search)
+# Block utility/auth surfaces and admin from index
 Disallow: /ai-readiness/survey
+Disallow: /admin
+Disallow: /account
+Disallow: /login
+Disallow: /unsubscribe
+Disallow: /agent/
+Disallow: /api/
+
+Sitemap: https://www.thecsquarterly.com/sitemap.xml

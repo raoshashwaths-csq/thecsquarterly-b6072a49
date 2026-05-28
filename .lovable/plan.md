@@ -1,52 +1,97 @@
-## Context
-The CS Codex already has 6 published playbook entries in the database:
-- `cs-health-score-calculator` (Framework, 14pp)
-- `qbr-deck-template-pack` (Template, 12pp)
-- `90-day-onboarding-playbook` (Playbook, 22pp)
-- `churn-early-warning-system` (Framework, 16pp)
-- `cs-ai-readiness-diagnostic` (Diagnostic, 18pp)
-- `expansion-revenue-playbook` (Playbook, 20pp)
+# SEO Defaults — Implementation Plan
 
-Currently, `codex.$slug.tsx` renders `pb.body` as plain markdown-style text for every playbook. The user wants these 6 playbooks replaced with rich interactive React components.
+Goal: replace the static SEO scaffolding with dynamic, data-driven endpoints that always reflect what's actually published, and add Article structured data on every post route.
 
-## Plan
+Base URL across all outputs: `https://www.thecsquarterly.com`.
 
-### 1. Create `src/components/playbooks/` with 6 adapted components
-Rewrite each component to use the site's design system:
-- Replace all `bg-stone-*`, `text-stone-*`, `border-stone-*` with semantic tokens (`bg-card`, `text-foreground`, `border-border`, `bg-muted`, `text-muted-foreground`, etc.)
-- Replace `font-serif` with `font-display`; keep `font-mono` for mono sections
-- Replace hardcoded `accent-stone-800` range inputs with `accent` color via CSS custom property
-- Ensure all components render correctly in dark mode (no hardcoded light-only backgrounds)
-- Preserve all interactive logic: sliders, state, copy-to-clipboard, tab switching, live text generation
+---
 
-Components to create:
-- `HealthScoreCalculator.tsx` — 4 weighted sliders → composite score + risk status badge
-- `QbrDeckTemplatePack.tsx` — 12-slide selector with copyable raw-text templates
-- `OnboardingPlaybook.tsx` — 3-phase timeline + live handover script generator
-- `ChurnEarlyWarningSystem.tsx` — Risk-code table + accusation-audit email generator
-- `AiReadinessDiagnostic.tsx` — 3-pillar sliders → geometric mean + 90-day remediation plan
-- `ExpansionRevenuePlaybook.tsx` — Stakeholder hierarchy + expansion-motion matrix + trigger-based dispatch script
+## 1. Dynamic `/sitemap.xml` (server route)
 
-### 2. Create `src/components/playbooks/index.tsx`
-Export a `PLAYBOOK_COMPONENTS` record mapping each of the 6 slugs to its component:
-```ts
-export const PLAYBOOK_COMPONENTS: Record<string, React.FC> = {
-  "cs-health-score-calculator": HealthScoreCalculator,
-  "qbr-deck-template-pack": QbrDeckTemplatePack,
-  "90-day-onboarding-playbook": OnboardingPlaybook,
-  "churn-early-warning-system": ChurnEarlyWarningSystem,
-  "cs-ai-readiness-diagnostic": AiReadinessDiagnostic,
-  "expansion-revenue-playbook": ExpansionRevenuePlaybook,
-};
+New file: `src/routes/sitemap[.]xml.ts`
+
+- `GET` handler returns `application/xml`, `Cache-Control: public, max-age=3600`.
+- Static entries (one per indexable page): `/`, `/insights`, `/vanguard`, `/retention-protocol`, `/outcome-forum`, `/codex`, `/ai-readiness`, `/pricing`, `/subscribe`, `/about`, `/job-board`, `/benchmarks`, `/directory`.
+- Dynamic entries:
+  - Pull all published posts via `supabaseAdmin.from("posts").select("slug, section, published_at").eq("published", true).lte("published_at", now())`.
+  - Emit `/insights/{slug}` for every post (matches the actual route file).
+  - Pull all playbooks via `supabaseAdmin.from("playbooks").select("slug, updated_at").eq("published", true)` → emit `/codex/{slug}`.
+- Each `<url>` includes `<loc>`, `<lastmod>` (post `published_at` / playbook `updated_at`), and a reasonable `<changefreq>` / `<priority>` per section.
+- Delete `public/sitemap.xml` (the static file would shadow the route at the same path).
+
+## 2. `/rss.xml` feed (server route)
+
+New file: `src/routes/rss[.]xml.ts`
+
+- `GET` handler returns `application/rss+xml; charset=utf-8`.
+- Channel metadata: title "The CS Quarterly", link to home, description from llms.txt intro, `language=en-us`, `lastBuildDate` = max `published_at`.
+- Items: latest 50 published posts ordered by `published_at desc`:
+  - `<title>` = post title
+  - `<link>` and `<guid isPermaLink="true">` = `https://www.thecsquarterly.com/insights/{slug}`
+  - `<description>` = excerpt (CDATA-wrapped, HTML-escaped)
+  - `<pubDate>` = RFC 822 from `published_at`
+  - `<category>` = post category
+  - `<author>` when available
+- `Cache-Control: public, max-age=900`.
+- Add `<link rel="alternate" type="application/rss+xml" href="/rss.xml" title="The CS Quarterly" />` to `__root.tsx` head `links` so feed readers auto-discover it.
+
+## 3. JSON-LD `Article` schema on post routes
+
+Edit `src/routes/insights.$slug.tsx`:
+
+- Extend the existing `head()` to add a `scripts` array with `type: "application/ld+json"` and a stringified `Article` schema using loaderData:
+  - `@context`, `@type: "Article"`, `headline`, `description` (excerpt), `image` (cover_image_url, absolute URL when present), `datePublished` (published_at), `author: { @type: "Person", name }`, `publisher: { @type: "Organization", name: "The CS Quarterly", logo }`, `mainEntityOfPage` = canonical URL, `articleSection` (category).
+- Also set `og:image` (and `twitter:image`) on the route head when `cover_image_url` exists — leaf only, per the head-meta rules.
+- Canonical and og:url upgraded from relative to absolute `https://www.thecsquarterly.com/insights/{slug}` so crawlers/feed readers resolve correctly.
+
+No change needed at `__root.tsx` beyond the RSS `<link>` (Organization/WebSite JSON-LD already lives there if present; if not, this plan does not add it — out of scope).
+
+## 4. Refresh `public/robots.txt`
+
+Edit in place; preserve existing block:
+
+```
+User-agent: *
+Allow: /
+
+# Block utility/auth surfaces and admin from index
+Disallow: /ai-readiness/survey
+Disallow: /admin
+Disallow: /account
+Disallow: /login
+Disallow: /unsubscribe
+Disallow: /agent/
+Disallow: /api/
+
+Sitemap: https://www.thecsquarterly.com/sitemap.xml
 ```
 
-### 3. Wire into `codex.$slug.tsx`
-In the unlocked content area of the playbook detail page, conditionally render the mapped component when `pb.slug` matches a key in `PLAYBOOK_COMPONENTS`. For all other slugs, keep the existing body-text rendering. The component renders inside the same `prose-content` container after a small eyebrow label indicating "Interactive Playbook".
+## 5. Refresh `public/llms.txt`
 
-No database changes are required — the 6 entries already exist with the correct slugs.
+Rewrite to mirror the actual current route map (Vanguard, Retention Protocol, Outcome Forum, Codex, CSFactors, AI Readiness, Pricing, Subscribe, About, Job Board, Benchmarks) and list all currently published essays pulled by hand from the live DB. Keep the existing intro voice. Document the two-voice system, the 3-2-1 model, and `/rss.xml` discovery URL.
 
-## Technical notes
-- All 6 components are client-only (useState, useMemo, clipboard API). No SSR concerns.
-- The copy-to-clipboard calls use `navigator.clipboard.writeText`.
-- The `OnboardingPlaybook.tsx` has a bug in the original (`navigator.clipboard.text = script`) — fix to `writeText`.
-- No new dependencies needed. Lucide icons are already available.
+(This stays a static file — llms.txt is small, low-churn, and conventionally hand-curated. Future post additions update it manually; not worth a build step.)
+
+---
+
+## Files touched
+
+- New: `src/routes/sitemap[.]xml.ts`
+- New: `src/routes/rss[.]xml.ts`
+- Edit: `src/routes/insights.$slug.tsx` (add JSON-LD + og:image + absolute URLs)
+- Edit: `src/routes/__root.tsx` (add RSS `<link rel="alternate">`)
+- Edit: `public/robots.txt` (expand disallows + Sitemap directive)
+- Edit: `public/llms.txt` (refresh page list + add RSS link)
+- Delete: `public/sitemap.xml` (replaced by server route)
+
+## Verification
+
+- After build, hit `/sitemap.xml` and `/rss.xml` in preview → expect valid XML with live post slugs.
+- View source on any `/insights/{slug}` → expect one `<script type="application/ld+json">` Article block plus `og:image`.
+- Trigger an SEO rescan once shipped to clear related findings.
+
+## Out of scope
+
+- llms.txt automation (kept static).
+- Organization/WebSite JSON-LD in `__root.tsx` (already covered by existing root head, not part of this request).
+- Per-section index pages (`/vanguard`, etc.) getting JSON-LD — only post routes per the request.
