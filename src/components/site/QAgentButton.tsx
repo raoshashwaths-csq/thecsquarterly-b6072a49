@@ -183,7 +183,16 @@ export function QAgentButton() {
 
   const handleOpen = () => { setOpen(true); dismissAttention(); };
 
-  const gated = !user || (trialUsed && !unlimited);
+  // Monthly Q interaction cap (designation-tier scoped).
+  const usage = useQuery({
+    queryKey: ["q-monthly-usage"],
+    queryFn: () => fetchUsage(),
+    enabled: !!user && open,
+    staleTime: 30_000,
+  });
+  const capped = !!usage.data && usage.data.cap !== null && usage.data.used >= usage.data.cap;
+
+  const gated = !user || (trialUsed && !unlimited) || capped;
   const needsSignIn = !user;
 
   const handleAsk = async (e?: React.FormEvent) => {
@@ -198,6 +207,7 @@ export function QAgentButton() {
         : "";
       const { reply } = await ask({ data: { question: prefix + query, witty: false } });
       setAnswer(reply);
+      usage.refetch();
       if (!unlimited) {
         try { localStorage.setItem(TRIAL_KEY, "1"); } catch { /* */ }
         setTrialUsed(true);
