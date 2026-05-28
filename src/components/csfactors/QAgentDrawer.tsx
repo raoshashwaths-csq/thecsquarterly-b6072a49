@@ -145,6 +145,23 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
           ) : null}
         </div>
 
+        {/* Cap banner */}
+        {usage.data && usage.data.cap !== null ? (
+          <div className={cn(
+            "border-t border-border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.2em] flex items-center justify-between",
+            capped ? "bg-accent/10 text-accent" : "bg-card text-foreground/60",
+          )}>
+            <span>
+              {usage.data.used} / {usage.data.cap} Q interactions this month
+            </span>
+            {capped ? (
+              <Link to="/pricing" className="underline hover:text-accent">
+                Upgrade →
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
+
         {/* Composer */}
         <form
           onSubmit={(e) => {
@@ -164,14 +181,15 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
               }
             }}
             rows={2}
-            placeholder="Ask Q about an account, a renewal, a stakeholder…"
-            className="flex-1 resize-none bg-transparent border border-border focus:border-accent outline-none px-3 py-2 text-sm font-sans"
+            disabled={capped}
+            placeholder={capped ? "Monthly cap reached — upgrade to keep asking Q." : "Ask Q about an account, a renewal, a stakeholder…"}
+            className="flex-1 resize-none bg-transparent border border-border focus:border-accent outline-none px-3 py-2 text-sm font-sans disabled:opacity-50"
           />
           {speech.supported ? (
             <button
               type="button"
               onClick={speech.toggle}
-              disabled={speech.transcribing || mut.isPending}
+              disabled={speech.transcribing || mut.isPending || capped}
               className={cn(
                 "shrink-0 inline-flex items-center justify-center h-9 w-9 border border-border hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors",
                 speech.recording && "border-accent text-accent animate-pulse",
@@ -184,7 +202,7 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
           ) : null}
           <button
             type="submit"
-            disabled={!input.trim() || mut.isPending}
+            disabled={!input.trim() || mut.isPending || capped}
             className="shrink-0 inline-flex items-center justify-center h-9 w-9 bg-accent text-accent-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
             aria-label="Send"
           >
