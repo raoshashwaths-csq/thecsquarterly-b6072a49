@@ -31,7 +31,7 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
     const [subsRes, jobsRes, qMTDRes, profilesRes, qSeriesRes] = await Promise.all([
       supabaseAdmin
         .from("subscriptions")
-        .select("user_id, tier, status")
+        .select("user_id, tier, designation, status")
         .eq("status", "active"),
       supabaseAdmin
         .from("job_listings")
@@ -54,11 +54,20 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
         .limit(5000),
     ]);
 
-    const paidSubs = (subsRes.data ?? []).filter((s) => s.tier !== "free");
-    const mrrCents = paidSubs.reduce(
-      (sum, s) => sum + (TIER_PRICE_CENTS[s.tier] ?? TIER_PRICE_CENTS.vanguard),
-      0,
-    );
+    const normalizedSubs = (subsRes.data ?? []).map((s) => ({
+      user_id: s.user_id as string,
+      ...normalizeTier({ tier: s.tier, designation: s.designation }),
+    }));
+    const paidSubs = normalizedSubs.filter((s) => isPaid(s.designation));
+    const mrrCents = paidSubs.reduce((sum, s) => sum + s.priceCents, 0);
+
+    // Per-tier breakdown (active paid only)
+    const tierBreakdown: { designation: Designation; label: string; count: number }[] =
+      PAID_DESIGNATIONS.map((d) => ({
+        designation: d,
+        label: (paidSubs.find((s) => s.designation === d)?.label) ?? d,
+        count: paidSubs.filter((s) => s.designation === d).length,
+      }));
 
     // 30-day registrations + sessions timeseries
     const days: { date: string; registrations: number; sessions: number }[] = [];
