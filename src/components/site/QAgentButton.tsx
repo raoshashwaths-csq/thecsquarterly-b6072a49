@@ -145,7 +145,14 @@ export function QAgentButton() {
   const handleAsk = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!query.trim() || loading) return;
-    if (gated) return;
+    if (gated) { if (!user) setGateModal(true); return; }
+    // Friction keyword detection — flag for end-of-day check-in.
+    if (user && typeof window !== "undefined") {
+      const kws = detectFrictionKeywords(query);
+      if (kws.length > 0) {
+        try { sessionStorage.setItem(FLAG_KEY, `${new Date().toISOString().slice(0,10)}|${kws.join(",")}`); } catch { /* */ }
+      }
+    }
     setLoading(true);
     setAnswer(null);
     try {
@@ -154,10 +161,12 @@ export function QAgentButton() {
         : "";
       const { reply } = await ask({ data: { question: prefix + query, witty: false } });
       setAnswer(reply);
+      try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* */ }
       usage.refetch();
       if (!unlimited) {
         try { localStorage.setItem(TRIAL_KEY, "1"); } catch { /* */ }
         setTrialUsed(true);
+        if (!user) setGateModal(true);
       }
     } catch (err) {
       toast.error((err as Error).message || "Q couldn't reply.");
@@ -166,7 +175,8 @@ export function QAgentButton() {
     }
   };
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/csfactors")) return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/csfactors")) return null;
+
 
   const currentPlaceholder = ROLLING_PROMPTS[placeholderIdx];
 
@@ -262,26 +272,27 @@ export function QAgentButton() {
               </button>
             </form>
 
-            {/* Suggestion chips — only when empty */}
-            {!query && !answer && suggestions.length > 0 && (
+            {/* Suggested Vectors — premium parchment pills, always visible */}
+            {!answer && (
               <div className="mb-5">
-                <div className="font-mono text-[9px] uppercase tracking-[0.25em] text-foreground/45 mb-2">
-                  Try
+                <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+                  Suggested Vectors
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {suggestions.map((s) => (
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
+                  {SUGGESTED_VECTORS.map((v) => (
                     <button
-                      key={s}
+                      key={v}
                       type="button"
-                      onClick={() => { setQuery(s); inputRef.current?.focus(); }}
-                      className="text-left text-xs font-body border border-border px-2.5 py-1.5 hover:border-foreground hover:bg-foreground/5 transition-colors max-w-full break-words"
+                      onClick={() => { setQuery(v); inputRef.current?.focus(); }}
+                      className="snap-start shrink-0 max-w-[280px] text-left text-xs font-body leading-snug border border-border bg-card/70 px-3 py-2.5 hover:border-accent hover:text-accent transition-colors"
                     >
-                      {s}
+                      {v}
                     </button>
                   ))}
                 </div>
               </div>
             )}
+
 
             {/* Live search results */}
             {query && (
