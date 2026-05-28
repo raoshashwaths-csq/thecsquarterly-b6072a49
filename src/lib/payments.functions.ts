@@ -79,15 +79,15 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         mode: "subscription",
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
-        // managed_payments enables Stripe's end-to-end tax/fraud/dispute handling.
-        // Not yet in the Stripe Node SDK types — cast through.
-        managed_payments: { enabled: true },
+        // Tax calculation & collection only (+0.5%). Full compliance handling
+        // (`managed_payments`) is not available for India-based seller accounts.
+        automatic_tax: { enabled: true },
         ...(customerId && { customer: customerId }),
         ...(data.userId && {
           metadata: { userId: data.userId },
           subscription_data: { metadata: { userId: data.userId } },
         }),
-      } as never);
+      });
 
       return { clientSecret: session.client_secret ?? "" };
     } catch (error) {
