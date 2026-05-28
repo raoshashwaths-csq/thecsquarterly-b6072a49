@@ -178,15 +178,22 @@ export function ImportCsvDialog() {
         </DialogHeader>
         <div className="space-y-4 text-sm">
           <p className="text-foreground/70">
-            Combined template covers all 32+ account fields. Max 500 rows. Required: <code>name, tier, arr, health, qbr_status, renewal_quarter</code>. Everything else is optional.
+            Combined template covers all {HEADERS.length} account fields. Max 500 rows. Required columns are marked with an <span className="text-accent font-semibold">*</span> in the header row: <code>name*, tier*, arr*, health*, qbr_status*, renewal_quarter*</code>. Everything else is optional.
           </p>
           <details className="text-xs">
             <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               View full column list ({HEADERS.length})
             </summary>
-            <code className="block mt-2 text-[11px] font-mono bg-muted p-3 border border-border overflow-x-auto">
-              {HEADERS.join(", ")}
-            </code>
+            <div className="block mt-2 text-[11px] font-mono bg-muted p-3 border border-border overflow-x-auto leading-relaxed">
+              {HEADERS.map((h, i) => (
+                <span key={h}>
+                  {i > 0 && ", "}
+                  <span className={REQUIRED.has(h) ? "text-accent font-semibold" : ""}>
+                    {h}{REQUIRED.has(h) && <span aria-hidden>*</span>}
+                  </span>
+                </span>
+              ))}
+            </div>
           </details>
           <Button type="button" variant="outline" size="sm" onClick={downloadTemplate} className="gap-2">
             <FileDown className="h-4 w-4" /> Download template
