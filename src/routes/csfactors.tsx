@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Maximize2 } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
 import { AddAccountDialog } from "@/components/csfactors/AddAccountDialog";
 import { ImportCsvDialog } from "@/components/csfactors/ImportCsvDialog";
@@ -9,11 +10,15 @@ import { BurningThree } from "@/components/csfactors/BurningThree";
 import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
 import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
 import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
+import { QAgentDrawer, QAgentLauncher } from "@/components/csfactors/QAgentDrawer";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
+
 
 export const Route = createFileRoute("/csfactors")({
   head: () => ({
