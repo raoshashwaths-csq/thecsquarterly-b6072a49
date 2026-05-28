@@ -179,6 +179,7 @@ function RootComponent() {
           <QAgentButton />
         </QErrorBoundary>
       ) : null}
+      <PlaybookBadge />
       <EndOfDaySentimentCheckIn />
       <ClientOnly fallback={null}>
         <Suspense fallback={null}>
