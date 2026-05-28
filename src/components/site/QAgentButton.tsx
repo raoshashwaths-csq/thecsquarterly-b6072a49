@@ -345,6 +345,41 @@ export function QAgentButton() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Anonymous gate modal — fires after the single trial answer. */}
+      <Dialog open={gateModal} onOpenChange={setGateModal}>
+        <DialogContent className="max-w-md bg-background border border-border p-7">
+          <DialogHeader className="text-left">
+            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+              <QMark /> · Trial complete
+            </div>
+            <DialogTitle asChild>
+              <h3 className="font-display text-3xl leading-[0.95] tracking-tight">
+                One on the house.
+              </h3>
+            </DialogTitle>
+            <DialogDescription className="font-body text-base text-foreground/75 leading-relaxed pt-2">
+              Sign in to keep asking <QMark />, or unlock unlimited reasoning with Vanguard.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            <Link
+              to="/login"
+              onClick={() => { setGateModal(false); setOpen(false); }}
+              className="text-center py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
+            >
+              Sign in
+            </Link>
+            <Link
+              to="/pricing"
+              onClick={() => { setGateModal(false); setOpen(false); }}
+              className="text-center py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+            >
+              See pricing
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

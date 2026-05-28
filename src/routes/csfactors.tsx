@@ -11,6 +11,7 @@ import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
 import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
 import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
 import { QAgentDrawer, QAgentLauncher } from "@/components/csfactors/QAgentDrawer";
+import { QErrorBoundary } from "@/components/site/QErrorBoundary";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
@@ -247,9 +248,11 @@ function CSFactorsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Q agent */}
-      {user && !qOpen ? <QAgentLauncher onClick={() => setQOpen(true)} /> : null}
-      <QAgentDrawer open={qOpen} onOpenChange={setQOpen} />
+      {/* Q agent — scoped to CSFactors data only, isolated under its own error boundary */}
+      <QErrorBoundary label="Q · CSFactors">
+        {user && !qOpen ? <QAgentLauncher onClick={() => setQOpen(true)} /> : null}
+        <QAgentDrawer open={qOpen} onOpenChange={setQOpen} />
+      </QErrorBoundary>
     </div>
   );
 }
