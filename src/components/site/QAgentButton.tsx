@@ -26,17 +26,6 @@ const TRIAL_KEY = "q.trial.used";
 const DRAFT_KEY = "q.draft.global";
 const FLAG_KEY = "q.flagged.today";
 
-// Rotating capability messages for the floating Meet Q. speech bubble.
-const CAPABILITY_LINES = [
-  "I can defuse a board-level escalation in 24 hours.",
-  "I can rebuild a QBR a customer actually wants to attend.",
-  "I can map a new champion after a reorg.",
-  "I can read renewal risk 90 days out.",
-  "I can write your appraisal narrative — retained ARR first.",
-  "I can break a 60-day silence without sounding desperate.",
-  "I can call upsell from coverage masking churn.",
-];
-
 // Rolling placeholder prompts pulled from the 8 trees' terminal nodes,
 // reframed as the question an operator would actually type.
 const ROLLING_PROMPTS = [
@@ -52,10 +41,6 @@ const ROLLING_PROMPTS = [
 
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
-  const [attention, setAttention] = useState(false);
-  const [bubble, setBubble] = useState(false);
-  const [bubbleLeaving, setBubbleLeaving] = useState(false);
-  const [bubbleIdx, setBubbleIdx] = useState(0);
   const [scope, setScope] = useState<"universal" | "workspace">("universal");
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
