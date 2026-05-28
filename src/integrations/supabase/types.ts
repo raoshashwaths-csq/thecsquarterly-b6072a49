@@ -126,54 +126,253 @@ export type Database = {
       }
       cs_accounts: {
         Row: {
+          account_manager: string | null
+          active_headcount: number | null
+          actual_go_live: string | null
           arr: number
+          associate_director: string | null
+          backup_owner: string | null
           blocker: string | null
+          carr: number | null
           champion: string | null
+          contract_renewal_date: string | null
+          country: string | null
           created_at: string
+          cs_transition_start: string | null
+          csm_name: string | null
+          csm_sentiment: string | null
+          customer_city: string | null
+          customer_success: string | null
+          da_project_manager: string | null
           economic_buyer: string | null
+          existing_crm: string | null
+          existing_erp: string | null
+          final_cs_nps: number | null
           health: number
           id: string
+          implementation_progress: number | null
+          industry: string | null
+          invoiced_arr: number | null
+          journey_stage: string | null
+          key_account_manager: string | null
+          marquee_client: boolean | null
           name: string
           notes: string | null
+          payroll_service_type: string | null
+          planned_go_live: string | null
+          project_manager_ii: string | null
           qbr_status: string
+          region: string | null
           renewal_quarter: string
+          server_location: string | null
+          server_name: string | null
+          sub_region: string | null
           tier: string
+          ucc: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          account_manager?: string | null
+          active_headcount?: number | null
+          actual_go_live?: string | null
           arr?: number
+          associate_director?: string | null
+          backup_owner?: string | null
           blocker?: string | null
+          carr?: number | null
           champion?: string | null
+          contract_renewal_date?: string | null
+          country?: string | null
           created_at?: string
+          cs_transition_start?: string | null
+          csm_name?: string | null
+          csm_sentiment?: string | null
+          customer_city?: string | null
+          customer_success?: string | null
+          da_project_manager?: string | null
           economic_buyer?: string | null
+          existing_crm?: string | null
+          existing_erp?: string | null
+          final_cs_nps?: number | null
           health?: number
           id?: string
+          implementation_progress?: number | null
+          industry?: string | null
+          invoiced_arr?: number | null
+          journey_stage?: string | null
+          key_account_manager?: string | null
+          marquee_client?: boolean | null
           name: string
           notes?: string | null
+          payroll_service_type?: string | null
+          planned_go_live?: string | null
+          project_manager_ii?: string | null
           qbr_status?: string
+          region?: string | null
           renewal_quarter?: string
+          server_location?: string | null
+          server_name?: string | null
+          sub_region?: string | null
           tier?: string
+          ucc?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          account_manager?: string | null
+          active_headcount?: number | null
+          actual_go_live?: string | null
           arr?: number
+          associate_director?: string | null
+          backup_owner?: string | null
           blocker?: string | null
+          carr?: number | null
           champion?: string | null
+          contract_renewal_date?: string | null
+          country?: string | null
           created_at?: string
+          cs_transition_start?: string | null
+          csm_name?: string | null
+          csm_sentiment?: string | null
+          customer_city?: string | null
+          customer_success?: string | null
+          da_project_manager?: string | null
           economic_buyer?: string | null
+          existing_crm?: string | null
+          existing_erp?: string | null
+          final_cs_nps?: number | null
           health?: number
           id?: string
+          implementation_progress?: number | null
+          industry?: string | null
+          invoiced_arr?: number | null
+          journey_stage?: string | null
+          key_account_manager?: string | null
+          marquee_client?: boolean | null
           name?: string
           notes?: string | null
+          payroll_service_type?: string | null
+          planned_go_live?: string | null
+          project_manager_ii?: string | null
           qbr_status?: string
+          region?: string | null
           renewal_quarter?: string
+          server_location?: string | null
+          server_name?: string | null
+          sub_region?: string | null
           tier?: string
+          ucc?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      cs_contracts: {
+        Row: {
+          account_id: string
+          auto_renewal: boolean
+          created_at: string
+          doc_type: string
+          executed_on: string | null
+          file_name: string | null
+          file_path: string | null
+          id: string
+          mime_type: string | null
+          notice_days: number
+          signed_value_cents: number | null
+          size_bytes: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          auto_renewal?: boolean
+          created_at?: string
+          doc_type?: string
+          executed_on?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          mime_type?: string | null
+          notice_days?: number
+          signed_value_cents?: number | null
+          size_bytes?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          auto_renewal?: boolean
+          created_at?: string
+          doc_type?: string
+          executed_on?: string | null
+          file_name?: string | null
+          file_path?: string | null
+          id?: string
+          mime_type?: string | null
+          notice_days?: number
+          signed_value_cents?: number | null
+          size_bytes?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_contracts_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "cs_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cs_stakeholders: {
+        Row: {
+          account_id: string
+          buying_role: string
+          contact_name: string
+          created_at: string
+          id: string
+          influence: string
+          sentiment: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          buying_role?: string
+          contact_name: string
+          created_at?: string
+          id?: string
+          influence?: string
+          sentiment?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          buying_role?: string
+          contact_name?: string
+          created_at?: string
+          id?: string
+          influence?: string
+          sentiment?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_stakeholders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "cs_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       directory_profiles: {
         Row: {

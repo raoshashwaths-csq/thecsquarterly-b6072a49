@@ -4,6 +4,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type QBRStatus = "Completed" | "Scheduled" | "Overdue";
 export type Tier = "Enterprise" | "Mid-Market" | "SMB";
+export type BuyingRole = "economic_buyer" | "champion" | "end_user" | "decision_maker" | "blocker";
+export type Influence = "high" | "medium" | "low";
+export type Sentiment = "positive" | "neutral" | "negative";
+export type CSMSentiment = "Positive" | "Neutral" | "Critical";
 
 export type CSAccount = {
   id: string;
@@ -20,6 +24,38 @@ export type CSAccount = {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  // Extended fields
+  ucc: string | null;
+  account_manager: string | null;
+  csm_name: string | null;
+  associate_director: string | null;
+  backup_owner: string | null;
+  customer_success: string | null;
+  key_account_manager: string | null;
+  contract_renewal_date: string | null;
+  carr: number | null;
+  invoiced_arr: number | null;
+  journey_stage: string | null;
+  cs_transition_start: string | null;
+  customer_city: string | null;
+  csm_sentiment: CSMSentiment | null;
+  active_headcount: number | null;
+  country: string | null;
+  sub_region: string | null;
+  actual_go_live: string | null;
+  planned_go_live: string | null;
+  implementation_progress: number | null;
+  da_project_manager: string | null;
+  project_manager_ii: string | null;
+  server_location: string | null;
+  server_name: string | null;
+  marquee_client: boolean | null;
+  existing_erp: string | null;
+  existing_crm: string | null;
+  region: string | null;
+  payroll_service_type: string | null;
+  final_cs_nps: number | null;
+  industry: string | null;
 };
 
 export type Json = string | number | boolean | null | { [k: string]: Json } | Json[];
@@ -33,7 +69,42 @@ export type CSAccountEvent = {
   occurred_at: string;
 };
 
-const SELECT = "id, user_id, name, tier, arr, health, qbr_status, renewal_quarter, champion, economic_buyer, blocker, notes, created_at, updated_at";
+export type CSStakeholder = {
+  id: string;
+  account_id: string;
+  user_id: string;
+  contact_name: string;
+  title: string | null;
+  buying_role: BuyingRole;
+  influence: Influence;
+  sentiment: Sentiment;
+};
+
+export type CSContract = {
+  id: string;
+  account_id: string;
+  user_id: string;
+  doc_type: string;
+  file_path: string | null;
+  file_name: string | null;
+  mime_type: string | null;
+  size_bytes: number | null;
+  signed_value_cents: number | null;
+  executed_on: string | null;
+  auto_renewal: boolean;
+  notice_days: number;
+};
+
+const SELECT = "*";
+
+const nstr = z.string().trim().max(500).nullable().optional();
+const nint = z.number().int().nullable().optional();
+const nnum = z.number().nullable().optional();
+const ndate = z
+  .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.literal("")])
+  .nullable()
+  .optional()
+  .transform((v) => (v === "" ? null : v));
 
 const AccountInput = z.object({
   name: z.string().trim().min(1).max(200),
@@ -42,10 +113,42 @@ const AccountInput = z.object({
   health: z.number().int().min(0).max(100),
   qbr_status: z.enum(["Completed", "Scheduled", "Overdue"]).default("Scheduled"),
   renewal_quarter: z.string().trim().min(1).max(20),
-  champion: z.string().trim().max(200).nullable().optional(),
-  economic_buyer: z.string().trim().max(200).nullable().optional(),
-  blocker: z.string().trim().max(500).nullable().optional(),
+  champion: nstr,
+  economic_buyer: nstr,
+  blocker: nstr,
   notes: z.string().trim().max(5000).nullable().optional(),
+  // Extended
+  ucc: nstr,
+  account_manager: nstr,
+  csm_name: nstr,
+  associate_director: nstr,
+  backup_owner: nstr,
+  customer_success: nstr,
+  key_account_manager: nstr,
+  contract_renewal_date: ndate,
+  carr: nnum,
+  invoiced_arr: nnum,
+  journey_stage: nstr,
+  cs_transition_start: ndate,
+  customer_city: nstr,
+  csm_sentiment: z.enum(["Positive", "Neutral", "Critical"]).nullable().optional(),
+  active_headcount: nint,
+  country: nstr,
+  sub_region: nstr,
+  actual_go_live: ndate,
+  planned_go_live: ndate,
+  implementation_progress: z.number().int().min(0).max(100).nullable().optional(),
+  da_project_manager: nstr,
+  project_manager_ii: nstr,
+  server_location: nstr,
+  server_name: nstr,
+  marquee_client: z.boolean().nullable().optional(),
+  existing_erp: nstr,
+  existing_crm: nstr,
+  region: nstr,
+  payroll_service_type: nstr,
+  final_cs_nps: z.number().int().min(0).max(10).nullable().optional(),
+  industry: nstr,
 });
 
 export const listAccounts = createServerFn({ method: "GET" })
@@ -169,7 +272,176 @@ export const logAccountEvent = createServerFn({ method: "POST" })
     return row as unknown as CSAccountEvent;
   });
 
-// Heuristic Burning Three: largest at-risk ARR, overdue QBRs, nearest renewals.
+// =================== Stakeholders ===================
+
+const StakeholderInput = z.object({
+  account_id: z.string().uuid(),
+  contact_name: z.string().trim().min(1).max(200),
+  title: z.string().trim().max(200).nullable().optional(),
+  buying_role: z.enum(["economic_buyer", "champion", "end_user", "decision_maker", "blocker"]),
+  influence: z.enum(["high", "medium", "low"]),
+  sentiment: z.enum(["positive", "neutral", "negative"]),
+});
+
+export const listStakeholders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ account_id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("cs_stakeholders" as never)
+      .select("*")
+      .eq("account_id", data.account_id)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as unknown as CSStakeholder[];
+  });
+
+export const upsertStakeholder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid().optional(), patch: StakeholderInput }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    if (data.id) {
+      const { data: row, error } = await supabase
+        .from("cs_stakeholders" as never)
+        .update(data.patch as never)
+        .eq("id", data.id)
+        .select("*")
+        .single();
+      if (error) throw new Error(error.message);
+      return row as unknown as CSStakeholder;
+    }
+    const { data: row, error } = await supabase
+      .from("cs_stakeholders" as never)
+      .insert({ ...data.patch, user_id: userId } as never)
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    return row as unknown as CSStakeholder;
+  });
+
+export const deleteStakeholder = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { error } = await supabase.from("cs_stakeholders" as never).delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// =================== Contracts ===================
+
+const ContractInput = z.object({
+  account_id: z.string().uuid(),
+  doc_type: z.enum(["MSA", "SOW", "Amendment", "Other"]).default("MSA"),
+  file_path: z.string().max(500).nullable().optional(),
+  file_name: z.string().max(255).nullable().optional(),
+  mime_type: z.string().max(120).nullable().optional(),
+  size_bytes: z.number().int().nullable().optional(),
+  signed_value_cents: z.number().int().nullable().optional(),
+  executed_on: ndate,
+  auto_renewal: z.boolean().default(false),
+  notice_days: z.number().int().min(0).max(365).default(90),
+});
+
+export const listContracts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ account_id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("cs_contracts" as never)
+      .select("*")
+      .eq("account_id", data.account_id)
+      .order("executed_on", { ascending: false });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as unknown as CSContract[];
+  });
+
+export const upsertContract = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid().optional(), patch: ContractInput }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    if (data.id) {
+      const { data: row, error } = await supabase
+        .from("cs_contracts" as never)
+        .update(data.patch as never)
+        .eq("id", data.id)
+        .select("*")
+        .single();
+      if (error) throw new Error(error.message);
+      return row as unknown as CSContract;
+    }
+    const { data: row, error } = await supabase
+      .from("cs_contracts" as never)
+      .insert({ ...data.patch, user_id: userId } as never)
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    return row as unknown as CSContract;
+  });
+
+export const deleteContract = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { data: existing } = await supabase
+      .from("cs_contracts" as never)
+      .select("file_path")
+      .eq("id", data.id)
+      .maybeSingle();
+    const path = (existing as unknown as { file_path: string | null } | null)?.file_path;
+    if (path) {
+      await supabase.storage.from("cs-contracts").remove([path]);
+    }
+    const { error } = await supabase.from("cs_contracts" as never).delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const createContractUploadUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        account_id: z.string().uuid(),
+        filename: z.string().min(1).max(255),
+      })
+      .parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    const safe = data.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${userId}/${data.account_id}/${crypto.randomUUID()}-${safe}`;
+    const { data: signed, error } = await supabase.storage
+      .from("cs-contracts")
+      .createSignedUploadUrl(path);
+    if (error) throw new Error(error.message);
+    return { path, token: signed.token, signedUrl: signed.signedUrl };
+  });
+
+export const createContractDownloadUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ path: z.string() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { data: signed, error } = await supabase.storage
+      .from("cs-contracts")
+      .createSignedUrl(data.path, 60);
+    if (error) throw new Error(error.message);
+    return { url: signed.signedUrl };
+  });
+
+// =================== Heuristics ===================
+
 export type BurningInsight = {
   id: string;
   headline: string;
@@ -182,9 +454,7 @@ export function deriveBurningThree(accounts: CSAccount[]): BurningInsight[] {
   if (!accounts.length) return [];
   const insights: BurningInsight[] = [];
 
-  const atRisk = [...accounts]
-    .filter((a) => a.health < 50)
-    .sort((a, b) => b.arr - a.arr)[0];
+  const atRisk = [...accounts].filter((a) => a.health < 50).sort((a, b) => b.arr - a.arr)[0];
   if (atRisk) {
     insights.push({
       id: `risk-${atRisk.id}`,
@@ -221,6 +491,55 @@ export function deriveBurningThree(accounts: CSAccount[]): BurningInsight[] {
   }
 
   return insights.slice(0, 3);
+}
+
+// NPS scale: 0-10 per account. Promoters 9-10, Passives 7-8, Detractors 0-6.
+export function computeNPS(accounts: CSAccount[]) {
+  const scored = accounts.filter((a) => a.final_cs_nps !== null && a.final_cs_nps !== undefined);
+  const n = scored.length;
+  if (!n) return { score: 0, promoters: 0, passives: 0, detractors: 0, n: 0 };
+  let p = 0,
+    pa = 0,
+    d = 0;
+  for (const a of scored) {
+    const s = a.final_cs_nps!;
+    if (s >= 9) p++;
+    else if (s >= 7) pa++;
+    else d++;
+  }
+  const score = Math.round(((p - d) / n) * 100);
+  return { score, promoters: p, passives: pa, detractors: d, n };
+}
+
+export function computeSentimentIndex(accounts: CSAccount[]) {
+  const scored = accounts.filter((a) => a.csm_sentiment);
+  const n = scored.length;
+  if (!n) return { positive: 0, neutral: 0, critical: 0, healthPct: 0, n: 0 };
+  let pos = 0,
+    neu = 0,
+    crit = 0;
+  for (const a of scored) {
+    if (a.csm_sentiment === "Positive") pos++;
+    else if (a.csm_sentiment === "Neutral") neu++;
+    else if (a.csm_sentiment === "Critical") crit++;
+  }
+  const healthPct = Math.round((pos / n) * 100);
+  return { positive: pos, neutral: neu, critical: crit, healthPct, n };
+}
+
+export function noticeWindow(renewalDate: string | null, noticeDays = 90) {
+  if (!renewalDate) return { daysOut: null as number | null, band: null as 90 | 60 | 30 | null };
+  const r = new Date(renewalDate);
+  if (Number.isNaN(r.getTime())) return { daysOut: null, band: null };
+  const now = new Date();
+  const ms = r.getTime() - now.getTime();
+  const days = Math.ceil(ms / (1000 * 60 * 60 * 24));
+  const daysOut = days - noticeDays;
+  let band: 90 | 60 | 30 | null = null;
+  if (days <= 30 && days >= 0) band = 30;
+  else if (days <= 60 && days > 30) band = 60;
+  else if (days <= 90 && days > 60) band = 90;
+  return { daysOut, band, days };
 }
 
 export const rewriteBurningThree = createServerFn({ method: "POST" })
