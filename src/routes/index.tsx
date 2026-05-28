@@ -69,6 +69,30 @@ function HomePage() {
           Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships.
         </p>
         <NewsletterInline source="home-hero" />
+
+        {/* CSFactors entry */}
+        <div className="mt-12 flex justify-center">
+          <Link
+            to="/csfactors"
+            className="group relative inline-flex items-center gap-4 border border-border bg-card/60 hover:bg-card hover:border-accent transition-colors pl-4 pr-6 py-3"
+            aria-label="Open CSFactors Executive Pulse dashboard"
+          >
+            <span
+              aria-hidden
+              className="flex h-11 w-11 items-center justify-center bg-accent text-accent-foreground rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
+            >
+              CSF
+            </span>
+            <span className="text-left">
+              <span className="block font-display text-base md:text-lg leading-tight">
+                CSFactors <span className="italic text-accent">Executive Pulse</span>
+              </span>
+              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mt-0.5">
+                Quarterly revenue protection console →
+              </span>
+            </span>
+          </Link>
+        </div>
       </header>
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />

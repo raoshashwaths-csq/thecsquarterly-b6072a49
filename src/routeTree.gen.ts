@@ -21,6 +21,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobBoardRouteImport } from './routes/job-board'
 import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as DirectoryRouteImport } from './routes/directory'
+import { Route as CsfactorsRouteImport } from './routes/csfactors'
 import { Route as CodexRouteImport } from './routes/codex'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
@@ -105,6 +106,11 @@ const InsightsRoute = InsightsRouteImport.update({
 const DirectoryRoute = DirectoryRouteImport.update({
   id: '/directory',
   path: '/directory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CsfactorsRoute = CsfactorsRouteImport.update({
+  id: '/csfactors',
+  path: '/csfactors',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CodexRoute = CodexRouteImport.update({
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
+  '/csfactors': typeof CsfactorsRoute
   '/directory': typeof DirectoryRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
+  '/csfactors': typeof CsfactorsRoute
   '/directory': typeof DirectoryRoute
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
@@ -321,6 +329,7 @@ export interface FileRoutesById {
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
+  '/csfactors': typeof CsfactorsRoute
   '/directory': typeof DirectoryRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
@@ -362,6 +371,7 @@ export interface FileRouteTypes {
     | '/benchmarks'
     | '/calculator'
     | '/codex'
+    | '/csfactors'
     | '/directory'
     | '/insights'
     | '/job-board'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/benchmarks'
     | '/calculator'
+    | '/csfactors'
     | '/directory'
     | '/job-board'
     | '/login'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/benchmarks'
     | '/calculator'
     | '/codex'
+    | '/csfactors'
     | '/directory'
     | '/insights'
     | '/job-board'
@@ -477,6 +489,7 @@ export interface RootRouteChildren {
   BenchmarksRoute: typeof BenchmarksRoute
   CalculatorRoute: typeof CalculatorRoute
   CodexRoute: typeof CodexRouteWithChildren
+  CsfactorsRoute: typeof CsfactorsRoute
   DirectoryRoute: typeof DirectoryRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JobBoardRoute: typeof JobBoardRoute
@@ -586,6 +599,13 @@ declare module '@tanstack/react-router' {
       path: '/directory'
       fullPath: '/directory'
       preLoaderRoute: typeof DirectoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/csfactors': {
+      id: '/csfactors'
+      path: '/csfactors'
+      fullPath: '/csfactors'
+      preLoaderRoute: typeof CsfactorsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/codex': {
@@ -824,6 +844,7 @@ const rootRouteChildren: RootRouteChildren = {
   BenchmarksRoute: BenchmarksRoute,
   CalculatorRoute: CalculatorRoute,
   CodexRoute: CodexRouteWithChildren,
+  CsfactorsRoute: CsfactorsRoute,
   DirectoryRoute: DirectoryRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JobBoardRoute: JobBoardRoute,
