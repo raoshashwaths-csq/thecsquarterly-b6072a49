@@ -388,14 +388,32 @@ export const listMasterUsers = createServerFn({ method: "GET" })
     });
   });
 
+const GRANT_ACTIONS = [
+  "grant-practitioner",
+  "grant-operator",
+  "grant-team",
+  "grant-scale",
+  "grant-enterprise",
+  "grant-strategic_partner",
+] as const;
+
+const GRANT_TO_DESIGNATION: Record<typeof GRANT_ACTIONS[number], Designation> = {
+  "grant-practitioner": "practitioner",
+  "grant-operator": "operator",
+  "grant-team": "team",
+  "grant-scale": "scale",
+  "grant-enterprise": "enterprise",
+  "grant-strategic_partner": "strategic_partner",
+};
+
 export const manageUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({
       user_id: z.string().uuid(),
       action: z.enum([
-        "grant-vanguard",
-        "revoke-vanguard",
+        ...GRANT_ACTIONS,
+        "revoke-subscription",
         "grant-admin",
         "revoke-admin",
         "revoke-sessions",
@@ -406,26 +424,40 @@ export const manageUser = createServerFn({ method: "POST" })
     await assertAdmin(context.userId);
     const { user_id, action } = data;
 
-    if (action === "grant-vanguard") {
+    if ((GRANT_ACTIONS as readonly string[]).includes(action)) {
+      const designation = GRANT_TO_DESIGNATION[action as typeof GRANT_ACTIONS[number]];
       const ends = new Date(Date.now() + 365 * 86_400_000).toISOString();
-      // Try update first, then insert if absent
+      const legacyTier =
+        designation === "practitioner" ? "vanguard"
+        : designation === "operator" ? "vanguard-pro"
+        : designation;
       const { data: existing } = await supabaseAdmin
         .from("subscriptions").select("id").eq("user_id", user_id).maybeSingle();
+      const row = { status: "active", tier: legacyTier, designation, current_period_end: ends } as never;
       if (existing) {
-        await supabaseAdmin
-          .from("subscriptions")
-          .update({ status: "active", tier: "vanguard", current_period_end: ends })
-          .eq("user_id", user_id);
+        await supabaseAdmin.from("subscriptions").update(row).eq("user_id", user_id);
       } else {
-        await supabaseAdmin
-          .from("subscriptions")
-          .insert({ user_id, status: "active", tier: "vanguard", current_period_end: ends } as never);
+        await supabaseAdmin.from("subscriptions").insert({ user_id, ...row } as never);
       }
-    } else if (action === "revoke-vanguard") {
+      await supabaseAdmin.from("admin_audit_log").insert({
+        actor_id: context.userId,
+        action: "subscription.grant",
+        target_table: "subscriptions",
+        target_id: user_id,
+        details: { designation } as never,
+      });
+    } else if (action === "revoke-subscription") {
       await supabaseAdmin
         .from("subscriptions")
-        .update({ status: "inactive", tier: "free" })
+        .update({ status: "inactive", tier: "free", designation: null } as never)
         .eq("user_id", user_id);
+      await supabaseAdmin.from("admin_audit_log").insert({
+        actor_id: context.userId,
+        action: "subscription.revoke",
+        target_table: "subscriptions",
+        target_id: user_id,
+        details: {} as never,
+      });
     } else if (action === "grant-admin") {
       await supabaseAdmin
         .from("user_roles")
