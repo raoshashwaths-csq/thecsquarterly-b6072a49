@@ -2,16 +2,21 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Maximize2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { Maximize2, X } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
+import { MobileNavDrawer } from "@/components/csfactors/MobileNavDrawer";
+import { WorkspacePane } from "@/components/csfactors/WorkspacePane";
+import { QFilterProvider, useQFilter, applyQFilter } from "@/components/csfactors/QFilterContext";
 import { AddAccountDialog } from "@/components/csfactors/AddAccountDialog";
 import { ImportCsvDialog } from "@/components/csfactors/ImportCsvDialog";
 import { BurningThree } from "@/components/csfactors/BurningThree";
 import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
 import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
 import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
-import { QAgentDrawer, QAgentLauncher } from "@/components/csfactors/QAgentDrawer";
+import { QAgentDrawer, QAgentDock } from "@/components/csfactors/QAgentDrawer";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
+import { QMark } from "@/components/site/QMark";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
@@ -21,6 +26,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { TierGateOverlay } from "@/components/site/TierGateOverlay";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
+import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
+import { toast } from "sonner";
 
 
 export const Route = createFileRoute("/csfactors")({
