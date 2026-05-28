@@ -1,91 +1,131 @@
-## Goal
 
-Stop estimating Q's compute cost. Capture real tokens/latency/cost on every Q run, then expose live cost metrics in the admin control panel (replacing the "(est.)" heuristics) plus a forward-looking projection tile.
+## Scope
 
-## Part A — Real cost tracking on `q_runs`
+Five front-end + one schema change. No edits to existing API routes, `askQ` handler, RLS model on existing tables, or auth flow. Editorial typography and oxblood/gold palette tokens stay untouched.
 
-### Migration: add telemetry columns
+---
 
-Add to `public.q_runs`:
-- `tokens_in integer` (nullable)
-- `tokens_out integer` (nullable)
-- `latency_ms integer` (nullable)
-- `cost_micros bigint` (nullable) — cost in millionths of a USD cent (i.e. 1e-8 USD), keeps integer math precise
-- `model text` (nullable) — which model produced the run, for future per-model breakdowns
+## 1. Restore Q's guided flow + anonymous gate
 
-Backfill stays `NULL` for historical rows; UI treats `NULL` as "pre-telemetry" and falls back to the heuristic with an "est." badge for that subset only.
+**File:** `src/components/site/QAgentButton.tsx` (and a new `src/lib/q-vectors.ts`).
 
-### Writer changes — `src/lib/q-agent.functions.ts`
+- Replace the current 3 short "Try" chips with a **Suggested Vectors** row directly below the Ask button: horizontally scrollable rail of parchment pills (`border border-border bg-card/70`, oxblood-on-hover, font-body, generous tracking). Three exact strings, sourced from a new `src/lib/q-vectors.ts` so they're easy to extend:
+  1. *"Navigating alignment issues with department leadership during performance review cycles."*
+  2. *"Defending account Net Retention Rate (NRR) during aggressive internal client restructuring."*
+  3. *"Managing professional diplomacy when a cross-functional project faces executive scrutiny."*
+  - Clicking a pill seeds the input and focuses it (existing pattern).
+  - Pills also remain visible after the input has text (do **not** hide them on type), to keep the guided framework prominent.
+- **Anonymous gate (1 free question):** the `gated` derivation already exists (`!user || (trialUsed && !unlimited) || capped`). Keep it, but:
+  - On the **first** answered question for an anonymous user, after `setAnswer(...)`, immediately open a new `AnonymousGateModal` (Dialog) instead of leaving the user able to keep typing into a disabled input.
+  - The modal is an editorial parchment card: "You've used your one free question with Q." → two CTAs: **Sign in** (`/login`) and **See pricing** (`/pricing`). No close-X; only an esc-to-dismiss that re-disables the input.
+  - Persist `q.trial.used = "1"` (already in place via `TRIAL_KEY`) — no schema change for this.
 
-Both `askQ` and `runQNode` already call `fetch("https://ai.gateway.lovable.dev/v1/chat/completions", ...)`. Wrap each call:
+## 2. End-of-day sentiment check-in pipeline
 
-1. `const t0 = Date.now()` before fetch
-2. After fetch, read `json.usage?.prompt_tokens` and `json.usage?.completion_tokens` (OpenAI-compatible response shape that the Lovable Gateway returns)
-3. Compute `latency_ms = Date.now() - t0`
-4. Compute `cost_micros` using a small `priceFor(model)` table in a new `src/lib/q-pricing.ts`:
-   - `google/gemini-2.5-flash`: $0.30 / 1M input, $2.50 / 1M output (list)
-   - Apply a configurable gateway multiplier (default 1.6) to approximate Lovable Gateway billing until we have real invoice data
-5. For `runQNode`, include these fields in the existing `.insert(...)` on `q_runs`
-6. For `askQ`, it currently does NOT persist anything. Add an insert of a thin telemetry row (or, cleaner: a separate `q_chat_runs` table). **Decision:** reuse `q_runs` with `node_id = 'chat:askq'` and `zones = { diagnosis: '', playbook: '', executable: '' }` so all telemetry lives in one place; one row per chat call. This also unifies the monthly cap counting in `q-usage.functions.ts` (chat already calls `assertQUnderCap`, so chat already counts — but currently doesn't write a row, which means the cap is technically off-by-one. Fixing.)
+**New schema** (single migration; the only DB change in this plan):
 
-`src/lib/q-pricing.ts` (new):
-- `PRICING: Record<string, { inPerM: number; outPerM: number }>`
-- `GATEWAY_MULTIPLIER = 1.6`
-- `computeCostMicros(model, tokensIn, tokensOut): number`
-- `formatUSD(micros): string`
+```sql
+CREATE TABLE public.user_daily_sentiment (
+  id uuid PK default gen_random_uuid(),
+  user_id uuid NOT NULL,                         -- no FK to auth.users per house rules
+  date date NOT NULL,
+  raw_text_feedback text NOT NULL,
+  calculated_sentiment_score text NOT NULL,      -- 'positive' | 'neutral' | 'negative'
+  flagged_keywords text[] NOT NULL DEFAULT '{}', -- which trigger words fired
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, date)
+);
+-- GRANT SELECT, INSERT, UPDATE on public.user_daily_sentiment TO authenticated;
+-- GRANT ALL TO service_role;
+-- RLS: owner SELECT/INSERT/UPDATE WHERE auth.uid() = user_id.
+```
 
-### Reader / aggregation — `src/lib/control-panel.functions.ts`
+**No new edge function.** Two new server fns in `src/lib/sentiment.functions.ts`:
+- `recordDailySentiment` — INSERT/UPSERT, owner-scoped via `requireSupabaseAuth`.
+- `getMonthlySentiment` — returns the last 30 daily rows for the signed-in user.
 
-Update `getAgentObservability`:
-- Sum `cost_micros`, `tokens_in`, `tokens_out`, `avg(latency_ms)` from `q_runs` over the selected window
-- For rows where telemetry columns are NULL, fall back to the existing heuristic and tag the aggregate response with `{ telemetryCoverage: realRows / totalRows }`
-- Replace the three heuristic fields:
-  - `totalTokenBurn` → real sum, `estimated: telemetryCoverage < 1`
-  - `avgLatencyMs` → real avg over non-null rows
-  - `computeProfitMargin` → MRR – (cost over same window annualized), real numbers
+**Trigger detection** (client, in `QAgentButton.handleAsk`):
+- Lightweight regex against the question for: `escalation`, `HOD`, `performance dispute`, `churn risk`, `scrutiny`, `restructuring`, `executive review`, `pip`, `appraisal conflict`. Configurable in `src/lib/sentiment.keywords.ts`.
+- If matched, set `sessionStorage["q.flagged.today"] = "<ISO date> | <keyword>"`.
 
-## Part B — Projected cost tile in control panel
+**Evening check-in UI** — new `src/components/site/EndOfDaySentimentCheckIn.tsx`, mounted in `__root.tsx` (logged-in only, same place as `QAgentButton`):
+- On mount, read `sessionStorage["q.flagged.today"]` and a local `endofday.{userId}.{YYYY-MM-DD}` flag.
+- Shows a non-intrusive bottom-right drawer (using `Sheet side="bottom"`) when:
+  - flagged today, AND
+  - local time ≥ 18:00, AND
+  - drawer not already dismissed/submitted today for this user.
+- Copy: *"Checking in. You flagged some critical corporate friction earlier today. How are you holding up? How did the escalation call or alignment connect turn out?"*
+- Large `<textarea>` (parchment card, Cormorant prompt + Instrument Sans body), Submit button.
+- On submit: call **`scoreSentiment(text)`** — a pure client lexicon scorer in `src/lib/sentiment.score.ts` (no AI gateway round-trip needed; weighted positive/negative lemma list → `positive` | `neutral` | `negative`). Then call `recordDailySentiment`. Set the local-dismiss flag.
 
-### New aggregator — `getQCostProjection` in `control-panel.functions.ts`
+**Monthly Sentiment sub-panel** — new `src/components/site/SentimentTrendPanel.tsx`, mounted inside `src/routes/account.workspace.tsx` as a new editorial section:
+- Pulls `getMonthlySentiment()` via `useQuery`.
+- Renders a thin SVG sparkline (positive=emerald, neutral=foreground/40, negative=destructive) over a 30-day rolling window, plus a 3-cell distribution matrix using existing `MetricCard` + `HealthChip` from `src/components/dashboard/` (per the dashboard-kit memory; no new color tokens).
 
-Compute:
-- Run rate: `runs_last_30d` from `q_runs`
-- Avg cost per run: `sum(cost_micros) / count(*)` over last 30d (telemetry rows only); if coverage < 50%, fall back to heuristic blended average from the cost model already used in chat
-- Projections at 1k / 10k / 100k conversations
-- Monthly projection at current run rate: `runs_last_30d * avg_cost_per_run`
-- Annualized: `monthly * 12`
+## 3. Operational resilience layer around Q
 
-### UI — `src/routes/admin.control-panel.tsx` (Diagnostics tab)
+**New file** `src/components/site/QErrorBoundary.tsx` — class component implementing `componentDidCatch`. Renders an editorial fallback card ("Q lost the signal. Your draft is safe — tap to retry.") with a retry button that resets `state.hasError` and re-mounts children.
 
-Add a new `SectionCard` "Projected Compute Cost" using existing `MetricCard` primitives (dashboard kit — no new tokens):
-- **Cost / run** (avg, last 30d) — with coverage % subtitle ("real telemetry on 78% of runs")
-- **Monthly run rate** (current) — `runs_last_30d`
-- **Projected monthly cost** at current rate
-- **Projected ARR cost** (monthly × 12)
-- A small inline table: cost @ 1k / 10k / 100k conversations
-- Footnote: "Includes Lovable Gateway multiplier (~1.6×). Replace with real invoice data once available." with a link to edit `GATEWAY_MULTIPLIER` (just docs, no UI editor)
+**Mount:** wrap `<QAgentButton />` in `__root.tsx`, and `<QAgentDrawer />` in `src/routes/csfactors.tsx`, with `<QErrorBoundary />`.
 
-Existing "(est.)" suffixes on the diagnostics tiles get removed once `telemetryCoverage === 1`; until then, keep the badge but show the live number alongside.
+**Local draft cache** in `QAgentButton` + `QAgentDrawer`:
+- On every `setQuery`/`setInput`, write to `sessionStorage["q.draft.global"]` / `"q.draft.csfactors"`.
+- On mount, hydrate from sessionStorage if non-empty.
+- Clear on successful answer.
+- Also stash the last `messages[]` array (CSFactors drawer) under `sessionStorage["q.transcript.csfactors"]` and rehydrate on remount — protects against network drops mid-session.
 
-## Out of scope
+## 4. Declutter Q UI + standardize global placement
 
-- A real billing reconciliation against the Lovable Gateway invoice (no API for that yet).
-- Per-user cost breakdown in `listMasterUsers` — easy follow-on, but not in this pass.
-- Per-model cost split UI (the column is captured; the chart can come later).
+**Declutter (`QAgentButton.tsx`):**
+- Remove the rotating capability speech bubble (`bubble`, `bubbleIdx`, `CAPABILITY_LINES`, `q-hint`) — visual noise.
+- Remove the scope toggle's caption block (lines ~306–312) and tighten margins; keep the toggle itself.
+- Increase composer padding (`p-7 md:p-9` → keep; tighten internal spacing); single 16px gutter between input, Ask button, vectors rail, and answer slot. No other typographic changes.
 
-## Verification
+**Standardize placement:**
+- Today `QAgentButton` early-returns on `/admin`, `/agent`, `/csfactors`. Loosen this:
+  - **`/csfactors`**: keep the dedicated `QAgentDrawer` (it's scoped to portfolio data, per the Q-isolation memory). Do not double-mount the global button there.
+  - **`/admin`**: keep hidden (admin surface).
+  - **All other routes including `/agent/framework` and `/job-board`**: render the global `QAgentButton` at the same fixed bottom-right anchor (`fixed bottom-20 right-5 md:bottom-28 md:right-8`).
+- No size/shape change — just remove `/agent` from the hide-list and let the existing fixed positioning do its job. This satisfies "exact same visual screen position across ALL pages".
 
-After build:
-1. Trigger one `runQNode` from a Vanguard account and one `askQ` chat → query `q_runs` and confirm `tokens_in`, `tokens_out`, `latency_ms`, `cost_micros`, `model` are populated.
-2. Control panel Diagnostics tab shows a new "Projected Compute Cost" card with non-zero values.
-3. The three previously-heuristic tiles ("Total Token Burn", "Avg Latency", "Compute Profit Margin") show real numbers for new runs, with coverage % visible.
-4. `psql` spot check: `select count(*) filter (where cost_micros is not null), count(*) from q_runs;` — coverage ratio matches what the UI reports.
+## 5. Lift Workspace + Canvas for signed-in users
 
-## Files touched
+**File:** `src/components/site/SiteHeader.tsx`.
 
-- `supabase` migration — add 5 columns to `q_runs`
-- `src/lib/q-pricing.ts` — new, pricing table + helpers
-- `src/lib/q-agent.functions.ts` — capture telemetry in both `askQ` and `runQNode`
-- `src/lib/control-panel.functions.ts` — new `getQCostProjection`, update `getAgentObservability`
-- `src/routes/admin.control-panel.tsx` — new Projected Compute Cost card, refine heuristic badges
-- `.lovable/plan.md` — refresh
+- Today: when signed in, Workspace lives only inside the avatar dropdown, Canvas (`/agent/framework`) isn't in the header at all.
+- Change: when `user` is present, render two header chips immediately before the avatar (both visible from `md:` and up; on `<md`, only Canvas chip shows to save room, full set in avatar menu):
+  - **Canvas** → `/agent/framework` (LayoutGrid icon already imported; swap for `Sparkles`-style mark? No — keep `LayoutGrid`-class chip, label "Canvas").
+  - **Workspace** → `/account/workspace` (replaces the conditional `canWorkspace` chip that currently only appears on non-home routes; show it everywhere when signed in).
+- Both rendered as `inline-flex … border border-border hover:border-accent hover:text-accent` chips in the existing mono `[0.25em]` style, matching the search/workspace chip pattern.
+- When **not** signed in, neither chip renders; the existing "Login" button stays as the last item (matches Core memory rule: sign-in is the last item when logged out).
+
+---
+
+## Technical details (out-of-band)
+
+- **Files created**
+  - `supabase/migrations/<ts>_user_daily_sentiment.sql`
+  - `src/lib/q-vectors.ts`
+  - `src/lib/sentiment.keywords.ts`
+  - `src/lib/sentiment.score.ts` (pure function, no network)
+  - `src/lib/sentiment.functions.ts` (two server fns)
+  - `src/components/site/QErrorBoundary.tsx`
+  - `src/components/site/EndOfDaySentimentCheckIn.tsx`
+  - `src/components/site/SentimentTrendPanel.tsx`
+- **Files edited (surgical)**
+  - `src/components/site/QAgentButton.tsx` — vectors rail, gate modal, declutter, draft cache, drop `/agent` from hide-list
+  - `src/components/csfactors/QAgentDrawer.tsx` — wrap in boundary, draft cache, transcript cache
+  - `src/components/site/SiteHeader.tsx` — Canvas + Workspace chips
+  - `src/routes/__root.tsx` — wrap QAgentButton, mount EndOfDaySentimentCheckIn
+  - `src/routes/csfactors.tsx` — wrap QAgentDrawer in boundary
+  - `src/routes/account.workspace.tsx` — mount SentimentTrendPanel
+- **Untouched**
+  - `askQ` / `askCSFactorsQ` server fns
+  - `/api/elevenlabs/stt`
+  - `subscriptions`, `q_runs`, `cs_*` tables and policies
+  - All other audit items (#4–#15 from the prior pass)
+  - The CSFactors Q drawer's data scope (no cross-leakage to global Q)
+
+## Open assumption to confirm
+
+I'm treating **Canvas = `/agent/framework`** (the operator decision canvas) and **Workspace = `/account/workspace`**. If "Canvas" should instead point at something new, tell me and I'll wire that route instead before building.
