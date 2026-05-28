@@ -68,7 +68,7 @@ export const TIERS: Tier[] = [
       "All six Codex playbooks",
       "AI Diagnostic full blueprint",
       "Q advisor, 30 sessions a month",
-      "General community spaces",
+      "Access to the Whiteboard to hold your article notes and pasted URLs",
     ],
     cta: "Become a Practitioner",
     ctaKind: "checkout",
