@@ -75,6 +75,30 @@ function SequencerPage() {
   };
   const onDragEnd = () => setDragIndex(null);
 
+  if (!authLoading && !user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <SiteHeader />
+        <main className="flex-1 container mx-auto px-6 py-24 max-w-2xl text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">Sequencer</p>
+          <h1 className="font-display text-4xl md:text-5xl tracking-tight leading-[0.95] mb-6">
+            Sign in to build a sequence.
+          </h1>
+          <p className="text-muted-foreground mb-8">
+            Sequences are saved to your account so you can hand them to a teammate or revisit later.
+          </p>
+          <Link
+            to="/login"
+            className="inline-block px-8 py-4 bg-foreground text-background font-mono text-xs uppercase tracking-widest font-bold hover:bg-accent transition-colors"
+          >
+            Sign in →
+          </Link>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
