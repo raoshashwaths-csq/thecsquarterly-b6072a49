@@ -173,7 +173,8 @@ export function QAgentButton() {
 
   const handleOpen = () => { setOpen(true); dismissAttention(); };
 
-  const gated = trialUsed && !unlimited;
+  const gated = !user || (trialUsed && !unlimited);
+  const needsSignIn = !user;
 
   const handleAsk = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -299,7 +300,7 @@ export function QAgentButton() {
                 onChange={(e) => setQuery(e.target.value)}
                 disabled={loading}
                 maxLength={1000}
-                placeholder={gated ? "Subscribe to Vanguard to keep asking Q." : currentPlaceholder}
+                placeholder={needsSignIn ? "Sign in to ask Q." : gated ? "Subscribe to Vanguard to keep asking Q." : currentPlaceholder}
                 className="w-full border border-border bg-background px-4 py-3.5 font-body text-base focus:outline-none focus:border-foreground transition-colors disabled:opacity-50"
               />
               <button
@@ -307,7 +308,7 @@ export function QAgentButton() {
                 disabled={loading || gated || !query.trim()}
                 className="w-full mt-2 py-3.5 bg-foreground text-background font-mono text-[11px] uppercase tracking-[0.3em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {loading ? <><QMark periodClassName="text-accent-foreground/70" /> is thinking…</> : gated ? "Trial used" : <>Ask <QMark periodClassName="text-accent-foreground/70" /></>}
+                {loading ? <><QMark periodClassName="text-accent-foreground/70" /> is thinking…</> : needsSignIn ? "Sign in to ask" : gated ? "Trial used" : <>Ask <QMark periodClassName="text-accent-foreground/70" /></>}
               </button>
             </form>
 
@@ -363,7 +364,15 @@ export function QAgentButton() {
               </div>
             )}
 
-            {gated && (
+            {needsSignIn ? (
+              <Link
+                to="/login"
+                onClick={() => setOpen(false)}
+                className="block text-center mb-3 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
+              >
+                Sign in to ask <QMark />
+              </Link>
+            ) : gated && (
               <Link
                 to="/pricing"
                 onClick={() => setOpen(false)}
