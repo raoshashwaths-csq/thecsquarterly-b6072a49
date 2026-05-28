@@ -192,7 +192,6 @@ function HomePage() {
             {SECTIONS.length} disciplines
           </div>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
           {SECTIONS.map((s, i) => (
             <Link
               key={s.to}
@@ -203,10 +202,13 @@ function HomePage() {
               <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
               <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">{s.name}</h2>
               <p className="text-sm text-foreground/65 text-pretty mb-4">{s.blurb}</p>
-              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors">
+              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors mb-3">
                 Enter section →
               </div>
+              <QHint>{s.hint}</QHint>
             </Link>
+          ))}
+
           ))}
         </div>
       </section>
