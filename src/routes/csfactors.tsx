@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
@@ -73,6 +73,8 @@ function CSFactorsPageInner() {
   const ask = useServerFn(askCSFactorsQ);
   const { filter, setFilter, applyPrompt } = useQFilter();
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const [greet, setGreet] = useState("Hello");
+  useEffect(() => { setGreet(greeting()); }, []);
 
   // Operator-tier gate
   if (!authLoading && !entLoading && user) {
@@ -191,8 +193,8 @@ function CSFactorsPageInner() {
               <div className="font-mono uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3 text-xs">
                 CSFactors / Command Center
               </div>
-              <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight">
-                {greeting()},{" "}
+              <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight" suppressHydrationWarning>
+                {greet},{" "}
                 <span className="italic text-accent">{firstName}.</span>
               </h1>
               <p className="text-foreground/70 mt-3 max-w-2xl text-sm md:text-base">
