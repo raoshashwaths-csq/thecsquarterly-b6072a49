@@ -149,7 +149,7 @@ export const logAccountEvent = createServerFn({ method: "POST" })
       .object({
         account_id: z.string().uuid(),
         kind: z.string().min(1).max(60),
-        payload: z.record(z.unknown()).default({}),
+        payload: z.any().optional(),
       })
       .parse(d),
   )
