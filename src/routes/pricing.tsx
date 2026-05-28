@@ -241,7 +241,7 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
               <Check size={14} className="mt-1 shrink-0 text-accent" />
               {isJob ? (
                 <span className="flex flex-wrap items-center gap-2">
-                  <span className="text-foreground/50 blur-[1.5px] select-none">{text}</span>
+                  <span className="text-foreground/50 blur-[5px] select-none">{text}</span>
                   <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
                     Stay tuned ✨
                   </span>
@@ -431,7 +431,7 @@ function RowGroup({ group }: { group: Group }) {
         >
           {isJobGroup ? (
             <span className="inline-flex items-center gap-3">
-              <span className="blur-[1.5px] select-none">{group.group}</span>
+              <span className="blur-[5px] select-none">{group.group}</span>
               <span className="text-secondary-accent">Stay tuned ✨</span>
             </span>
           ) : (
@@ -443,11 +443,11 @@ function RowGroup({ group }: { group: Group }) {
         const blurRow = r.label.toLowerCase().includes("job posting");
         return (
           <tr key={r.label} className="border-b border-border/60 last:border-b-0">
-            <td className={"px-4 py-3 text-foreground/80 " + (blurRow ? "blur-[1.5px] select-none" : "")}>
+            <td className={"px-4 py-3 text-foreground/80 " + (blurRow ? "blur-[5px] select-none" : "")}>
               {r.label}
             </td>
             {r.values.map((v, i) => (
-              <td key={i} className={"px-4 py-3 text-center " + (blurRow ? "blur-[1.5px] select-none" : "")}>
+              <td key={i} className={"px-4 py-3 text-center " + (blurRow ? "blur-[5px] select-none" : "")}>
                 {typeof v === "boolean" ? (
                   v ? (
                     <Check size={14} className="inline text-accent" />

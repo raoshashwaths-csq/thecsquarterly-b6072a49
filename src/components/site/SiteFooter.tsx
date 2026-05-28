@@ -128,7 +128,7 @@ function FooterCol({
           <li key={l.label}>
             {l.comingSoon ? (
               <span className="inline-flex items-center gap-2 font-body text-sm">
-                <span className="text-background/40 blur-[1.5px] select-none">{l.label}</span>
+                <span className="text-background/40 blur-[5px] select-none">{l.label}</span>
                 <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
                   Stay tuned ✨
                 </span>
