@@ -156,10 +156,7 @@ export function QAgentButton() {
     setLoading(true);
     setAnswer(null);
     try {
-      const prefix = scope === "workspace"
-        ? "Answer using ONLY the operator's saved Workspace context if relevant; otherwise say you have nothing on file.\n\nQuestion: "
-        : "";
-      const { reply } = await ask({ data: { question: prefix + query, witty: false } });
+      const { reply } = await ask({ data: { question: query, witty: false } });
       setAnswer(reply);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* */ }
       usage.refetch();
