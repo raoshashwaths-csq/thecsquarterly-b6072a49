@@ -361,7 +361,7 @@ const COMPARE_GROUPS: Group[] = [
   {
     group: "Community & learning",
     rows: [
-      { label: "General community spaces", values: [false, true, true, true, true, true, true] },
+      { label: "Access to the Whiteboard to hold your article notes and pasted URLs", values: [false, true, true, true, true, true, true] },
       { label: "VP+ community space", values: [false, false, true, true, true, true, true] },
       { label: "Assignable learning paths", values: [false, false, false, true, true, true, true] },
       { label: "Certified learning paths", values: [false, false, false, false, false, true, true] },
