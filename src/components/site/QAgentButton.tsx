@@ -117,19 +117,15 @@ export function QAgentButton() {
   useEffect(() => {
     const q = query.trim();
     if (!q) { setHits([]); return; }
-    if (scope === "workspace" && !user) { setHits([]); return; }
     setSearchLoading(true);
     const t = setTimeout(() => {
-      const call = scope === "universal"
-        ? runUniversal({ data: { q } })
-        : runWorkspace({ data: { q } });
-      call
+      runUniversal({ data: { q } })
         .then((r) => setHits(r.hits ?? []))
         .catch(() => setHits([]))
         .finally(() => setSearchLoading(false));
     }, 200);
     return () => clearTimeout(t);
-  }, [query, scope, user, runUniversal, runWorkspace]);
+  }, [query, runUniversal]);
 
   const handleOpen = () => { setOpen(true); };
 
