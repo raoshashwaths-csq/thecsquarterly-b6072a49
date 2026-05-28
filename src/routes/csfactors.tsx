@@ -154,7 +154,7 @@ function CSFactorsPageInner() {
         <div className="md:hidden sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-3 py-2 flex items-center justify-between gap-2">
           <MobileNavDrawer onOpenWorkspace={() => setWorkspaceOpen(true)} />
           <Link to="/csfactors" aria-label="CSFactors home">
-            <CSFLogo size="sm" />
+            <CSFLogo size="md" />
           </Link>
           <ThemeToggle />
         </div>
