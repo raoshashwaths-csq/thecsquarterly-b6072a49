@@ -47,6 +47,7 @@ export function QAgentButton() {
   const [loading, setLoading] = useState(false);
   const [trialUsed, setTrialUsed] = useState(false);
   const [unlimited, setUnlimited] = useState(false);
+  const [gateModal, setGateModal] = useState(false);
 
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -60,7 +61,6 @@ export function QAgentButton() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
-  const prevUserIdRef = useRef<string | null>(null);
   const speech = useElevenLabsSpeechInput({
     onTranscript: (text) => {
       setQuery((current) => (current ? `${current} ${text}` : text));
@@ -68,39 +68,24 @@ export function QAgentButton() {
     },
   });
 
-  // Sample 3 terminal-node prompt templates to seed the suggestion chips.
-  const suggestions = useMemo(() => {
-    const terminals = NODES.filter((n) => n.isTerminal && n.promptTemplate);
-    const picks: string[] = [];
-    const step = Math.max(1, Math.floor(terminals.length / 3));
-    for (let i = 0; i < terminals.length && picks.length < 3; i += step) {
-      picks.push(terminals[i].label);
-    }
-    return picks;
-  }, []);
-
+  // Hydrate trial state + draft cache on mount.
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       setTrialUsed(localStorage.getItem(TRIAL_KEY) === "1");
-      if (localStorage.getItem(SEEN_KEY) !== "1") {
-        const t = setTimeout(() => {
-          setAttention(true);
-          setBubble(true);
-        }, 1200);
-        return () => clearTimeout(t);
-      }
+      const draft = sessionStorage.getItem(DRAFT_KEY);
+      if (draft) setQuery(draft);
     } catch { /* */ }
   }, []);
 
-  // Rotate capability messages in the floating speech bubble.
+  // Persist draft as user types (resilience layer).
   useEffect(() => {
-    if (!bubble) return;
-    const t = setInterval(() => {
-      setBubbleIdx((i) => (i + 1) % CAPABILITY_LINES.length);
-    }, 3800);
-    return () => clearInterval(t);
-  }, [bubble]);
+    if (typeof window === "undefined") return;
+    try {
+      if (query) sessionStorage.setItem(DRAFT_KEY, query);
+      else sessionStorage.removeItem(DRAFT_KEY);
+    } catch { /* */ }
+  }, [query]);
 
   // Rotate placeholder prompts inside the search bar.
   useEffect(() => {
@@ -124,26 +109,6 @@ export function QAgentButton() {
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
-  useEffect(() => {
-    const prev = prevUserIdRef.current;
-    const current = user?.id ?? null;
-    prevUserIdRef.current = current;
-    if (!current || prev === current) return;
-    try {
-      const key = `${LOGIN_HINT_KEY}.${current}`;
-      if (localStorage.getItem(key) === "1") return;
-      localStorage.setItem(key, "1");
-    } catch { /* */ }
-    const inT = window.setTimeout(() => {
-      setAttention(true);
-      setBubbleLeaving(false);
-      setBubble(true);
-    }, 800);
-    const leaveT = window.setTimeout(() => setBubbleLeaving(true), 800 + 8000);
-    const outT = window.setTimeout(() => setBubble(false), 800 + 8000 + 320);
-    return () => { window.clearTimeout(inT); window.clearTimeout(leaveT); window.clearTimeout(outT); };
-  }, [user?.id]);
-
   // Debounced live search as the operator types.
   useEffect(() => {
     const q = query.trim();
@@ -162,14 +127,8 @@ export function QAgentButton() {
     return () => clearTimeout(t);
   }, [query, scope, user, runUniversal, runWorkspace]);
 
-  const dismissAttention = () => {
-    setAttention(false);
-    setBubbleLeaving(true);
-    window.setTimeout(() => setBubble(false), 300);
-    try { localStorage.setItem(SEEN_KEY, "1"); } catch { /* */ }
-  };
+  const handleOpen = () => { setOpen(true); };
 
-  const handleOpen = () => { setOpen(true); dismissAttention(); };
 
   // Monthly Q interaction cap (designation-tier scoped).
   const usage = useQuery({
