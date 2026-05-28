@@ -16,7 +16,7 @@ import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
-import { Search, LayoutGrid } from "lucide-react";
+import { Search, LayoutGrid, Compass } from "lucide-react";
 
 const sections = [
   { to: "/vanguard", label: "Vanguard" },
@@ -100,6 +100,18 @@ export function SiteHeader() {
                   <Search size={13} strokeWidth={2.75} />
                   <span className="hidden md:inline text-[10px] tracking-widest">⌘K</span>
                 </button>
+              )}
+
+              {user && (
+                <Link
+                  to="/agent/framework"
+                  aria-label="Decision Canvas"
+                  title="Decision Canvas"
+                  className="inline-flex items-center justify-center gap-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px] px-2.5 py-1.5"
+                >
+                  <Compass size={13} strokeWidth={2.75} />
+                  <span className="hidden md:inline text-[10px] tracking-widest">Canvas</span>
+                </Link>
               )}
 
               {user && canWorkspace && (
