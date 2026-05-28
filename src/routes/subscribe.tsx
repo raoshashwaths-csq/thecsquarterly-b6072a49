@@ -85,27 +85,50 @@ function FreeBriefingLanding() {
 function TierConfirm({ designation }: { designation: Designation }) {
   const tier = getTier(designation)!;
   const { user } = useAuth();
-  const fetchMe = useServerFn(getMe);
-  const startSub = useServerFn(startSubscriptionPlaceholder);
-  const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe(), enabled: !!user });
+  const [cadence, setCadence] = useState<Cadence>("monthly");
+  const [checkingOut, setCheckingOut] = useState(false);
 
-  const onCheckout = async () => {
-    if (tier.ctaKind === "contact") {
+  const priceId = priceIdFor(designation, cadence);
+  const annualSaving =
+    tier.priceMonthlyValue > 0
+      ? `Save ~$${(tier.priceMonthlyValue * 12 - tier.priceMonthlyValue * 10).toLocaleString()} a year`
+      : "";
+
+  const onCheckout = () => {
+    if (tier.ctaKind === "contact" || !priceId) {
       window.location.href = tierMailto(tier.label);
       return;
     }
     if (!user) {
-      window.location.href = "/login";
+      window.location.href = `/login?return=/subscribe?tier=${designation}`;
       return;
     }
-    try {
-      await startSub();
-      toast.success(`${tier.label} activated (preview). Checkout wires up next release.`);
-      me.refetch();
-    } catch (e) {
-      toast.error((e as Error).message);
-    }
+    setCheckingOut(true);
   };
+
+  if (checkingOut && priceId && user) {
+    return (
+      <section className="max-w-2xl mx-auto px-6 py-16 animate-fade-up">
+        <button
+          type="button"
+          onClick={() => setCheckingOut(false)}
+          className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/60 hover:text-foreground mb-8"
+        >
+          <ArrowLeft size={12} />
+          Back
+        </button>
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+          Secure checkout · {cadence === "monthly" ? "Monthly" : "Annual"}
+        </div>
+        <h1 className="font-display text-3xl tracking-tight mb-6">{tier.label}.</h1>
+        <StripeEmbeddedCheckout
+          priceId={priceId}
+          userId={user.id}
+          customerEmail={user.email ?? undefined}
+        />
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-20 animate-fade-up">
@@ -126,13 +149,39 @@ function TierConfirm({ designation }: { designation: Designation }) {
       <p className="text-lg text-foreground/70 max-w-2xl mb-10">{tier.tagline}</p>
 
       <div className="border-2 border-accent bg-card p-8">
+        {priceId && (
+          <div className="inline-flex border border-border mb-6">
+            <button
+              type="button"
+              onClick={() => setCadence("monthly")}
+              className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] ${cadence === "monthly" ? "bg-foreground text-background" : "text-foreground/60"}`}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setCadence("yearly")}
+              className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] ${cadence === "yearly" ? "bg-foreground text-background" : "text-foreground/60"}`}
+            >
+              Annual · 2 mo free
+            </button>
+          </div>
+        )}
+
         <div className="flex items-baseline gap-3 mb-1">
-          <span className="font-display text-6xl leading-none">{tier.priceMonthly}</span>
+          <span className="font-display text-6xl leading-none">
+            {cadence === "yearly" && tier.priceMonthlyValue > 0
+              ? `$${(tier.priceMonthlyValue * 10).toLocaleString()}`
+              : tier.priceMonthly}
+          </span>
           <span className="text-sm text-muted-foreground">
-            {tier.priceMonthlyValue === 0 ? "" : "/ month"}
+            {tier.priceMonthlyValue === 0 ? "" : cadence === "yearly" ? "/ year" : "/ month"}
           </span>
         </div>
-        {tier.priceAnnual && (
+        {cadence === "yearly" && annualSaving && (
+          <div className="text-xs text-secondary-accent mb-6">{annualSaving}</div>
+        )}
+        {cadence === "monthly" && tier.priceAnnual && (
           <div className="text-xs text-muted-foreground mb-6">{tier.priceAnnual}</div>
         )}
 
@@ -164,12 +213,16 @@ function TierConfirm({ designation }: { designation: Designation }) {
           onClick={onCheckout}
           className="block w-full py-3.5 text-center font-mono text-[10px] uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all"
         >
-          {tier.ctaKind === "contact" ? tier.cta : "Continue to checkout"}
+          {tier.ctaKind === "contact"
+            ? tier.cta
+            : !user
+              ? "Sign in to continue"
+              : "Continue to checkout"}
         </button>
 
         {tier.ctaKind !== "contact" && (
           <p className="text-xs text-foreground/55 text-center mt-4">
-            Cancel or change tiers any time. Annual plans carry a two-month discount.
+            Cancel any time — access continues until the end of your billing period.
           </p>
         )}
       </div>
