@@ -1,8 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
 import { toast } from "sonner";
 import { Check, ArrowLeft } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -13,14 +11,20 @@ import { TIERS, getTier, tierMailto, type Designation } from "@/lib/tiers";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, startSubscriptionPlaceholder } from "@/lib/auth.functions";
 
-const DESIGNATIONS = TIERS.map((t) => t.designation) as [Designation, ...Designation[]];
+const DESIGNATIONS = new Set<string>(TIERS.map((t) => t.designation));
 
-const searchSchema = z.object({
-  tier: fallback(z.enum(DESIGNATIONS), undefined as unknown as Designation).optional(),
-});
+type SubscribeSearch = { tier?: Designation };
+
+function validateSearch(input: Record<string, unknown>): SubscribeSearch {
+  const t = input.tier;
+  if (typeof t === "string" && DESIGNATIONS.has(t)) {
+    return { tier: t as Designation };
+  }
+  return {};
+}
 
 export const Route = createFileRoute("/subscribe")({
-  validateSearch: zodValidator(searchSchema),
+  validateSearch,
   head: () => ({
     meta: [
       { title: "Subscribe — The CS Quarterly" },
