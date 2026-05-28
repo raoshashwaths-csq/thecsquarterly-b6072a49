@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Reveal } from "@/components/site/Reveal";
 import { listMySequences, saveSequence } from "@/lib/enterprise.functions";
 import { listPosts } from "@/lib/posts.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/sequencer")({
   head: () => ({
@@ -31,13 +32,18 @@ export const Route = createFileRoute("/sequencer")({
 type Item = { slug: string; title: string };
 
 function SequencerPage() {
+  const { user, loading: authLoading } = useAuth();
   const fetchSeqs = useServerFn(listMySequences);
   const fetchPosts = useServerFn(listPosts);
   const save = useServerFn(saveSequence);
   const qc = useQueryClient();
 
   const { data: posts } = useQuery({ queryKey: ["posts"], queryFn: () => fetchPosts() });
-  const { data: seqs } = useQuery({ queryKey: ["mySequences"], queryFn: () => fetchSeqs() });
+  const { data: seqs } = useQuery({
+    queryKey: ["mySequences"],
+    queryFn: () => fetchSeqs(),
+    enabled: !!user,
+  });
 
   const [items, setItems] = useState<Item[]>([]);
   const [name, setName] = useState("");
@@ -68,6 +74,30 @@ function SequencerPage() {
     setItems(next);
   };
   const onDragEnd = () => setDragIndex(null);
+
+  if (!authLoading && !user) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <SiteHeader />
+        <main className="flex-1 container mx-auto px-6 py-24 max-w-2xl text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">Sequencer</p>
+          <h1 className="font-display text-4xl md:text-5xl tracking-tight leading-[0.95] mb-6">
+            Sign in to build a sequence.
+          </h1>
+          <p className="text-muted-foreground mb-8">
+            Sequences are saved to your account so you can hand them to a teammate or revisit later.
+          </p>
+          <Link
+            to="/login"
+            className="inline-block px-8 py-4 bg-foreground text-background font-mono text-xs uppercase tracking-widest font-bold hover:bg-accent transition-colors"
+          >
+            Sign in →
+          </Link>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
