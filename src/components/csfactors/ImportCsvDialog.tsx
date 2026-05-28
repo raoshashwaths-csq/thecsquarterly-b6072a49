@@ -25,8 +25,8 @@ const HEADERS = [
 const TEMPLATE_HEADERS = HEADERS.map((h) => (REQUIRED.has(h) ? `${h}*` : h));
 
 const SAMPLE = [
-  HEADERS.join(","),
-  `Acme Corp,Enterprise,120000,84,Completed,Q3-2026,Jane Doe,John Smith,,Strong adoption,UCC-001,Maria K,David L,Priya S,Sam B,CS Team,Tom R,Anu G,2026-09-15,140000,120000,Adopted,2024-01-10,Boston,Positive,420,USA,Northeast,2024-03-01,2024-02-15,100,Lina P,Hari V,AWS us-east-1,prod-na-01,true,SAP,Salesforce,NA,Standard,9,Manufacturing`,
+  TEMPLATE_HEADERS.join(","),
+  `Acme Corp,Enterprise,120000,84,Completed,Q3-2026,Jane Doe,John Smith,,Strong adoption,UCC-001,Maria K,David L,Priya S,Sam B,CS Team,Tom R,2026-09-15,140000,120000,Adopted,2024-01-10,Boston,Positive,420,USA,Northeast,2024-03-01,2024-02-15,100,Lina P,Hari V,AWS us-east-1,prod-na-01,true,SAP,Salesforce,NA,Standard,9,Manufacturing`,
   `Stark Industries,Enterprise,450000,42,Overdue,Q2-2026,,,Champion left,At risk,UCC-002,Maria K,Jamie T,David L,,CS Team,,2026-06-30,500000,450000,Onboarding,2025-11-01,Malibu,Critical,1800,USA,West,,2026-04-01,55,Lina P,,Azure westus2,prod-na-02,true,Oracle,HubSpot,NA,Premium,4,Aerospace`,
 ].join("\n") + "\n";
 
