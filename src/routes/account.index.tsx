@@ -6,9 +6,12 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { OperatorTools } from "@/components/site/OperatorTools";
+import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
+import { SectionCard } from "@/components/dashboard/SectionCard";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth.functions";
+
 
 
 export const Route = createFileRoute("/account/")({
