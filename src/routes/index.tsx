@@ -119,6 +119,7 @@ function HomePage() {
         <div className="mt-4 flex justify-center">
           <Link
             to="/account/workspace"
+            data-tour="workspace-icon"
             className="group w-full max-w-2xl inline-flex items-center gap-4 bg-card border border-border hover:border-accent transition-colors p-4 md:p-5 text-left"
             aria-label="Open your Workspace"
           >
