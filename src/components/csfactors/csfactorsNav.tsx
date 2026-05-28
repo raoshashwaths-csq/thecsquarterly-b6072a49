@@ -11,6 +11,7 @@ import {
   Gauge,
   FolderOpen,
   Users2,
+  BookUser,
 } from "lucide-react";
 
 export type NavLink = {
@@ -39,6 +40,7 @@ export const STANDALONE_LINKS: NavLink[] = [
   { to: "/ai-readiness", label: "AI Readiness Diagnostic", icon: Gauge },
   { to: "/calculator", label: "ROI Calculator", icon: Calculator },
   { to: "/benchmarks", label: "NRR Benchmarks", icon: BarChart3 },
+  { to: "/directory", label: "Operator Directory", icon: BookUser },
   { to: "/teams", label: "Teams", icon: Users2 },
 ];
 
