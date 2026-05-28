@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Mic, Send, Sparkle, Square, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { QMark } from "@/components/site/QMark";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { CSFACTORS_Q_TREE } from "@/lib/csfactors-q-tree";
 import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
+import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { cn } from "@/lib/utils";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -22,11 +24,21 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
   });
 
   const ask = useServerFn(askCSFactorsQ);
+  const fetchUsage = useServerFn(getMonthlyQUsage);
+  const usage = useQuery({
+    queryKey: ["q-monthly-usage"],
+    queryFn: () => fetchUsage(),
+    enabled: open,
+    staleTime: 30_000,
+  });
+  const capped = usage.data && usage.data.cap !== null && usage.data.used >= usage.data.cap;
+
   const mut = useMutation({
     mutationFn: async (q: string) => ask({ data: { question: q, history: messages.slice(-10) } }),
     onSuccess: (res) => {
       setMessages((m) => [...m, { role: "assistant", content: res.reply || "(no reply)" }]);
       setError(null);
+      usage.refetch();
     },
     onError: (e: Error) => setError(e.message),
   });
@@ -41,7 +53,7 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
 
   function send(text: string) {
     const q = text.trim();
-    if (!q || mut.isPending) return;
+    if (!q || mut.isPending || capped) return;
     setMessages((m) => [...m, { role: "user", content: q }]);
     setInput("");
     mut.mutate(q);
