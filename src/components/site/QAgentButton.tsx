@@ -349,19 +349,6 @@ export function QAgentButton() {
               </>
             )}
 
-
-            {/* Q replies */}
-            {answer && (
-              <div className="mb-5 border-l-2 border-accent pl-4 py-1">
-                <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-2">
-                  <QMark /> replies
-                </div>
-                <div className="font-body text-[15px] text-foreground/85 leading-relaxed whitespace-pre-wrap">
-                  {answer}
-                </div>
-              </div>
-            )}
-
             {needsSignIn ? (
               <Link
                 to="/login"
