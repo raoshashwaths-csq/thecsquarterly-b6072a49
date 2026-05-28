@@ -251,18 +251,29 @@ function OverviewTab() {
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
         {isLoading ? (
-          [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[100px]" />)
+          [...Array(5)].map((_, i) => <Skeleton key={i} className="h-[100px]" />)
         ) : (
           <>
             <MetricCard accent label="Total MRR" value={fmtUsd(data?.mrrCents ?? 0)} sub="Active paid subs × tier price" />
-            <MetricCard label="Active Paid Subscribers" value={fmtNum(data?.paidSubscribers ?? 0)} sub="Vanguard tier and above" />
+            <MetricCard label="ARR run-rate" value={fmtUsd(data?.arrCents ?? 0)} sub="MRR × 12" />
+            <MetricCard label="Active Paid Subscribers" value={fmtNum(data?.paidSubscribers ?? 0)} sub="Practitioner and above" />
             <MetricCard label="Active Job Listings" value={fmtNum(data?.activeJobs ?? 0)} sub="Live on storefront" />
             <MetricCard label="Agent Sessions MTD" value={fmtNum(data?.agentSessionsMTD ?? 0)} sub="Month-to-date Q. runs" />
           </>
         )}
       </div>
+
+      {data?.tierBreakdown && (
+        <div className="flex flex-wrap gap-1.5 mb-6">
+          {data.tierBreakdown.map((t) => (
+            <Badge key={t.designation} variant="outline" className="text-[10px] tabular-nums">
+              {TIER_LABEL[t.designation] ?? t.designation} · <span className="ml-1 font-mono">{t.count}</span>
+            </Badge>
+          ))}
+        </div>
+      )}
 
       <div className="rounded-md border border-border bg-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
