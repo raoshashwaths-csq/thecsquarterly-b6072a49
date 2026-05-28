@@ -31,7 +31,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
       <SiteHeader />
 
       <header className="max-w-5xl mx-auto px-6 pt-24 pb-16 animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">
           {eyebrow}
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-8">
@@ -48,7 +48,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
           <h2 className="font-display text-4xl">
             {posts.length > 0 ? "Dispatches in this section" : "What lives in this section"}
           </h2>
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
             {posts.length} {posts.length === 1 ? "essay" : "essays"}
           </span>
         </div>
@@ -62,7 +62,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
                 params={{ slug: p.slug }}
                 className="group block border-t border-border pt-6"
               >
-                <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
+                <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   <span className="text-accent">{p.category}</span>
                   <span>{p.read_minutes} min</span>
                 </div>
@@ -70,7 +70,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
                   {p.title}
                 </h3>
                 <p className="text-foreground/70 text-pretty">{p.excerpt}</p>
-                <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-secondary-accent">
+                <div className="mt-4 font-mono uppercase tracking-widest text-xs text-secondary-accent">
                   Read essay →
                 </div>
               </Link>
@@ -91,7 +91,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
 
       {posts.length > 0 && (
         <section className="max-w-7xl w-full mx-auto px-6 pb-20">
-          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-10">
+          <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-10">
             The editorial spine of this section
           </div>
           <div className="grid md:grid-cols-3 gap-x-12 gap-y-12">
@@ -112,7 +112,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] opacity-60 mb-6">
             Subscribe to the dispatch
           </div>
           <h3 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
@@ -124,7 +124,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
           <div className="max-w-md mx-auto">
             <NewsletterInline source={`section-${sectionSlug}`} />
           </div>
-          <Link to="/insights" className="inline-block mt-8 font-mono text-[10px] uppercase tracking-widest underline underline-offset-4 opacity-70 hover:opacity-100">
+          <Link to="/insights" className="inline-block mt-8 font-mono uppercase tracking-widest text-xs underline underline-offset-4 opacity-70 hover:opacity-100">
             ← Back to the full archive
           </Link>
         </div>

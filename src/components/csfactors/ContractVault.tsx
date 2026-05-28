@@ -117,7 +117,7 @@ export function ContractVault({
     <div className="space-y-4">
       {window90.band && (
         <div className="border-l-[3px] border-l-accent bg-accent/5 px-4 py-3">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-1">
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-1">
             Critical Notification Window — {window90.band}d
           </div>
           <p className="text-xs text-foreground/80">
@@ -149,7 +149,7 @@ export function ContractVault({
         <p className="text-xs text-foreground/70">
           {uploading ? "Uploading…" : "Drop MSA / SOW / Amendment here, or click to choose a file"}
         </p>
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+        <p className="font-mono uppercase tracking-widest text-xs text-muted-foreground mt-1">
           PDF · DOCX · PNG · max 20MB
         </p>
         <input
@@ -226,7 +226,7 @@ export function ContractVault({
                     checked={r.auto_renewal}
                     onCheckedChange={(v) => patch(r, { auto_renewal: v })}
                   />
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
                     Auto-renewal
                   </span>
                 </div>

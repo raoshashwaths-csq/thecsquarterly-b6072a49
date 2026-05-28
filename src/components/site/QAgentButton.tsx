@@ -201,7 +201,7 @@ export function QAgentButton() {
         >
           <div className="p-7 md:p-9">
             <SheetHeader className="text-left mb-7">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-5">
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-5">
                 Operator Agent · Beta
               </div>
               <SheetTitle asChild>
@@ -219,7 +219,7 @@ export function QAgentButton() {
               <button
                 type="button"
                 onClick={() => { setScope("universal"); setHits([]); }}
-                className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
                   scope === "universal" ? "bg-foreground text-background" : "hover:bg-muted"
                 }`}
               >
@@ -229,7 +229,7 @@ export function QAgentButton() {
                 type="button"
                 onClick={() => { setScope("workspace"); setHits([]); }}
                 disabled={!user}
-                className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                   scope === "workspace" ? "bg-foreground text-background" : "hover:bg-muted"
                 }`}
               >
@@ -298,7 +298,7 @@ export function QAgentButton() {
             {query && (
               <div className="mb-5 space-y-2">
                 {searchLoading && hits.length === 0 && (
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Searching…</div>
+                  <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Searching…</div>
                 )}
                 {!searchLoading && hits.length === 0 && (
                   <div className="text-sm text-foreground/60">
@@ -316,7 +316,7 @@ export function QAgentButton() {
             {/* Q replies */}
             {answer && (
               <div className="mb-5 border-l-2 border-accent pl-4 py-1">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-2">
+                <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-2">
                   <QMark /> replies
                 </div>
                 <div className="font-body text-[15px] text-foreground/85 leading-relaxed whitespace-pre-wrap">
@@ -329,7 +329,7 @@ export function QAgentButton() {
               <Link
                 to="/login"
                 onClick={() => setOpen(false)}
-                className="block text-center mb-3 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
+                className="block text-center mb-3 py-3 border border-foreground font-mono text-xs uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
               >
                 Sign in to ask <QMark />
               </Link>
@@ -337,7 +337,7 @@ export function QAgentButton() {
               <Link
                 to="/pricing"
                 onClick={() => setOpen(false)}
-                className="block text-center mb-3 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
+                className="block text-center mb-3 py-3 border border-foreground font-mono text-xs uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
               >
                 Unlock unlimited <QMark periodClassName="text-accent-foreground/70" /> · Vanguard
               </Link>
@@ -350,7 +350,7 @@ export function QAgentButton() {
       <Dialog open={gateModal} onOpenChange={setGateModal}>
         <DialogContent className="max-w-md bg-background border border-border p-7">
           <DialogHeader className="text-left">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
               <QMark /> · Trial complete
             </div>
             <DialogTitle asChild>
@@ -366,14 +366,14 @@ export function QAgentButton() {
             <Link
               to="/login"
               onClick={() => { setGateModal(false); setOpen(false); }}
-              className="text-center py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
+              className="text-center py-3 border border-foreground font-mono text-xs uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
             >
               Sign in
             </Link>
             <Link
               to="/pricing"
               onClick={() => { setGateModal(false); setOpen(false); }}
-              className="text-center py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+              className="text-center py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.25em] hover:bg-accent transition-colors"
             >
               See pricing
             </Link>
@@ -396,7 +396,7 @@ function ResultRow({ hit, onClose }: { hit: SearchHit; onClose: () => void }) {
     <div className="flex items-start gap-3 border border-border p-3 hover:border-accent transition-colors group">
       <Icon className="w-4 h-4 mt-0.5 text-accent shrink-0" />
       <div className="min-w-0 flex-1">
-        <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-secondary-accent mb-0.5">
+        <div className="font-mono text-xs uppercase tracking-[0.2em] text-secondary-accent mb-0.5">
           {hit.kind}{hit.category ? ` · ${hit.category}` : ""}
         </div>
         <div className="font-display text-[15px] leading-snug group-hover:text-accent transition-colors break-words">

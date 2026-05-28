@@ -26,7 +26,7 @@ function ApiManagementPage() {
       <div className="min-h-screen flex flex-col">
         <SiteHeader />
         <main className="flex-1 max-w-3xl mx-auto px-6 py-16 w-full">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent">Loading…</div>
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent">Loading…</div>
         </main>
         <SiteFooter />
       </div>
@@ -52,7 +52,7 @@ function ApiManagementPage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 max-w-3xl mx-auto px-6 py-16 w-full">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">
           Account / API
         </div>
         <h1 className="font-display text-5xl tracking-tight mb-3">API management</h1>

@@ -112,7 +112,7 @@ function RetentionFunnelPage() {
                   <div key={s.key} className="space-y-1.5">
                     <div className="flex items-baseline justify-between gap-3 text-sm">
                       <div className="flex items-baseline gap-3 min-w-0">
-                        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground w-6 shrink-0">
+                        <span className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground w-6 shrink-0">
                           0{i + 1}
                         </span>
                         <span className="font-display text-base md:text-lg tracking-tight truncate">{s.label}</span>
@@ -133,7 +133,7 @@ function RetentionFunnelPage() {
                         style={{ width: `${widthPct}%` }}
                       >
                         {widthPct > 15 && (
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-accent-foreground">
+                          <span className="font-mono uppercase tracking-widest text-xs text-accent-foreground">
                             {stageRetention}%
                           </span>
                         )}
@@ -158,7 +158,7 @@ function RetentionFunnelPage() {
                 const dropPct = pct(drop, prev.count);
                 return (
                   <div key={s.key} className="bg-card p-5">
-                    <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+                    <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
                       {prev.label} → {s.label}
                     </div>
                     <div className="font-display text-3xl tracking-tight mb-1 tabular-nums">

@@ -210,7 +210,7 @@ export function AudioBar({
     <div className={container} onClick={!hintDismissed ? dismissHint : undefined}>
       <div className="flex flex-wrap items-center gap-2">
         <Headphones className="w-3.5 h-3.5 text-muted-foreground" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground pr-1">
+        <span className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground pr-1">
           Listen{voice && /en[-_]IN/i.test(voice.lang) ? " · IN" : ""}
         </span>
         <button
@@ -236,7 +236,7 @@ export function AudioBar({
         >
           <Gauge className="w-3.5 h-3.5" /> {rate}x
         </button>
-        <span className="ml-auto font-mono text-[10px] tabular-nums text-muted-foreground">
+        <span className="ml-auto font-mono text-xs tabular-nums text-muted-foreground">
           {formatTime(elapsed)} / {formatTime(estDuration)}
         </span>
       </div>
@@ -249,13 +249,13 @@ export function AudioBar({
       </div>
 
       {playing && currentWord && (
-        <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground truncate">
+        <div className="mt-1.5 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground truncate">
           Now reading · <span className="text-accent">{currentWord}</span>
         </div>
       )}
 
       {!hintDismissed && inline && !playing && (
-        <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-accent animate-pulse">
+        <div className="mt-1 font-mono text-xs uppercase tracking-[0.2em] text-accent animate-pulse">
           New · tap play to narrate this dispatch
         </div>
       )}

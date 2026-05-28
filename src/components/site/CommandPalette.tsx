@@ -93,12 +93,12 @@ export function CommandPalette() {
       <CommandList className="max-h-[60vh]">
         {debouncedQ.trim().length === 0 ? (
           <div className="px-4 py-10 text-center">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">
               Command palette
             </div>
             <p className="font-display text-2xl mb-1">What are you looking for?</p>
             <p className="text-sm text-muted-foreground">
-              Press <kbd className="font-mono text-[10px] border border-border px-1.5 py-0.5">⌘K</kbd> any time. Try
+              Press <kbd className="font-mono text-xs border border-border px-1.5 py-0.5">⌘K</kbd> any time. Try
               <span className="italic"> "escalation"</span> or <span className="italic">"NRR"</span>.
             </p>
           </div>

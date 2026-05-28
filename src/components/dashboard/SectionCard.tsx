@@ -21,7 +21,7 @@ export function SectionCard({
       <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 px-4 md:px-6 pt-5 md:pt-6 pb-4 border-b border-border">
         <div>
           {eyebrow ? (
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-2">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-2">
               {eyebrow}
             </div>
           ) : null}

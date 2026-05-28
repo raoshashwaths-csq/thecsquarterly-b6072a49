@@ -71,7 +71,7 @@ function LoginPage() {
       <SiteHeader />
       <main className="flex-1 flex items-center justify-center px-6 py-20">
         <div className="w-full max-w-md">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4 text-center">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4 text-center">
             Members
           </div>
           <h1 className="font-display text-4xl md:text-5xl mb-8 text-center leading-tight">
@@ -101,7 +101,7 @@ function LoginPage() {
                   className="w-full border border-border bg-background px-4 py-3 font-body"
                 />
                 <div>
-                  <label className="block font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+                  <label className="block font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
                     Your role in the CS hierarchy
                   </label>
                   <select
@@ -127,7 +127,7 @@ function LoginPage() {
                       ))}
                     </optgroup>
                   </select>
-                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <p className="mt-1.5 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
                     Recruiters & team leads see tools first; operators see articles first.
                   </p>
                 </div>

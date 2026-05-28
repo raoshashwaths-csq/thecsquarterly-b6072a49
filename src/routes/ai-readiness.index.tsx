@@ -39,7 +39,7 @@ function AiReadinessLanding() {
       <SiteHeader />
 
       <header className="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-medium">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-medium">
           6 Minutes · 8 Dimensions · 32 Metrics
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10">
@@ -54,7 +54,7 @@ function AiReadinessLanding() {
         >
           Start the diagnostic
         </Link>
-        <p className="mt-6 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <p className="mt-6 font-mono uppercase tracking-widest text-xs text-muted-foreground">
           Block · Pilot · Scale · AI Native, find your tier instantly
         </p>
       </header>
@@ -90,11 +90,11 @@ function AiReadinessLanding() {
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">External Research</div>
+          <div className="font-mono text-xs uppercase tracking-[0.3em] opacity-60 mb-6">External Research</div>
           <p className="font-display text-3xl md:text-4xl mb-10 leading-tight italic">
             "The median SaaS company loses 13% of ARR to churn and downsell every year. Top-decile retention orgs lose less than 4%."
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-12">, SaaS Capital Retention Benchmarks, 2024</p>
+          <p className="font-mono uppercase tracking-widest text-xs opacity-60 mb-12">, SaaS Capital Retention Benchmarks, 2024</p>
           <Link
             to="/ai-readiness/survey"
             className="inline-block px-10 py-5 bg-background text-foreground font-mono text-[11px] uppercase tracking-widest font-bold hover:bg-accent hover:text-accent-foreground transition-colors"

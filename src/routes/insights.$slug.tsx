@@ -212,11 +212,11 @@ function PostPage() {
   const articleInner = (
     <article className={`animate-fade-up ${toneClass}`}>
       {isSeries && (
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
           {post.series_title} · Part {post.series_part} of {post.series_total}
         </div>
       )}
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
         {post.category} · {post.read_minutes} min read
       </div>
       <h1
@@ -237,7 +237,7 @@ function PostPage() {
         </div>
         {hasBothTones && (
           <div className="relative flex items-center gap-2 shrink-0 leading-none">
-            <span className="sm:hidden font-mono text-[10px] normal-case tracking-normal text-muted-foreground whitespace-nowrap leading-none">
+            <span className="sm:hidden font-mono text-xs normal-case tracking-normal text-muted-foreground whitespace-nowrap leading-none">
               Switch tone →
             </span>
             <ToneToggle tone={tone} setTone={setTone} />
@@ -253,7 +253,7 @@ function PostPage() {
                 >
                   <X size={14} />
                 </button>
-                <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-secondary-accent mb-2 font-semibold">
+                <div className="flex items-center gap-2 font-mono uppercase tracking-widest text-xs text-secondary-accent mb-2 font-semibold">
                   <Glasses size={12} /> / <Smile size={12} /> Try the tone toggle
                 </div>
                 <p className="text-sm leading-snug text-background/85 normal-case tracking-normal font-body">
@@ -261,7 +261,7 @@ function PostPage() {
                 </p>
                 <button
                   onClick={() => setShowToneHint(false)}
-                  className="mt-3 font-mono text-[10px] uppercase tracking-widest text-secondary-accent hover:text-background"
+                  className="mt-3 font-mono uppercase tracking-widest text-xs text-secondary-accent hover:text-background"
                 >
                   Got it →
                 </button>
@@ -296,7 +296,7 @@ function PostPage() {
 
           {sources.length > 0 && (
             <section className="mt-20 pt-10 border-t border-border">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-5">
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-5">
                 Sources & further reading
               </div>
               <ol className="space-y-2 list-decimal pl-6 marker:text-secondary-accent marker:font-mono text-sm text-foreground/75">

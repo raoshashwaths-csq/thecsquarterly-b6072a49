@@ -132,7 +132,7 @@ function TeamLeaderboardPage() {
                 <thead>
                   <tr className="text-left border-b border-border">
                     {["#", "CSM", "Accts", "Book", "Avg Health", "QBR %", "ARR at Risk"].map((h, i) => (
-                      <th key={h} className={`py-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground ${i === 0 ? "w-10" : ""}`}>
+                      <th key={h} className={`py-3 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground ${i === 0 ? "w-10" : ""}`}>
                         {h}
                       </th>
                     ))}
@@ -165,7 +165,7 @@ function TeamLeaderboardPage() {
                 {movers.map((m, i) => (
                   <div key={m.name} className="bg-card p-4 flex items-center justify-between gap-3">
                     <div className="flex items-baseline gap-3 min-w-0">
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-secondary-accent">0{i + 1}</span>
+                      <span className="font-mono uppercase tracking-widest text-xs text-secondary-accent">0{i + 1}</span>
                       <span className="font-display text-base truncate">{m.name}</span>
                     </div>
                     <HealthChip score={m.avgHealth} />

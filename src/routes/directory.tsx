@@ -29,7 +29,7 @@ function DirectoryPage() {
       <SiteHeader />
       <main className="flex-1 container mx-auto px-6 py-16 max-w-6xl">
         <Reveal>
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
             Directory
           </p>
           <h1 className="font-display text-5xl md:text-6xl tracking-tight leading-[0.95]">
@@ -79,7 +79,7 @@ function DirectoryPage() {
                   {p.credentials.map((c: string) => (
                     <span
                       key={c}
-                      className="font-mono text-[10px] uppercase tracking-wider border border-border rounded px-1.5 py-0.5 text-muted-foreground"
+                      className="font-mono text-xs uppercase tracking-wider border border-border rounded px-1.5 py-0.5 text-muted-foreground"
                     >
                       {c}
                     </span>

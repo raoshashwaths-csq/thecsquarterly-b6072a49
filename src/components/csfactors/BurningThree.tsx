@@ -64,7 +64,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
           size="sm"
           onClick={onRewrite}
           disabled={busy}
-          className="gap-2 font-mono text-[10px] uppercase tracking-widest"
+          className="gap-2 font-mono uppercase tracking-widest text-xs"
         >
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
           Rewrite with Q.
@@ -79,7 +79,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
               ACCENT[it.accent],
             )}
           >
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
               {it.accent === "danger" ? "At risk" : it.accent === "warn" ? "Overdue" : "Upcoming"}
             </div>
             <div className="font-display text-lg leading-snug tracking-tight">{it.headline}</div>
@@ -88,7 +88,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
               <Link
                 to="/csfactors/$accountId"
                 params={{ accountId: it.accountId }}
-                className="mt-auto pt-2 font-mono text-[10px] uppercase tracking-widest text-accent hover:underline"
+                className="mt-auto pt-2 font-mono uppercase tracking-widest text-xs text-accent hover:underline"
               >
                 Open account →
               </Link>

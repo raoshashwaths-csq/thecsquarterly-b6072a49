@@ -60,14 +60,14 @@ export function OperatorTools({
     >
       <div className="flex items-end justify-between mb-6 gap-4 flex-wrap">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 font-semibold">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2 font-semibold">
             {eyebrow}
           </div>
           <h2 id="operator-tools-heading" className="font-display text-2xl md:text-4xl tracking-tight">
             The instruments<span className="text-accent">.</span>
           </h2>
         </div>
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <p className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
           {sorted.length} surfaces
         </p>
       </div>
@@ -81,7 +81,7 @@ export function OperatorTools({
               to={t.to}
               className="group bg-background p-5 md:p-6 hover:bg-accent/5 transition-colors min-h-[120px] flex flex-col"
             >
-              <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
+              <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
                 <Icon className="w-3.5 h-3.5 text-accent" strokeWidth={2.5} />
                 {t.audience === "recruiter" ? "Talent" : t.audience === "leader" ? "Leader" : "Operator"}
               </div>

@@ -47,7 +47,7 @@ export function TierGateOverlay({
           <div className="h-10 w-10 inline-flex items-center justify-center border border-accent/40 text-accent">
             <Lock className="h-4 w-4" />
           </div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold">
             {eyebrow} · {tierLabel}+
           </div>
         </div>

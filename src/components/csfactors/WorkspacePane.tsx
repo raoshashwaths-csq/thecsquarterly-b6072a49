@@ -43,7 +43,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
       <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col bg-background border-l border-border">
         <SheetHeader className="px-5 py-4 border-b border-border">
           <SheetTitle className="font-display text-lg tracking-tight">Workspace</SheetTitle>
-          <SheetDescription className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+          <SheetDescription className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
             Notes · Highlights · Links
           </SheetDescription>
           <div className="relative pt-3">
@@ -63,7 +63,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
               <div key={n.id} className="border-b border-border/60 pb-3">
                 <div className="text-sm leading-snug">{n.text}</div>
                 {n.note ? <div className="text-xs text-muted-foreground mt-1">{n.note}</div> : null}
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70 mt-1">
+                <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground/70 mt-1">
                   /{n.slug}
                 </div>
               </div>
@@ -74,7 +74,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
             {highlights.length === 0 ? <Empty /> : highlights.slice(0, 50).map((h) => (
               <div key={h.id} className="border-b border-border/60 pb-3">
                 <div className="text-sm leading-snug italic">"{h.text}"</div>
-                <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70 mt-1">
+                <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground/70 mt-1">
                   /{h.slug}
                 </div>
               </div>
@@ -92,7 +92,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
               >
                 <div className="min-w-0">
                   <div className="text-sm truncate">{u.title}</div>
-                  {u.url ? <div className="font-mono text-[10px] text-muted-foreground truncate">{u.url}</div> : null}
+                  {u.url ? <div className="font-mono text-xs text-muted-foreground truncate">{u.url}</div> : null}
                 </div>
                 <ExternalLink className="h-3.5 w-3.5 shrink-0 mt-0.5 opacity-60 group-hover:opacity-100" />
               </a>
@@ -103,7 +103,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
         <div className="border-t border-border px-5 py-3">
           <Link
             to="/account/workspace"
-            className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/70 hover:text-accent"
+            className="font-mono text-xs uppercase tracking-[0.22em] text-foreground/70 hover:text-accent"
             onClick={() => onOpenChange(false)}
           >
             Open full workspace →
@@ -117,7 +117,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
 function Section({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-accent font-semibold mb-3">
+      <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-accent font-semibold mb-3">
         {icon} {label}
       </div>
       <div className="space-y-3">{children}</div>

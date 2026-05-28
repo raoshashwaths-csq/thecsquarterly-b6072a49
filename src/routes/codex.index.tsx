@@ -31,7 +31,7 @@ function CodexPage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <header className="max-w-7xl w-full mx-auto px-6 pt-20 pb-12 animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6">The CS Codex</div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">The CS Codex</div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-6 max-w-4xl">
           The reference library for <span className="italic text-accent">serious operators.</span>
         </h1>
@@ -47,10 +47,10 @@ function CodexPage() {
           {playbooks.map((p) => (
             <article key={p.id} className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors">
               <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
-                <div className="absolute top-4 left-4 flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest opacity-80">
+                <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
                   <Lock size={12} /> Premium
                 </div>
-                <div className="absolute top-4 right-4 font-mono text-[10px] opacity-50">{p.pages}pp</div>
+                <div className="absolute top-4 right-4 font-mono text-xs opacity-50">{p.pages}pp</div>
                 <FileText size={48} className="opacity-30" />
                 <div className="absolute bottom-4 left-4 right-4 font-mono text-[9px] uppercase tracking-widest opacity-50">
                   {p.category}
@@ -63,12 +63,12 @@ function CodexPage() {
                   <Link
                     to="/codex/$slug"
                     params={{ slug: p.slug }}
-                    className="block w-full py-3 text-center bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors"
+                    className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
                   >
                     ${(p.price_cents / 100).toFixed(0)} · View playbook
                   </Link>
                   {p.included_in_vanguard && (
-                    <Link to="/pricing" className="block text-center text-[10px] uppercase tracking-widest font-mono text-secondary-accent hover:text-accent">
+                    <Link to="/pricing" className="block text-center uppercase tracking-widest text-xs font-mono text-secondary-accent hover:text-accent">
                       Or unlock instantly with Vanguard →
                     </Link>
                   )}
@@ -87,7 +87,7 @@ function CodexPage() {
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">The economics</div>
+          <div className="font-mono text-xs uppercase tracking-[0.3em] opacity-60 mb-6">The economics</div>
           <h3 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
             $500+ of playbooks. <span className="italic">$49 a month.</span>
           </h3>

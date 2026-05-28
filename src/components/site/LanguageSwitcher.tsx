@@ -77,13 +77,13 @@ export function LanguageSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Choose language edition"
-        className="inline-flex items-center gap-1.5 px-2 py-1 border border-transparent hover:border-border hover:text-accent transition-colors text-[10px] font-semibold uppercase tracking-widest"
+        className="inline-flex items-center gap-1.5 px-2 py-1 border border-transparent hover:border-border hover:text-accent transition-colors text-xs font-semibold uppercase tracking-widest"
       >
         <Globe size={13} aria-hidden />
         <span className="leading-none">{active.code.toUpperCase()}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
-        <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55">
+        <DropdownMenuLabel className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55">
           Editions
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

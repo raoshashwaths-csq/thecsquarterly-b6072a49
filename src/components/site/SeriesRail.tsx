@@ -38,7 +38,7 @@ export function SeriesRail({
 
   return (
     <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
         The series
       </div>
       <div className="font-display text-xl leading-tight mb-6 text-balance">
@@ -57,7 +57,7 @@ export function SeriesRail({
                 isCurrent ? "text-foreground" : released ? "text-foreground/80 hover:text-accent" : "text-muted-foreground/60",
               ].join(" ")}
             >
-              <span className="font-mono text-[10px] uppercase tracking-widest pt-1 w-8 shrink-0 text-secondary-accent">
+              <span className="font-mono uppercase tracking-widest text-xs pt-1 w-8 shrink-0 text-secondary-accent">
                 {num}
               </span>
               <div className="flex-1 min-w-0">

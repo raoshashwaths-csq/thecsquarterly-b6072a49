@@ -44,10 +44,10 @@ export const Route = createFileRoute("/account/workspace")({
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 max-w-3xl mx-auto px-6 py-20 w-full">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">Workspace · Error</div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">Workspace · Error</div>
         <h1 className="font-display text-4xl tracking-tight mb-3">Something snagged.</h1>
         <p className="text-foreground/70 mb-6">{error?.message || "An unexpected error occurred."}</p>
-        <button onClick={reset} className="px-5 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">Retry</button>
+        <button onClick={reset} className="px-5 py-3 bg-foreground text-background font-mono uppercase tracking-widest text-xs">Retry</button>
       </main>
       <SiteFooter />
     </div>
@@ -224,7 +224,7 @@ function WorkspacePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 max-w-6xl mx-auto px-4 md:px-6 py-10 w-full">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
           Members · Workspace
         </div>
         <div className="flex flex-wrap items-end justify-between gap-4 mb-2">
@@ -233,7 +233,7 @@ function WorkspacePage() {
           </h1>
           <button
             onClick={() => exportWorkspacePDF({ links, assets, annotations })}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors min-h-[44px]"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors min-h-[44px]"
           >
             <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
           </button>
@@ -260,11 +260,11 @@ function WorkspacePage() {
               </button>
             )}
           </div>
-          <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="mt-1.5 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Scope · saved Workspace items only — does not query the CSQ corpus.
           </p>
           {!searchHintDismissed && (
-            <div className="mt-2 inline-flex items-center gap-2 px-2 py-1 bg-accent text-accent-foreground font-mono text-[10px] uppercase tracking-[0.25em] animate-pulse">
+            <div className="mt-2 inline-flex items-center gap-2 px-2 py-1 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.25em] animate-pulse">
               <Sparkles className="w-3 h-3" /> New · search across your saved intel
               <button type="button" onClick={(e) => { e.stopPropagation(); dismissSearchHint(); }} className="ml-1 opacity-80 hover:opacity-100" aria-label="Dismiss">
                 <X className="w-3 h-3" />
@@ -373,7 +373,7 @@ function DailyBriefing({ links, assets, annotations }: { links: SavedLink[]; ass
 
   return (
     <section className="mt-8 border-2 border-accent bg-accent/5 p-6 md:p-8">
-      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 font-semibold">
+      <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2 font-semibold">
         <Sparkles className="w-3 h-3" />
         Daily Operational Briefing · {briefing.today}
       </div>
@@ -389,7 +389,7 @@ function DailyBriefing({ links, assets, annotations }: { links: SavedLink[]; ass
         ))}
       </ul>
       {briefing.meta.total > 0 && (
-        <div className="mt-5 flex flex-wrap gap-4 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground border-t border-accent/30 pt-4">
+        <div className="mt-5 flex flex-wrap gap-4 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground border-t border-accent/30 pt-4">
           <span>{briefing.meta.total} saved</span>
           <span>· {briefing.meta.fresh} fresh (7d)</span>
           <span>· {briefing.meta.stale} stale (30d+)</span>
@@ -597,9 +597,9 @@ function HistoryPanel({ query = "" }: { query?: string }) {
   if (items.length === 0) {
     return (
       <div className="border border-dashed border-border p-10 text-center">
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">No transcripts yet</p>
+        <p className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-2">No transcripts yet</p>
         <p className="text-foreground/70 mb-4">Run a diagnostic with Q to see it land here.</p>
-        <Link to="/agent/framework" className="inline-block px-5 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">
+        <Link to="/agent/framework" className="inline-block px-5 py-3 bg-foreground text-background font-mono uppercase tracking-widest text-xs">
           Open Q canvas →
         </Link>
       </div>
@@ -618,7 +618,7 @@ function HistoryPanel({ query = "" }: { query?: string }) {
             >
               {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               <div className="flex-1 min-w-0">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-accent">
+                <div className="font-mono uppercase tracking-widest text-xs text-accent">
                   {r.node_id}
                 </div>
                 <div className="text-sm text-foreground/80 truncate">
@@ -634,7 +634,7 @@ function HistoryPanel({ query = "" }: { query?: string }) {
                 <Link
                   to="/agent/response/$runId"
                   params={{ runId: r.id }}
-                  className="inline-block mt-3 font-mono text-[10px] uppercase tracking-widest underline underline-offset-4 hover:text-accent"
+                  className="inline-block mt-3 font-mono uppercase tracking-widest text-xs underline underline-offset-4 hover:text-accent"
                 >
                   Open full response →
                 </Link>
@@ -673,12 +673,12 @@ function HighlightsPanel({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+        <p className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
           {items.length} entries across the site
         </p>
         <button
           onClick={() => exportWorkspacePDF({ links, assets, annotations })}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors min-h-[44px]"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors min-h-[44px]"
         >
           <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
         </button>
@@ -694,7 +694,7 @@ function HighlightsPanel({
             <li key={a.id} className="p-4 flex gap-3">
               <span className={`mt-1.5 inline-block w-1.5 h-1.5 rounded-full shrink-0 ${a.kind === "highlight" ? "bg-secondary-accent" : "bg-accent"}`} />
               <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                <div className="flex flex-wrap items-center gap-3 font-mono uppercase tracking-widest text-xs text-muted-foreground mb-1">
                   <span>{a.kind}</span>
                   <Link
                     to="/insights/$slug"
@@ -820,7 +820,7 @@ function LedgerPanel({
     <div className="grid md:grid-cols-2 gap-6">
       <div>
         <form onSubmit={addLink} className="border border-border p-4">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
+          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
             <LinkIcon className="w-3.5 h-3.5" /> Save a link
           </div>
           <input
@@ -839,7 +839,7 @@ function LedgerPanel({
           />
           <button
             type="submit"
-            className="mt-3 w-full min-h-[44px] py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-accent transition-colors"
+            className="mt-3 w-full min-h-[44px] py-3 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
           >
             Save to ledger
           </button>
@@ -862,11 +862,11 @@ function LedgerPanel({
             onChange={(e) => void onFiles(e.target.files)}
           />
           <Upload className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
-          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
             Drop files or tap to upload
           </div>
           {showHint && (
-            <div className="mt-3 inline-flex items-center gap-2 px-2 py-1 bg-accent text-accent-foreground font-mono text-[10px] uppercase tracking-widest">
+            <div className="mt-3 inline-flex items-center gap-2 px-2 py-1 bg-accent text-accent-foreground font-mono uppercase tracking-widest text-xs">
               <Sparkles className="w-3 h-3" /> New · start your ledger
               <button
                 type="button"
@@ -882,7 +882,7 @@ function LedgerPanel({
       </div>
 
       <div>
-        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
+        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
           <Tag className="w-3.5 h-3.5" /> Auto-organized
         </div>
         {tagGroups.length === 0 ? (
@@ -914,7 +914,7 @@ function LedgerPanel({
                       <FolderOpen className="w-3.5 h-3.5 mt-1 text-muted-foreground shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="truncate">{a.name}</div>
-                        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                        <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
                           {(a.size / 1024).toFixed(1)} KB
                         </div>
                       </div>

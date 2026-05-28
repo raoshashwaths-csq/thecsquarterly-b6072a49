@@ -76,13 +76,13 @@ function AccountPage() {
   return (
     <Shell>
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 animate-fade-up">
-        <Link to="/csfactors" className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-accent mb-6">
+        <Link to="/csfactors" className="inline-flex items-center gap-2 font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent mb-6">
           <ArrowLeft className="h-3.5 w-3.5" /> All accounts
         </Link>
 
         <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10 pb-6 border-b border-border">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
               {account.tier} · Renewal {account.renewal_quarter}
             </div>
             <h1 className="font-display text-4xl md:text-5xl tracking-tight leading-[0.95]">
@@ -141,7 +141,7 @@ function AccountPage() {
                     <div className="font-mono text-[11px] uppercase tracking-widest text-accent">{e.kind}</div>
                     <div className="text-xs text-muted-foreground">{JSON.stringify(e.payload)}</div>
                   </div>
-                  <time className="font-mono text-[10px] text-muted-foreground tabular-nums">
+                  <time className="font-mono text-xs text-muted-foreground tabular-nums">
                     {new Date(e.occurred_at).toLocaleString()}
                   </time>
                 </li>
@@ -169,7 +169,7 @@ function AccountPage() {
 function Row({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="flex items-baseline justify-between gap-4 pb-2 border-b border-border/60 last:border-0">
-      <dt className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{label}</dt>
+      <dt className="font-mono uppercase tracking-widest text-xs text-muted-foreground">{label}</dt>
       <dd className="text-foreground/85">{value || <span className="text-muted-foreground italic">—</span>}</dd>
     </div>
   );

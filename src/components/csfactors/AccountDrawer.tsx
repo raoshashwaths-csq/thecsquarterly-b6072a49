@@ -73,14 +73,14 @@ export function AccountDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto p-0">
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-border bg-card sticky top-0 z-10">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold">
             Account Profile Optimization
           </div>
           <SheetTitle className="font-display text-2xl tracking-tight flex items-center gap-3">
             {draft.name}
             <HealthChip score={draft.health} />
             {window90.band && (
-              <span className="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 border border-accent bg-accent/10 text-accent">
+              <span className="font-mono uppercase tracking-widest text-xs px-2 py-0.5 border border-accent bg-accent/10 text-accent">
                 Notice {window90.band}d
               </span>
             )}
@@ -184,7 +184,7 @@ export function AccountDrawer({
                 <Field label="Open Blocker" value={draft.blocker} onSave={(v) => save({ blocker: v })} />
               </Grid>
               <div className="mt-3 space-y-1.5">
-                <Label className="font-mono text-[10px] uppercase tracking-widest">Notes</Label>
+                <Label className="font-mono uppercase tracking-widest text-xs">Notes</Label>
                 <Textarea
                   defaultValue={draft.notes ?? ""}
                   onBlur={(e) => save({ notes: e.target.value || null })}
@@ -236,7 +236,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="font-mono text-[10px] uppercase tracking-widest">{label}</Label>
+      <Label className="font-mono uppercase tracking-widest text-xs">{label}</Label>
       <Input
         type={type}
         defaultValue={value ?? ""}
@@ -265,7 +265,7 @@ function SelectField({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="font-mono text-[10px] uppercase tracking-widest">{label}</Label>
+      <Label className="font-mono uppercase tracking-widest text-xs">{label}</Label>
       <Select value={value || "__none__"} onValueChange={(v) => onSave(v === "__none__" ? "" : v)}>
         <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
         <SelectContent>
@@ -291,7 +291,7 @@ function ToggleField({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="font-mono text-[10px] uppercase tracking-widest">{label}</Label>
+      <Label className="font-mono uppercase tracking-widest text-xs">{label}</Label>
       <div className="h-9 flex items-center">
         <Switch checked={value} onCheckedChange={onSave} />
       </div>

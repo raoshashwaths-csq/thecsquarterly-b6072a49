@@ -113,7 +113,7 @@ function ControlPanelPage() {
               <QMark className="h-7 w-auto" />
               <div>
                 <div className="font-display text-lg leading-none">Control Panel</div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mt-1">Command Center</div>
+                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mt-1">Command Center</div>
               </div>
             </div>
           </div>
@@ -136,7 +136,7 @@ function ControlPanelPage() {
                   <Icon className="h-4 w-4 mt-0.5 shrink-0" />
                   <div className="min-w-0">
                     <div className="text-sm leading-tight">{t.label}</div>
-                    <div className="text-[10px] uppercase tracking-[0.2em] mt-0.5 opacity-70">{t.hint}</div>
+                    <div className="text-xs uppercase tracking-[0.2em] mt-0.5 opacity-70">{t.hint}</div>
                   </div>
                 </button>
               );
@@ -173,7 +173,7 @@ function TabHeader({ title, subtitle, action }: { title: string; subtitle: strin
   return (
     <div className="flex items-end justify-between border-b border-border pb-4 mb-5">
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-1">Workspace</div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-1">Workspace</div>
         <h1 className="font-display text-3xl tracking-tight leading-none">{title}</h1>
         <p className="text-sm text-muted-foreground mt-1.5">{subtitle}</p>
       </div>
@@ -269,7 +269,7 @@ function OverviewTab() {
       {data?.tierBreakdown && (
         <div className="flex flex-wrap gap-1.5 mb-6">
           {data.tierBreakdown.map((t) => (
-            <Badge key={t.designation} variant="outline" className="text-[10px] tabular-nums">
+            <Badge key={t.designation} variant="outline" className="text-xs tabular-nums">
               {TIER_LABEL[t.designation] ?? t.designation} · <span className="ml-1 font-mono">{t.count}</span>
             </Badge>
           ))}
@@ -282,7 +282,7 @@ function OverviewTab() {
             <h3 className="font-display text-lg leading-none">Sessions vs Registrations</h3>
             <p className="text-[11px] text-muted-foreground mt-1">Rolling 30-day window</p>
           </div>
-          <Badge variant="outline" className="text-[10px] uppercase tracking-[0.2em]">Live</Badge>
+          <Badge variant="outline" className="text-xs uppercase tracking-[0.2em]">Live</Badge>
         </div>
         <div className="h-[260px]">
           {isLoading || !data ? (
@@ -317,7 +317,7 @@ function OverviewTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/30">
-              <tr className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <tr className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 <th className="text-left font-normal py-2 px-3">Date</th>
                 <th className="text-left font-normal py-2 px-3">Email</th>
                 <th className="text-left font-normal py-2 px-3">Method</th>
@@ -339,10 +339,10 @@ function OverviewTab() {
                     <td className="py-2 px-3 text-muted-foreground tabular-nums">{fmtDateTime(r.created_at)}</td>
                     <td className="py-2 px-3">{r.email}</td>
                     <td className="py-2 px-3">
-                      <Badge variant="outline" className="text-[10px]">{r.method}</Badge>
+                      <Badge variant="outline" className="text-xs">{r.method}</Badge>
                     </td>
                     <td className="py-2 px-3">
-                      <Badge variant={r.designation === "reader" ? "secondary" : "default"} className="text-[10px]">{r.tier}</Badge>
+                      <Badge variant={r.designation === "reader" ? "secondary" : "default"} className="text-xs">{r.tier}</Badge>
                     </td>
                   </tr>
                 ))
@@ -426,7 +426,7 @@ function DiagnosticsTab() {
           </>
         )}
       </div>
-      <p className="text-[10px] text-muted-foreground mb-6 font-mono uppercase tracking-[0.2em]">
+      <p className="text-xs text-muted-foreground mb-6 font-mono uppercase tracking-[0.2em]">
         {isReal
           ? `Telemetry coverage: 100% · all metrics from real per-run usage data.`
           : `Telemetry coverage: ${coveragePct}% · ${coveragePct}% of last-30d runs have real token/latency/cost data; the rest fall back to heuristic.`}
@@ -442,7 +442,7 @@ function DiagnosticsTab() {
             </p>
           </div>
           {proj && (
-            <Badge variant="outline" className="text-[10px] uppercase tracking-[0.2em]">
+            <Badge variant="outline" className="text-xs uppercase tracking-[0.2em]">
               {proj.basis === "real"
                 ? `Real · ${Math.round(proj.telemetryCoverage * 100)}% coverage`
                 : "Heuristic"}
@@ -465,7 +465,7 @@ function DiagnosticsTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/30">
-                <tr className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                <tr className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                   <th className="text-left font-normal py-2 px-3">Conversations</th>
                   <th className="text-right font-normal py-2 px-3">Projected Cost</th>
                   <th className="text-right font-normal py-2 px-3">Per Run</th>
@@ -481,7 +481,7 @@ function DiagnosticsTab() {
                 ))}
               </tbody>
             </table>
-            <p className="text-[10px] text-muted-foreground mt-3 font-mono uppercase tracking-[0.2em]">
+            <p className="text-xs text-muted-foreground mt-3 font-mono uppercase tracking-[0.2em]">
               Includes ~1.6× Lovable Gateway multiplier · replace with invoice data when available · edit constants in src/lib/q-pricing.ts
             </p>
           </div>
@@ -522,7 +522,7 @@ function DiagnosticsTab() {
         <div className="overflow-x-auto max-h-[520px]">
           <table className="w-full text-sm">
             <thead className="bg-muted/30 sticky top-0">
-              <tr className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <tr className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 <th className="text-left font-normal py-2 px-3">When</th>
                 <th className="text-left font-normal py-2 px-3">Operator</th>
                 <th className="text-left font-normal py-2 px-3">Node</th>
@@ -546,7 +546,7 @@ function DiagnosticsTab() {
                     <td className="py-2 px-3 font-mono text-[11px]">{r.node_id}</td>
                     <td className="py-2 px-3 tabular-nums">{r.latency_ms} ms</td>
                     <td className="py-2 px-3">
-                      <Badge variant={r.sentiment === "up" ? "default" : "secondary"} className="text-[10px]">
+                      <Badge variant={r.sentiment === "up" ? "default" : "secondary"} className="text-xs">
                         {r.sentiment === "up" ? "↑ up" : "—"}
                       </Badge>
                     </td>
@@ -572,11 +572,11 @@ function DiagnosticsTab() {
           ) : (
             <div className="space-y-3 max-h-[60vh] overflow-auto">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Input context</div>
+                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Input context</div>
                 <pre className="bg-muted/50 border border-border rounded-md p-3 text-xs font-mono overflow-auto">{open?.input}</pre>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Output zones</div>
+                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Output zones</div>
                 <pre className="bg-muted/50 border border-border rounded-md p-3 text-xs font-mono overflow-auto">{open?.output}</pre>
               </div>
             </div>
@@ -664,7 +664,7 @@ function JobsTab() {
           <div className="max-h-[600px] overflow-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/30 sticky top-0">
-                <tr className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                <tr className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                   <th className="text-left font-normal py-2 px-3">Employer</th>
                   <th className="text-left font-normal py-2 px-3">Title</th>
                   <th className="text-left font-normal py-2 px-3">Tier</th>
@@ -716,7 +716,7 @@ function JobsTab() {
                     <div className="text-xs text-muted-foreground truncate">{j.employer_name} · <span className="tabular-nums">${j.package_tier}</span></div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Clicks</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Clicks</div>
                     <div className="font-mono text-sm tabular-nums">{j.click_count}</div>
                   </div>
                 </div>
@@ -809,7 +809,7 @@ function ArticleComposer() {
           <h3 className="font-display text-lg leading-none">Article Composer</h3>
           <p className="text-[11px] text-muted-foreground mt-1">Markdown body · tier-gated publish</p>
         </div>
-        <Badge variant="outline" className="text-[10px]">Drafts not auto-saved</Badge>
+        <Badge variant="outline" className="text-xs">Drafts not auto-saved</Badge>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4">
@@ -834,7 +834,7 @@ function ArticleComposer() {
 
         <div className="space-y-4">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">Tier gating</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">Tier gating</div>
             <div className="space-y-1.5">
               {TIER_OPTIONS.map((t) => (
                 <label key={t} className="flex items-center gap-2 text-sm cursor-pointer">
@@ -846,7 +846,7 @@ function ArticleComposer() {
           </div>
 
           <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2 flex items-center gap-1.5">
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 flex items-center gap-1.5">
               <Calendar className="h-3 w-3" /> Schedule
             </div>
             <Input
@@ -855,7 +855,7 @@ function ArticleComposer() {
               onChange={(e) => setScheduledAt(e.target.value)}
               className="h-9 text-sm"
             />
-            <p className="text-[10px] text-muted-foreground mt-1.5">Leave blank to publish immediately.</p>
+            <p className="text-xs text-muted-foreground mt-1.5">Leave blank to publish immediately.</p>
           </div>
 
           <Button onClick={submit} disabled={busy} className="w-full">
@@ -914,7 +914,7 @@ function MailerCenter() {
           >
             <div className="flex items-center justify-between">
               <div className="font-medium text-sm">{t.displayName}</div>
-              <Badge variant="outline" className="text-[10px]">{t.cadence}</Badge>
+              <Badge variant="outline" className="text-xs">{t.cadence}</Badge>
             </div>
             <div className="text-[11px] text-muted-foreground mt-0.5 truncate">{t.subject}</div>
           </button>
@@ -924,11 +924,11 @@ function MailerCenter() {
       {current && (
         <div className="p-4 border-t border-border space-y-3 bg-muted/10">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Subject</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Subject</div>
             <Input defaultValue={current.subject} className="h-9 text-sm" />
           </div>
           <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Body override</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Body override</div>
             <Textarea
               rows={5}
               placeholder="Body copy (uses default template if blank)…"
@@ -938,7 +938,7 @@ function MailerCenter() {
             />
           </div>
           <div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Test recipient</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">Test recipient</div>
             <Input
               type="email"
               value={recipient}
@@ -1021,7 +1021,7 @@ function UsersTab() {
         <div className="overflow-x-auto max-h-[640px]">
           <table className="w-full text-sm">
             <thead className="bg-muted/30 sticky top-0">
-              <tr className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <tr className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 <th className="text-left font-normal py-2 px-3">Name</th>
                 <th className="text-left font-normal py-2 px-3">Email</th>
                 <th className="text-left font-normal py-2 px-3">Tier</th>
@@ -1046,7 +1046,7 @@ function UsersTab() {
                     </td>
                     <td className="py-2 px-3 text-muted-foreground">{u.email}</td>
                     <td className="py-2 px-3">
-                      <Badge variant={isPaid(u.tier) ? "default" : "secondary"} className="text-[10px]">{u.tier_label}</Badge>
+                      <Badge variant={isPaid(u.tier) ? "default" : "secondary"} className="text-xs">{u.tier_label}</Badge>
                     </td>
                     <td className="py-2 px-3 text-muted-foreground text-xs tabular-nums">
                       {u.current_period_end ? new Date(u.current_period_end).toLocaleDateString() : "—"}

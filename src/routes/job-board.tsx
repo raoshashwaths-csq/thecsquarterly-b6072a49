@@ -127,7 +127,7 @@ function JobBoardPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="max-w-7xl mx-auto px-6 pt-20 pb-12">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">The Job Board</div>
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4">The Job Board</div>
           <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-6 max-w-4xl">
             Pre-qualified roles, <span className="italic">read by operators.</span>
           </h1>
@@ -155,7 +155,7 @@ function JobBoardPage() {
                   key={s}
                   onClick={() => setSegment(s)}
                   className={
-                    "px-3 py-2 font-mono text-[10px] uppercase tracking-widest border transition-all " +
+                    "px-3 py-2 font-mono uppercase tracking-widest text-xs border transition-all " +
                     (segment === s
                       ? "bg-foreground text-background border-foreground"
                       : "border-border hover:border-foreground")
@@ -170,7 +170,7 @@ function JobBoardPage() {
 
         {/* Listings */}
         <section className="max-w-7xl mx-auto px-6 pb-20">
-          <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-4">
+          <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-4">
             {filtered.length} open role{filtered.length === 1 ? "" : "s"}
           </div>
           <ul className="space-y-3">
@@ -210,16 +210,16 @@ function JobBoardPage() {
                     </div>
                     <div className="mt-3 flex gap-2 flex-wrap">
                       {j.stack.map((s) => (
-                        <span key={s} className="font-mono text-[10px] uppercase tracking-widest px-2 py-1 border border-border text-foreground/70">
+                        <span key={s} className="font-mono uppercase tracking-widest text-xs px-2 py-1 border border-border text-foreground/70">
                           {s}
                         </span>
                       ))}
                     </div>
                   </div>
                   <div className="text-left md:text-right shrink-0">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50 mb-1">Comp</div>
+                    <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-1">Comp</div>
                     <div className="font-display text-lg mb-3">{j.comp}</div>
-                    <button className="px-5 py-2.5 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all">
+                    <button className="px-5 py-2.5 border border-foreground font-mono text-xs uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all">
                       View role
                     </button>
                   </div>
@@ -238,7 +238,7 @@ function JobBoardPage() {
         <section className="border-t border-border bg-muted/30">
           <div className="max-w-7xl mx-auto px-6 py-20">
             <div className="text-center mb-12">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">For Recruiters</div>
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4">For Recruiters</div>
               <h2 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-4">
                 Reach the operators <span className="italic">other boards can't.</span>
               </h2>
@@ -261,7 +261,7 @@ function JobBoardPage() {
                   }
                 >
                   <div className={
-                    "font-mono text-[10px] uppercase tracking-widest mb-3 " +
+                    "font-mono uppercase tracking-widest text-xs mb-3 " +
                     (p.rust ? "text-secondary-accent" : "text-foreground/60")
                   }>
                     {p.name}
@@ -281,7 +281,7 @@ function JobBoardPage() {
                   </ul>
                   <button
                     className={
-                      "w-full py-3 font-mono text-[10px] uppercase tracking-[0.25em] transition-all " +
+                      "w-full py-3 font-mono text-xs uppercase tracking-[0.25em] transition-all " +
                       (p.emphasis
                         ? "bg-accent text-accent-foreground hover:opacity-90"
                         : "border border-foreground hover:bg-foreground hover:text-background")
@@ -299,7 +299,7 @@ function JobBoardPage() {
               </p>
               <Link
                 to="/pricing"
-                className="inline-block px-6 py-3 border border-foreground font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
+                className="inline-block px-6 py-3 border border-foreground font-mono text-xs uppercase tracking-[0.25em] hover:bg-foreground hover:text-background transition-all"
               >
                 See team & enterprise tiers
               </Link>

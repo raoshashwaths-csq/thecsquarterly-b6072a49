@@ -33,7 +33,7 @@ Operational ownership is now officially transitioned to your designated Account 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {phases.map((p) => (
           <div key={p.title} className="p-4 bg-muted/40 border border-border rounded-lg relative">
-            <div className={`absolute top-3 right-3 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${p.muted ? "bg-muted text-foreground/70" : "bg-foreground text-background"}`}>
+            <div className={`absolute top-3 right-3 text-xs font-mono font-bold px-2 py-0.5 rounded-full ${p.muted ? "bg-muted text-foreground/70" : "bg-foreground text-background"}`}>
               {p.range}
             </div>
             <p.Icon className="h-5 w-5 text-foreground/70 mb-2" />
@@ -43,7 +43,7 @@ Operational ownership is now officially transitioned to your designated Account 
         ))}
       </div>
       <div className="border-t border-border pt-6">
-        <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">Automated Handover Communication Suite</h3>
+        <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">Automated Handover Communication Suite</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <input value={clientName} onChange={(e) => setClientName(e.target.value)} className="px-3 py-2 border border-border rounded text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring" />
           <input value={uccCode} onChange={(e) => setUccCode(e.target.value)} className="px-3 py-2 border border-border rounded text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring" />

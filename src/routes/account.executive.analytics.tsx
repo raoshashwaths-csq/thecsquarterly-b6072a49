@@ -69,7 +69,7 @@ function ExecutiveAnalyticsPage() {
       <div className="min-h-screen flex flex-col">
         <SiteHeader />
         <main className="flex-1 max-w-5xl mx-auto px-6 py-16 w-full">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4">
             Loading…
           </div>
         </main>
@@ -98,7 +98,7 @@ function ExecutiveAnalyticsPage() {
       <SiteHeader />
       <main className="flex-1 max-w-[1600px] mx-auto px-6 md:px-10 py-12 w-full">
         <header className="mb-10 pb-6 border-b border-border">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3 font-semibold">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3 font-semibold">
             Account / Executive Analytics
           </div>
           <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight">
@@ -114,7 +114,7 @@ function ExecutiveAnalyticsPage() {
               <button
                 type="button"
                 onClick={() => setTeamScope("me")}
-                className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
                   teamScope === "me" ? "bg-foreground text-background" : "hover:bg-muted"
                 }`}
               >
@@ -123,7 +123,7 @@ function ExecutiveAnalyticsPage() {
               <button
                 type="button"
                 onClick={() => setTeamScope("team")}
-                className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
                   teamScope === "team" ? "bg-foreground text-background" : "hover:bg-muted"
                 }`}
               >

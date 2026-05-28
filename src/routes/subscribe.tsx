@@ -62,7 +62,7 @@ function SubscribePage() {
 function FreeBriefingLanding() {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-24 animate-fade-up text-center">
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
         The Weekly Dispatch
       </div>
       <h1 className="font-display text-6xl md:text-8xl leading-[0.95] tracking-tight text-balance mb-10 max-w-4xl">
@@ -112,12 +112,12 @@ function TierConfirm({ designation }: { designation: Designation }) {
         <button
           type="button"
           onClick={() => setCheckingOut(false)}
-          className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/60 hover:text-foreground mb-8"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-foreground/60 hover:text-foreground mb-8"
         >
           <ArrowLeft size={12} />
           Back
         </button>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
           Secure checkout · {cadence === "monthly" ? "Monthly" : "Annual"}
         </div>
         <h1 className="font-display text-3xl tracking-tight mb-6">{tier.label}.</h1>
@@ -134,13 +134,13 @@ function TierConfirm({ designation }: { designation: Designation }) {
     <section className="max-w-3xl mx-auto px-6 py-20 animate-fade-up">
       <Link
         to="/pricing"
-        className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/60 hover:text-foreground mb-8"
+        className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-foreground/60 hover:text-foreground mb-8"
       >
         <ArrowLeft size={12} />
         Back to pricing
       </Link>
 
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4">
         Confirm your plan
       </div>
       <h1 className="font-display text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance mb-4">
@@ -154,14 +154,14 @@ function TierConfirm({ designation }: { designation: Designation }) {
             <button
               type="button"
               onClick={() => setCadence("monthly")}
-              className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] ${cadence === "monthly" ? "bg-foreground text-background" : "text-foreground/60"}`}
+              className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] ${cadence === "monthly" ? "bg-foreground text-background" : "text-foreground/60"}`}
             >
               Monthly
             </button>
             <button
               type="button"
               onClick={() => setCadence("yearly")}
-              className={`px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] ${cadence === "yearly" ? "bg-foreground text-background" : "text-foreground/60"}`}
+              className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] ${cadence === "yearly" ? "bg-foreground text-background" : "text-foreground/60"}`}
             >
               Annual · 2 mo free
             </button>
@@ -211,7 +211,7 @@ function TierConfirm({ designation }: { designation: Designation }) {
 
         <button
           onClick={onCheckout}
-          className="block w-full py-3.5 text-center font-mono text-[10px] uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all"
+          className="block w-full py-3.5 text-center font-mono text-xs uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all"
         >
           {tier.ctaKind === "contact"
             ? tier.cta

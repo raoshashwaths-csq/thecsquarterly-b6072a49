@@ -27,7 +27,7 @@ export function Acronym({ term, children }: { term: string; children?: React.Rea
           side="top"
           className="max-w-xs border border-border bg-popover text-popover-foreground shadow-md"
         >
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-1">
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent mb-1">
             {entry.term}
           </div>
           <p className="text-sm leading-snug">{entry.definition}</p>

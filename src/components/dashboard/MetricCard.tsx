@@ -47,7 +47,7 @@ export function MetricCard({
       )}
     >
       <div className={cn("absolute left-0 top-0 bottom-0 w-[3px]", ACCENT_BAR[accent])} />
-      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">
+      <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">
         {eyebrow}
       </div>
       <div className="font-display text-4xl md:text-5xl tracking-tight leading-none mb-3 flex items-baseline gap-1">

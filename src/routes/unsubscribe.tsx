@@ -61,7 +61,7 @@ function UnsubscribePage() {
   return (
     <main className="min-h-[70vh] flex items-center justify-center px-6 py-24">
       <div className="max-w-lg w-full">
-        <p className="font-mono text-[10px] tracking-[0.28em] uppercase text-accent mb-5">
+        <p className="font-mono text-xs tracking-[0.28em] uppercase text-accent mb-5">
           The CS Quarterly · Email Preferences
         </p>
         <h1 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight text-balance mb-6">

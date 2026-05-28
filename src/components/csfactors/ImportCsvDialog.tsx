@@ -181,7 +181,7 @@ export function ImportCsvDialog() {
             Combined template covers all {HEADERS.length} account fields. Max 500 rows. Required columns are marked with an <span className="text-accent font-semibold">*</span> in the header row: <code>name*, tier*, arr*, health*, qbr_status*, renewal_quarter*</code>. Everything else is optional.
           </p>
           <details className="text-xs">
-            <summary className="cursor-pointer font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            <summary className="cursor-pointer font-mono uppercase tracking-widest text-xs text-muted-foreground">
               View full column list ({HEADERS.length})
             </summary>
             <div className="block mt-2 text-[11px] font-mono bg-muted p-3 border border-border overflow-x-auto leading-relaxed">
@@ -199,7 +199,7 @@ export function ImportCsvDialog() {
             <FileDown className="h-4 w-4" /> Download template
           </Button>
           <label className="block">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">CSV file</span>
+            <span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">CSV file</span>
             <input
               type="file"
               accept=".csv,text/csv"

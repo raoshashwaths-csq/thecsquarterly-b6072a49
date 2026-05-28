@@ -186,7 +186,7 @@ function StakeholderRadarPage() {
                         y={y}
                         textAnchor="middle"
                         dominantBaseline="middle"
-                        className="fill-foreground font-mono text-[10px] uppercase tracking-widest"
+                        className="fill-foreground font-mono uppercase tracking-widest text-xs"
                       >
                         {axis.label}
                       </text>
@@ -197,7 +197,7 @@ function StakeholderRadarPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedId(null)}
-                    className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-accent"
+                    className="mt-4 font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent"
                   >
                     ← Back to portfolio average
                   </button>
@@ -220,7 +220,7 @@ function StakeholderRadarPage() {
                     >
                       <div className="min-w-0">
                         <div className="font-display text-base truncate">{a.name}</div>
-                        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-0.5">
+                        <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mt-0.5">
                           {a.tier} · {a.csm_name ?? "Unassigned"}
                         </div>
                       </div>
@@ -240,7 +240,7 @@ function StakeholderRadarPage() {
                 { tag: "Sentiment", play: focus.sentiment < 60 ? "Run a 30-min listening session with the champion." : "Ask for a quote / referral while sentiment is warm." },
               ].map((m, i) => (
                 <div key={i} className="bg-card p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-2">
+                  <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-2">
                     {m.tag}
                   </div>
                   <p className="text-sm">{m.play}</p>

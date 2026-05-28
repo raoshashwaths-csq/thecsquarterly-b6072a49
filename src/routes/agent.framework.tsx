@@ -72,7 +72,7 @@ function AgentFrameworkPage() {
   return (
     <CanvasShell>
       <header className="mb-10 animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
           Operator Canvas · <QMark periodClassName="text-foreground" />
         </div>
         <h1 className="font-display text-4xl sm:text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance max-w-3xl">
@@ -85,7 +85,7 @@ function AgentFrameworkPage() {
         {/* Global voice toggle */}
         <div className="mt-6 inline-flex items-center gap-4 border border-border rounded-full px-4 py-2">
           <div className="flex flex-col leading-tight">
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">Voice</span>
+            <span className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/70">Voice</span>
             <span className="text-xs text-foreground/55">{witty ? "Wodehouse — witty" : "McKinsey — analytical"}</span>
           </div>
           <Switch checked={witty} onCheckedChange={setWitty} aria-label="Toggle witty voice" />
@@ -120,7 +120,7 @@ function AgentFrameworkPage() {
       {/* Selected tree header */}
       <RevealBlock>
         <div className="border-t border-border pt-6 mb-10">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-2">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
             {cleanEyebrow(tree.eyebrow)}
           </div>
           <h2 className="font-display text-3xl md:text-4xl leading-tight">{tree.title}</h2>
@@ -178,7 +178,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 function GateCard({ kind }: { kind: "signin" | "vanguard" }) {
   return (
     <div className="max-w-xl mx-auto border border-border p-10 md:p-14 mt-12 animate-fade-up">
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4">
         {kind === "signin" ? "Sign in required" : "Vanguard only"}
       </div>
       <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight mb-4">
@@ -192,13 +192,13 @@ function GateCard({ kind }: { kind: "signin" | "vanguard" }) {
       <div className="flex gap-3">
         <Link
           to={kind === "signin" ? "/login" : "/pricing"}
-          className="px-6 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+          className="px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.25em] hover:bg-accent transition-colors"
         >
           {kind === "signin" ? "Sign in" : "See Vanguard"}
         </Link>
         <Link
           to="/"
-          className="px-6 py-3 border border-border font-mono text-[10px] uppercase tracking-[0.25em] hover:border-foreground transition-colors"
+          className="px-6 py-3 border border-border font-mono text-xs uppercase tracking-[0.25em] hover:border-foreground transition-colors"
         >
           Back home
         </Link>
@@ -248,7 +248,7 @@ function TerminalCard({
         : { animation: `fade-up 0.5s cubic-bezier(0.22,0.61,0.36,1) ${index * 50}ms both` }}
     >
       <div className="flex items-start gap-3">
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent shrink-0 mt-0.5">
+        <span className="font-mono text-xs uppercase tracking-[0.25em] text-accent shrink-0 mt-0.5">
           {String(index + 1).padStart(2, "0")}
         </span>
         <div className="min-w-0 flex-1">
@@ -270,7 +270,7 @@ function TerminalCard({
                 {node.promptTemplate?.slice(0, 220) ?? ""}
                 {node.promptTemplate && node.promptTemplate.length > 220 ? "…" : ""}
               </p>
-              <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-accent">
+              <div className="mt-3 font-mono text-xs uppercase tracking-[0.25em] text-accent">
                 Tap to open →
               </div>
             </div>
@@ -332,7 +332,7 @@ function TreeWheel({
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background border border-foreground shadow-[0_20px_60px_-20px_rgba(0,0,0,0.35)] flex flex-col items-center justify-center text-center p-8"
           style={{ width: 280, height: 280 }}
         >
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3 break-words">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3 break-words">
             {cleanEyebrow(tree.eyebrow)}
           </div>
           <div className="font-display text-xl leading-tight mb-3 text-balance break-words">
@@ -375,7 +375,7 @@ function TreeStack({
   return (
     <div className="space-y-6">
       <div className="rounded-full border border-foreground bg-background p-6 text-center mx-auto max-w-xs aspect-square flex flex-col items-center justify-center">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 break-words">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2 break-words">
           {cleanEyebrow(tree.eyebrow)}
         </div>
         <div className="font-display text-lg leading-tight mb-2 text-balance break-words">
@@ -414,12 +414,12 @@ function RunHistory() {
       <section className="mt-20 border-t border-border pt-10">
         <div className="flex items-baseline justify-between mb-6">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">
               Run history
             </div>
             <h3 className="font-display text-2xl md:text-3xl tracking-tight">Your recent decisions</h3>
           </div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/45">
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/45">
             Last {runs.length}
           </span>
         </div>
@@ -438,12 +438,12 @@ function RunHistory() {
                     <div className="font-display text-base leading-tight truncate">
                       {node?.label ?? "Decision"}
                     </div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/50 mt-1 truncate">
+                    <div className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/50 mt-1 truncate">
                       {node ? breadcrumbFor(node.id).join(" › ") : r.node_id}
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55">
+                    <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55">
                       {date.toLocaleDateString()}
                     </div>
                     <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/40 mt-1">
@@ -503,7 +503,7 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
       <SheetContent side="right" className="w-full sm:max-w-[460px] md:max-w-[40vw] bg-background border-l border-border p-0 overflow-y-auto">
         <div className="p-7 md:p-9">
           <SheetHeader className="text-left mb-6">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4 break-words">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4 break-words">
               {breadcrumb.join(" › ")}
             </div>
             <SheetTitle asChild>
@@ -519,7 +519,7 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
           <div className="space-y-4 mb-6">
             {fields.map((f) => (
               <div key={f.key}>
-                <label className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55 block mb-1.5">
+                <label className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55 block mb-1.5">
                   {f.label}{f.required && <span className="text-accent ml-1">·</span>}
                 </label>
                 {f.kind === "select" ? (
@@ -547,7 +547,7 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
 
           <div className="flex items-center justify-between mb-6 pt-4 border-t border-border">
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">Voice</div>
+              <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/70">Voice</div>
               <div className="text-xs text-foreground/55 mt-0.5">
                 {witty ? "Wodehouse — witty" : "McKinsey — analytical"}
               </div>
@@ -558,7 +558,7 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
           <button
             onClick={handleRun}
             disabled={!canSubmit || submitting}
-            className="w-full py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.25em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {submitting ? <><QMark periodClassName="text-accent-foreground/70" /> is working…</> : <>Run <QMark periodClassName="text-accent-foreground/70" /></>}
           </button>

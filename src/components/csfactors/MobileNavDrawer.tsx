@@ -56,7 +56,7 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
               className="w-full flex items-center gap-2 px-3 py-2 text-foreground/60"
               aria-expanded={analyticsOpen}
             >
-              <span className="font-mono uppercase tracking-[0.22em] text-[10px] font-semibold flex-1 text-left">
+              <span className="font-mono uppercase tracking-[0.22em] text-xs font-semibold flex-1 text-left">
                 Analytics
               </span>
               <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", !analyticsOpen && "-rotate-90")} />
@@ -86,7 +86,7 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
           </div>
 
           <div className="mt-4 px-2">
-            <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-[10px] font-semibold text-foreground/50">
+            <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-xs font-semibold text-foreground/50">
               Modules
             </div>
             <div className="space-y-0.5">
@@ -124,7 +124,7 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
           <Link
             to="/"
             onClick={close}
-            className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground hover:text-accent"
+            className="block font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent"
           >
             ← The CS Quarterly
           </Link>

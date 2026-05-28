@@ -26,7 +26,7 @@ export function ProgressGauge({
     <div className={cn("space-y-2", className)}>
       {label ? (
         <div className="flex items-baseline justify-between">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
             {label}
           </div>
           <div className="font-display text-2xl tracking-tight tabular-nums">

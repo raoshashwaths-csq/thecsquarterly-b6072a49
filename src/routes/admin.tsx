@@ -77,7 +77,7 @@ function AdminPage() {
         <SiteHeader />
         <main className="flex-1 flex items-center justify-center px-6 py-20 text-center">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Restricted</div>
+            <div className="font-mono uppercase tracking-widest text-xs text-accent mb-3">Restricted</div>
             <h1 className="font-display text-4xl mb-4">Editorial access only.</h1>
             <p className="text-muted-foreground max-w-md">Your account doesn't have admin privileges.</p>
           </div>
@@ -99,7 +99,7 @@ function AdminPage() {
       <main className="flex-1 max-w-[1500px] mx-auto px-6 py-10 w-full">
         <div className="mb-8 flex items-end justify-between gap-6">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Editorial dashboard</div>
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Editorial dashboard</div>
             <h1 className="font-display text-5xl">The Newsroom</h1>
           </div>
           <Link
@@ -116,7 +116,7 @@ function AdminPage() {
               <nav className="space-y-6">
                 {Object.entries(groups).map(([group, items]) => (
                   <div key={group}>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2 px-2">{group}</div>
+                    <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 px-2">{group}</div>
                     <ul className="space-y-px">
                       {items.map((item) => {
                         const Icon = item.icon;
@@ -203,7 +203,7 @@ function AdminPage() {
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
     <div className="border border-border p-5">
-      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">{label}</div>
+      <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">{label}</div>
       <div className="font-display text-4xl leading-none">{value}</div>
       {hint && <div className="text-xs text-muted-foreground mt-2">{hint}</div>}
     </div>
@@ -225,7 +225,7 @@ function DashboardSection() {
         <StatCard label="MRR" value={d ? `$${(d.mrrCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : "—"} hint={d ? `ARR run-rate $${(d.arrCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : "From active paid subs"} />
       </div>
       <div className="border border-border p-6">
-        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-2">Editorial cadence</div>
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent mb-2">Editorial cadence</div>
         <p className="font-display text-2xl leading-snug max-w-2xl">
           New articles follow the 3-2-1 model: <span className="text-accent">3 facts</span>, <span className="text-accent">2 insights</span>, <span className="text-accent">1 actionable</span>. Title, subtitle and excerpt must each say something different.
         </p>
@@ -238,12 +238,12 @@ function ComingSoon({ title, blurb, checklist }: { title: string; blurb: string;
   return (
     <div className="space-y-6">
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Groundwork ready</div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Groundwork ready</div>
         <h2 className="font-display text-4xl mb-3">{title}</h2>
         <p className="text-muted-foreground max-w-2xl leading-relaxed">{blurb}</p>
       </div>
       <div className="border border-border p-6">
-        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">When you're ready, this becomes</div>
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">When you're ready, this becomes</div>
         <ul className="space-y-2">
           {checklist.map((c) => (
             <li key={c} className="flex items-start gap-3 text-sm">
@@ -266,7 +266,7 @@ function DataTable<T extends Record<string, any>>({ rows, cols, empty }: {
       <table className="w-full text-sm">
         <thead className="bg-muted/40">
           <tr>{cols.map((c) => (
-            <th key={String(c.key)} className="text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground px-4 py-3">
+            <th key={String(c.key)} className="text-left font-mono uppercase tracking-widest text-xs text-muted-foreground px-4 py-3">
               {c.label}
             </th>
           ))}</tr>
@@ -470,14 +470,14 @@ function PostsAdmin() {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Articles</h2><ExportButton dataset="posts" /></div>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest hover:bg-foreground/90 transition-colors">+ New article</button>
+        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-foreground/90 transition-colors">+ New article</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto bg-background">
         {(list.data ?? []).map((p) => (
           <div key={p.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="font-display text-lg truncate">{p.title}</div>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
                 {p.section} · {p.tier} · {p.published ? "live" : "draft"}
               </div>
             </div>
@@ -510,7 +510,7 @@ function PostEditor({ editing, setEditing, onCancel, onSubmit }: {
         {/* Sticky header */}
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border bg-background sticky top-0 z-10">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-1">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-1">
               {editing.id ? "Editing" : "New article"}
             </div>
             <div className="font-display text-2xl leading-tight">
@@ -600,7 +600,7 @@ function PostEditor({ editing, setEditing, onCancel, onSubmit }: {
               </div>
 
               <div className="pt-4 mt-2 border-t border-border space-y-3">
-                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">Scheduling & series</div>
+                <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent">Scheduling & series</div>
                 <Field label="Publish at" hint="ISO timestamp. Blank = publish immediately. Future = scheduled release.">
                   <input type="text" placeholder="2026-06-02T12:00:00+00:00" value={editing.published_at ?? ""} onChange={(e) => setEditing({ ...editing, published_at: e.target.value })} className={inputCls} />
                 </Field>
@@ -661,7 +661,7 @@ function PostEditor({ editing, setEditing, onCancel, onSubmit }: {
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1.5">{label}</div>
+      <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">{label}</div>
       {children}
       {hint && <div className="text-[11px] text-muted-foreground mt-1.5 leading-snug">{hint}</div>}
     </label>
@@ -696,14 +696,14 @@ function PlaybooksAdmin() {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Codex Playbooks</h2><ExportButton dataset="playbooks" /></div>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono text-[10px] uppercase tracking-widest">+ New playbook</button>
+        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-xs">+ New playbook</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
         {(list.data ?? []).map((p: any) => (
           <div key={p.id} className="p-4 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="font-display text-lg truncate">{p.title}</div>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
                 {p.category} · ${(p.price_cents / 100).toFixed(0)} · {p.pages}pp
               </div>
             </div>
@@ -721,7 +721,7 @@ function PlaybooksAdmin() {
           <div className="bg-background border border-border w-full max-w-2xl my-0 sm:my-8 max-h-[100dvh] sm:max-h-[calc(100dvh-4rem)] flex flex-col shadow-2xl">
             <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border bg-background sticky top-0 z-10">
               <div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-1">
+                <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-1">
                   {editing.id ? "Editing playbook" : "New playbook"}
                 </div>
                 <div className="font-display text-2xl leading-tight">{editing.title || "Untitled"}</div>
@@ -802,7 +802,7 @@ function QAgentAdmin() {
   return (
     <div className="space-y-10">
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Operator agent</div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Operator agent</div>
         <h2 className="font-display text-4xl mb-2"><QMark /> Control Room</h2>
         <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
           Every canvas run, every voice toggle, every shared response. <QMark /> is gated to admins and active Vanguard subscribers — manage them here.
@@ -819,14 +819,14 @@ function QAgentAdmin() {
       </div>
 
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">Trees · last 30 days</div>
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">Trees · last 30 days</div>
         <div className="border border-border divide-y divide-border">
           {treeRows.map((t) => {
             const max = Math.max(1, ...treeRows.map((r) => r.count));
             const pct = (t.count / max) * 100;
             return (
               <div key={t.id} className="px-4 py-3 grid grid-cols-[60px_1fr_auto] items-center gap-4">
-                <div className="font-mono text-[10px] text-accent">{t.id}</div>
+                <div className="font-mono text-xs text-accent">{t.id}</div>
                 <div>
                   <div className="font-display text-base leading-tight">{t.title}</div>
                   <div className="text-xs text-muted-foreground">{t.blurb}</div>
@@ -842,7 +842,7 @@ function QAgentAdmin() {
       </div>
 
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">Recent runs</div>
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">Recent runs</div>
         <DataTable
           rows={runs.data ?? []}
           empty="No Q. runs yet."
@@ -854,32 +854,32 @@ function QAgentAdmin() {
               return (
                 <div>
                   <div className="text-sm">{n?.label ?? r.node_id}</div>
-                  <div className="text-[10px] font-mono text-muted-foreground">{breadcrumbFor(r.node_id).join(" › ")}</div>
+                  <div className="text-xs font-mono text-muted-foreground">{breadcrumbFor(r.node_id).join(" › ")}</div>
                 </div>
               );
             }},
             { key: "witty", label: "Voice", render: (r) => (
-              <span className="font-mono text-[10px] uppercase tracking-widest">
+              <span className="font-mono uppercase tracking-widest text-xs">
                 {r.witty ? "Witty" : "Analytical"}
               </span>
             )},
             { key: "shared", label: "Shared", render: (r) => r.shared ? <span className="text-accent">●</span> : <span className="text-muted-foreground">—</span> },
             { key: "id", label: "Run", render: (r) => (
-              <a href={`/agent/response/${r.id}`} className="font-mono text-[10px] uppercase tracking-widest underline">Open</a>
+              <a href={`/agent/response/${r.id}`} className="font-mono uppercase tracking-widest text-xs underline">Open</a>
             )},
           ]}
         />
       </div>
 
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">Entitled operators</div>
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">Entitled operators</div>
         <DataTable
           rows={ents.data ?? []}
           empty="No entitled operators yet."
           cols={[
             { key: "email", label: "Email" },
-            { key: "is_admin", label: "Admin", render: (r) => r.is_admin ? <span className="font-mono text-[10px] uppercase tracking-widest text-accent">Admin</span> : "—" },
-            { key: "has_vanguard", label: "Vanguard", render: (r) => r.has_vanguard ? <span className="font-mono text-[10px] uppercase tracking-widest">Active</span> : "—" },
+            { key: "is_admin", label: "Admin", render: (r) => r.is_admin ? <span className="font-mono uppercase tracking-widest text-xs text-accent">Admin</span> : "—" },
+            { key: "has_vanguard", label: "Vanguard", render: (r) => r.has_vanguard ? <span className="font-mono uppercase tracking-widest text-xs">Active</span> : "—" },
             { key: "since", label: "Since", render: (r) => fmtDate(r.since) },
             { key: "renews", label: "Renews", render: (r) => fmtDate(r.renews) },
           ]}
@@ -961,7 +961,7 @@ function ImportArticlesAdmin() {
   return (
     <div className="space-y-6">
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Bulk import</div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Bulk import</div>
         <h2 className="font-display text-4xl mb-2">Import Articles</h2>
         <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
           Upload a CSV or paste JSON. Required columns: <code>slug, title, excerpt, body</code>.
@@ -1002,13 +1002,13 @@ function ImportArticlesAdmin() {
 
       {results && (
         <div className="border border-border">
-          <div className="px-4 py-3 border-b border-border font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <div className="px-4 py-3 border-b border-border font-mono uppercase tracking-widest text-xs text-muted-foreground">
             Results · {results.length}
           </div>
           <div className="max-h-[400px] overflow-auto divide-y divide-border">
             {results.map((r, i) => (
               <div key={i} className="px-4 py-2 flex items-start gap-3 text-sm">
-                <span className={`font-mono text-[10px] uppercase tracking-widest shrink-0 ${
+                <span className={`font-mono uppercase tracking-widest text-xs shrink-0 ${
                   r.status === "ok" ? "text-accent" : r.status === "skipped" ? "text-muted-foreground" : "text-destructive"
                 }`}>{r.status}</span>
                 <span className="font-mono text-xs">{r.slug}</span>
@@ -1037,7 +1037,7 @@ function AuditLogAdmin() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">Activity</div>
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Activity</div>
           <h2 className="font-display text-4xl">Audit Log</h2>
         </div>
         <ExportButton dataset="admin_audit_log" />
@@ -1067,8 +1067,8 @@ function AuditLogAdmin() {
           { key: "actor_email", label: "Actor", render: (r) => r.actor_email ?? <code className="text-xs">{String(r.actor_id ?? "").slice(0, 8)}</code> },
           { key: "action", label: "Action", render: (r) => <span className="font-mono text-xs">{r.action}</span> },
           { key: "target_table", label: "Target", render: (r) => r.target_table ? <span className="font-mono text-xs">{r.target_table}{r.target_id ? `/${String(r.target_id).slice(0, 8)}` : ""}</span> : "—" },
-          { key: "details", label: "Details", render: (r) => <code className="text-[10px] text-muted-foreground">{r.details ? JSON.stringify(r.details) : ""}</code> },
-          { key: "ip", label: "IP", render: (r) => <span className="font-mono text-[10px] text-muted-foreground">{r.ip ?? "—"}</span> },
+          { key: "details", label: "Details", render: (r) => <code className="text-xs text-muted-foreground">{r.details ? JSON.stringify(r.details) : ""}</code> },
+          { key: "ip", label: "IP", render: (r) => <span className="font-mono text-xs text-muted-foreground">{r.ip ?? "—"}</span> },
         ]}
       />
     </div>

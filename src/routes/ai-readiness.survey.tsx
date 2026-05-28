@@ -77,7 +77,7 @@ function SurveyPage() {
 
       {step >= 0 && (
         <div className="max-w-3xl mx-auto px-6 w-full pt-12">
-          <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">
+          <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-3">
             <span>{currentQuestion!.section}</span>
             <span>Question {step + 1} of {QUESTIONS.length}</span>
           </div>
@@ -93,7 +93,7 @@ function SurveyPage() {
       <main className="max-w-3xl mx-auto px-6 pt-12 pb-16 w-full">
         {step === -1 && (
           <div className="animate-fade-up">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
               6 minutes · 8 dimensions · 32 metrics
             </div>
             <h1 className="font-display text-5xl md:text-6xl leading-[0.95] mb-6">
@@ -157,7 +157,7 @@ function SurveyPage() {
 
         {currentQuestion && (
           <div key={currentQuestion.id} className="animate-fade-up">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4">
               Dimension {currentQuestion.id} · Weight {currentQuestion.weight} pts
             </div>
             <h2 className="font-display text-3xl md:text-5xl leading-[1.1] mb-4 text-balance">
@@ -237,7 +237,7 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="max-w-4xl mx-auto px-6 pt-16 pb-16 w-full animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
           Your Super Agent Readiness Report
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] mb-3">
@@ -249,15 +249,15 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
 
         <div className="grid md:grid-cols-3 gap-8 items-end border-t border-b border-border py-10 mb-12">
           <div className="md:col-span-1">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Final Score</div>
+            <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-2">Final Score</div>
             <div className="font-display text-8xl leading-none">{result.finalScore}<span className="text-2xl text-muted-foreground">/100</span></div>
           </div>
           <div className="md:col-span-2">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2">Tier</div>
+            <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-2">Tier</div>
             <span className={`inline-block px-4 py-2 font-mono text-[11px] uppercase tracking-widest ${TIER_TINT[result.tier]}`}>
               {result.tierLabel}
             </span>
-            <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            <div className="mt-4 font-mono uppercase tracking-widest text-xs text-muted-foreground">
               Foundational {Math.round(result.foundationalTotal)}/50 · Agent-Level {Math.round(result.agentTotal)}/50
             </div>
           </div>
@@ -267,7 +267,7 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
           <h2 className="font-display text-3xl mb-4">What this means for you</h2>
           <p className="text-lg leading-relaxed text-foreground/85 text-pretty">{result.headline}</p>
           <div className="mt-8 bg-foreground text-background p-8">
-            <div className="font-mono text-[10px] uppercase tracking-widest opacity-60 mb-2">Recommended Path</div>
+            <div className="font-mono uppercase tracking-widest text-xs opacity-60 mb-2">Recommended Path</div>
             <div className="text-xl leading-relaxed">{result.recommendation}</div>
           </div>
         </section>
@@ -310,12 +310,12 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
                   <div key={id} className={`border p-6 ${ready ? "border-accent" : "border-secondary-accent"}`}>
                     <div className="flex justify-between items-baseline mb-2">
                       <h3 className="font-display text-xl">{a.name}</h3>
-                      <span className={`font-mono text-[10px] uppercase tracking-widest ${ready ? "text-accent" : "text-secondary-accent"}`}>
+                      <span className={`font-mono uppercase tracking-widest text-xs ${ready ? "text-accent" : "text-secondary-accent"}`}>
                         {ready ? "Ready" : "Prep"}
                       </span>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{a.desc}</p>
-                    <div className="font-mono text-[10px] uppercase tracking-widest">
+                    <div className="font-mono uppercase tracking-widest text-xs">
                       Readiness: <span className="font-bold">{Math.round((d.weighted / d.weight) * 100)}%</span>
                     </div>
                   </div>
@@ -396,7 +396,7 @@ function Breakdown({ title, max, total, items }: { title: string; max: number; t
 function Field({ label, value, onChange, type = "text", placeholder }: { label: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string }) {
   return (
     <label className="block">
-      <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">{label}</span>
       <input
         type={type}
         value={value}
@@ -411,7 +411,7 @@ function Field({ label, value, onChange, type = "text", placeholder }: { label: 
 function SelectField({ label, value, onChange, children }: { label: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="font-mono uppercase tracking-widest text-xs text-muted-foreground">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}

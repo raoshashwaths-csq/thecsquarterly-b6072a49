@@ -27,7 +27,7 @@ export const Route = createFileRoute("/vanguard")({
       ]}
       extras={
         <section className="max-w-7xl w-full mx-auto px-6 pb-20">
-          <div className="font-mono text-[10px] uppercase tracking-widest text-foreground font-semibold mb-10">
+          <div className="font-mono uppercase tracking-widest text-xs text-foreground font-semibold mb-10">
             Pair the dispatches with playbooks & diagnostics
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/vanguard")({
               <p className="text-sm text-foreground/70 mb-4">
                 Templates, frameworks, and decks for the exact motions referenced in every Vanguard essay. Included with subscription.
               </p>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/60 group-hover:text-accent transition-colors">
+              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors">
                 Open the Codex →
               </div>
             </Link>
@@ -57,7 +57,7 @@ export const Route = createFileRoute("/vanguard")({
               <p className="text-sm text-foreground/70 mb-4">
                 The Super Agent Readiness Diagnostic scores your team across 11 dimensions and ships a 90-day plan.
               </p>
-              <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/60 group-hover:text-accent transition-colors">
+              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors">
                 Take the diagnostic →
               </div>
             </Link>

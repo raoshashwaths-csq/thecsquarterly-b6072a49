@@ -40,7 +40,7 @@ function InsightsPage() {
       <SiteHeader />
 
       <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6 font-medium">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6 font-medium">
           The Archive
         </div>
         <h1 className="font-display text-6xl md:text-8xl leading-[0.95] tracking-tight text-balance max-w-4xl">
@@ -73,7 +73,7 @@ function InsightsPage() {
               params={{ slug: p.slug }}
               className="group block border-t border-border pt-6"
             >
-              <div className="flex justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-4">
+              <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                 <span className="text-accent">{p.category}</span>
                 <span>{p.read_minutes} min</span>
               </div>
@@ -81,7 +81,7 @@ function InsightsPage() {
                 {p.title}
               </h2>
               <p className="text-foreground/70 text-pretty">{p.excerpt}</p>
-              <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <div className="mt-4 font-mono uppercase tracking-widest text-xs text-muted-foreground">
                 By {p.author}
               </div>
             </Link>
