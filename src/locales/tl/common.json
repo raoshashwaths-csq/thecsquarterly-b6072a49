@@ -1,7 +1,7 @@
 {
   "nav": {
     "vanguard": "Vanguard",
-    "retention": "Retention",
+    "retention": "Retensyon",
     "outcome": "Outcome",
     "codex": "Codex",
     "diagnostic": "Diagnostic",
@@ -15,33 +15,33 @@
     "account": "Account",
     "admin": "Admin",
     "roiCalculator": "ROI Calculator",
-    "benchmarks": "Mga Benchmark",
+    "benchmarks": "Benchmarks",
     "directory": "Direktoryo",
     "teams": "Mga Team",
-    "sequencer": "Sequencer ng Pagbasa",
+    "sequencer": "Sequencer",
     "controlPanel": "Control Panel",
     "signOut": "Mag-sign out",
     "member": "Miyembro"
   },
   "footer": {
-    "ctaEyebrow": "Ang Briefing / Lingguhan",
-    "ctaHeadlineLine1": "Estratehikong intelihensiya para sa",
-    "ctaHeadlineLine2": "mga arkitekto ng retention.",
+    "ctaEyebrow": "The Briefing / Lingguhan",
+    "ctaHeadlineLine1": "Estratehikong intelihensya para sa mga",
+    "ctaHeadlineLine2": "arkitekto ng retensyon.",
     "subscribeFree": "Mag-subscribe Libre",
     "sections": "Mga Seksyon",
-    "resources": "Mga Mapagkukunan",
+    "resources": "Mga Sanggunian",
     "company": "Kumpanya",
     "social": "Social",
     "privacy": "Privacy",
     "terms": "Mga Tuntunin",
     "colophon": "Colophon",
     "copyright": "© {{year}} The CS Quarterly",
-    "stayTuned": "Abangan",
+    "stayTuned": "Malapit nang ilunsad",
     "sectionLinks": {
       "vanguard": "The CS Vanguard",
-      "retention": "Ang Retention Protocol",
-      "outcome": "Ang Outcome Forum",
-      "codex": "Ang CS Codex"
+      "retention": "The Retention Protocol",
+      "outcome": "The Outcome Forum",
+      "codex": "The CS Codex"
     },
     "resourceLinks": {
       "diagnostic": "AI Readiness Diagnostic",
@@ -55,23 +55,88 @@
       "subscribe": "Mag-subscribe"
     },
     "companyLinks": {
-      "mission": "Ang Aming Misyon",
-      "editorial": "Mga Editorial Standard",
+      "mission": "Aming Misyon",
+      "editorial": "Editorial Standards",
       "contact": "Makipag-ugnayan",
       "login": "Mag-login"
     }
   },
   "langSwitcher": {
-    "label": "Pumili ng wika ng edisyon",
+    "label": "Piliin ang wikang edisyon",
     "editions": "Mga Edisyon",
     "regions": {
-      "global": "Pandaigdigan",
+      "global": "Global",
       "sea": "Timog-Silangang Asya",
-      "mena": "Gitnang Silangan at Hilagang Africa"
+      "mena": "Gitnang Silangan at Hilagang Aprika"
     },
     "soon": "malapit na",
-    "activeToast": "Aktibo ang edisyong {{native}}.",
-    "soonToast": "Ilulunsad na ang edisyong {{native}}. Mag-eemail kami pagdating nito.",
-    "soonDescription": "Paglulunsad sa {{region}} · darating ang dispatch sa {{native}}."
+    "activeToast": "Aktibo na ang {{native}} edition.",
+    "soonToast": "Malapit nang ilunsad ang {{native}} edition. Mag-eemail kami pag handa na.",
+    "soonDescription": "{{region}} rollout · ipadadala ang dispatch sa {{native}}."
+  },
+  "home": {
+    "eyebrow": "Lingguhang Dispatch para sa 1% ng mga Customer Success Operator",
+    "hero": {
+      "line1": "Itigil ang pamamahala ng accounts.",
+      "line2": "Simulan ang pag-engineer ng trajectory."
+    },
+    "hero_sub": "Ang pasibo ay nagsisilbi sa kontrata; ang lider ay nag-aarkitekto ng paglago. Dinadala ng lingguhang playbook na ito sa elite tier ang eksaktong sikolohiya, estratehiya, at framework na kailangan para makabuo ng alamat-na-antas na enterprise partnership.",
+    "welcomeBack": "Maligayang pagbabalik —",
+    "openAccount": "buksan ang iyong account →",
+    "aiCard": {
+      "eyebrow": "AI Readiness · Diagnostic",
+      "title": "Sukatin ang CS org mo sa 5 minuto",
+      "body": "8 dimensyon, 32 metrics. Tingnan kung nasaan ka sa pagitan ng Reactive, Operational at Predictive — at ano ang dapat ayusin muna.",
+      "cta": "Kunin ang libreng diagnostic →",
+      "hint": "Q: ang 5-minute audit ang magsasabi ng pinakamahinang dimensyon mo at ng isang ayos na magpapabago ng iyong tier."
+    },
+    "csfCard": {
+      "eyebrow": "CSF · Command Centre",
+      "title": "Iyong personal na CS dashboard",
+      "body": "Portfolio analytics, health, renewals at opportunities — sa isang operator-grade console.",
+      "cta": "I-unlock sa Operator tier →",
+      "hint": "Q: ang araw-araw mong operator console — magsimula dito tuwing umaga para i-triage ang tatlong pinakamadalian."
+    },
+    "workspace": {
+      "eyebrow": "Iyong Workspace",
+      "title": "Notes · Highlights · Links →"
+    },
+    "sections": {
+      "eyebrow": "Mga Seksyon",
+      "count": "{{count}} disiplina",
+      "enter": "Pumasok sa seksyon →",
+      "items": {
+        "vanguard": {
+          "blurb": "Proactive plays para sa mabungang engagement.",
+          "hint": "Q: buksan kapag gusto mo ng lingguhang signal kung ano ang ginagawa ng ibang CS orgs."
+        },
+        "retention": {
+          "blurb": "Matukoy ang churn agad. Baliktarin ito nang sistematiko.",
+          "hint": "Q: pumili ng isang playbook kada quarter at patakbuhin ito buo sa buong book."
+        },
+        "outcome": {
+          "blurb": "Validated case studies, may resibo.",
+          "hint": "Q: balikan ito kung kailangan mo ng numero para sa board o stakeholder argument."
+        },
+        "codex": {
+          "blurb": "Reference library para sa seryosong operator.",
+          "hint": "Q: gamitin parang diksyunaryo — pumasok, kunin ang framework, umalis."
+        },
+        "diagnostic": {
+          "name": "Mga Diagnostic",
+          "blurb": "Sukatin ang iyong team. 8 dimensyon, 32 metrics.",
+          "hint": "Q: ang iisang transisyon na magbubukas sa susunod mong tier ay ang unang pondohan."
+        }
+      }
+    },
+    "thesis": {
+      "eyebrow": "Tesis"
+    },
+    "recent": {
+      "title": "Mga Pinakabagong Dispatch",
+      "viewAll": "Tingnan lahat"
+    },
+    "insightLabel": "Insight #{{n}}, {{min}} min basahin",
+    "readFull": "Basahin ang buong sanaysay"
   }
 }

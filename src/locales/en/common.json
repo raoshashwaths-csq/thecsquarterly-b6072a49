@@ -73,5 +73,70 @@
     "activeToast": "{{native}} edition active.",
     "soonToast": "{{native}} edition launching soon. We'll email you when it ships.",
     "soonDescription": "{{region}} rollout · the dispatch will arrive in {{native}}."
+  },
+  "home": {
+    "eyebrow": "Weekly Dispatch for the 1% of Customer Success Operators",
+    "hero": {
+      "line1": "Stop managing accounts.",
+      "line2": "Start engineering trajectory.",
+      "sub": "Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships."
+    },
+    "welcomeBack": "Welcome back —",
+    "openAccount": "open your account →",
+    "aiCard": {
+      "eyebrow": "AI Readiness · Diagnostic",
+      "title": "Benchmark your CS org in 5 minutes",
+      "body": "8 dimensions, 32 metrics. See where you sit between Reactive, Operational and Predictive — and what to fix first.",
+      "cta": "Take the free diagnostic →",
+      "hint": "Q: the 5-min audit pinpoints your weakest of 8 dimensions and names the single fix that moves your band."
+    },
+    "csfCard": {
+      "eyebrow": "CSF · Command Centre",
+      "title": "Your personal CS dashboard",
+      "body": "Portfolio analytics, health, renewals and opportunities — in one operator-grade console.",
+      "cta": "Unlock at Operator tier →",
+      "hint": "Q: your daily operator console — start here every morning to triage the burning three."
+    },
+    "workspace": {
+      "eyebrow": "Your Workspace",
+      "title": "Notes · Highlights · Links →"
+    },
+    "sections": {
+      "eyebrow": "The Sections",
+      "count": "{{count}} disciplines",
+      "enter": "Enter section →",
+      "items": {
+        "vanguard": {
+          "blurb": "Proactive plays for fruitful engagement.",
+          "hint": "Q: open when you want this week's signal on what other CS orgs are doing."
+        },
+        "retention": {
+          "blurb": "Identify churn early. Reverse it systematically.",
+          "hint": "Q: pick one playbook per quarter and run it end-to-end across the book."
+        },
+        "outcome": {
+          "blurb": "Validated case studies, with the receipts.",
+          "hint": "Q: bring receipts here when you need numbers for a board or stakeholder argument."
+        },
+        "codex": {
+          "blurb": "The reference library for serious operators.",
+          "hint": "Q: use it like a dictionary — jump in, grab the framework, leave."
+        },
+        "diagnostic": {
+          "name": "The Diagnostics",
+          "blurb": "Benchmark your team. 8 dimensions, 32 metrics.",
+          "hint": "Q: the single transition that unlocks your next band is the one to fund first."
+        }
+      }
+    },
+    "thesis": {
+      "eyebrow": "The Thesis"
+    },
+    "recent": {
+      "title": "Recent Dispatches",
+      "viewAll": "View all"
+    },
+    "insightLabel": "Insight #{{n}}, {{min}} min read",
+    "readFull": "Read the full essay"
   }
 }

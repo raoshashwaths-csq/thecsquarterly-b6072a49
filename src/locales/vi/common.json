@@ -1,32 +1,32 @@
 {
   "nav": {
-    "vanguard": "Tiên phong",
+    "vanguard": "Vanguard",
     "retention": "Giữ chân",
     "outcome": "Kết quả",
     "codex": "Codex",
     "diagnostic": "Chẩn đoán",
     "canvas": "Canvas",
-    "workspace": "Không gian làm việc",
+    "workspace": "Workspace",
     "search": "Tìm",
     "login": "Đăng nhập"
   },
   "menu": {
-    "yourWorkspace": "Không gian của bạn",
+    "yourWorkspace": "Workspace của bạn",
     "account": "Tài khoản",
     "admin": "Quản trị",
     "roiCalculator": "Máy tính ROI",
-    "benchmarks": "Chuẩn mực",
+    "benchmarks": "Chuẩn so sánh",
     "directory": "Danh bạ",
     "teams": "Đội nhóm",
-    "sequencer": "Trình tự đọc",
+    "sequencer": "Sequencer",
     "controlPanel": "Bảng điều khiển",
     "signOut": "Đăng xuất",
     "member": "Thành viên"
   },
   "footer": {
-    "ctaEyebrow": "Bản tin / Hàng tuần",
-    "ctaHeadlineLine1": "Tình báo chiến lược cho các",
-    "ctaHeadlineLine2": "kiến trúc sư của sự giữ chân.",
+    "ctaEyebrow": "The Briefing / Hàng tuần",
+    "ctaHeadlineLine1": "Tri thức chiến lược cho",
+    "ctaHeadlineLine2": "các kiến trúc sư giữ chân khách hàng.",
     "subscribeFree": "Đăng ký miễn phí",
     "sections": "Chuyên mục",
     "resources": "Tài nguyên",
@@ -34,44 +34,109 @@
     "social": "Mạng xã hội",
     "privacy": "Riêng tư",
     "terms": "Điều khoản",
-    "colophon": "Thông tin xuất bản",
+    "colophon": "Colophon",
     "copyright": "© {{year}} The CS Quarterly",
     "stayTuned": "Sắp ra mắt",
     "sectionLinks": {
       "vanguard": "The CS Vanguard",
-      "retention": "Giao thức Giữ chân",
-      "outcome": "Diễn đàn Kết quả",
-      "codex": "CS Codex"
+      "retention": "The Retention Protocol",
+      "outcome": "The Outcome Forum",
+      "codex": "The CS Codex"
     },
     "resourceLinks": {
-      "diagnostic": "Chẩn đoán sẵn sàng AI",
+      "diagnostic": "Chẩn đoán Sẵn sàng AI",
       "calculator": "Máy tính ROI",
-      "benchmarks": "Chuẩn mực NRR",
-      "directory": "Danh bạ chuyên gia",
+      "benchmarks": "Chuẩn NRR",
+      "directory": "Danh bạ Operator",
       "teams": "Đội nhóm",
-      "sequencer": "Trình tự đọc",
-      "jobBoard": "Bảng tuyển dụng",
-      "pricing": "Bảng giá",
+      "sequencer": "Sequencer đọc",
+      "jobBoard": "Bảng việc làm",
+      "pricing": "Giá",
       "subscribe": "Đăng ký"
     },
     "companyLinks": {
       "mission": "Sứ mệnh",
-      "editorial": "Tiêu chuẩn biên tập",
+      "editorial": "Chuẩn biên tập",
       "contact": "Liên hệ",
       "login": "Đăng nhập"
     }
   },
   "langSwitcher": {
-    "label": "Chọn phiên bản ngôn ngữ",
-    "editions": "Phiên bản",
+    "label": "Chọn ấn bản ngôn ngữ",
+    "editions": "Ấn bản",
     "regions": {
       "global": "Toàn cầu",
       "sea": "Đông Nam Á",
       "mena": "Trung Đông & Bắc Phi"
     },
     "soon": "sắp có",
-    "activeToast": "Phiên bản {{native}} đã kích hoạt.",
-    "soonToast": "Phiên bản {{native}} sắp ra mắt. Chúng tôi sẽ gửi email khi sẵn sàng.",
-    "soonDescription": "Triển khai {{region}} · bản tin sẽ đến bằng {{native}}."
+    "activeToast": "Đã bật ấn bản {{native}}.",
+    "soonToast": "Ấn bản {{native}} sắp ra mắt. Chúng tôi sẽ gửi email khi sẵn sàng.",
+    "soonDescription": "Triển khai {{region}} · dispatch sẽ đến bằng {{native}}."
+  },
+  "home": {
+    "eyebrow": "Dispatch hàng tuần cho 1% Operator Customer Success",
+    "hero": {
+      "line1": "Đừng chỉ quản lý tài khoản.",
+      "line2": "Hãy thiết kế quỹ đạo tăng trưởng."
+    },
+    "hero_sub": "Người bị động phục vụ hợp đồng; người lãnh đạo kiến tạo tăng trưởng. Playbook hàng tuần này mang đến tầng tinh hoa đúng tâm lý, chiến lược và khung mẫu để xây dựng quan hệ đối tác doanh nghiệp huyền thoại.",
+    "welcomeBack": "Chào mừng trở lại —",
+    "openAccount": "mở tài khoản của bạn →",
+    "aiCard": {
+      "eyebrow": "AI Readiness · Chẩn đoán",
+      "title": "Đo độ sẵn sàng đội CS trong 5 phút",
+      "body": "8 chiều, 32 chỉ số. Xem bạn đang ở Reactive, Operational hay Predictive — và phải sửa gì trước.",
+      "cta": "Bắt đầu chẩn đoán miễn phí →",
+      "hint": "Q: bài đánh giá 5 phút chỉ ra chiều yếu nhất và nêu một việc sửa duy nhất sẽ nâng tầng của bạn."
+    },
+    "csfCard": {
+      "eyebrow": "CSF · Command Centre",
+      "title": "Dashboard CS cá nhân của bạn",
+      "body": "Phân tích danh mục, sức khỏe, gia hạn và cơ hội — trong một console cấp operator.",
+      "cta": "Mở khóa ở tầng Operator →",
+      "hint": "Q: console hàng ngày — bắt đầu ở đây mỗi sáng để phân loại ba việc cấp bách."
+    },
+    "workspace": {
+      "eyebrow": "Workspace của bạn",
+      "title": "Ghi chú · Highlight · Liên kết →"
+    },
+    "sections": {
+      "eyebrow": "Chuyên mục",
+      "count": "{{count}} bộ môn",
+      "enter": "Vào chuyên mục →",
+      "items": {
+        "vanguard": {
+          "blurb": "Chiến thuật chủ động cho cam kết hiệu quả.",
+          "hint": "Q: mở khi bạn cần tín hiệu tuần về việc các tổ chức CS khác đang làm gì."
+        },
+        "retention": {
+          "blurb": "Phát hiện churn sớm. Đảo ngược một cách hệ thống.",
+          "hint": "Q: chọn một playbook mỗi quý và chạy hết toàn bộ danh mục."
+        },
+        "outcome": {
+          "blurb": "Case study đã được xác thực, kèm bằng chứng.",
+          "hint": "Q: quay lại đây khi bạn cần con số để thuyết phục board hay stakeholder."
+        },
+        "codex": {
+          "blurb": "Thư viện tham khảo cho operator chuyên nghiệp.",
+          "hint": "Q: dùng như từ điển — vào, lấy khung mẫu, ra."
+        },
+        "diagnostic": {
+          "name": "Chẩn đoán",
+          "blurb": "Đo đội bạn. 8 chiều, 32 chỉ số.",
+          "hint": "Q: bước chuyển duy nhất mở khóa tầng kế tiếp là thứ đáng đầu tư trước."
+        }
+      }
+    },
+    "thesis": {
+      "eyebrow": "Luận điểm"
+    },
+    "recent": {
+      "title": "Dispatch gần đây",
+      "viewAll": "Xem tất cả"
+    },
+    "insightLabel": "Insight #{{n}}, {{min}} phút đọc",
+    "readFull": "Đọc toàn bộ bài viết"
   }
 }

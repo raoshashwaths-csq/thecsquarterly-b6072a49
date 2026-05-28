@@ -2,31 +2,31 @@
   "nav": {
     "vanguard": "Vanguard",
     "retention": "Retensi",
-    "outcome": "Hasil",
+    "outcome": "Outcome",
     "codex": "Codex",
     "diagnostic": "Diagnostik",
     "canvas": "Kanvas",
-    "workspace": "Ruang Kerja",
+    "workspace": "Workspace",
     "search": "Cari",
     "login": "Masuk"
   },
   "menu": {
-    "yourWorkspace": "Ruang Kerja Anda",
+    "yourWorkspace": "Workspace Anda",
     "account": "Akun",
     "admin": "Admin",
     "roiCalculator": "Kalkulator ROI",
     "benchmarks": "Tolok Ukur",
     "directory": "Direktori",
     "teams": "Tim",
-    "sequencer": "Pengatur Bacaan",
+    "sequencer": "Sequencer",
     "controlPanel": "Panel Kontrol",
     "signOut": "Keluar",
     "member": "Anggota"
   },
   "footer": {
-    "ctaEyebrow": "Briefing / Mingguan",
+    "ctaEyebrow": "The Briefing / Mingguan",
     "ctaHeadlineLine1": "Intelijen strategis untuk para",
-    "ctaHeadlineLine2": "arsitek retensi pelanggan.",
+    "ctaHeadlineLine2": "arsitek retensi.",
     "subscribeFree": "Berlangganan Gratis",
     "sections": "Bagian",
     "resources": "Sumber Daya",
@@ -39,9 +39,9 @@
     "stayTuned": "Segera hadir",
     "sectionLinks": {
       "vanguard": "The CS Vanguard",
-      "retention": "Protokol Retensi",
-      "outcome": "Forum Hasil",
-      "codex": "CS Codex"
+      "retention": "The Retention Protocol",
+      "outcome": "The Outcome Forum",
+      "codex": "The CS Codex"
     },
     "resourceLinks": {
       "diagnostic": "Diagnostik Kesiapan AI",
@@ -49,8 +49,8 @@
       "benchmarks": "Tolok Ukur NRR",
       "directory": "Direktori Operator",
       "teams": "Tim",
-      "sequencer": "Pengatur Bacaan",
-      "jobBoard": "Papan Lowongan",
+      "sequencer": "Sequencer Bacaan",
+      "jobBoard": "Lowongan Kerja",
       "pricing": "Harga",
       "subscribe": "Berlangganan"
     },
@@ -73,5 +73,70 @@
     "activeToast": "Edisi {{native}} aktif.",
     "soonToast": "Edisi {{native}} segera diluncurkan. Kami akan mengirim email saat tersedia.",
     "soonDescription": "Peluncuran {{region}} · dispatch akan tiba dalam {{native}}."
+  },
+  "home": {
+    "eyebrow": "Dispatch Mingguan untuk 1% Operator Customer Success",
+    "hero": {
+      "line1": "Berhenti mengelola akun.",
+      "line2": "Mulai merekayasa lintasan."
+    },
+    "hero_sub": "Yang pasif melayani kontrak; pemimpin merancang pertumbuhan. Playbook mingguan ini memberi tier elit psikologi, strategi, dan kerangka kerja yang dibutuhkan untuk membangun kemitraan enterprise yang legendaris.",
+    "welcomeBack": "Selamat datang kembali —",
+    "openAccount": "buka akun Anda →",
+    "aiCard": {
+      "eyebrow": "AI Readiness · Diagnostik",
+      "title": "Ukur kesiapan tim CS Anda dalam 5 menit",
+      "body": "8 dimensi, 32 metrik. Lihat posisi Anda antara Reactive, Operational, dan Predictive — dan apa yang harus diperbaiki lebih dulu.",
+      "cta": "Mulai diagnostik gratis →",
+      "hint": "Q: audit 5 menit menunjukkan dimensi terlemah Anda dan menamai satu perbaikan yang menggerakkan tier Anda."
+    },
+    "csfCard": {
+      "eyebrow": "CSF · Command Centre",
+      "title": "Dasbor CS pribadi Anda",
+      "body": "Analitik portofolio, kesehatan, renewal, dan peluang — dalam satu konsol kelas operator.",
+      "cta": "Buka di tier Operator →",
+      "hint": "Q: konsol harian Anda — mulai di sini setiap pagi untuk menangani tiga prioritas mendesak."
+    },
+    "workspace": {
+      "eyebrow": "Workspace Anda",
+      "title": "Catatan · Highlight · Tautan →"
+    },
+    "sections": {
+      "eyebrow": "Bagian",
+      "count": "{{count}} disiplin",
+      "enter": "Masuk bagian →",
+      "items": {
+        "vanguard": {
+          "blurb": "Strategi proaktif untuk engagement yang produktif.",
+          "hint": "Q: buka saat Anda ingin sinyal mingguan tentang apa yang dilakukan organisasi CS lain."
+        },
+        "retention": {
+          "blurb": "Deteksi churn lebih awal. Balikkan secara sistematis.",
+          "hint": "Q: pilih satu playbook per kuartal dan jalankan dari awal hingga akhir di seluruh book."
+        },
+        "outcome": {
+          "blurb": "Studi kasus tervalidasi, dengan bukti angkanya.",
+          "hint": "Q: kembali ke sini ketika Anda butuh angka untuk argumen ke board atau stakeholder."
+        },
+        "codex": {
+          "blurb": "Perpustakaan referensi untuk operator serius.",
+          "hint": "Q: pakai seperti kamus — masuk, ambil kerangkanya, keluar."
+        },
+        "diagnostic": {
+          "name": "Diagnostik",
+          "blurb": "Ukur tim Anda. 8 dimensi, 32 metrik.",
+          "hint": "Q: satu transisi yang membuka tier berikutnya adalah yang pertama harus didanai."
+        }
+      }
+    },
+    "thesis": {
+      "eyebrow": "Tesis"
+    },
+    "recent": {
+      "title": "Dispatch Terbaru",
+      "viewAll": "Lihat semua"
+    },
+    "insightLabel": "Insight #{{n}}, {{min}} menit baca",
+    "readFull": "Baca esai lengkap"
   }
 }
