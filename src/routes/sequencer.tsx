@@ -39,6 +39,9 @@ function SequencerPage() {
   const fetchPosts = useServerFn(listPosts);
   const save = useServerFn(saveSequence);
   const qc = useQueryClient();
+
+  const { data: posts } = useQuery({ queryKey: ["posts"], queryFn: () => fetchPosts() });
+
   const {
     data: seqs,
     error: seqsError,
