@@ -1,93 +1,73 @@
+## Goal
 
-# Multi-Tier Entitlement Engine
+Reposition The CS Quarterly from "premium publication + AI tooling" to "CS operating platform with the industry's intelligence layer built in." Rebuild the pricing matrix into 7 tiers, align entitlements/Q caps, and persist the new positioning to project memory. No competitor names anywhere in copy.
 
-## 1. Schema: new `designation` column
+## 1. Memory updates (permanent knowledge)
 
-Migration on `public.subscriptions`:
+Add a new memory file `mem://product/positioning-v4` capturing:
+- Category shift: publication → CS operating platform + intelligence layer.
+- Three buyer narratives (individual practitioner / CS teams / enterprise) — paraphrased, no competitor names.
+- Five-layer moat (data, intelligence, platform, community, brand).
+- The full 7-tier matrix below as the canonical pricing source of truth.
+- Conversion levers: Operator unlocks the personal CS dashboard; Team unlocks shared dashboard + admin; Scale unlocks branded benchmark PDF + SSO; Enterprise unlocks white-label + API; Strategic Partner is co-branded data partnership.
 
-- Add `designation text` with check constraint over: `reader`, `practitioner`, `operator`, `team`, `scale`, `enterprise`, `strategic_partner`.
-- Backfill from existing `tier`:
-  - `free` → `reader`
-  - `vanguard` / `vanguard-individual` → `practitioner`
-  - `vanguard-pro` → `operator`
-  - `team-starter` → `team`
-  - `team-growth` → `scale`
-  - `enterprise` → `enterprise`
-- Admins (via `has_role`) resolve to `strategic_partner` in code, no DB change.
-- Add `public.has_designation(_user uuid, _min designation_rank int)` security-definer helper that returns boolean, used by future RLS where needed.
+Update `mem://index.md` Core with a one-liner: "Pricing follows the 7-tier matrix in product/positioning-v4. Operator ($79) is the dashboard unlock; never bundle the dashboard into Practitioner. Never name competitors in marketing copy."
 
-## 2. Entitlements layer (code)
+## 2. Tier matrix (canonical)
 
-Extend `src/hooks/useEntitlements.ts`:
+| # | Designation | Price | Seats | Q sessions / mo | Headline unlock |
+|---|---|---|---|---|---|
+| 1 | reader | $0 | 1 | 0 | Weekly briefings, Ledger ticker, AI Diagnostic score only |
+| 2 | practitioner | $29 / $290 yr | 1 | 30 | Full library, all Codex playbooks, AI blueprint, Q advisor |
+| 3 | operator | $79 / $790 yr | 1 | 100 | Personal CS dashboard + benchmark comparison tool |
+| 4 | team | $599 / $5,990 yr | up to 8 | 400 shared | Shared team dashboard, admin analytics, learning paths, 2 job credits/qtr, SSO prep |
+| 5 | scale | $1,499 / $14,990 yr | up to 20 | 1,000 shared | Advanced dashboard (cohort, heatmap), quarterly branded benchmark PDF, quarterly briefing call, SSO/SAML, 4 job credits/qtr |
+| 6 | enterprise | $3,500 / mo | up to 50 | unlimited | White-label benchmark reports, Ledger API access, custom learning paths + certificates, dedicated community space |
+| 7 | strategic_partner | $8,000 / mo (annual) | unlimited | unlimited | Co-branded Codex content, full Ledger API, event speaking slot, editorial footer logo |
 
-- Add `designation: Designation` and numeric `dRank`.
-- Add booleans: `canExecAnalytics` (operator+), `canTeamScope` (team+), `canSSO` (scale+), `canApiKeys` (enterprise+), `qMonthlyCap` (number).
-- Server mirror: `src/lib/entitlements.functions.ts` — `getMyDesignation()` returning the same shape; used by server-fn gates.
+Caps already wired in `src/lib/entitlements.ts` — verify and adjust the numbers above (currently practitioner=30, operator=100, team=400, scale=1000, enterprise/strategic=∞) — these already match, so no code change to caps.
 
-## 3. New gated routes
+## 3. `/pricing` route rebuild
 
-### `/account/executive/analytics`
-- New route file `src/routes/account.executive.analytics.tsx`.
-- Renders an embedded CSFactors-style command center (reuse `AccountsGrid`, `BurningThree`, `AnalyticsHeader` already in `src/components/csfactors/`).
-- `beforeLoad` reads `useEntitlements`-equivalent server check; if designation < operator, mount a `<TierGateOverlay />` (blurred Parchment modal, `backdrop-blur`, copy from spec) instead of the analytics body.
-- For `operator`: load grid scoped to current user only (already how `listAccounts` works).
-- For `team`+: surface a new "Team scope" `<Select>` (placeholder data — `getTeamMembers` server-fn returns the user's `team_members` rows; switching scope is a no-op until a real team data model lands, but the dropdown renders).
+Rewrite `src/routes/pricing.tsx` as an editorial pricing page using existing parchment design language:
 
-### `/account/api`
-- New route `src/routes/account.api.tsx`.
-- Only visible if `canApiKeys`. Otherwise renders the same `<TierGateOverlay />` with enterprise copy.
-- Tab inside `/account` shell with a "Generate bearer token" form (stub button → `toast.info("Available on Enterprise — contact us")` for now; no actual key minting).
+- **Hero**: mono eyebrow "THE PLATFORM", display headline "An operating system for the customer success profession." Subhead reframing the category (publication → platform), no competitor mentions.
+- **Three-narrative band**: 3 short cards (Individual practitioner / CS teams / Enterprise) with the displacement story rewritten without naming competitors ("legacy enterprise CS suites", "mid-market platforms", "spreadsheet-based workflows").
+- **Tier grid**: 7 cards in two rows.
+  - Row A (individual): Reader, Practitioner, Operator — 3 columns, Operator highlighted as "Most popular for senior ICs".
+  - Row B (teams): Team, Scale, Enterprise — 3 columns, Scale highlighted.
+  - Strategic Partner: full-width contact-sales card at the bottom (oxblood accent, "Talk to editorial" CTA → mailto).
+- Each card: tier name (display serif), price (annual + monthly), seat cap, Q-session cap, 5–7 bullet features, CTA. CTAs:
+  - Reader → `/login` ("Start free")
+  - Practitioner / Operator / Team / Scale → `/subscribe?tier=<designation>` ("Upgrade")
+  - Enterprise / Strategic Partner → `mailto:hello@thecsquarterly.com?subject=...` ("Talk to editorial")
+- **Comparison strip**: dense table with rows = capability, columns = tiers, checkmark grid. Capabilities grouped: Editorial, Codex & Diagnostic, Q advisor, Dashboard, Benchmarks, Community, Job board, Admin & integrations.
+- **Moat band** (below grid): 5 short blocks — Data / Intelligence / Platform / Community / Brand — written as principles, not boasts.
+- **FAQ**: 4 items (billing cadence, downgrades, seat overages, dashboard onboarding time).
 
-### `/api/v1/*` guard
-- Add server route `src/routes/api/v1.$.ts` that returns:
-  ```json
-  { "error": "unauthenticated", "message": "Enterprise API key required" }
-  ```
-  status 403, `Content-Type: application/json`. Covers any direct hit on `/api/v1/...` without a verified key. Existing `api/v1.benchmarks.nrr.ts` and `api/v1.retention-ledger.ticker.ts` remain (they're public read endpoints); the catch-all only handles unmatched `/api/v1/*` paths.
+Design constraints: semantic tokens only, mono eyebrows, hairline `border-border` dividers, no new color tokens. Highlighted cards use `--accent` ring + soft gold dot.
 
-## 4. Q agent monthly cap
+## 4. `/subscribe` flow
 
-- New server-fn `src/lib/q-usage.functions.ts` → `getMonthlyQUsage()`:
-  - `count(*) from q_runs where user_id = me and created_at >= date_trunc('month', now())`
-  - returns `{ used, cap }` where cap derives from designation (reader 0, practitioner 30, operator 100, team 400, scale 1000, enterprise/strategic ∞).
-- In `src/lib/csfactors-q.functions.ts` (and any other Q entry server-fn): call usage check before `q_runs` insert; throw `Error("Q monthly cap reached")` when exceeded.
-- In both Q surfaces (`src/components/site/QAgentButton.tsx` and `src/components/csfactors/QAgentDrawer.tsx`):
-  - Fetch usage via `useQuery`.
-  - When `used >= cap`, render an inline notification block (uses `SectionCard` + accent border) above the composer: "You've used X / Y Q interactions this month. Upgrade to {next tier} for more."
-  - Disable mic + send when capped.
+`src/routes/subscribe.tsx` — accept `?tier=` query param matching one of the seven designations; show a confirmation card with the selected tier's price and the same feature bullets, then a single "Continue to checkout" CTA (stub — payments not wired in this change). Keep existing UI shell; just data-drive it from a shared `TIERS` constant.
 
-## 5. Scale-tier stubs
+## 5. Shared tier metadata
 
-- In `/account` shell add two cards behind `canSSO`:
-  - **Single Sign-On (SAML)** — title + body + disabled "Configure SSO" button + small note: "Available on Scale and above". For tiers ≥ scale, button shows toast: "SSO setup is concierge — we'll reach out to provision WorkOS."
-  - **Brand assets** — disabled file input + same gating. No upload wiring.
-- Both rendered with `SectionCard` from the dashboard kit, Parchment styling.
+Create `src/lib/tiers.ts` exporting a single `TIERS` array of `{ designation, label, priceMonthly, priceAnnual, seatCap, qCap, tagline, features[], cta, highlight }`. Both `pricing.tsx` and `subscribe.tsx` consume it so the matrix stays in one place. `useEntitlements` keeps its current shape — the new file is presentation metadata, not entitlement logic.
 
-## 6. Shared `<TierGateOverlay />`
+## 6. Header / footer copy touch-ups
 
-`src/components/site/TierGateOverlay.tsx`:
-- Full-bleed blurred backdrop over whatever it wraps (`backdrop-blur-xl bg-background/70`).
-- Centered Parchment card: mono eyebrow "Tier required", display headline, body copy passed via props, two CTAs (Primary → `/pricing`, ghost → "Back").
-- Used by `/account/executive/analytics`, `/account/api`, and any future gates.
+- Footer: change any "Subscribe to the briefing" CTA blurb that implies pure newsletter into "Read the briefing. Run the platform." (one-line edit in the footer component only if such copy exists).
+- No header changes (Pricing/Subscribe stay out of the header per existing rule).
 
-## 7. Files touched
+## 7. Out of scope
 
-**New**
-- `src/routes/account.executive.analytics.tsx`
-- `src/routes/account.api.tsx`
-- `src/routes/api/v1.$.ts`
-- `src/components/site/TierGateOverlay.tsx`
-- `src/lib/entitlements.functions.ts`
-- `src/lib/q-usage.functions.ts`
-- Migration: add `designation` + backfill + helper fn
+- Real Stripe/Paddle wiring, seat-pooling logic, SSO provisioning, Ledger API tokens, learning-path engine, white-label PDF renderer — all remain stubs / placeholders behind the existing tier gates.
+- No changes to the Q drawer, CSFactors dashboard, or `/account/executive/analytics` gating — they already read from the same `designation` field this plan reinforces.
+- No competitor names will appear in any committed copy.
 
-**Edited**
-- `src/hooks/useEntitlements.ts` (designation, new booleans, caps)
-- `src/components/site/QAgentButton.tsx` + `src/components/csfactors/QAgentDrawer.tsx` (cap UI)
-- `src/lib/csfactors-q.functions.ts` + `src/lib/q-agent.functions.ts` (server cap enforcement)
-- `src/routes/account.index.tsx` (SSO + brand stubs + API tab link)
+## Files touched
 
-## Out of scope (explicit)
-- Real WorkOS SAML wiring, real brand-asset storage, real API-key minting, real team aggregation queries.
-- Renaming existing `tier` column or removing legacy values.
-- Migrating existing RLS policies to use `designation` (the column is additive; current `tier`-based policies keep working).
+- New: `src/lib/tiers.ts`, `mem://product/positioning-v4`
+- Edited: `src/routes/pricing.tsx`, `src/routes/subscribe.tsx`, `mem://index.md`
+- Optional: footer component (one-line copy tweak) if a stale "subscribe to the briefing" line exists.
