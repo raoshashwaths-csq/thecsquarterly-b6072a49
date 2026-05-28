@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-type Msg = { role: "user" | "assistant"; content: string };
+
 
 const Input = z.object({
   question: z.string().trim().min(1).max(2000),
