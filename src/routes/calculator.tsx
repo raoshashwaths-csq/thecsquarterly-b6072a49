@@ -195,8 +195,9 @@ function CalculatorPage() {
                   />
                   <Tooltip
                     contentStyle={{
-                      background: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
+                      background: "var(--background)",
+                      border: "1px solid var(--border)",
+                      color: "var(--foreground)",
                       fontFamily: "JetBrains Mono",
                       fontSize: 12,
                     }}
