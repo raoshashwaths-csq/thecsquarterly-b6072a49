@@ -224,9 +224,7 @@ export function SiteHeader() {
               {t("nav.login")}
             </Link>
 
-            >
-              Login
-            </Link>
+
           )}
         </div>
       </nav>
