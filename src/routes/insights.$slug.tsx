@@ -26,19 +26,56 @@ export const Route = createFileRoute("/insights/$slug")({
   },
   head: ({ loaderData, params }) => {
     if (!loaderData) return { meta: [{ title: "Insight, The CS Quarterly" }] };
+    const url = `https://www.thecsquarterly.com/insights/${params.slug}`;
+    const image = loaderData.cover_image_url
+      ? (loaderData.cover_image_url.startsWith("http")
+          ? loaderData.cover_image_url
+          : `https://www.thecsquarterly.com${loaderData.cover_image_url}`)
+      : undefined;
+    const meta: Array<Record<string, string>> = [
+      { title: `${loaderData.title}, The CS Quarterly` },
+      { name: "description", content: loaderData.excerpt },
+      { property: "og:title", content: loaderData.title },
+      { property: "og:description", content: loaderData.excerpt },
+      { property: "og:type", content: "article" },
+      { property: "og:url", content: url },
+      { property: "article:author", content: loaderData.author },
+      { property: "article:section", content: loaderData.category },
+      { property: "article:published_time", content: loaderData.published_at },
+    ];
+    if (image) {
+      meta.push({ property: "og:image", content: image });
+      meta.push({ name: "twitter:image", content: image });
+      meta.push({ name: "twitter:card", content: "summary_large_image" });
+    }
+    const ld: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: loaderData.title,
+      description: loaderData.excerpt,
+      datePublished: loaderData.published_at,
+      author: { "@type": "Person", name: loaderData.author },
+      publisher: {
+        "@type": "Organization",
+        name: "The CS Quarterly",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://www.thecsquarterly.com/favicon.ico",
+        },
+      },
+      mainEntityOfPage: { "@type": "WebPage", "@id": url },
+      articleSection: loaderData.category,
+    };
+    if (image) ld.image = image;
     return {
-      meta: [
-        { title: `${loaderData.title}, The CS Quarterly` },
-        { name: "description", content: loaderData.excerpt },
-        { property: "og:title", content: loaderData.title },
-        { property: "og:description", content: loaderData.excerpt },
-        { property: "og:type", content: "article" },
-        { property: "og:url", content: `/insights/${params.slug}` },
-        { property: "article:author", content: loaderData.author },
-        { property: "article:section", content: loaderData.category },
-        { property: "article:published_time", content: loaderData.published_at },
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(ld),
+        },
       ],
-      links: [{ rel: "canonical", href: `/insights/${params.slug}` }],
     };
   },
   component: PostPage,
