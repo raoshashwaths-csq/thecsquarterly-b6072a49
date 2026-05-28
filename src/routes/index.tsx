@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
+import { QHint } from "@/components/site/QHint";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -61,9 +62,7 @@ function HomePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center animate-fade-up">
-        {/* (Workspace anchor moved below the CSF Command Centre card) */}
-
+      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center md:animate-fade-up">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           Weekly Dispatch for the 1% of Customer Success Operators
         </div>
@@ -84,8 +83,42 @@ function HomePage() {
           </p>
         )}
 
-        {/* Elevated CSF Command Centre card */}
+        {/* AI Readiness Audit — primary value-prop card for first-time visitors */}
         <div className="mt-12 flex justify-center">
+          <Link
+            to="/ai-readiness"
+            data-tour="ai-readiness-box"
+            className="group relative w-full max-w-2xl bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7 text-left flex flex-col md:flex-row md:items-center gap-5"
+            aria-label="Take the AI Readiness Audit"
+          >
+            <span
+              aria-hidden
+              className="flex h-14 w-14 shrink-0 items-center justify-center bg-secondary-accent text-background rounded-sm font-mono text-base font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
+            >
+              AR
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
+                AI Readiness · Diagnostic
+              </div>
+              <div className="font-display text-xl md:text-2xl leading-tight mb-1">
+                Benchmark your CS org in 5 minutes
+              </div>
+              <p className="text-sm text-foreground/70 leading-snug mb-2">
+                11 dimensions, 44 metrics. See where you sit between Reactive, Operational and Predictive — and what to fix first.
+              </p>
+              <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
+                Take the free diagnostic →
+              </div>
+              <QHint>
+                Q: the 5-min audit pinpoints your weakest of 11 dimensions and names the single fix that moves your band.
+              </QHint>
+            </div>
+          </Link>
+        </div>
+
+        {/* Elevated CSF Command Centre card */}
+        <div className="mt-4 flex justify-center">
           <Link
             to="/csfactors"
             data-tour="csf-box"
@@ -111,6 +144,9 @@ function HomePage() {
               <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
                 Unlock at Operator tier →
               </div>
+              <QHint>
+                Q: your daily operator console — start here every morning to triage the burning three.
+              </QHint>
             </div>
           </Link>
         </div>
