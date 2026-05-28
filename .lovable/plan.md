@@ -1,164 +1,70 @@
-# Q — Operational Canvas
+# CSFactors: Q Agent + Dashboard Polish
 
-Build a guided decision-graph tool for Vanguard subscribers. Free users keep the current Q sheet (1 trial question). Paid users get a full-page canvas at `/agent/framework` where they navigate an 8-tree graph; the terminal node fires an AI call with a pre-structured prompt and renders the response in a fixed 3-zone layout.
+Five additions to `/csfactors`, all frontend + one new server function. No schema changes.
 
-## 1. Entry points & gating
+## 1. Q Agent on the CSFactors dashboard
 
-- **Floating Q. button** (unchanged) opens the existing sheet.
-- Inside the sheet, add a new CTA: **"Open the Canvas →"**.
-  - Logged-out / free → routes to `/pricing` with a `?from=q-canvas` highlight on Vanguard.
-  - Vanguard subscriber → routes to `/agent/framework`.
-- `/agent/framework` is gated by a Vanguard role check (server-side via `requireSupabaseAuth` + `has_role`). Non-subscribers see a paywall card with one screenshot of the canvas and a CTA.
+Add a floating Q launcher (reusing `QMark` brand) in the bottom-right of `/csfactors`, opening a chat drawer scoped to the signed-in user's portfolio.
 
-## 2. Routes
+**Server side** — new `src/lib/csfactors-q.functions.ts`:
+- `askCSFactorsQ` (`createServerFn` + `requireSupabaseAuth`)
+- Loads the caller's `cs_accounts` rows + related `cs_stakeholders`, `cs_contracts`, `cs_qbrs`, `cs_touchpoints` (whatever tables back the drawer today — will confirm during build by reading `csfactors.functions.ts`).
+- Compacts them into a JSON "portfolio context" (cap ~40KB; trim long notes).
+- Calls Lovable AI Gateway (`google/gemini-3-flash-preview`) via the shared `ai-gateway.server` helper with a system prompt: "You are Q, the analyst for The CS Quarterly's CSFactors command center. Answer only from the provided portfolio JSON. Cite account names verbatim. If the data does not contain the answer, say so."
+- Streams via `toUIMessageStreamResponse` to a `/api/csfactors-q` route (so we can use `useChat`).
 
-```
-src/routes/
-  agent.framework.tsx       # canvas shell + tree picker + node graph
-  agent.response.$runId.tsx # 3-zone response view (deep-linkable, saved per user)
-```
+**Client side** — `src/components/csfactors/QAgentDrawer.tsx`:
+- Sheet from the right (reuse `Sheet`), header with `QMark`, suggested-question chips derived from a logic tree (below), `useChat` transport pointed at `/api/csfactors-q`.
+- Floating trigger button bottom-right; hidden when drawer is open.
 
-Each gets its own `head()` metadata. No nav link in the header — Q is reached only via the floating button.
+## 2. Logic tree of starter questions
 
-## 3. Data layer — `src/lib/q-trees.ts`
+Mirror the original Q tree pattern (`src/lib/q-trees.ts`). Add `src/lib/csfactors-q-tree.ts` with grouped prompts the user clicks to seed the chat:
 
-Single source of truth, typed exactly as the spec:
+- **Stakeholders** — "Who is the primary stakeholder at {account}?", "Which accounts have no exec sponsor mapped?"
+- **QBRs** — "Which QBRs were conducted last quarter?", "Which accounts are overdue for a QBR?"
+- **Sentiment** — "What's the sentiment trend across my book?", "Which Critical accounts moved from Positive in the last 30 days?"
+- **Leadership connects** — "When was the last leadership connect for {account}?", "Which accounts haven't had a leadership touch in 60+ days?"
+- **Renewals** — "What's at risk in the next 90 days?", "Top 3 renewals by ARR this quarter."
 
-```ts
-export type TreeId = 'T1'|'T2'|'T3'|'T4'|'T5'|'T6'|'T7'|'T8'
-export interface TreeNode {
-  id: string
-  treeId: TreeId
-  label: string
-  level: 1 | 2 | 3
-  parentId?: string
-  isTerminal: boolean
-  // terminal-only:
-  promptTemplate?: string       // injected into the AI call
-  benchmarks?: string[]         // benchmark IDs pulled from a small benchmarks map
-  position: { x: number; y: number }  // % of canvas
-}
-export const trees: TreeNode[] = [ /* 8 trees, levels 1-3 */ ]
-```
+Chips render inside the drawer's empty state and inject text into the composer.
 
-Eight trees (Level 1 labels): **Escalation, Champion Change, Upsell Qualification, Renewal Risk, QBR Prep, Career & Alignment, Onboarding Stall, Exec Misalignment.** Each Level 1 → 2–4 Level 2 branches → 2–3 Level 3 terminal nodes. ~60–80 nodes total. Authored as static data; no DB tables in this phase.
+## 3. Light/dark theme toggle in the CSFactors top bar
 
-## 4. Canvas UI — `agent.framework.tsx`
+Add the existing `ThemeToggle` (already in `src/components/site/ThemeToggle.tsx`) to the `/csfactors` header row, immediately left of `ImportCsvDialog` / `AddAccountDialog`. No new component needed.
 
-Layout (desktop ≥1024px):
+## 4. Expand-on-hover for NPS + Sentiment cards
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│  Eyebrow: OPERATOR CANVAS · Q.                          │
-│  H1: What decision are you running today?               │
-├─────────────────────────────────────────────────────────┤
-│  Tree picker rail (8 cards, horizontal scroll on mobile)│
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│           SVG node graph (selected tree)                │
-│  ● Level 1 ── ● Level 2 ── ◉ Level 3 (terminal)         │
-│                                                         │
-│  Hairlines connect parent→child. Hover lifts node.      │
-│  Click L2 expands its L3 children.                      │
-│  Click terminal (◉) → opens RunDrawer.                  │
-└─────────────────────────────────────────────────────────┘
-```
+Modify `AnalyticsHeader.tsx`:
+- Wrap each metric block in a `HoverCard` (already in `src/components/ui/hover-card.tsx`).
+- Hover content: enlarged chart + breakdown (NPS: promoters/passives/detractors counts and trailing trend bars from `RhythmBars`; Sentiment: per-bucket account list with `HealthChip`).
+- Trigger keeps the compact card; content is `w-[480px]` with `align="start"`.
 
-- SVG-rendered nodes positioned by `position` percentages, so it scales responsively. Mobile collapses to a stacked accordion (L1 → L2 → L3 list).
-- Selected path is highlighted (accent stroke + breadcrumb above the graph: `Escalation › Product Failure › Core Platform Downtime`).
-- Respect `prefers-reduced-motion`; use the existing `Reveal` + cinematic easing tokens.
+## 5. Fullscreen view for Master Account Matrix
 
-## 5. Run drawer — terminal click
+In `csfactors.tsx`'s `SectionCard` for the matrix:
+- Add a small icon button (`Maximize2` from lucide) in the section header's right slot.
+- Clicking opens a `Dialog` with `max-w-[98vw] h-[95vh]` rendering the same `<AccountsGrid />` with all 32 columns and the full row set. ESC / X to close.
+- State is local (`const [fullscreen, setFullscreen] = useState(false)`).
 
-Right-side `Sheet` (reuse existing primitive). Contents:
+## Files
 
-1. **Breadcrumb** of the selected path.
-2. **Context form** — 3–5 short, structured fields, not a free prompt. Examples for the Escalation tree:
-   - Account ARR (range select)
-   - Time since escalation opened (select)
-   - Exec involved (yes/no)
-   - Free-text: 1 sentence of context (max 240 chars)
-3. **Witty mode** toggle (carried from current sheet).
-4. **Run Q** button → calls `runQNode` server fn.
+**New**
+- `src/lib/csfactors-q.functions.ts` — `askCSFactorsQ` server fn (portfolio context + Lovable AI)
+- `src/lib/csfactors-q-tree.ts` — starter-question groups
+- `src/routes/api/csfactors-q.ts` — streaming chat route (POST)
+- `src/components/csfactors/QAgentDrawer.tsx` — sheet + `useChat` + chip tree
 
-## 6. Prompt-injection contract — `src/lib/q-agent.functions.ts`
+**Edited**
+- `src/routes/csfactors.tsx` — mount drawer, add theme toggle + fullscreen state + matrix dialog
+- `src/components/csfactors/AnalyticsHeader.tsx` — wrap NPS + sentiment in `HoverCard`
+- `src/components/csfactors/SectionCard.tsx` *(if it supports an actions slot; otherwise add inline trigger above the grid)*
 
-New server fn `runQNode`:
+## Notes / assumptions
 
-```ts
-runQNode({
-  data: {
-    nodeId: string,
-    context: Record<string, string>,
-    witty: boolean,
-  }
-}) → { runId, zones: { diagnosis, playbook, executable } }
-```
+- Q runs auth-gated (matches the security fix from earlier — no anonymous trial here).
+- No new DB tables; chat history is in-memory for the session (matches "no persistence" — confirm if you want threads later).
+- Reuses existing design tokens (`--accent`, `--secondary-accent`, emerald/destructive). No new colors.
+- Mono labels + `QMark` for brand consistency.
 
-Handler:
-- Look up `TreeNode` by `nodeId`; reject if not terminal.
-- Verify Vanguard role (via `requireSupabaseAuth` + `has_role`).
-- Build the system prompt from the existing two-voice strings (McKinsey / Wodehouse).
-- Build the user prompt by interpolating `node.promptTemplate` with `context` + benchmark hints, then append a **strict response contract** instructing the model to return three labeled zones separated by `---ZONE---` markers:
-  1. `DIAGNOSIS` (3 bullets, what's actually happening)
-  2. `PLAYBOOK` (numbered steps, benchmark-anchored)
-  3. `EXECUTABLE` (one artifact: email draft, talk-track, or checklist — copy-pasteable)
-- Call Lovable AI Gateway (`google/gemini-2.5-flash` for speed; `gemini-2.5-pro` toggle later).
-- Parse the three zones; if parsing fails, fall back to a single Diagnosis zone with the raw text + a "regenerate" hint.
-- Persist `{ runId, userId, nodeId, context, zones, createdAt }` to a new `q_runs` table for deep-linking and history.
-
-## 7. Response view — `agent.response.$runId.tsx`
-
-Fixed 3-zone layout, always:
-
-```text
-┌─ Zone 1 · DIAGNOSIS ──────────────────┐
-│  3 sharp bullets                      │
-├─ Zone 2 · PLAYBOOK ───────────────────┤
-│  Numbered steps, benchmark callouts   │
-├─ Zone 3 · EXECUTABLE ─────────────────┤
-│  Copy-to-clipboard artifact card      │
-└───────────────────────────────────────┘
-```
-
-- Eyebrow shows the breadcrumb + run timestamp.
-- "Run again" + "New decision" buttons at the bottom.
-- Same route renders both fresh runs and revisits (loader fetches by `runId`, RLS-scoped to user).
-
-## 8. Database (one migration)
-
-```sql
-create table public.q_runs (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  node_id text not null,
-  context jsonb not null default '{}'::jsonb,
-  zones jsonb not null,
-  witty boolean not null default false,
-  created_at timestamptz not null default now()
-);
-alter table public.q_runs enable row level security;
-create policy "users read own runs" on public.q_runs for select using (auth.uid() = user_id);
-create policy "users insert own runs" on public.q_runs for insert with check (auth.uid() = user_id);
-```
-
-No new role table — relies on existing `user_roles` + `has_role('vanguard')`. If that role doesn't exist yet, a tiny seed migration adds it to the `app_role` enum.
-
-## 9. Out of scope this phase
-
-- Logic-tree authoring UI (admin will edit `src/lib/q-trees.ts` directly for now).
-- Retrospective drawer (PRD v3 §4) — separate later phase.
-- Streaming responses — first version returns the full payload, then renders.
-- Job board recruiter logins — already on the checklist, untouched.
-
-## 10. Build order (next turn, after approval)
-
-1. Migration for `q_runs` + `vanguard` role.
-2. `src/lib/q-trees.ts` with all 8 trees authored.
-3. `runQNode` server fn + role gate.
-4. `agent.framework.tsx` canvas + RunDrawer.
-5. `agent.response.$runId.tsx` 3-zone view.
-6. Hook the "Open the Canvas" CTA into the existing Q sheet.
-7. Add `og`/`head` metadata for both routes; verify `prefers-reduced-motion` and mobile accordion fallback.
-
-Estimated 1 large build turn for steps 1–4, a second turn for 5–7 + QA.
+Confirm and I'll build it.
