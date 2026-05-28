@@ -433,9 +433,9 @@ export const manageUser = createServerFn({ method: "POST" })
         : designation;
       const { data: existing } = await supabaseAdmin
         .from("subscriptions").select("id").eq("user_id", user_id).maybeSingle();
-      const row = { status: "active", tier: legacyTier, designation, current_period_end: ends } as never;
+      const row = { status: "active", tier: legacyTier, designation, current_period_end: ends };
       if (existing) {
-        await supabaseAdmin.from("subscriptions").update(row).eq("user_id", user_id);
+        await supabaseAdmin.from("subscriptions").update(row as never).eq("user_id", user_id);
       } else {
         await supabaseAdmin.from("subscriptions").insert({ user_id, ...row } as never);
       }
