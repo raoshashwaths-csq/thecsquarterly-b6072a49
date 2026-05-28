@@ -206,7 +206,7 @@ export function QAgentButton() {
     }
   };
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/agent")) return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/csfactors")) return null;
 
   const currentPlaceholder = ROLLING_PROMPTS[placeholderIdx];
 
