@@ -117,7 +117,7 @@ function PricingPage() {
 
         {/* Moat */}
         <section className="max-w-6xl mx-auto px-6 pb-24">
-          <BandHeader eyebrow="The moat" title="Five layers, not one." />
+          <BandHeader eyebrow="Let's peel the Value Onion" title="Five layers, not one." />
           <div className="grid md:grid-cols-5 gap-4">
             {[
               { k: "Data", v: "The Retention Ledger is proprietary and compounds with every operator who contributes." },
