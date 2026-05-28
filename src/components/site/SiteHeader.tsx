@@ -35,13 +35,13 @@ export function SiteHeader() {
     { to: "/ai-readiness", label: t("nav.diagnostic") },
   ] as const;
 
+  const meta = (user?.user_metadata ?? {}) as {
+    avatar_url?: string;
+    picture?: string;
+    display_name?: string;
+    full_name?: string;
+  };
 
-export function SiteHeader() {
-  const { user } = useAuth();
-  const { canUniversalSearch, canWorkspace } = useEntitlements();
-  const { isRecruiterOrLead } = usePersona();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isHome = pathname === "/";
 
 
   const meta = (user?.user_metadata ?? {}) as {
