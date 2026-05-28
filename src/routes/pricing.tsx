@@ -421,6 +421,7 @@ function ComparisonTable() {
 }
 
 function RowGroup({ group }: { group: Group }) {
+  const isJobGroup = group.group === "Job board & admin";
   return (
     <>
       <tr className="bg-muted/30 border-b border-border">
@@ -428,27 +429,39 @@ function RowGroup({ group }: { group: Group }) {
           colSpan={TIERS.length + 1}
           className="px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent"
         >
-          {group.group}
+          {isJobGroup ? (
+            <span className="inline-flex items-center gap-3">
+              <span className="blur-[1.5px] select-none">{group.group}</span>
+              <span className="text-secondary-accent">Stay tuned ✨</span>
+            </span>
+          ) : (
+            group.group
+          )}
         </td>
       </tr>
-      {group.rows.map((r) => (
-        <tr key={r.label} className="border-b border-border/60 last:border-b-0">
-          <td className="px-4 py-3 text-foreground/80">{r.label}</td>
-          {r.values.map((v, i) => (
-            <td key={i} className="px-4 py-3 text-center">
-              {typeof v === "boolean" ? (
-                v ? (
-                  <Check size={14} className="inline text-accent" />
-                ) : (
-                  <Minus size={14} className="inline text-foreground/25" />
-                )
-              ) : (
-                <span className="text-xs font-mono text-foreground/80">{v}</span>
-              )}
+      {group.rows.map((r) => {
+        const blurRow = r.label.toLowerCase().includes("job posting");
+        return (
+          <tr key={r.label} className="border-b border-border/60 last:border-b-0">
+            <td className={"px-4 py-3 text-foreground/80 " + (blurRow ? "blur-[1.5px] select-none" : "")}>
+              {r.label}
             </td>
-          ))}
-        </tr>
-      ))}
+            {r.values.map((v, i) => (
+              <td key={i} className={"px-4 py-3 text-center " + (blurRow ? "blur-[1.5px] select-none" : "")}>
+                {typeof v === "boolean" ? (
+                  v ? (
+                    <Check size={14} className="inline text-accent" />
+                  ) : (
+                    <Minus size={14} className="inline text-foreground/25" />
+                  )
+                ) : (
+                  <span className="text-xs font-mono text-foreground/80">{v}</span>
+                )}
+              </td>
+            ))}
+          </tr>
+        );
+      })}
     </>
   );
 }
