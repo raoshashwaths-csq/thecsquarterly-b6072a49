@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { usePersona } from "@/hooks/usePersona";
@@ -18,13 +19,22 @@ import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
 
-const sections = [
-  { to: "/vanguard", label: "Vanguard" },
-  { to: "/retention-protocol", label: "Retention" },
-  { to: "/outcome-forum", label: "Outcome" },
-  { to: "/codex", label: "Codex" },
-  { to: "/ai-readiness", label: "Diagnostic" },
-] as const;
+export function SiteHeader() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { canUniversalSearch, canWorkspace } = useEntitlements();
+  const { isRecruiterOrLead } = usePersona();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isHome = pathname === "/";
+
+  const sections = [
+    { to: "/vanguard", label: t("nav.vanguard") },
+    { to: "/retention-protocol", label: t("nav.retention") },
+    { to: "/outcome-forum", label: t("nav.outcome") },
+    { to: "/codex", label: t("nav.codex") },
+    { to: "/ai-readiness", label: t("nav.diagnostic") },
+  ] as const;
+
 
 export function SiteHeader() {
   const { user } = useAuth();
