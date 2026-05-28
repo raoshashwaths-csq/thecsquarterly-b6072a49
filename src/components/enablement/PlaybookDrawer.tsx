@@ -20,9 +20,10 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onStartTour: () => void;
+  hasTour?: boolean;
 };
 
-export function PlaybookDrawer({ open, onOpenChange, onStartTour }: Props) {
+export function PlaybookDrawer({ open, onOpenChange, onStartTour, hasTour = true }: Props) {
   const group = useRouteTips();
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [showAll, setShowAll] = useState(false);
@@ -70,10 +71,12 @@ export function PlaybookDrawer({ open, onOpenChange, onStartTour }: Props) {
                   onOpenChange(false);
                   onStartTour();
                 }}
+                disabled={!hasTour}
                 className="gap-1.5"
+                title={hasTour ? "Tour this page" : "No tour for this page yet"}
               >
                 <Compass className="h-3.5 w-3.5" />
-                Take a Quick Tour
+                {hasTour ? "Tour this page" : "No tour here yet"}
               </Button>
               <Button
                 size="sm"

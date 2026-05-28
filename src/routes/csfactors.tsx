@@ -238,7 +238,7 @@ function CSFactorsPageInner() {
             </div>
           ) : (
             <>
-              <section className="mb-10" id="reminders">
+              <section className="mb-10" id="reminders" data-tour="burning-three">
                 <BurningThree accounts={accounts} />
               </section>
 
