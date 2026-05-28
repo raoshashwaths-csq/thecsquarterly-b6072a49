@@ -1,11 +1,11 @@
 {
   "nav": {
-    "vanguard": "แวนการ์ด",
+    "vanguard": "Vanguard",
     "retention": "การรักษาลูกค้า",
     "outcome": "ผลลัพธ์",
-    "codex": "โคเด็กซ์",
-    "diagnostic": "การประเมิน",
-    "canvas": "แคนวาส",
+    "codex": "Codex",
+    "diagnostic": "การวินิจฉัย",
+    "canvas": "Canvas",
     "workspace": "พื้นที่ทำงาน",
     "search": "ค้นหา",
     "login": "เข้าสู่ระบบ"
@@ -15,63 +15,128 @@
     "account": "บัญชี",
     "admin": "ผู้ดูแล",
     "roiCalculator": "เครื่องคำนวณ ROI",
-    "benchmarks": "เกณฑ์มาตรฐาน",
+    "benchmarks": "เกณฑ์อ้างอิง",
     "directory": "ไดเรกทอรี",
     "teams": "ทีม",
-    "sequencer": "ตัวจัดลำดับการอ่าน",
+    "sequencer": "Sequencer",
     "controlPanel": "แผงควบคุม",
     "signOut": "ออกจากระบบ",
     "member": "สมาชิก"
   },
   "footer": {
-    "ctaEyebrow": "บรีฟฟิ่ง / รายสัปดาห์",
+    "ctaEyebrow": "The Briefing / รายสัปดาห์",
     "ctaHeadlineLine1": "ข่าวกรองเชิงกลยุทธ์สำหรับ",
     "ctaHeadlineLine2": "สถาปนิกแห่งการรักษาลูกค้า",
     "subscribeFree": "สมัครฟรี",
     "sections": "หมวด",
-    "resources": "ทรัพยากร",
+    "resources": "แหล่งข้อมูล",
     "company": "บริษัท",
     "social": "โซเชียล",
     "privacy": "ความเป็นส่วนตัว",
     "terms": "ข้อกำหนด",
-    "colophon": "โคโลฟอน",
+    "colophon": "Colophon",
     "copyright": "© {{year}} The CS Quarterly",
-    "stayTuned": "เร็ว ๆ นี้",
+    "stayTuned": "เร็วๆ นี้",
     "sectionLinks": {
       "vanguard": "The CS Vanguard",
-      "retention": "โปรโตคอลการรักษาลูกค้า",
-      "outcome": "ฟอรัมผลลัพธ์",
-      "codex": "CS Codex"
+      "retention": "The Retention Protocol",
+      "outcome": "The Outcome Forum",
+      "codex": "The CS Codex"
     },
     "resourceLinks": {
-      "diagnostic": "การประเมินความพร้อมด้าน AI",
+      "diagnostic": "การวินิจฉัยความพร้อม AI",
       "calculator": "เครื่องคำนวณ ROI",
-      "benchmarks": "เกณฑ์มาตรฐาน NRR",
-      "directory": "ไดเรกทอรีผู้ปฏิบัติงาน",
+      "benchmarks": "เกณฑ์ NRR",
+      "directory": "ไดเรกทอรี Operator",
       "teams": "ทีม",
-      "sequencer": "ตัวจัดลำดับการอ่าน",
-      "jobBoard": "บอร์ดงาน",
+      "sequencer": "Sequencer การอ่าน",
+      "jobBoard": "ประกาศงาน",
       "pricing": "ราคา",
       "subscribe": "สมัครสมาชิก"
     },
     "companyLinks": {
-      "mission": "พันธกิจของเรา",
+      "mission": "ภารกิจของเรา",
       "editorial": "มาตรฐานบรรณาธิการ",
       "contact": "ติดต่อ",
       "login": "เข้าสู่ระบบ"
     }
   },
   "langSwitcher": {
-    "label": "เลือกภาษาของฉบับ",
+    "label": "เลือกภาษาฉบับ",
     "editions": "ฉบับ",
     "regions": {
-      "global": "ทั่วโลก",
+      "global": "Global",
       "sea": "เอเชียตะวันออกเฉียงใต้",
       "mena": "ตะวันออกกลางและแอฟริกาเหนือ"
     },
-    "soon": "เร็ว ๆ นี้",
-    "activeToast": "ใช้งานฉบับ {{native}} แล้ว",
-    "soonToast": "ฉบับ {{native}} กำลังจะเปิดตัวเร็ว ๆ นี้ เราจะส่งอีเมลเมื่อพร้อมใช้งาน",
-    "soonDescription": "การเปิดตัว {{region}} · จะส่งถึงคุณในภาษา {{native}}"
+    "soon": "เร็วๆ นี้",
+    "activeToast": "เปิดใช้งานฉบับ {{native}} แล้ว",
+    "soonToast": "ฉบับ {{native}} กำลังจะมาเร็วๆ นี้ เราจะส่งอีเมลแจ้งเมื่อพร้อม",
+    "soonDescription": "เปิดตัว {{region}} · จะส่งฉบับเป็นภาษา {{native}}"
+  },
+  "home": {
+    "eyebrow": "Dispatch รายสัปดาห์สำหรับ 1% ของผู้ปฏิบัติงาน Customer Success",
+    "hero": {
+      "line1": "หยุดแค่บริหารบัญชี",
+      "line2": "เริ่มออกแบบเส้นทางการเติบโต",
+      "sub": "ผู้ตั้งรับให้บริการตามสัญญา ผู้นำสร้างการเติบโต Playbook รายสัปดาห์นี้มอบจิตวิทยา กลยุทธ์ และเฟรมเวิร์กที่ระดับชั้นนำต้องใช้เพื่อสร้างพันธมิตรองค์กรในตำนาน"
+    },
+    "welcomeBack": "ยินดีต้อนรับกลับ —",
+    "openAccount": "เปิดบัญชีของคุณ →",
+    "aiCard": {
+      "eyebrow": "AI Readiness · การวินิจฉัย",
+      "title": "วัดความพร้อมทีม CS ใน 5 นาที",
+      "body": "8 มิติ 32 ตัวชี้วัด ดูว่าคุณอยู่ระหว่าง Reactive, Operational หรือ Predictive — และต้องแก้อะไรก่อน",
+      "cta": "เริ่มการวินิจฉัยฟรี →",
+      "hint": "Q: การประเมิน 5 นาทีจะชี้มิติที่อ่อนที่สุดและบอกการแก้ไขเดียวที่จะยกระดับคุณ"
+    },
+    "csfCard": {
+      "eyebrow": "CSF · Command Centre",
+      "title": "แดชบอร์ด CS ส่วนตัวของคุณ",
+      "body": "การวิเคราะห์พอร์ตโฟลิโอ สุขภาพลูกค้า การต่อสัญญา และโอกาส — ในคอนโซลระดับ operator เดียว",
+      "cta": "ปลดล็อกที่ระดับ Operator →",
+      "hint": "Q: คอนโซลประจำวันของคุณ — เริ่มที่นี่ทุกเช้าเพื่อจัดลำดับสามเรื่องเร่งด่วน"
+    },
+    "workspace": {
+      "eyebrow": "พื้นที่ทำงานของคุณ",
+      "title": "บันทึก · ไฮไลต์ · ลิงก์ →"
+    },
+    "sections": {
+      "eyebrow": "หมวด",
+      "count": "{{count}} ศาสตร์",
+      "enter": "เข้าหมวด →",
+      "items": {
+        "vanguard": {
+          "blurb": "วิธีเชิงรุกเพื่อการมีส่วนร่วมที่ให้ผล",
+          "hint": "Q: เปิดเมื่อคุณต้องการสัญญาณประจำสัปดาห์ว่าทีม CS อื่นทำอะไรกัน"
+        },
+        "retention": {
+          "blurb": "ตรวจจับ churn ตั้งแต่เนิ่นๆ และพลิกกลับอย่างเป็นระบบ",
+          "hint": "Q: เลือก playbook หนึ่งต่อไตรมาสและรันให้จบทั่วทั้งพอร์ต"
+        },
+        "outcome": {
+          "blurb": "กรณีศึกษาที่ผ่านการตรวจสอบ พร้อมหลักฐานตัวเลข",
+          "hint": "Q: กลับมาที่นี่เมื่อคุณต้องการตัวเลขเพื่อโต้แย้งกับบอร์ดหรือ stakeholder"
+        },
+        "codex": {
+          "blurb": "ห้องสมุดอ้างอิงสำหรับ operator มืออาชีพ",
+          "hint": "Q: ใช้เหมือนพจนานุกรม — เข้า หยิบเฟรมเวิร์ก ออก"
+        },
+        "diagnostic": {
+          "name": "การวินิจฉัย",
+          "blurb": "วัดทีมของคุณ 8 มิติ 32 ตัวชี้วัด",
+          "hint": "Q: การเปลี่ยนผ่านหนึ่งเดียวที่จะปลดล็อกระดับถัดไป คือสิ่งที่ควรลงทุนก่อน"
+        }
+      }
+    },
+    "thesis": {
+      "eyebrow": "วิทยานิพนธ์"
+    },
+    "recent": {
+      "title": "Dispatch ล่าสุด",
+      "viewAll": "ดูทั้งหมด"
+    },
+    "insightLabel": "Insight #{{n}}, อ่าน {{min}} นาที",
+    "readFull": "อ่านบทความฉบับเต็ม"
   }
 }

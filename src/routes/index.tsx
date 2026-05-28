@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LayoutGrid } from "lucide-react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
@@ -18,12 +19,14 @@ const postsQuery = queryOptions({
   queryFn: () => listPosts(),
 });
 
+// Section proper nouns ("The CS Vanguard", etc.) stay in English per the
+// editorial brand rules. Only the blurb / hint / surrounding chrome translate.
 const SECTIONS = [
-  { to: "/vanguard", name: "The CS Vanguard", blurb: "Proactive plays for fruitful engagement.", hint: "Q: open when you want this week's signal on what other CS orgs are doing." },
-  { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically.", hint: "Q: pick one playbook per quarter and run it end-to-end across the book." },
-  { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts.", hint: "Q: bring receipts here when you need numbers for a board or stakeholder argument." },
-  { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators.", hint: "Q: use it like a dictionary — jump in, grab the framework, leave." },
-  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 8 dimensions, 32 metrics.", hint: "Q: the single transition that unlocks your next band is the one to fund first." },
+  { to: "/vanguard", name: "The CS Vanguard", key: "vanguard" },
+  { to: "/retention-protocol", name: "The Retention Protocol", key: "retention" },
+  { to: "/outcome-forum", name: "The Outcome Forum", key: "outcome" },
+  { to: "/codex", name: "The CS Codex", key: "codex" },
+  { to: "/ai-readiness", name: "The Diagnostics", key: "diagnostic" },
 ] as const;
 
 
@@ -52,11 +55,13 @@ export const Route = createFileRoute("/")({
 
 
 function HomePage() {
+  const { t } = useTranslation();
   const { data: posts } = useSuspenseQuery(postsQuery);
   const featured = posts[0];
   const rest = posts.slice(1, 5);
   const { group, isRecruiterOrLead } = usePersona();
   const { user } = useAuth();
+
 
 
   return (
@@ -65,24 +70,25 @@ function HomePage() {
 
       <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center md:animate-fade-up">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
-          Weekly Dispatch for the 1% of Customer Success Operators
+          {t("home.eyebrow")}
         </div>
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
-          Stop managing accounts. <span className="italic text-accent">Start engineering trajectory.</span>
+          {t("home.hero.line1")} <span className="italic text-accent">{t("home.hero.line2")}</span>
         </h1>
         <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-10">
-          Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships.
+          {t("home.hero.sub")}
         </p>
         {!user ? (
           <NewsletterInline source="home-hero" />
         ) : (
           <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
-            Welcome back —{" "}
+            {t("home.welcomeBack")}{" "}
             <Link to="/account" className="text-accent border-b border-accent/40 hover:border-accent pb-0.5">
-              open your account →
+              {t("home.openAccount")}
             </Link>
           </p>
         )}
+
 
         {/* AI Readiness Audit — primary value-prop card for first-time visitors */}
         <div className="mt-12 flex justify-center">
@@ -100,22 +106,21 @@ function HomePage() {
             </span>
             <div className="flex-1 min-w-0">
               <div className="font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
-                AI Readiness · Diagnostic
+                {t("home.aiCard.eyebrow")}
               </div>
               <div className="font-display text-xl md:text-2xl leading-tight mb-1">
-                Benchmark your CS org in 5 minutes
+                {t("home.aiCard.title")}
               </div>
               <p className="text-sm text-foreground/70 leading-snug mb-2">
-                8 dimensions, 32 metrics. See where you sit between Reactive, Operational and Predictive — and what to fix first.
+                {t("home.aiCard.body")}
               </p>
               <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
-                Take the free diagnostic →
+                {t("home.aiCard.cta")}
               </div>
-              <QHint>
-                Q: the 5-min audit pinpoints your weakest of 8 dimensions and names the single fix that moves your band.
-              </QHint>
+              <QHint>{t("home.aiCard.hint")}</QHint>
             </div>
           </Link>
+
         </div>
 
         {/* Elevated CSF Command Centre card */}
@@ -134,22 +139,21 @@ function HomePage() {
             </span>
             <div className="flex-1 min-w-0">
               <div className="font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
-                CSF · Command Centre
+                {t("home.csfCard.eyebrow")}
               </div>
               <div className="font-display text-xl md:text-2xl leading-tight mb-1">
-                Your personal CS dashboard
+                {t("home.csfCard.title")}
               </div>
               <p className="text-sm text-foreground/70 leading-snug mb-2">
-                Portfolio analytics, health, renewals and opportunities — in one operator-grade console.
+                {t("home.csfCard.body")}
               </p>
               <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
-                Unlock at Operator tier →
+                {t("home.csfCard.cta")}
               </div>
-              <QHint>
-                Q: your daily operator console — start here every morning to triage the burning three.
-              </QHint>
+              <QHint>{t("home.csfCard.hint")}</QHint>
             </div>
           </Link>
+
         </div>
 
         {/* Workspace anchor — placed directly below the CSF card */}
@@ -168,11 +172,12 @@ function HomePage() {
             </span>
             <span className="flex-1 min-w-0">
               <span className="block font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground leading-tight mb-1">
-                Your Workspace
+                {t("home.workspace.eyebrow")}
               </span>
               <span className="block font-display text-base md:text-lg leading-tight">
-                Notes · Highlights · Links →
+                {t("home.workspace.title")}
               </span>
+
             </span>
           </Link>
         </div>
@@ -186,10 +191,10 @@ function HomePage() {
       <section className="max-w-7xl w-full mx-auto px-6 py-16 animate-fade-up [animation-delay:300ms]">
         <div className="flex items-end justify-between mb-10">
           <div className="font-mono text-xs uppercase tracking-widest text-foreground font-semibold">
-            The Sections
+            {t("home.sections.eyebrow")}
           </div>
           <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
-            {SECTIONS.length} disciplines
+            {t("home.sections.count", { count: SECTIONS.length })}
           </div>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
@@ -201,16 +206,21 @@ function HomePage() {
             >
               <span aria-hidden className="absolute top-0 left-6 right-6 h-px bg-foreground/80" />
               <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
-              <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">{s.name}</h2>
-              <p className="text-sm text-foreground/65 text-pretty mb-4">{s.blurb}</p>
+              <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">
+                {t(`home.sections.items.${s.key}.name`, { defaultValue: s.name })}
+              </h2>
+              <p className="text-sm text-foreground/65 text-pretty mb-4">
+                {t(`home.sections.items.${s.key}.blurb`)}
+              </p>
               <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors mb-3">
-                Enter section →
+                {t("home.sections.enter")}
               </div>
-              <QHint>{s.hint}</QHint>
+              <QHint>{t(`home.sections.items.${s.key}.hint`)}</QHint>
             </Link>
           ))}
         </div>
       </section>
+
 
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
@@ -225,7 +235,10 @@ function HomePage() {
           <div className="grid lg:grid-cols-12 gap-16">
             <div className="lg:col-span-7">
               <div className="mb-8 font-mono text-xs text-accent font-medium">
-                Insight #{posts.length.toString().padStart(3, "0")}, {featured.read_minutes} min read
+                {t("home.insightLabel", {
+                  n: posts.length.toString().padStart(3, "0"),
+                  min: featured.read_minutes,
+                })}
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
                 <h2 className="font-display text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight transition-all">
@@ -249,14 +262,15 @@ function HomePage() {
                 params={{ slug: featured.slug }}
                 className="font-mono text-xs uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
               >
-                Read the full essay
+                {t("home.readFull")}
               </Link>
             </div>
+
 
             <aside className="lg:col-span-5 flex flex-col gap-12 lg:border-l lg:border-border lg:pl-12">
               <div>
                 <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
-                  The Thesis
+                  {t("home.thesis.eyebrow")}
                 </div>
                 <p className="text-lg italic leading-snug">
                   "CS is no longer a service department; it is a revenue engine that requires the same mechanical precision as an assembly line."
@@ -272,12 +286,12 @@ function HomePage() {
       {rest.length > 0 && (
         <section className="max-w-7xl w-full mx-auto px-6 pb-24">
           <div className="flex justify-between items-end mb-12">
-            <h2 className="font-display text-4xl">Recent Dispatches</h2>
+            <h2 className="font-display text-4xl">{t("home.recent.title")}</h2>
             <Link
               to="/insights"
               className="font-mono text-xs uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
             >
-              View all
+              {t("home.recent.viewAll")}
             </Link>
           </div>
           <div className="grid md:grid-cols-2 gap-x-16 gap-y-12">
