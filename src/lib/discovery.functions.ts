@@ -115,7 +115,6 @@ export const getForYou = createServerFn({ method: "GET" })
     z
       .object({
         band: z.enum(["foundational", "emerging", "operating", "scaling"]).nullish(),
-        userEmail: z.string().email().nullish(),
       })
       .parse(input ?? {}),
   )
@@ -128,24 +127,10 @@ export const getForYou = createServerFn({ method: "GET" })
       .order("published_at", { ascending: false })
       .limit(60);
 
-    // If we know the email, pull their most recent diagnostic to derive a band.
-    let band = data.band ?? null;
-    if (!band && data.userEmail) {
-      const { data: latest } = await supabaseAdmin
-        .from("survey_responses")
-        .select("tier, score, agent_score, foundational_score")
-        .eq("email", data.userEmail)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (latest?.tier) {
-        const t = String(latest.tier).toLowerCase();
-        if (t.includes("found")) band = "foundational";
-        else if (t.includes("emerg")) band = "emerging";
-        else if (t.includes("scal")) band = "scaling";
-        else band = "operating";
-      }
-    }
+    // Band is only accepted from the caller (derived client-side from a
+    // previously returned survey result). We do NOT probe the DB by email —
+    // that would let any unauthenticated caller enumerate respondents' tiers.
+    const band = data.band ?? null;
 
     // Category preference by band.
     const order: Record<string, string[]> = {
