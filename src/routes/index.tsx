@@ -192,6 +192,7 @@ function HomePage() {
             {SECTIONS.length} disciplines
           </div>
         </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
           {SECTIONS.map((s, i) => (
             <Link
               key={s.to}
@@ -208,10 +209,9 @@ function HomePage() {
               <QHint>{s.hint}</QHint>
             </Link>
           ))}
-
-          ))}
         </div>
       </section>
+
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
 
