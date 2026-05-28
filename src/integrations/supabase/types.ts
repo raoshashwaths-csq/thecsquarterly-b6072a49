@@ -758,30 +758,45 @@ export type Database = {
       q_runs: {
         Row: {
           context: Json
+          cost_micros: number | null
           created_at: string
           id: string
+          latency_ms: number | null
+          model: string | null
           node_id: string
           shared: boolean
+          tokens_in: number | null
+          tokens_out: number | null
           user_id: string
           witty: boolean
           zones: Json
         }
         Insert: {
           context?: Json
+          cost_micros?: number | null
           created_at?: string
           id?: string
+          latency_ms?: number | null
+          model?: string | null
           node_id: string
           shared?: boolean
+          tokens_in?: number | null
+          tokens_out?: number | null
           user_id: string
           witty?: boolean
           zones: Json
         }
         Update: {
           context?: Json
+          cost_micros?: number | null
           created_at?: string
           id?: string
+          latency_ms?: number | null
+          model?: string | null
           node_id?: string
           shared?: boolean
+          tokens_in?: number | null
+          tokens_out?: number | null
           user_id?: string
           witty?: boolean
           zones?: Json
