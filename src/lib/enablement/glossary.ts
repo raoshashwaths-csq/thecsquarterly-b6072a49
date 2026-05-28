@@ -5,7 +5,7 @@ export type GlossaryItem = {
   id: string;
   term: string;
   short: string;
-  definition: string;
+  definition?: string;
   formula?: string;
   whyItMatters?: string;
   tags?: string[];
