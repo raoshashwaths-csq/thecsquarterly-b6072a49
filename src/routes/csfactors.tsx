@@ -58,10 +58,13 @@ function CSFactorsPage() {
   });
 
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [qOpen, setQOpen] = useState(false);
   const drawerAccount = useMemo(
     () => accounts.find((a) => a.id === drawerId) ?? null,
     [accounts, drawerId],
   );
+
 
   const totalARR = useMemo(() => accounts.reduce((s, a) => s + Number(a.arr), 0), [accounts]);
   const atRisk = useMemo(
