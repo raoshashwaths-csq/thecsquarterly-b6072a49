@@ -2,6 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import {
+  normalizeTier,
+  isPaid,
+  TIER_Q_CAP,
+  TIER_SEAT_CAP,
+  PAID_DESIGNATIONS,
+} from "@/lib/admin-tiers";
+import type { Designation } from "@/lib/tiers";
 
 async function assertAdmin(userId: string) {
   const { data: roles } = await supabaseAdmin
@@ -10,13 +18,6 @@ async function assertAdmin(userId: string) {
 }
 
 // =============== Overview ===============
-
-const TIER_PRICE_CENTS: Record<string, number> = {
-  vanguard: 2900,           // $29/mo proxy
-  "vanguard-pro": 9900,
-  enterprise: 49900,
-  free: 0,
-};
 
 export const getControlPanelOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -30,7 +31,7 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
     const [subsRes, jobsRes, qMTDRes, profilesRes, qSeriesRes] = await Promise.all([
       supabaseAdmin
         .from("subscriptions")
-        .select("user_id, tier, status")
+        .select("user_id, tier, designation, status")
         .eq("status", "active"),
       supabaseAdmin
         .from("job_listings")
@@ -53,11 +54,20 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
         .limit(5000),
     ]);
 
-    const paidSubs = (subsRes.data ?? []).filter((s) => s.tier !== "free");
-    const mrrCents = paidSubs.reduce(
-      (sum, s) => sum + (TIER_PRICE_CENTS[s.tier] ?? TIER_PRICE_CENTS.vanguard),
-      0,
-    );
+    const normalizedSubs = (subsRes.data ?? []).map((s) => ({
+      user_id: s.user_id as string,
+      ...normalizeTier({ tier: s.tier, designation: s.designation }),
+    }));
+    const paidSubs = normalizedSubs.filter((s) => isPaid(s.designation));
+    const mrrCents = paidSubs.reduce((sum, s) => sum + s.priceCents, 0);
+
+    // Per-tier breakdown (active paid only)
+    const tierBreakdown: { designation: Designation; label: string; count: number }[] =
+      PAID_DESIGNATIONS.map((d) => ({
+        designation: d,
+        label: (paidSubs.find((s) => s.designation === d)?.label) ?? d,
+        count: paidSubs.filter((s) => s.designation === d).length,
+      }));
 
     // 30-day registrations + sessions timeseries
     const days: { date: string; registrations: number; sessions: number }[] = [];
@@ -80,15 +90,17 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
     // Latest registrations w/ method + tier
     const latestProfiles = (profilesRes.data ?? []).slice(0, 25);
     const ids = latestProfiles.map((p) => p.id);
-    let subByUser: Record<string, string> = {};
-    let methodByUser: Record<string, string> = {};
+    const subByUser: Record<string, { designation: string; label: string }> = {};
+    const methodByUser: Record<string, string> = {};
     if (ids.length) {
       const [subs2, identitiesLikely] = await Promise.all([
-        supabaseAdmin.from("subscriptions").select("user_id, tier, status").in("user_id", ids),
+        supabaseAdmin.from("subscriptions").select("user_id, tier, designation, status").in("user_id", ids),
         Promise.resolve({ data: [] as Array<{ user_id: string; provider: string }> }),
       ]);
       (subs2.data ?? []).forEach((s) => {
-        if (s.status === "active" && s.tier !== "free") subByUser[s.user_id] = s.tier;
+        if (s.status !== "active") return;
+        const n = normalizeTier({ tier: s.tier, designation: s.designation });
+        if (isPaid(n.designation)) subByUser[s.user_id] = { designation: n.designation, label: n.label };
       });
       latestProfiles.forEach((p) => {
         methodByUser[p.id] = "Email";
@@ -102,12 +114,15 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
       display_name: (p.display_name as string) ?? "",
       created_at: p.created_at as string,
       method: methodByUser[p.id] ?? "Email",
-      tier: subByUser[p.id] ?? "free",
+      designation: subByUser[p.id]?.designation ?? "reader",
+      tier: subByUser[p.id]?.label ?? "Reader",
     }));
 
     return {
       mrrCents,
+      arrCents: mrrCents * 12,
       paidSubscribers: paidSubs.length,
+      tierBreakdown,
       activeJobs: jobsRes.count ?? 0,
       agentSessionsMTD: qMTDRes.count ?? 0,
       series: days,
@@ -328,15 +343,20 @@ export const listMasterUsers = createServerFn({ method: "GET" })
         .select("id, email, display_name, created_at")
         .order("created_at", { ascending: false })
         .limit(1000),
-      supabaseAdmin.from("subscriptions").select("user_id, tier, status, current_period_end"),
+      supabaseAdmin.from("subscriptions").select("user_id, tier, designation, status, current_period_end"),
       supabaseAdmin.from("user_roles").select("user_id, role"),
       supabaseAdmin.from("q_runs").select("user_id"),
     ]);
 
-    const subMap: Record<string, { tier: string; status: string }> = {};
+    const subMap: Record<string, { tier: string; designation: string | null; status: string; current_period_end: string | null }> = {};
     (subsRes.data ?? []).forEach((s) => {
       if (!subMap[s.user_id] || s.status === "active") {
-        subMap[s.user_id] = { tier: s.tier, status: s.status };
+        subMap[s.user_id] = {
+          tier: s.tier,
+          designation: (s as { designation?: string | null }).designation ?? null,
+          status: s.status,
+          current_period_end: (s as { current_period_end?: string | null }).current_period_end ?? null,
+        };
       }
     });
     const roleSet: Record<string, string[]> = {};
@@ -348,18 +368,43 @@ export const listMasterUsers = createServerFn({ method: "GET" })
       qUsage[r.user_id] = (qUsage[r.user_id] ?? 0) + 1;
     });
 
-    return (profilesRes.data ?? []).map((p) => ({
-      id: p.id as string,
-      email: (p.email as string) ?? "—",
-      display_name: (p.display_name as string) ?? "",
-      created_at: p.created_at as string,
-      tier: subMap[p.id]?.tier ?? "free",
-      status: subMap[p.id]?.status ?? "inactive",
-      is_admin: (roleSet[p.id] ?? []).includes("admin"),
-      sessions_used: qUsage[p.id] ?? 0,
-      seat_cap: 50, // default cap — wire to per-user override later
-    }));
+    return (profilesRes.data ?? []).map((p) => {
+      const sub = subMap[p.id];
+      const n = normalizeTier({ tier: sub?.tier ?? null, designation: sub?.designation ?? null });
+      return {
+        id: p.id as string,
+        email: (p.email as string) ?? "—",
+        display_name: (p.display_name as string) ?? "",
+        created_at: p.created_at as string,
+        tier: n.designation,
+        tier_label: n.label,
+        status: sub?.status ?? "inactive",
+        current_period_end: sub?.current_period_end ?? null,
+        is_admin: (roleSet[p.id] ?? []).includes("admin"),
+        sessions_used: qUsage[p.id] ?? 0,
+        seat_cap: TIER_SEAT_CAP[n.designation] ?? 1,
+        q_cap: TIER_Q_CAP[n.designation] ?? 0,
+      };
+    });
   });
+
+const GRANT_ACTIONS = [
+  "grant-practitioner",
+  "grant-operator",
+  "grant-team",
+  "grant-scale",
+  "grant-enterprise",
+  "grant-strategic_partner",
+] as const;
+
+const GRANT_TO_DESIGNATION: Record<typeof GRANT_ACTIONS[number], Designation> = {
+  "grant-practitioner": "practitioner",
+  "grant-operator": "operator",
+  "grant-team": "team",
+  "grant-scale": "scale",
+  "grant-enterprise": "enterprise",
+  "grant-strategic_partner": "strategic_partner",
+};
 
 export const manageUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -367,8 +412,8 @@ export const manageUser = createServerFn({ method: "POST" })
     z.object({
       user_id: z.string().uuid(),
       action: z.enum([
-        "grant-vanguard",
-        "revoke-vanguard",
+        ...GRANT_ACTIONS,
+        "revoke-subscription",
         "grant-admin",
         "revoke-admin",
         "revoke-sessions",
@@ -379,26 +424,40 @@ export const manageUser = createServerFn({ method: "POST" })
     await assertAdmin(context.userId);
     const { user_id, action } = data;
 
-    if (action === "grant-vanguard") {
+    if ((GRANT_ACTIONS as readonly string[]).includes(action)) {
+      const designation = GRANT_TO_DESIGNATION[action as typeof GRANT_ACTIONS[number]];
       const ends = new Date(Date.now() + 365 * 86_400_000).toISOString();
-      // Try update first, then insert if absent
+      const legacyTier =
+        designation === "practitioner" ? "vanguard"
+        : designation === "operator" ? "vanguard-pro"
+        : designation;
       const { data: existing } = await supabaseAdmin
         .from("subscriptions").select("id").eq("user_id", user_id).maybeSingle();
+      const row = { status: "active", tier: legacyTier, designation, current_period_end: ends };
       if (existing) {
-        await supabaseAdmin
-          .from("subscriptions")
-          .update({ status: "active", tier: "vanguard", current_period_end: ends })
-          .eq("user_id", user_id);
+        await supabaseAdmin.from("subscriptions").update(row as never).eq("user_id", user_id);
       } else {
-        await supabaseAdmin
-          .from("subscriptions")
-          .insert({ user_id, status: "active", tier: "vanguard", current_period_end: ends } as never);
+        await supabaseAdmin.from("subscriptions").insert({ user_id, ...row } as never);
       }
-    } else if (action === "revoke-vanguard") {
+      await supabaseAdmin.from("admin_audit_log").insert({
+        actor_id: context.userId,
+        action: "subscription.grant",
+        target_table: "subscriptions",
+        target_id: user_id,
+        details: { designation } as never,
+      });
+    } else if (action === "revoke-subscription") {
       await supabaseAdmin
         .from("subscriptions")
-        .update({ status: "inactive", tier: "free" })
+        .update({ status: "inactive", tier: "free", designation: null } as never)
         .eq("user_id", user_id);
+      await supabaseAdmin.from("admin_audit_log").insert({
+        actor_id: context.userId,
+        action: "subscription.revoke",
+        target_table: "subscriptions",
+        target_id: user_id,
+        details: {} as never,
+      });
     } else if (action === "grant-admin") {
       await supabaseAdmin
         .from("user_roles")

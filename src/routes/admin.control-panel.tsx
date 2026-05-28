@@ -39,6 +39,10 @@ import {
   listEmailTemplates, sendTestBroadcast, schedulePost,
   listMasterUsers, manageUser,
 } from "@/lib/control-panel.functions";
+import { TIER_LABEL, ALL_DESIGNATIONS, PAID_DESIGNATIONS, isPaid } from "@/lib/admin-tiers";
+import {
+  DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, DropdownMenuPortal,
+} from "@/components/ui/dropdown-menu";
 
 
 export const Route = createFileRoute("/admin/control-panel")({
@@ -247,18 +251,29 @@ function OverviewTab() {
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
         {isLoading ? (
-          [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[100px]" />)
+          [...Array(5)].map((_, i) => <Skeleton key={i} className="h-[100px]" />)
         ) : (
           <>
             <MetricCard accent label="Total MRR" value={fmtUsd(data?.mrrCents ?? 0)} sub="Active paid subs × tier price" />
-            <MetricCard label="Active Paid Subscribers" value={fmtNum(data?.paidSubscribers ?? 0)} sub="Vanguard tier and above" />
+            <MetricCard label="ARR run-rate" value={fmtUsd(data?.arrCents ?? 0)} sub="MRR × 12" />
+            <MetricCard label="Active Paid Subscribers" value={fmtNum(data?.paidSubscribers ?? 0)} sub="Practitioner and above" />
             <MetricCard label="Active Job Listings" value={fmtNum(data?.activeJobs ?? 0)} sub="Live on storefront" />
             <MetricCard label="Agent Sessions MTD" value={fmtNum(data?.agentSessionsMTD ?? 0)} sub="Month-to-date Q. runs" />
           </>
         )}
       </div>
+
+      {data?.tierBreakdown && (
+        <div className="flex flex-wrap gap-1.5 mb-6">
+          {data.tierBreakdown.map((t) => (
+            <Badge key={t.designation} variant="outline" className="text-[10px] tabular-nums">
+              {TIER_LABEL[t.designation] ?? t.designation} · <span className="ml-1 font-mono">{t.count}</span>
+            </Badge>
+          ))}
+        </div>
+      )}
 
       <div className="rounded-md border border-border bg-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
@@ -326,7 +341,7 @@ function OverviewTab() {
                       <Badge variant="outline" className="text-[10px]">{r.method}</Badge>
                     </td>
                     <td className="py-2 px-3">
-                      <Badge variant={r.tier === "free" ? "secondary" : "default"} className="text-[10px] capitalize">{r.tier}</Badge>
+                      <Badge variant={r.designation === "reader" ? "secondary" : "default"} className="text-[10px]">{r.tier}</Badge>
                     </td>
                   </tr>
                 ))
@@ -661,7 +676,7 @@ function JobsTab() {
 // 4. PUBLISHING (content + email)
 // ────────────────────────────────────────────────────────────────────
 
-const TIER_OPTIONS = ["Free", "Vanguard Individual", "Vanguard Pro", "Enterprise Team"];
+const TIER_OPTIONS = ["Reader", "Practitioner", "Operator", "Team", "Scale", "Enterprise", "Strategic Partner"];
 
 function PublishingTab() {
   return (
@@ -894,7 +909,10 @@ function UsersTab() {
     });
   }, [data, search, tierFilter]);
 
-  const act = async (user_id: string, action: "grant-vanguard" | "revoke-vanguard" | "grant-admin" | "revoke-admin" | "revoke-sessions") => {
+  type ManageAction =
+    | `grant-${typeof PAID_DESIGNATIONS[number]}`
+    | "revoke-subscription" | "grant-admin" | "revoke-admin" | "revoke-sessions";
+  const act = async (user_id: string, action: ManageAction) => {
     try {
       await mgrFn({ data: { user_id, action } });
       toast.success("Updated");
@@ -918,10 +936,9 @@ function UsersTab() {
             <SelectTrigger className="h-9 w-44 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All tiers</SelectItem>
-              <SelectItem value="free">Free</SelectItem>
-              <SelectItem value="vanguard">Vanguard</SelectItem>
-              <SelectItem value="vanguard-pro">Vanguard Pro</SelectItem>
-              <SelectItem value="enterprise">Enterprise</SelectItem>
+              {ALL_DESIGNATIONS.map((d) => (
+                <SelectItem key={d} value={d}>{TIER_LABEL[d] ?? d}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <div className="text-[11px] text-muted-foreground tabular-nums">{filtered.length} users</div>
@@ -934,7 +951,7 @@ function UsersTab() {
                 <th className="text-left font-normal py-2 px-3">Name</th>
                 <th className="text-left font-normal py-2 px-3">Email</th>
                 <th className="text-left font-normal py-2 px-3">Tier</th>
-                <th className="text-left font-normal py-2 px-3">Affiliation</th>
+                <th className="text-left font-normal py-2 px-3">Renewal</th>
                 <th className="text-left font-normal py-2 px-3">Sessions</th>
                 <th className="text-right font-normal py-2 px-3">Manage</th>
               </tr>
@@ -955,20 +972,36 @@ function UsersTab() {
                     </td>
                     <td className="py-2 px-3 text-muted-foreground">{u.email}</td>
                     <td className="py-2 px-3">
-                      <Badge variant={u.tier === "free" ? "secondary" : "default"} className="text-[10px] capitalize">{u.tier}</Badge>
+                      <Badge variant={isPaid(u.tier) ? "default" : "secondary"} className="text-[10px]">{u.tier_label}</Badge>
                     </td>
-                    <td className="py-2 px-3 text-muted-foreground text-xs">{u.tier === "enterprise" ? "Enterprise Team" : "—"}</td>
-                    <td className="py-2 px-3 font-mono tabular-nums text-xs">{u.sessions_used} / {u.seat_cap}</td>
+                    <td className="py-2 px-3 text-muted-foreground text-xs tabular-nums">
+                      {u.current_period_end ? new Date(u.current_period_end).toLocaleDateString() : "—"}
+                    </td>
+                    <td className="py-2 px-3 font-mono tabular-nums text-xs">
+                      {u.sessions_used} / {u.q_cap >= 9999 ? "∞" : u.q_cap}
+                    </td>
                     <td className="py-2 px-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          {u.tier === "vanguard" || u.tier === "vanguard-pro" || u.tier === "enterprise" ? (
-                            <DropdownMenuItem onClick={() => act(u.id, "revoke-vanguard")}>Revoke Vanguard</DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem onClick={() => act(u.id, "grant-vanguard")}>Grant Vanguard (1y)</DropdownMenuItem>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>Grant subscription</DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                {PAID_DESIGNATIONS.map((d) => (
+                                  <DropdownMenuItem key={d} onClick={() => act(u.id, `grant-${d}` as ManageAction)}>
+                                    {TIER_LABEL[d]}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                          {isPaid(u.tier) && (
+                            <DropdownMenuItem onClick={() => act(u.id, "revoke-subscription")}>
+                              Revoke subscription
+                            </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
                           {u.is_admin ? (
