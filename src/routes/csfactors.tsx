@@ -107,28 +107,49 @@ function CSFactorsPage() {
     <div className="min-h-screen flex bg-background">
       <CSFactorsSidebar />
       <main className="flex-1 min-w-0">
-        <div className="max-w-[1600px] mx-auto px-6 md:px-10 pt-10 pb-24 animate-fade-up">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-10 pt-6 md:pt-10 pb-24 animate-fade-up">
+          {/* Mobile section nav */}
+          <nav className="md:hidden -mx-4 px-4 mb-6 overflow-x-auto border-b border-border">
+            <div className="flex gap-1 min-w-max pb-px">
+              {[
+                { href: "#reminders", label: "Pulse" },
+                { href: "#accounts", label: "Accounts" },
+                { href: "#renewals", label: "Renewals" },
+                { href: "/account/analytics", label: "Analytics" },
+              ].map((i) => (
+                <a
+                  key={i.label}
+                  href={i.href}
+                  className="font-mono text-[10px] uppercase tracking-[0.2em] px-3 py-2 border-b-2 border-transparent text-foreground/70 hover:text-accent hover:border-accent whitespace-nowrap"
+                >
+                  {i.label}
+                </a>
+              ))}
+            </div>
+          </nav>
+
           {/* Header */}
-          <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 pb-6 border-b border-border">
-            <div>
+          <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-8 md:mb-10 pb-6 border-b border-border">
+            <div className="min-w-0">
               <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
                 CSFactors / Command Center
               </div>
-              <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight">
+              <h1 className="font-display text-3xl md:text-6xl leading-[0.95] tracking-tight">
                 {greeting()},{" "}
                 <span className="italic text-accent">{firstName}.</span>
               </h1>
-              <p className="text-foreground/70 mt-3 max-w-2xl">
+              <p className="text-foreground/70 mt-3 max-w-2xl text-sm md:text-base">
                 Your portfolio at a glance. Account matrix, stakeholder power-map, and contract vault — written for one person: you.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <ThemeToggle />
               <ImportCsvDialog />
               <AddAccountDialog />
             </div>
 
           </header>
+
 
           {!authLoading && !user ? (
             <div className="border border-dashed border-border bg-card p-10 text-center">
