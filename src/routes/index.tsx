@@ -19,12 +19,13 @@ const postsQuery = queryOptions({
 });
 
 const SECTIONS = [
-  { to: "/vanguard", name: "The CS Vanguard", blurb: "Proactive plays for fruitful engagement." },
-  { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically." },
-  { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts." },
-  { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators." },
-  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 11 dimensions, 44 metrics." },
+  { to: "/vanguard", name: "The CS Vanguard", blurb: "Proactive plays for fruitful engagement.", hint: "Q: open when you want this week's signal on what other CS orgs are doing." },
+  { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically.", hint: "Q: pick one playbook per quarter and run it end-to-end across the book." },
+  { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts.", hint: "Q: bring receipts here when you need numbers for a board or stakeholder argument." },
+  { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators.", hint: "Q: use it like a dictionary — jump in, grab the framework, leave." },
+  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 11 dimensions, 44 metrics.", hint: "Q: the single transition that unlocks your next band is the one to fund first." },
 ] as const;
+
 
 
 export const Route = createFileRoute("/")({
