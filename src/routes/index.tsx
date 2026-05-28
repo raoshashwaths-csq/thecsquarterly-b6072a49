@@ -60,7 +60,7 @@ function HomePage() {
 
       <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center animate-fade-up">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
-          Weekly Dispatch for the 1% of Operators
+          Weekly Dispatch for the 1% of Customer Success Operators
         </div>
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
           Stop managing accounts. <span className="italic text-accent">Start engineering trajectory.</span>
