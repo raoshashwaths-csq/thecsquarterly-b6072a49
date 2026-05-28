@@ -479,7 +479,7 @@ export function filterGlossary(items: GlossaryItem[], query: string): GlossaryIt
   const q = query.trim().toLowerCase();
   if (!q) return items;
   return items.filter((it) => {
-    const haystack = [it.term, it.short, it.definition, it.whyItMatters ?? "", ...(it.tags ?? [])]
+    const haystack = [it.term, it.short, it.definition ?? "", it.whyItMatters ?? "", ...(it.tags ?? [])]
       .join(" ")
       .toLowerCase();
     return haystack.includes(q);
