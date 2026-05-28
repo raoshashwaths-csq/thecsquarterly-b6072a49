@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Send, X, Sparkle } from "lucide-react";
+import { Mic, Send, Sparkle, Square, X } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { QMark } from "@/components/site/QMark";
+import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { CSFACTORS_Q_TREE } from "@/lib/csfactors-q-tree";
 import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,9 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const speech = useElevenLabsSpeechInput({
+    onTranscript: (text) => setInput((current) => (current ? `${current} ${text}` : text)),
+  });
 
   const ask = useServerFn(askCSFactorsQ);
   const mut = useMutation({
@@ -151,6 +155,21 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
             placeholder="Ask Q about an account, a renewal, a stakeholder…"
             className="flex-1 resize-none bg-transparent border border-border focus:border-accent outline-none px-3 py-2 text-sm font-sans"
           />
+          {speech.supported ? (
+            <button
+              type="button"
+              onClick={speech.toggle}
+              disabled={speech.transcribing || mut.isPending}
+              className={cn(
+                "shrink-0 inline-flex items-center justify-center h-9 w-9 border border-border hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors",
+                speech.recording && "border-accent text-accent animate-pulse",
+              )}
+              aria-label={speech.recording ? "Stop recording" : "Ask by voice"}
+              title={speech.error ?? (speech.transcribing ? "Transcribing…" : "Ask by voice")}
+            >
+              {speech.recording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            </button>
+          ) : null}
           <button
             type="submit"
             disabled={!input.trim() || mut.isPending}
