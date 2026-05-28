@@ -167,6 +167,17 @@ function CSFactorsPage() {
                 eyebrow="Accounts"
                 description="32 fields per account. Click any row to open the optimization drawer. Name and UCC stay frozen as you scroll right."
                 className="mb-10"
+                actions={
+                  <button
+                    type="button"
+                    onClick={() => setFullscreen(true)}
+                    className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] border border-border hover:border-accent hover:text-accent px-3 py-1.5 transition-colors"
+                    title="Expand matrix to full screen"
+                  >
+                    <Maximize2 className="h-3 w-3" />
+                    Fullscreen
+                  </button>
+                }
               >
                 {isLoading ? (
                   <p className="text-sm text-muted-foreground py-6">Loading…</p>
@@ -186,6 +197,7 @@ function CSFactorsPage() {
               </SectionCard>
             </>
           )}
+
         </div>
       </main>
 
