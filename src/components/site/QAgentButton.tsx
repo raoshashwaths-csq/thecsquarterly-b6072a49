@@ -7,6 +7,8 @@ import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
 import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { globalSearch, searchUserWorkspace, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
+import { SUGGESTED_VECTORS } from "@/lib/q-vectors";
+import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Sheet,
@@ -15,13 +17,14 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { QMark } from "@/components/site/QMark";
 import { BookOpen, FileText, Highlighter, Bookmark, Mic, Sparkles, Square } from "lucide-react";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 
 const TRIAL_KEY = "q.trial.used";
-const SEEN_KEY = "q.attention.seen";
-const LOGIN_HINT_KEY = "q.hint.login";
+const DRAFT_KEY = "q.draft.global";
+const FLAG_KEY = "q.flagged.today";
 
 // Rotating capability messages for the floating Meet Q. speech bubble.
 const CAPABILITY_LINES = [
