@@ -71,7 +71,7 @@ function HomePage() {
               <LayoutGrid size={16} strokeWidth={2.5} />
             </span>
             <span className="text-left">
-              <span className="block font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground leading-tight">
+              <span className="block font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground leading-tight">
                 Your Workspace
               </span>
               <span className="block font-display text-sm leading-tight">Notes · Highlights · Links →</span>
@@ -79,7 +79,7 @@ function HomePage() {
           </Link>
         </div>
 
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           Weekly Dispatch for the 1% of Customer Success Operators
         </div>
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
@@ -104,7 +104,7 @@ function HomePage() {
               CSF
             </span>
             <div className="flex-1 min-w-0">
-              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
+              <div className="font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
                 CSF · Command Centre
               </div>
               <div className="font-display text-xl md:text-2xl leading-tight mb-1">
@@ -113,7 +113,7 @@ function HomePage() {
               <p className="text-sm text-foreground/70 leading-snug mb-2">
                 Portfolio analytics, health, renewals and opportunities — in one operator-grade console.
               </p>
-              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
+              <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
                 Unlock at Operator tier →
               </div>
             </div>
@@ -206,7 +206,7 @@ function HomePage() {
 
               {/* AI Survey Promo */}
               <div className="bg-foreground text-background p-10">
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] mb-6 opacity-60">
+                <div className="font-mono text-xs uppercase tracking-[0.2em] mb-6 opacity-60">
                   Tooling & Diagnostics
                 </div>
                 <h3 className="font-display text-3xl mb-6">The 2026 AI Readiness Audit</h3>

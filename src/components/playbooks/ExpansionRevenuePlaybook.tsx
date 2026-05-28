@@ -37,7 +37,7 @@ To avoid system limits and protect your current setup velocity, I have put toget
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div className="p-5 border border-border bg-muted/40 rounded-lg">
-          <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/80 mb-3 flex items-center gap-1.5">
+          <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/80 mb-3 flex items-center gap-1.5">
             <Network className="h-4 w-4" /> Purchasing Stakeholder Hierarchy
           </h3>
           <div className="space-y-3 text-xs">
@@ -50,7 +50,7 @@ To avoid system limits and protect your current setup velocity, I have put toget
           </div>
         </div>
         <div className="p-5 border border-border bg-muted/40 rounded-lg">
-          <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/80 mb-3 flex items-center gap-1.5">
+          <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/80 mb-3 flex items-center gap-1.5">
             <Users className="h-4 w-4" /> Expansion Motion Matrix
           </h3>
           <div className="space-y-2 text-xs">
@@ -64,7 +64,7 @@ To avoid system limits and protect your current setup velocity, I have put toget
         </div>
       </div>
       <div className="border-t border-border pt-6">
-        <h3 className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">Trigger-Based Account-Expansion Dispatch Script</h3>
+        <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">Trigger-Based Account-Expansion Dispatch Script</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-xs font-medium text-muted-foreground mb-1">Active Headcount</label>
@@ -83,7 +83,7 @@ To avoid system limits and protect your current setup velocity, I have put toget
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
-            className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-1 bg-foreground text-background rounded text-[10px] font-sans hover:opacity-90"
+            className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-1 bg-foreground text-background rounded text-xs font-sans hover:opacity-90"
           >
             {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
             {copied ? "Copied" : "Copy dispatch"}

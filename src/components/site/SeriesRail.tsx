@@ -38,7 +38,7 @@ export function SeriesRail({
 
   return (
     <aside className="lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
         The series
       </div>
       <div className="font-display text-xl leading-tight mb-6 text-balance">

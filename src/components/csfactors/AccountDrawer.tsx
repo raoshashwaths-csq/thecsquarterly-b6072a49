@@ -73,7 +73,7 @@ export function AccountDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto p-0">
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-border bg-card sticky top-0 z-10">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold">
             Account Profile Optimization
           </div>
           <SheetTitle className="font-display text-2xl tracking-tight flex items-center gap-3">

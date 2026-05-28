@@ -162,7 +162,7 @@ function CSFactorsPageInner() {
           {/* Active filter badge */}
           {filter ? (
             <div className="mb-4 flex items-center gap-2">
-              <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/40 text-accent px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em]">
+              <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/40 text-accent px-3 py-1.5 font-mono text-xs uppercase tracking-[0.2em]">
                 Active filter: {filter.label}
                 <button
                   type="button"
@@ -179,7 +179,7 @@ function CSFactorsPageInner() {
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-8 md:mb-10 pb-6 border-b border-border">
             <div className="min-w-0">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
                 CSFactors / Command Center
               </div>
               <h1 className="font-display text-3xl md:text-6xl leading-[0.95] tracking-tight">
@@ -253,7 +253,7 @@ function CSFactorsPageInner() {
                   <button
                     type="button"
                     onClick={() => setFullscreen(true)}
-                    className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] border border-border hover:border-accent hover:text-accent px-3 py-1.5 transition-colors"
+                    className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] border border-border hover:border-accent hover:text-accent px-3 py-1.5 transition-colors"
                     title="Expand matrix to full screen"
                   >
                     <Maximize2 className="h-3 w-3" />
@@ -299,7 +299,7 @@ function CSFactorsPageInner() {
         <DialogContent className="max-w-[98vw] w-[98vw] h-[95vh] p-0 flex flex-col bg-background border-border">
           <header className="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-1">
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-1">
                 Accounts · Fullscreen
               </div>
               <h2 className="font-display text-xl tracking-tight">Master Account Matrix</h2>

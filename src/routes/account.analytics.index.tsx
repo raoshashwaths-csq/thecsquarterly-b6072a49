@@ -51,7 +51,7 @@ function AnalyticsIndex() {
       <SiteHeader />
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-10 pt-8 md:pt-12 pb-24 animate-fade-up">
         <header className="mb-10 md:mb-14 pb-6 border-b border-border">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
             Analytics / Dashboards
           </div>
           <h1 className="font-display text-3xl md:text-6xl leading-[0.95] tracking-tight">
@@ -75,7 +75,7 @@ function AnalyticsIndex() {
                   <Icon className="h-6 w-6 text-accent" />
                   <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
                 </div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-2">
+                <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
                   {c.eyebrow}
                 </div>
                 <h2 className="font-display text-2xl md:text-3xl tracking-tight mb-2">{c.title}</h2>

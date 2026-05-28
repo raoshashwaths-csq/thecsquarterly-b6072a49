@@ -93,7 +93,7 @@ function SurveyPage() {
       <main className="max-w-3xl mx-auto px-6 pt-12 pb-16 w-full">
         {step === -1 && (
           <div className="animate-fade-up">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
               6 minutes · 8 dimensions · 32 metrics
             </div>
             <h1 className="font-display text-5xl md:text-6xl leading-[0.95] mb-6">
@@ -157,7 +157,7 @@ function SurveyPage() {
 
         {currentQuestion && (
           <div key={currentQuestion.id} className="animate-fade-up">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4">
               Dimension {currentQuestion.id} · Weight {currentQuestion.weight} pts
             </div>
             <h2 className="font-display text-3xl md:text-5xl leading-[1.1] mb-4 text-balance">
@@ -237,7 +237,7 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="max-w-4xl mx-auto px-6 pt-16 pb-16 w-full animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
           Your Super Agent Readiness Report
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] mb-3">

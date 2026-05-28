@@ -79,7 +79,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
               ACCENT[it.accent],
             )}
           >
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
               {it.accent === "danger" ? "At risk" : it.accent === "warn" ? "Overdue" : "Upcoming"}
             </div>
             <div className="font-display text-lg leading-snug tracking-tight">{it.headline}</div>

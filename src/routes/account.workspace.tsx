@@ -44,7 +44,7 @@ export const Route = createFileRoute("/account/workspace")({
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 max-w-3xl mx-auto px-6 py-20 w-full">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">Workspace · Error</div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">Workspace · Error</div>
         <h1 className="font-display text-4xl tracking-tight mb-3">Something snagged.</h1>
         <p className="text-foreground/70 mb-6">{error?.message || "An unexpected error occurred."}</p>
         <button onClick={reset} className="px-5 py-3 bg-foreground text-background font-mono uppercase tracking-widest text-xs">Retry</button>
@@ -224,7 +224,7 @@ function WorkspacePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 max-w-6xl mx-auto px-4 md:px-6 py-10 w-full">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
           Members · Workspace
         </div>
         <div className="flex flex-wrap items-end justify-between gap-4 mb-2">
@@ -260,11 +260,11 @@ function WorkspacePage() {
               </button>
             )}
           </div>
-          <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="mt-1.5 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
             Scope · saved Workspace items only — does not query the CSQ corpus.
           </p>
           {!searchHintDismissed && (
-            <div className="mt-2 inline-flex items-center gap-2 px-2 py-1 bg-accent text-accent-foreground font-mono text-[10px] uppercase tracking-[0.25em] animate-pulse">
+            <div className="mt-2 inline-flex items-center gap-2 px-2 py-1 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.25em] animate-pulse">
               <Sparkles className="w-3 h-3" /> New · search across your saved intel
               <button type="button" onClick={(e) => { e.stopPropagation(); dismissSearchHint(); }} className="ml-1 opacity-80 hover:opacity-100" aria-label="Dismiss">
                 <X className="w-3 h-3" />
@@ -373,7 +373,7 @@ function DailyBriefing({ links, assets, annotations }: { links: SavedLink[]; ass
 
   return (
     <section className="mt-8 border-2 border-accent bg-accent/5 p-6 md:p-8">
-      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 font-semibold">
+      <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2 font-semibold">
         <Sparkles className="w-3 h-3" />
         Daily Operational Briefing · {briefing.today}
       </div>
@@ -389,7 +389,7 @@ function DailyBriefing({ links, assets, annotations }: { links: SavedLink[]; ass
         ))}
       </ul>
       {briefing.meta.total > 0 && (
-        <div className="mt-5 flex flex-wrap gap-4 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground border-t border-accent/30 pt-4">
+        <div className="mt-5 flex flex-wrap gap-4 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground border-t border-accent/30 pt-4">
           <span>{briefing.meta.total} saved</span>
           <span>· {briefing.meta.fresh} fresh (7d)</span>
           <span>· {briefing.meta.stale} stale (30d+)</span>
@@ -820,7 +820,7 @@ function LedgerPanel({
     <div className="grid md:grid-cols-2 gap-6">
       <div>
         <form onSubmit={addLink} className="border border-border p-4">
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
+          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
             <LinkIcon className="w-3.5 h-3.5" /> Save a link
           </div>
           <input
@@ -882,7 +882,7 @@ function LedgerPanel({
       </div>
 
       <div>
-        <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3">
+        <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">
           <Tag className="w-3.5 h-3.5" /> Auto-organized
         </div>
         {tagGroups.length === 0 ? (

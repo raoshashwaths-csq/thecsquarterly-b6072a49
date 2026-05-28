@@ -208,7 +208,7 @@ export function AccountsGrid({
                   <th
                     key={c.key as string}
                     className={cn(
-                      "px-3 py-2.5 border-b border-border whitespace-nowrap font-semibold text-[10px] uppercase tracking-[0.15em] text-muted-foreground",
+                      "px-3 py-2.5 border-b border-border whitespace-nowrap font-semibold text-xs uppercase tracking-[0.15em] text-muted-foreground",
                       isSticky && "sticky bg-muted/40 z-10",
                       idx === 0 && "left-0",
                       idx === 1 && "left-[200px] border-r border-border",

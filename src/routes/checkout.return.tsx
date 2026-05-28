@@ -43,7 +43,7 @@ function CheckoutReturn() {
         <div className="inline-flex h-14 w-14 items-center justify-center border border-accent text-accent mb-8">
           <Check className="h-6 w-6" />
         </div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">
           Payment received
         </div>
         <h1 className="font-display text-5xl md:text-6xl tracking-tight mb-6">
@@ -54,7 +54,7 @@ function CheckoutReturn() {
           seconds — refresh if it doesn't appear immediately.
         </p>
         {session_id && (
-          <p className="font-mono text-[10px] text-foreground/40 mb-10 break-all">
+          <p className="font-mono text-xs text-foreground/40 mb-10 break-all">
             Ref: {session_id}
           </p>
         )}

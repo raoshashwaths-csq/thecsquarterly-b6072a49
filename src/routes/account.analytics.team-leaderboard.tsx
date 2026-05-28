@@ -132,7 +132,7 @@ function TeamLeaderboardPage() {
                 <thead>
                   <tr className="text-left border-b border-border">
                     {["#", "CSM", "Accts", "Book", "Avg Health", "QBR %", "ARR at Risk"].map((h, i) => (
-                      <th key={h} className={`py-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground ${i === 0 ? "w-10" : ""}`}>
+                      <th key={h} className={`py-3 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground ${i === 0 ? "w-10" : ""}`}>
                         {h}
                       </th>
                     ))}

@@ -26,7 +26,7 @@ function AboutPage() {
       <SiteHeader />
 
       <header className="max-w-3xl mx-auto px-6 pt-24 pb-12 animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
           About
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10">

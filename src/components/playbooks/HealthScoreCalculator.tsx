@@ -44,14 +44,14 @@ export default function HealthScoreCalculator() {
         </div>
         <div className="flex flex-col justify-between p-6 bg-muted/40 border border-border rounded-lg gap-4">
           <div className="text-center py-4">
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Composite Health Index</span>
+            <span className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">Composite Health Index</span>
             <div className="text-6xl font-display font-semibold mt-2">{hComp.toFixed(1)}</div>
           </div>
           <div className={`flex items-center gap-3 p-4 border rounded ${status.cls}`}>
             <status.Icon className="h-5 w-5 flex-shrink-0" />
             <span className="text-sm font-semibold">{status.label}</span>
           </div>
-          <div className="font-mono text-[10px] text-muted-foreground bg-background/60 p-3 rounded border border-border">
+          <div className="font-mono text-xs text-muted-foreground bg-background/60 p-3 rounded border border-border">
             <strong>Formula:</strong> H_comp = 0.25P + 0.25T + 0.30S + 0.20C
           </div>
         </div>

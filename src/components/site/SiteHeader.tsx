@@ -68,7 +68,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-4 md:gap-6 font-mono text-[10px] font-semibold uppercase tracking-widest">
+        <div className="flex items-center gap-4 md:gap-6 font-mono text-xs font-semibold uppercase tracking-widest">
           {isHome && (
             <div className="hidden lg:flex items-center gap-6">
               {sections.map((item, i) => (
@@ -98,7 +98,7 @@ export function SiteHeader() {
                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px]"
                 >
                   <Search size={13} strokeWidth={2.75} />
-                  <span className="hidden md:inline text-[10px] tracking-widest">⌘K</span>
+                  <span className="hidden md:inline text-xs tracking-widest">⌘K</span>
                 </button>
               )}
 
@@ -110,7 +110,7 @@ export function SiteHeader() {
                   className="inline-flex items-center justify-center gap-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px] px-2.5 py-1.5"
                 >
                   <Compass size={13} strokeWidth={2.75} />
-                  <span className="hidden md:inline text-[10px] tracking-widest">Canvas</span>
+                  <span className="hidden md:inline text-xs tracking-widest">Canvas</span>
                 </Link>
               )}
 
@@ -122,7 +122,7 @@ export function SiteHeader() {
                   className="inline-flex items-center justify-center gap-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px] px-2.5 py-1.5"
                 >
                   <LayoutGrid size={13} strokeWidth={2.75} />
-                  <span className="hidden md:inline text-[10px] tracking-widest">Workspace</span>
+                  <span className="hidden md:inline text-xs tracking-widest">Workspace</span>
                 </Link>
               )}
             </>
@@ -140,7 +140,7 @@ export function SiteHeader() {
               >
                 <Avatar className="h-8 w-8">
                   {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
-                  <AvatarFallback className="bg-foreground text-background font-mono text-[10px] tracking-widest">
+                  <AvatarFallback className="bg-foreground text-background font-mono text-xs tracking-widest">
                     {initials || "·"}
                   </AvatarFallback>
                 </Avatar>
@@ -216,7 +216,7 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/login"
-              className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-[10px] md:text-[11px] font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
+              className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-xs md:text-[11px] font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
             >
               Login
             </Link>

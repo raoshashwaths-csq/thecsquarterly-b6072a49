@@ -221,7 +221,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
 
       {/* 2x2 power matrix */}
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent font-semibold mb-2">
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent font-semibold mb-2">
           Power Matrix
         </div>
         <div className="grid grid-cols-2 gap-px bg-border border border-border">

@@ -32,7 +32,7 @@ If you have already decided to terminate our contract, please let me know so we 
       <div className="border border-border rounded-lg overflow-hidden mb-6">
         <table className="w-full text-left border-collapse text-xs md:text-sm">
           <thead>
-            <tr className="bg-muted/50 border-b border-border font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            <tr className="bg-muted/50 border-b border-border font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
               <th className="p-3">Risk Code</th>
               <th className="p-3">Trigger Parameter</th>
               <th className="p-3">Remediation Path</th>
@@ -50,7 +50,7 @@ If you have already decided to terminate our contract, please let me know so we 
         </table>
       </div>
       <div className="bg-muted/40 p-5 border border-border rounded-lg">
-        <div className="flex items-center gap-2 mb-4 font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/80">
+        <div className="flex items-center gap-2 mb-4 font-mono text-xs uppercase tracking-[0.25em] text-foreground/80">
           <AlertCircle className="h-4 w-4" /> Accusation Audit Intervention Script
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -71,7 +71,7 @@ If you have already decided to terminate our contract, please let me know so we 
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
-            className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-1 bg-foreground text-background rounded text-[10px] font-sans hover:opacity-90 transition-opacity"
+            className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-1 bg-foreground text-background rounded text-xs font-sans hover:opacity-90 transition-opacity"
           >
             {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
             {copied ? "Copied" : "Copy email"}

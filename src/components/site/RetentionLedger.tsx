@@ -15,7 +15,7 @@ export function RetentionLedger() {
   return (
     <div className="border-y border-border bg-foreground text-background overflow-hidden">
       <div className="relative flex">
-        <div className="shrink-0 px-4 py-2 bg-accent text-accent-foreground font-mono text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 z-10">
+        <div className="shrink-0 px-4 py-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.25em] flex items-center gap-2 z-10">
           <span className="inline-block w-1.5 h-1.5 rounded-full bg-secondary-accent animate-pulse" />
           The Retention Ledger
         </div>

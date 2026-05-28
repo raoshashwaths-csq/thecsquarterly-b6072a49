@@ -73,7 +73,7 @@ export function EndOfDaySentimentCheckIn() {
       <SheetContent side="bottom" className="bg-background border-t border-border p-0">
         <div className="max-w-2xl mx-auto p-7 md:p-9">
           <SheetHeader className="text-left mb-5">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
               <QMark /> · End-of-day check-in
             </div>
             <SheetTitle asChild>
@@ -101,14 +101,14 @@ export function EndOfDaySentimentCheckIn() {
               <button
                 type="submit"
                 disabled={busy || !text.trim()}
-                className="flex-1 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.3em] hover:bg-accent transition-colors disabled:opacity-40"
+                className="flex-1 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.3em] hover:bg-accent transition-colors disabled:opacity-40"
               >
                 {busy ? "Logging…" : "Log today"}
               </button>
               <button
                 type="button"
                 onClick={dismiss}
-                className="py-3 px-5 border border-border font-mono text-[10px] uppercase tracking-[0.3em] hover:border-foreground transition-colors"
+                className="py-3 px-5 border border-border font-mono text-xs uppercase tracking-[0.3em] hover:border-foreground transition-colors"
               >
                 Not now
               </button>

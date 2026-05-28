@@ -30,7 +30,7 @@ export function Paywall({
           : "bg-foreground text-background p-8 md:p-10 my-12"
       }
     >
-      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-4">
+      <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-4">
         <Lock size={12} />
         <span>Premium · Locked</span>
       </div>

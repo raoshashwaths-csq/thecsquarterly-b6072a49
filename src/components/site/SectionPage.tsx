@@ -31,7 +31,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
       <SiteHeader />
 
       <header className="max-w-5xl mx-auto px-6 pt-24 pb-16 animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">
           {eyebrow}
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-8">
@@ -112,7 +112,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] opacity-60 mb-6">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] opacity-60 mb-6">
             Subscribe to the dispatch
           </div>
           <h3 className="font-display text-4xl md:text-5xl mb-6 leading-tight">

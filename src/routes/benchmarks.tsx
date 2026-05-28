@@ -42,7 +42,7 @@ function BenchmarksPage() {
       <SiteHeader />
       <main className="flex-1 container mx-auto px-6 py-16 max-w-6xl">
         <Reveal>
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
             Benchmarks
           </p>
           <h1 className="font-display text-5xl md:text-6xl tracking-tight leading-[0.95]">
@@ -74,7 +74,7 @@ function BenchmarksPage() {
             <SectionCard key={period} eyebrow={period} title="Quarterly retention drop">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <tr className="text-left font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
                     <th className="py-2 font-normal">Metric</th>
                     <th className="py-2 font-normal">Segment</th>
                     <th className="py-2 font-normal text-right">Value</th>

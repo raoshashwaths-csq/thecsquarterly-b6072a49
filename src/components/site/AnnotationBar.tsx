@@ -196,7 +196,7 @@ export function AnnotationBar({ slug }: { slug: string }) {
       {noteOpen && (
         <div className="fixed inset-0 z-50 bg-background/70 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-background border border-border rounded-lg max-w-lg w-full p-6">
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-2">
+            <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
               Private note
             </p>
             <blockquote className="border-l-2 border-accent pl-3 text-sm italic text-muted-foreground mb-4">
@@ -230,7 +230,7 @@ export function AnnotationBar({ slug }: { slug: string }) {
 
       {items.length > 0 && (
         <aside className="mt-16 border-t border-border pt-8">
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">
             Your margin {user ? "· synced" : "· local only — sign in to sync"}
           </p>
           <ul className="space-y-5">

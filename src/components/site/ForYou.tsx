@@ -23,7 +23,7 @@ export function ForYou() {
       <div className="max-w-[1280px] mx-auto px-6">
         <div className="flex items-end justify-between gap-6 mb-10">
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2 flex items-center gap-2">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2 flex items-center gap-2">
               <Sparkles className="h-3 w-3" />
               {user ? "For you" : "Editor's selection"}
             </div>
@@ -61,7 +61,7 @@ export function ForYou() {
                 to={p.href}
                 className="group bg-background p-6 flex flex-col gap-3 hover:bg-muted/20 transition-colors"
               >
-                <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-accent">
+                <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-accent">
                   <FileText className="h-3 w-3" />
                   <span className="truncate">{p.category}</span>
                   {p.isPremium && (

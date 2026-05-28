@@ -27,7 +27,7 @@ export function SentimentTrendPanel() {
 
   return (
     <section className="mt-12 border-t border-border pt-10">
-      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-2">
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
         Monthly · Sentiment
       </div>
       <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
@@ -54,7 +54,7 @@ export function SentimentTrendPanel() {
             const pct = Math.round((dist[k] / total) * 100);
             return (
               <div key={k} className="border border-border p-5">
-                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/55 mb-2">{k}</div>
+                <div className="font-mono text-xs uppercase tracking-[0.3em] text-foreground/55 mb-2">{k}</div>
                 <div className="font-display text-4xl tracking-tight mb-1">{dist[k]}</div>
                 <div className="font-mono uppercase tracking-widest text-xs text-foreground/45">{pct}% of month</div>
                 <div className="mt-3 h-1 bg-border">
@@ -65,7 +65,7 @@ export function SentimentTrendPanel() {
           })}
 
           <div className="md:col-span-3 border border-border p-5">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/55 mb-3">
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-foreground/55 mb-3">
               30-day trace
             </div>
             <Sparkline rows={rows} />

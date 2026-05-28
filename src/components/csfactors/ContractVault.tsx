@@ -117,7 +117,7 @@ export function ContractVault({
     <div className="space-y-4">
       {window90.band && (
         <div className="border-l-[3px] border-l-accent bg-accent/5 px-4 py-3">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent font-semibold mb-1">
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-1">
             Critical Notification Window — {window90.band}d
           </div>
           <p className="text-xs text-foreground/80">

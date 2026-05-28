@@ -41,7 +41,7 @@ function TeamsPage() {
       <SiteHeader />
       <main className="flex-1 container mx-auto px-6 py-16 max-w-5xl">
         <Reveal>
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">Teams</p>
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">Teams</p>
           <h1 className="font-display text-5xl md:text-6xl tracking-tight leading-[0.95]">
             Your bench, on one page.
           </h1>
@@ -96,7 +96,7 @@ function TeamCard({ team, role }: { team: any; role: string }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-secondary-accent" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+          <span className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
             {role}
           </span>
         </div>

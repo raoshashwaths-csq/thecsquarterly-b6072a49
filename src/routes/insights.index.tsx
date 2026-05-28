@@ -40,7 +40,7 @@ function InsightsPage() {
       <SiteHeader />
 
       <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 animate-fade-up">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6 font-medium">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6 font-medium">
           The Archive
         </div>
         <h1 className="font-display text-6xl md:text-8xl leading-[0.95] tracking-tight text-balance max-w-4xl">

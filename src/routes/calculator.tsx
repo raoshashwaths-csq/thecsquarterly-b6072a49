@@ -71,7 +71,7 @@ function CalculatorPage() {
         <section className="border-b border-border">
           <div className="container mx-auto px-6 py-16 md:py-24 max-w-5xl">
             <Reveal>
-              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+              <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
                 The Calculator
               </p>
               <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance">
@@ -119,7 +119,7 @@ function CalculatorPage() {
 
             <div className="space-y-6">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">
+                <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2">
                   Year 5 ARR delta
                 </p>
                 <p className="font-display text-5xl md:text-6xl tracking-tight text-accent">
@@ -128,7 +128,7 @@ function CalculatorPage() {
                 </p>
               </div>
               <div className="border-t border-border pt-6">
-                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-2">
+                <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2">
                   Cumulative 5-year revenue gap
                 </p>
                 <p className="font-display text-3xl tracking-tight">
@@ -147,7 +147,7 @@ function CalculatorPage() {
 
         <section className="border-b border-border">
           <div className="container mx-auto px-6 py-16 max-w-5xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-6">
+            <p className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">
               Trajectory comparison
             </p>
             <div className="h-[360px] w-full">
@@ -232,7 +232,7 @@ function SliderRow({
   return (
     <div>
       <div className="flex items-baseline justify-between mb-3">
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
+        <span className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
           {label}
         </span>
         <span className="font-display text-2xl tracking-tight">{value}</span>

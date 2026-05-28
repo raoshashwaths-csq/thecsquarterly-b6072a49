@@ -74,7 +74,7 @@ function SequencerPage() {
       <SiteHeader />
       <main className="flex-1 container mx-auto px-6 py-16 max-w-6xl">
         <Reveal>
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-6">
+          <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
             Sequencer
           </p>
           <h1 className="font-display text-5xl md:text-6xl tracking-tight leading-[0.95]">
@@ -88,7 +88,7 @@ function SequencerPage() {
 
         <div className="grid md:grid-cols-2 gap-10 mt-12">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4">
+            <p className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4">
               Archive
             </p>
             <ul className="space-y-1 max-h-[520px] overflow-y-auto border border-border rounded">
@@ -98,7 +98,7 @@ function SequencerPage() {
                     onClick={() => add(p)}
                     className="w-full text-left px-3 py-2 text-sm hover:bg-accent/10 border-b border-border last:border-0"
                   >
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mr-2">
+                    <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground mr-2">
                       {p.category}
                     </span>
                     {p.title}
@@ -141,7 +141,7 @@ function SequencerPage() {
                   className="flex items-center gap-3 border border-border rounded px-3 py-2 bg-background cursor-move hover:border-accent"
                 >
                   <GripVertical className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-mono text-[10px] text-secondary-accent w-6">
+                  <span className="font-mono text-xs text-secondary-accent w-6">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span className="flex-1 text-sm truncate">{it.title}</span>
@@ -154,7 +154,7 @@ function SequencerPage() {
 
             {seqs && seqs.length > 0 && (
               <div className="mt-10">
-                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-3">
+                <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
                   Saved
                 </p>
                 <ul className="space-y-1">
@@ -164,7 +164,7 @@ function SequencerPage() {
                       className="flex items-center justify-between border-b border-border py-2 text-sm"
                     >
                       <span>{s.name}</span>
-                      <span className="font-mono text-[10px] text-muted-foreground">
+                      <span className="font-mono text-xs text-muted-foreground">
                         {(s.items as any[]).length} essays
                       </span>
                     </li>

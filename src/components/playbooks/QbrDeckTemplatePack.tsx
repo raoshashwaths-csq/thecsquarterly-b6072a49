@@ -49,7 +49,7 @@ export default function QbrDeckTemplatePack() {
         </div>
         <div className="md:col-span-2 bg-muted/40 p-6 border border-border rounded-lg flex flex-col justify-between min-h-[350px]">
           <div>
-            <div className="flex items-center gap-2 text-muted-foreground font-mono text-[10px] uppercase tracking-[0.25em] mb-2">
+            <div className="flex items-center gap-2 text-muted-foreground font-mono text-xs uppercase tracking-[0.25em] mb-2">
               <Layers className="h-3 w-3" /> Slide Preview
             </div>
             <h3 className="text-lg font-display font-semibold mb-2">{current.title}</h3>

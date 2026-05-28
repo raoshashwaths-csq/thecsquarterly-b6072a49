@@ -77,16 +77,16 @@ function ResponsePage() {
         <div className="container max-w-4xl mx-auto px-5 sm:px-6 md:px-10">
           {error && (
             <div className="border border-border p-8 max-w-xl mx-auto">
-              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">Error</div>
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">Error</div>
               <p className="font-body text-foreground/80 mb-6">{error}</p>
-              <Link to="/agent/framework" className="font-mono text-[10px] uppercase tracking-[0.25em] underline">
+              <Link to="/agent/framework" className="font-mono text-xs uppercase tracking-[0.25em] underline">
                 Back to canvas
               </Link>
             </div>
           )}
 
           {!run && !error && (
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50 text-center mt-24">
+            <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/50 text-center mt-24">
               <QMark /> is composing the response…
             </div>
           )}
@@ -94,13 +94,13 @@ function ResponsePage() {
           {run && (
             <>
               <div className="mb-10">
-                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-3">
+                <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
                   <QMark periodClassName="text-foreground" /> Response · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
                 </div>
                 <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3 break-words">
                   {node?.label ?? "Decision"}<span className="text-accent">.</span>
                 </h1>
-                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/55 break-words">
+                <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55 break-words">
                   {crumb.join(" › ")}
                 </div>
               </div>
@@ -108,7 +108,7 @@ function ResponsePage() {
               {run.isOwner && (
                 <div className="flex flex-wrap items-center justify-between gap-4 border border-border rounded-md px-5 py-4 mb-10">
                   <div className="min-w-0">
-                    <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/70">Share link</div>
+                    <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/70">Share link</div>
                     <div className="text-xs text-foreground/55 mt-0.5">
                       {run.shared ? "Anyone with the link can read this response." : "Only you can see this response."}
                     </div>
@@ -118,7 +118,7 @@ function ResponsePage() {
                     {run.shared && (
                       <button
                         onClick={copyLink}
-                        className="font-mono text-[10px] uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
+                        className="font-mono text-xs uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
                       >
                         Copy link
                       </button>
@@ -134,13 +134,13 @@ function ResponsePage() {
               <div className="flex flex-wrap gap-3 pt-10 border-t border-border mt-12">
                 <button
                   onClick={() => navigate({ to: "/agent/framework" })}
-                  className="px-6 py-3 bg-foreground text-background font-mono text-[10px] uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+                  className="px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.25em] hover:bg-accent transition-colors"
                 >
                   New decision
                 </button>
                 <Link
                   to="/agent/framework"
-                  className="px-6 py-3 border border-border font-mono text-[10px] uppercase tracking-[0.25em] hover:border-foreground transition-colors"
+                  className="px-6 py-3 border border-border font-mono text-xs uppercase tracking-[0.25em] hover:border-foreground transition-colors"
                 >
                   Back to canvas
                 </Link>
@@ -162,7 +162,7 @@ function Zone({
     <section className="border-t border-border pt-8 pb-10">
       <div className="flex items-baseline justify-between mb-5">
         <div>
-          <div className={`font-mono text-[10px] uppercase tracking-[0.3em] mb-1 ${toneClass}`}>
+          <div className={`font-mono text-xs uppercase tracking-[0.3em] mb-1 ${toneClass}`}>
             Zone {index}
           </div>
           <h2 className="font-display text-2xl md:text-3xl tracking-tight">{label}</h2>
@@ -170,7 +170,7 @@ function Zone({
         {copyable && (
           <button
             onClick={() => { navigator.clipboard.writeText(body); toast.success("Copied to clipboard"); }}
-            className="font-mono text-[10px] uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
+            className="font-mono text-xs uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
           >
             Copy
           </button>

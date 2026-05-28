@@ -77,7 +77,7 @@ function PlaybookPage() {
         <Link to="/codex" className="font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent">
           ← The Codex
         </Link>
-        <div className="mt-8 font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4 flex items-center gap-3">
+        <div className="mt-8 font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4 flex items-center gap-3">
           <Lock size={12} /> {pb.category} · {pb.pages} pages
         </div>
         <h1 className="font-display text-5xl md:text-6xl leading-[0.95] tracking-tight text-balance mb-6">

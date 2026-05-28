@@ -51,7 +51,7 @@ export default function AiReadinessDiagnostic() {
         </div>
       </div>
       <div className="border border-border rounded-lg p-5">
-        <h4 className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-3 flex items-center gap-1">
+        <h4 className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3 flex items-center gap-1">
           <BarChart3 className="h-3.5 w-3.5" /> 90-Day Remediation Playbook
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">

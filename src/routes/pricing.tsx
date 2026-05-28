@@ -39,7 +39,7 @@ function PricingPage() {
       <main className="flex-1">
         {/* Hero */}
         <section className="max-w-5xl mx-auto px-6 pt-20 pb-12 text-center">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4">
             The Platform
           </div>
           <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-6">
@@ -71,7 +71,7 @@ function PricingPage() {
               },
             ].map((c) => (
               <div key={c.eyebrow} className="p-6 border border-border bg-card/60">
-                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-3">
+                <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-3">
                   {c.eyebrow}
                 </div>
                 <h3 className="font-display text-2xl leading-tight mb-3">{c.title}</h3>
@@ -127,7 +127,7 @@ function PricingPage() {
               { k: "Brand", v: "The only entity that is simultaneously the platform, the publication, and the source cited to boards." },
             ].map((m) => (
               <div key={m.k} className="p-5 border border-border bg-card/60">
-                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-2">
+                <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent mb-2">
                   {m.k}
                 </div>
                 <p className="text-sm text-foreground/75">{m.v}</p>
@@ -175,7 +175,7 @@ function BandHeader({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="mb-8 flex items-end justify-between gap-6 border-b border-border pb-4">
       <div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-2">
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
           {eyebrow}
         </div>
         <h2 className="font-display text-3xl md:text-4xl leading-tight tracking-tight">
@@ -261,7 +261,7 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
 
 function TierCta({ tier, emphasized }: { tier: Tier; emphasized: boolean }) {
   const cls =
-    "block w-full py-3.5 text-center font-mono text-[10px] uppercase tracking-[0.25em] transition-all " +
+    "block w-full py-3.5 text-center font-mono text-xs uppercase tracking-[0.25em] transition-all " +
     (emphasized
       ? "bg-accent text-accent-foreground hover:opacity-90"
       : "border border-foreground hover:bg-foreground hover:text-background");
@@ -317,7 +317,7 @@ function PartnerCard({ tier }: { tier: Tier }) {
         )}
         <a
           href={tierMailto(tier.label)}
-          className="block w-full py-3.5 text-center font-mono text-[10px] uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all"
+          className="block w-full py-3.5 text-center font-mono text-xs uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all"
         >
           {tier.cta}
         </a>
@@ -427,7 +427,7 @@ function RowGroup({ group }: { group: Group }) {
       <tr className="bg-muted/30 border-b border-border">
         <td
           colSpan={TIERS.length + 1}
-          className="px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent"
+          className="px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent"
         >
           {isJobGroup ? (
             <span className="inline-flex items-center gap-3">

@@ -107,7 +107,7 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
             >
               {!collapsed && (
                 <>
-                  <span className="font-mono uppercase tracking-[0.22em] text-[10px] font-semibold flex-1 text-left">
+                  <span className="font-mono uppercase tracking-[0.22em] text-xs font-semibold flex-1 text-left">
                     Analytics
                   </span>
                   <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", !analyticsOpen && "-rotate-90")} />
@@ -144,7 +144,7 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
           {/* Standalone */}
           <div className="mt-4 px-2">
             {!collapsed && (
-              <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-[10px] font-semibold text-foreground/50">
+              <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-xs font-semibold text-foreground/50">
                 Modules
               </div>
             )}
