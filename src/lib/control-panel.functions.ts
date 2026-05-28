@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   normalizeTier,
   isPaid,
+  TIER_LABEL,
   TIER_Q_CAP,
   TIER_SEAT_CAP,
   PAID_DESIGNATIONS,
@@ -65,7 +66,7 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
     const tierBreakdown: { designation: Designation; label: string; count: number }[] =
       PAID_DESIGNATIONS.map((d) => ({
         designation: d,
-        label: (paidSubs.find((s) => s.designation === d)?.label) ?? d,
+        label: TIER_LABEL[d] ?? d,
         count: paidSubs.filter((s) => s.designation === d).length,
       }));
 
@@ -93,19 +94,33 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
     const subByUser: Record<string, { designation: string; label: string }> = {};
     const methodByUser: Record<string, string> = {};
     if (ids.length) {
-      const [subs2, identitiesLikely] = await Promise.all([
-        supabaseAdmin.from("subscriptions").select("user_id, tier, designation, status").in("user_id", ids),
-        Promise.resolve({ data: [] as Array<{ user_id: string; provider: string }> }),
-      ]);
+      const subs2 = await supabaseAdmin
+        .from("subscriptions")
+        .select("user_id, tier, designation, status")
+        .in("user_id", ids);
       (subs2.data ?? []).forEach((s) => {
         if (s.status !== "active") return;
         const n = normalizeTier({ tier: s.tier, designation: s.designation });
         if (isPaid(n.designation)) subByUser[s.user_id] = { designation: n.designation, label: n.label };
       });
-      latestProfiles.forEach((p) => {
-        methodByUser[p.id] = "Email";
-      });
-      void identitiesLikely;
+
+      // Real provider lookup via auth admin API — fall back to "Email".
+      await Promise.all(
+        ids.map(async (uid) => {
+          try {
+            const { data } = await supabaseAdmin.auth.admin.getUserById(uid);
+            const providers = (data?.user?.identities ?? [])
+              .map((i) => i.provider)
+              .filter(Boolean);
+            if (providers.includes("google")) methodByUser[uid] = "Google";
+            else if (providers.includes("apple")) methodByUser[uid] = "Apple";
+            else if (providers.includes("github")) methodByUser[uid] = "GitHub";
+            else methodByUser[uid] = "Email";
+          } catch {
+            methodByUser[uid] = "Email";
+          }
+        }),
+      );
     }
 
     const latestRegistrations = latestProfiles.map((p) => ({
