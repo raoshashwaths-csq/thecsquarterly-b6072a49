@@ -73,7 +73,7 @@ export function AccountDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto p-0">
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-border bg-card sticky top-0 z-10">
-          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold">
+          <div className="font-mono uppercase tracking-[0.3em] text-xs text-secondary-accent font-semibold">
             Account Profile Optimization
           </div>
           <SheetTitle className="font-display text-2xl tracking-tight flex items-center gap-3">
@@ -210,7 +210,7 @@ function Section({ value, title, children }: { value: string; title: string; chi
   return (
     <AccordionItem value={value} className="border border-border bg-card">
       <AccordionTrigger className="px-4 py-3 hover:no-underline">
-        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/80">
+        <span className="font-mono uppercase tracking-[0.2em] text-xs text-foreground/80">
           {title}
         </span>
       </AccordionTrigger>

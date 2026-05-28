@@ -43,7 +43,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
       <SheetContent side="right" className="w-full sm:max-w-md p-0 flex flex-col bg-background border-l border-border">
         <SheetHeader className="px-5 py-4 border-b border-border">
           <SheetTitle className="font-display text-lg tracking-tight">Workspace</SheetTitle>
-          <SheetDescription className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
+          <SheetDescription className="font-mono uppercase tracking-[0.22em] text-xs text-muted-foreground">
             Notes · Highlights · Links
           </SheetDescription>
           <div className="relative pt-3">
@@ -103,7 +103,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
         <div className="border-t border-border px-5 py-3">
           <Link
             to="/account/workspace"
-            className="font-mono text-xs uppercase tracking-[0.22em] text-foreground/70 hover:text-accent"
+            className="font-mono uppercase tracking-[0.22em] text-xs text-foreground/70 hover:text-accent"
             onClick={() => onOpenChange(false)}
           >
             Open full workspace →
@@ -117,7 +117,7 @@ export function WorkspacePane({ open, onOpenChange }: { open: boolean; onOpenCha
 function Section({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-accent font-semibold mb-3">
+      <div className="flex items-center gap-2 font-mono uppercase tracking-[0.22em] text-xs text-accent font-semibold mb-3">
         {icon} {label}
       </div>
       <div className="space-y-3">{children}</div>

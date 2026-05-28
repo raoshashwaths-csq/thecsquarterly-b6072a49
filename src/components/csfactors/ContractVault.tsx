@@ -117,7 +117,7 @@ export function ContractVault({
     <div className="space-y-4">
       {window90.band && (
         <div className="border-l-[3px] border-l-accent bg-accent/5 px-4 py-3">
-          <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-1">
+          <div className="font-mono uppercase tracking-[0.25em] text-xs text-accent font-semibold mb-1">
             Critical Notification Window — {window90.band}d
           </div>
           <p className="text-xs text-foreground/80">
@@ -189,7 +189,7 @@ export function ContractVault({
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                 <div>
-                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Type</label>
+                  <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Type</label>
                   <Select value={r.doc_type} onValueChange={(v) => patch(r, { doc_type: v })}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -201,7 +201,7 @@ export function ContractVault({
                   </Select>
                 </div>
                 <div>
-                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Signed value ($)</label>
+                  <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Signed value ($)</label>
                   <Input
                     type="number"
                     defaultValue={r.signed_value_cents !== null ? r.signed_value_cents / 100 : ""}
@@ -213,7 +213,7 @@ export function ContractVault({
                   />
                 </div>
                 <div>
-                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Executed on</label>
+                  <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Executed on</label>
                   <Input
                     type="date"
                     defaultValue={r.executed_on ?? ""}
