@@ -233,12 +233,25 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
       </div>
 
       <ul className="space-y-2.5 mb-8 flex-1">
-        {tier.features.map((f) => (
-          <li key={f} className="flex gap-2.5 text-sm">
-            <Check size={14} className="mt-1 shrink-0 text-accent" />
-            <span className="text-foreground/85">{f}</span>
-          </li>
-        ))}
+        {tier.features.map((f) => {
+          const isJob = f.startsWith("__jobboard__:");
+          const text = isJob ? f.slice("__jobboard__:".length) : f;
+          return (
+            <li key={f} className="flex gap-2.5 text-sm">
+              <Check size={14} className="mt-1 shrink-0 text-accent" />
+              {isJob ? (
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="text-foreground/50 blur-[1.5px] select-none">{text}</span>
+                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
+                    Stay tuned ✨
+                  </span>
+                </span>
+              ) : (
+                <span className="text-foreground/85">{text}</span>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       <TierCta tier={tier} emphasized={emphasized} />
