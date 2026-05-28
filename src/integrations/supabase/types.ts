@@ -1086,6 +1086,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_daily_sentiment: {
+        Row: {
+          calculated_sentiment_score: string
+          created_at: string
+          date: string
+          flagged_keywords: string[]
+          id: string
+          raw_text_feedback: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calculated_sentiment_score: string
+          created_at?: string
+          date: string
+          flagged_keywords?: string[]
+          id?: string
+          raw_text_feedback: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calculated_sentiment_score?: string
+          created_at?: string
+          date?: string
+          flagged_keywords?: string[]
+          id?: string
+          raw_text_feedback?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
