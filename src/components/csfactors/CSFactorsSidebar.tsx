@@ -1,24 +1,20 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ChevronLeft, ChevronDown } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { CSFLogo } from "./CSFLogo";
-import { TOP_LINKS, ANALYTICS_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
+import { TOP_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
 
 const COLLAPSE_KEY = "csf.sidebar.collapsed";
-const ANALYTICS_OPEN_KEY = "csf.sidebar.analyticsOpen";
 
 export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => void }) {
   const [collapsed, setCollapsed] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(true);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const hash = useRouterState({ select: (r) => r.location.hash });
 
   useEffect(() => {
     try {
       setCollapsed(localStorage.getItem(COLLAPSE_KEY) === "1");
-      const ao = localStorage.getItem(ANALYTICS_OPEN_KEY);
-      if (ao !== null) setAnalyticsOpen(ao === "1");
     } catch { /* */ }
   }, []);
 
@@ -29,16 +25,11 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
       return next;
     });
   }
-  function toggleAnalytics() {
-    setAnalyticsOpen((o) => {
-      const next = !o;
-      try { localStorage.setItem(ANALYTICS_OPEN_KEY, next ? "1" : "0"); } catch { /* */ }
-      return next;
-    });
-  }
 
-  const isActiveTop = (to: string, h?: string) =>
-    pathname === to && (!h || `#${hash}` === h || hash === h.slice(1));
+  const isActiveTop = (to: string, h?: string) => {
+    if (h) return pathname === to && (`#${hash}` === h || hash === h.slice(1));
+    return pathname === to || pathname.startsWith(to + "/");
+  };
   const isActive = (to: string) => pathname === to || pathname.startsWith(to + "/");
 
   return (
@@ -64,11 +55,11 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
         </div>
 
         <nav className="flex-1 overflow-y-auto py-3">
-          {/* Top */}
           <div className="px-2 space-y-0.5">
             {TOP_LINKS.map((item) => {
               const Icon = item.icon;
               const active = isActiveTop(item.to, item.hash);
+              const emphasized = item.to === "/csfactors/360" && !item.hash;
               return (
                 <a
                   key={item.label}
@@ -76,65 +67,24 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
                   className={cn(
                     "flex items-center gap-3 px-3 py-2 text-sm border-l-2 transition-colors hover:bg-muted/60",
                     active ? "border-accent text-foreground bg-muted/40" : "border-transparent text-foreground/70",
+                    emphasized && !active && "text-foreground",
                   )}
                   title={collapsed ? item.label : undefined}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span className="font-mono uppercase tracking-wider text-xs">{item.label}</span>}
+                  <Icon className={cn("h-4 w-4 shrink-0", emphasized && "text-accent")} />
+                  {!collapsed && (
+                    <span className={cn(
+                      "font-mono uppercase tracking-wider text-xs",
+                      emphasized && "font-semibold",
+                    )}>
+                      {item.label}
+                    </span>
+                  )}
                 </a>
               );
             })}
           </div>
 
-          {/* Analytics group */}
-          <div className="mt-4 px-2" data-tour="analytics-dropdown">
-            <button
-              type="button"
-              onClick={toggleAnalytics}
-              className={cn(
-                "w-full flex items-center gap-2 px-3 py-2 text-foreground/60 hover:text-foreground",
-                collapsed && "justify-center",
-              )}
-              aria-expanded={analyticsOpen}
-              title={collapsed ? "Analytics" : undefined}
-            >
-              {!collapsed && (
-                <>
-                  <span className="font-mono uppercase tracking-[0.22em] text-xs font-semibold flex-1 text-left">
-                    Analytics
-                  </span>
-                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", !analyticsOpen && "-rotate-90")} />
-                </>
-              )}
-              {collapsed && <ChevronDown className="h-3.5 w-3.5" />}
-            </button>
-            {analyticsOpen && (
-              <div className="space-y-0.5 mt-1">
-                {ANALYTICS_LINKS.map((item) => {
-                  const Icon = item.icon;
-                  const active = isActive(item.to);
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-2 text-sm border-l-2 transition-colors hover:bg-muted/60",
-                        active ? "border-accent text-foreground bg-muted/40" : "border-transparent text-foreground/70",
-                      )}
-                      title={collapsed ? item.label : undefined}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && (
-                        <span className="text-[12px] leading-tight">{item.label}</span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Standalone */}
           <div className="mt-4 px-2" data-tour="standalone-modules">
             {!collapsed && (
               <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-xs font-semibold text-foreground/50">
@@ -187,3 +137,4 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
     </aside>
   );
 }
+

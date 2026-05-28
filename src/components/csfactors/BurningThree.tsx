@@ -67,7 +67,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
           className="gap-2 font-mono uppercase tracking-widest text-xs"
         >
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          Rewrite with Q.
+          Powered by Q
         </Button>
       </div>
       <div className="grid md:grid-cols-3 gap-4 md:gap-px bg-transparent md:bg-border border-0 md:border border-border">

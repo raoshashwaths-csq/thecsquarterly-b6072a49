@@ -841,6 +841,195 @@ export type Database = {
           },
         ]
       }
+      rl_accounts: {
+        Row: {
+          contract_value: number
+          created_at: string
+          current_roi: number
+          id: string
+          name: string
+          owner_id: string
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          contract_value?: number
+          created_at?: string
+          current_roi?: number
+          id?: string
+          name: string
+          owner_id: string
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          contract_value?: number
+          created_at?: string
+          current_roi?: number
+          id?: string
+          name?: string
+          owner_id?: string
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rl_intelligence_signals: {
+        Row: {
+          account_id: string
+          created_at: string
+          description: string
+          id: string
+          owner_id: string
+          severity: string
+          signal_type: string
+          status: string
+          team_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          description: string
+          id?: string
+          owner_id: string
+          severity?: string
+          signal_type: string
+          status?: string
+          team_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          owner_id?: string
+          severity?: string
+          signal_type?: string
+          status?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rl_intelligence_signals_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "rl_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rl_stakeholders: {
+        Row: {
+          account_id: string
+          created_at: string
+          current_title: string | null
+          email: string | null
+          first_name: string
+          id: string
+          owner_id: string
+          team_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          current_title?: string | null
+          email?: string | null
+          first_name: string
+          id?: string
+          owner_id: string
+          team_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          current_title?: string | null
+          email?: string | null
+          first_name?: string
+          id?: string
+          owner_id?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rl_stakeholders_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "rl_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rl_value_ledger: {
+        Row: {
+          account_id: string
+          created_at: string
+          financial_value_override: number | null
+          id: string
+          logged_at: string
+          metric_type: string
+          owner_id: string
+          quantity_logged: number
+          team_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          financial_value_override?: number | null
+          id?: string
+          logged_at?: string
+          metric_type: string
+          owner_id: string
+          quantity_logged?: number
+          team_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          financial_value_override?: number | null
+          id?: string
+          logged_at?: string
+          metric_type?: string
+          owner_id?: string
+          quantity_logged?: number
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rl_value_ledger_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "rl_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rl_value_metrics: {
+        Row: {
+          created_at: string
+          hourly_multiplier: number
+          id: string
+          metric_name: string
+          owner_id: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          hourly_multiplier?: number
+          id?: string
+          metric_name: string
+          owner_id: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          hourly_multiplier?: number
+          id?: string
+          metric_name?: string
+          owner_id?: string
+          team_id?: string
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string

@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { QMark } from "@/components/site/QMark";
 import { cn } from "@/lib/utils";
-import { TOP_LINKS, ANALYTICS_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
+import { TOP_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
 
 export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => void }) {
   const [open, setOpen] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(true);
   const pathname = useRouterState({ select: (r) => r.location.pathname });
 
   function close() { setOpen(false); }
@@ -35,6 +34,7 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
           <div className="px-2 space-y-0.5">
             {TOP_LINKS.map((item) => {
               const Icon = item.icon;
+              const emphasized = item.to === "/csfactors/360" && !item.hash;
               return (
                 <a
                   key={item.label}
@@ -42,47 +42,16 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
                   onClick={close}
                   className="flex items-center gap-3 px-3 py-3 text-sm border-l-2 border-transparent text-foreground/80 hover:bg-muted/60"
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="font-mono uppercase tracking-wider text-xs">{item.label}</span>
+                  <Icon className={cn("h-4 w-4 shrink-0", emphasized && "text-accent")} />
+                  <span className={cn(
+                    "font-mono uppercase tracking-wider text-xs",
+                    emphasized && "font-semibold",
+                  )}>
+                    {item.label}
+                  </span>
                 </a>
               );
             })}
-          </div>
-
-          <div className="mt-4 px-2">
-            <button
-              type="button"
-              onClick={() => setAnalyticsOpen((o) => !o)}
-              className="w-full flex items-center gap-2 px-3 py-2 text-foreground/60"
-              aria-expanded={analyticsOpen}
-            >
-              <span className="font-mono uppercase tracking-[0.22em] text-xs font-semibold flex-1 text-left">
-                Analytics
-              </span>
-              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", !analyticsOpen && "-rotate-90")} />
-            </button>
-            {analyticsOpen && (
-              <div className="space-y-0.5 mt-1">
-                {ANALYTICS_LINKS.map((item) => {
-                  const Icon = item.icon;
-                  const active = pathname === item.to;
-                  return (
-                    <Link
-                      key={item.to}
-                      to={item.to}
-                      onClick={close}
-                      className={cn(
-                        "flex items-center gap-3 px-3 py-3 text-sm border-l-2",
-                        active ? "border-accent text-foreground bg-muted/40" : "border-transparent text-foreground/80 hover:bg-muted/60",
-                      )}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      <span className="text-[13px]">{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
           </div>
 
           <div className="mt-4 px-2">
@@ -133,3 +102,4 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
     </Sheet>
   );
 }
+
