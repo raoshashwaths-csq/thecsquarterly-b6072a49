@@ -147,6 +147,8 @@ export const getControlPanelOverview = createServerFn({ method: "GET" })
 
 // =============== Agent Observability ===============
 
+import { heuristicCostMicrosPerRun, microsToUsd, HEURISTIC_TOKENS_PER_RUN } from "@/lib/q-pricing";
+
 export const getAgentObservability = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
@@ -157,33 +159,50 @@ export const getAgentObservability = createServerFn({ method: "GET" })
       supabaseAdmin.from("q_runs").select("id", { count: "exact", head: true }),
       supabaseAdmin
         .from("q_runs")
-        .select("id, user_id, node_id, witty, shared, created_at, context, zones")
+        .select("id, user_id, node_id, witty, shared, created_at, context, zones, tokens_in, tokens_out, latency_ms, cost_micros, model")
         .gte("created_at", since30)
         .order("created_at", { ascending: false })
         .limit(500),
     ]);
 
-    const runs = recent.data ?? [];
+    const runs = (recent.data ?? []) as Array<{
+      id: string; user_id: string; node_id: string; witty: boolean; shared: boolean;
+      created_at: string; context: unknown; zones: unknown;
+      tokens_in: number | null; tokens_out: number | null;
+      latency_ms: number | null; cost_micros: number | null; model: string | null;
+    }>;
 
-    // Token burn estimate: each run ≈ 1500 in + 900 out tokens (heuristic).
-    const tokensPerRun = 2400;
-    const totalTokenBurn = (total.count ?? 0) * tokensPerRun;
+    // Telemetry coverage on the 30-day window.
+    const withTelemetry = runs.filter((r) => r.cost_micros !== null);
+    const coverage = runs.length ? withTelemetry.length / runs.length : 0;
 
-    // Latency heuristic from json size — until we persist real latency.
-    let latencySum = 0;
-    let latencyN = 0;
-    runs.forEach((r) => {
-      const size = JSON.stringify(r.zones ?? {}).length;
-      // Rough proxy: 200ms baseline + 1ms per 100 chars
-      latencySum += 200 + size / 100;
-      latencyN++;
-    });
+    // Real sums where present + heuristic backfill for legacy rows.
+    const realTokens = withTelemetry.reduce(
+      (s, r) => s + (r.tokens_in ?? 0) + (r.tokens_out ?? 0), 0,
+    );
+    const legacyRuns = runs.length - withTelemetry.length;
+    const heuristicTokens = legacyRuns * (HEURISTIC_TOKENS_PER_RUN.in + HEURISTIC_TOKENS_PER_RUN.out);
+    // Project to all-time totals — apply same blended rate to lifetime count.
+    const blendedTokensPerRun = runs.length
+      ? (realTokens + heuristicTokens) / runs.length
+      : (HEURISTIC_TOKENS_PER_RUN.in + HEURISTIC_TOKENS_PER_RUN.out);
+    const totalTokenBurn = Math.round((total.count ?? 0) * blendedTokensPerRun);
+
+    // Avg latency from real telemetry only.
+    const latencyN = withTelemetry.filter((r) => r.latency_ms !== null).length;
+    const latencySum = withTelemetry.reduce((s, r) => s + (r.latency_ms ?? 0), 0);
     const avgLatencyMs = latencyN ? Math.round(latencySum / latencyN) : 0;
 
-    // Cost estimate: $0.30 per 1M tokens (gemini flash blended); price to user $4 / session premium.
-    const costUsd = (totalTokenBurn / 1_000_000) * 0.3;
-    const revenueUsd = (total.count ?? 0) * 0.5; // attributed Q revenue per session proxy
-    const profitMarginPct = revenueUsd > 0 ? Math.round(((revenueUsd - costUsd) / revenueUsd) * 100) : 0;
+    // Cost — real where we have it, heuristic for legacy.
+    const realCostMicros = withTelemetry.reduce((s, r) => s + (r.cost_micros ?? 0), 0);
+    const heuristicCostMicros = legacyRuns * heuristicCostMicrosPerRun();
+    const windowCostMicros = realCostMicros + heuristicCostMicros;
+    const windowCostUsd = microsToUsd(windowCostMicros);
+    // Approximate revenue: $0.50 attributed per session (placeholder until billing webhook).
+    const revenueUsd = runs.length * 0.5;
+    const profitMarginPct = revenueUsd > 0
+      ? Math.round(((revenueUsd - windowCostUsd) / revenueUsd) * 100)
+      : 0;
 
     // Tree frequency (T1..T8)
     const trees: Record<string, number> = {};
@@ -205,16 +224,19 @@ export const getAgentObservability = createServerFn({ method: "GET" })
     }
 
     const executionLogs = runs.slice(0, 100).map((r) => {
-      const size = JSON.stringify(r.zones ?? {}).length;
+      const latency = r.latency_ms ?? Math.round(200 + JSON.stringify(r.zones ?? {}).length / 100);
       return {
-        id: r.id as string,
-        user_id: r.user_id as string,
-        operator_email: profMap[r.user_id as string] ?? "—",
-        node_id: r.node_id as string,
-        latency_ms: Math.round(200 + size / 100),
+        id: r.id,
+        user_id: r.user_id,
+        operator_email: profMap[r.user_id] ?? "—",
+        node_id: r.node_id,
+        latency_ms: latency,
+        cost_micros: r.cost_micros ?? null,
+        tokens_in: r.tokens_in ?? null,
+        tokens_out: r.tokens_out ?? null,
         sentiment: r.witty ? "up" : "neutral",
         shared: !!r.shared,
-        created_at: r.created_at as string,
+        created_at: r.created_at,
       };
     });
 
@@ -222,15 +244,77 @@ export const getAgentObservability = createServerFn({ method: "GET" })
       totalRuns: total.count ?? 0,
       totalTokenBurn,
       avgLatencyMs,
-      costUsd: Math.round(costUsd * 100) / 100,
+      costUsd: Math.round(windowCostUsd * 100) / 100,
       revenueUsd: Math.round(revenueUsd * 100) / 100,
       profitMarginPct,
       treeFrequency,
       executionLogs,
-      // True until we persist per-run tokens/latency on q_runs.
-      estimated: true,
+      // Telemetry coverage on the 30-day window (0..1). 1 = all real.
+      telemetryCoverage: Math.round(coverage * 100) / 100,
+      estimated: coverage < 1,
     };
   });
+
+// =============== Cost Projection ===============
+
+export const getQCostProjection = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const since30Iso = new Date(Date.now() - 30 * 86_400_000).toISOString();
+
+    const [countRes, costRes] = await Promise.all([
+      supabaseAdmin
+        .from("q_runs")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since30Iso),
+      supabaseAdmin
+        .from("q_runs")
+        .select("cost_micros, tokens_in, tokens_out")
+        .gte("created_at", since30Iso)
+        .not("cost_micros", "is", null)
+        .limit(5000),
+    ]);
+
+    const runs30d = countRes.count ?? 0;
+    const telemetryRows = (costRes.data ?? []) as Array<{
+      cost_micros: number | null; tokens_in: number | null; tokens_out: number | null;
+    }>;
+    const telemetryCoverage = runs30d ? telemetryRows.length / runs30d : 0;
+
+    // Average cost per run.
+    let avgCostMicros: number;
+    let basis: "real" | "heuristic";
+    if (telemetryRows.length >= 5 && telemetryCoverage >= 0.5) {
+      avgCostMicros = Math.round(
+        telemetryRows.reduce((s, r) => s + (r.cost_micros ?? 0), 0) / telemetryRows.length,
+      );
+      basis = "real";
+    } else {
+      avgCostMicros = heuristicCostMicrosPerRun();
+      basis = "heuristic";
+    }
+
+    const monthlyCostMicros = runs30d * avgCostMicros;
+    const annualCostMicros = monthlyCostMicros * 12;
+
+    const projections = [1_000, 10_000, 100_000].map((n) => ({
+      conversations: n,
+      costMicros: n * avgCostMicros,
+    }));
+
+    return {
+      runs30d,
+      telemetryCoverage: Math.round(telemetryCoverage * 100) / 100,
+      basis,
+      avgCostMicros,
+      monthlyCostMicros,
+      annualCostMicros,
+      projections,
+    };
+  });
+
+
 
 export const getQRunTranscript = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

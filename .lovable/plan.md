@@ -1,61 +1,91 @@
 ## Goal
 
-Every metric, chart, and table on both admin surfaces (`/admin` classic + `/admin/control-panel`) should compute against live data and reflect the current 7-tier model. No fabricated values, no stale labels.
+Stop estimating Q's compute cost. Capture real tokens/latency/cost on every Q run, then expose live cost metrics in the admin control panel (replacing the "(est.)" heuristics) plus a forward-looking projection tile.
 
-## Issues found
+## Part A — Real cost tracking on `q_runs`
 
-**Classic `/admin` (src/lib/admin.functions.ts → src/routes/admin.tsx)**
+### Migration: add telemetry columns
 
-1. `getAdminStats.revenueCents` filters `purchases.status = 'completed'`, but the `purchases` table only writes `'pending'` (no completion path yet). Revenue silently reads $0 forever — misleading. Should switch to MRR×12 from `subscriptions` (same source as control panel) until Paddle/Stripe webhooks land.
-2. `listSubscriptions` selects `tier` only — UI shows legacy strings like `vanguard` / `vanguard-pro` instead of the new labels (Practitioner, Operator, …).
-3. `getQAdminStats` is fine but the "active vanguard" entitlement in `listQEntitlementsAdmin` filters `tier='vanguard'` — misses everyone on the new `designation` field (operator/team/scale/enterprise/strategic_partner). Result: paid operators don't show as entitled.
+Add to `public.q_runs`:
+- `tokens_in integer` (nullable)
+- `tokens_out integer` (nullable)
+- `latency_ms integer` (nullable)
+- `cost_micros bigint` (nullable) — cost in millionths of a USD cent (i.e. 1e-8 USD), keeps integer math precise
+- `model text` (nullable) — which model produced the run, for future per-model breakdowns
 
-**Control Panel `/admin/control-panel` (src/lib/control-panel.functions.ts)**
+Backfill stays `NULL` for historical rows; UI treats `NULL` as "pre-telemetry" and falls back to the heuristic with an "est." badge for that subset only.
 
-4. `getControlPanelOverview.tierBreakdown` label fallback — when a tier has 0 subs, `paidSubs.find(...)?.label` returns undefined and the chip shows the raw designation string instead of the human label. Use `TIER_LABEL[d]` directly.
-5. `latestRegistrations.method` is hard-coded `"Email"` for everyone — Google sign-ins are invisible. Use `supabaseAdmin.auth.admin.listUsers()` (or `getUserById` per id) to read `identities[].provider` and surface `Google` / `Email`.
-6. `getAgentObservability` labels two metrics as facts but they are heuristics: "Total Token Burn" (`runs × 2400`) and "Compute Profit Margin" (`runs × $0.50` revenue). Either (a) relabel the tiles "Estimated" and add a small "heuristic" footnote, or (b) gate them behind a feature flag until real per-run token/latency columns exist on `q_runs`. Recommended: relabel + footnote now; add real columns later when payments land.
-7. `getAgentObservability.avgLatencyMs` is computed from JSON payload size — same heuristic problem. Relabel "Est. response size proxy" or remove until we persist latency.
-8. Sessions-vs-Registrations chart caps `q_runs` query at 5000 rows in 30 days — once we cross that volume the series under-reports. Switch to a `select count() group by date` via an RPC, or page through with `range()`.
+### Writer changes — `src/lib/q-agent.functions.ts`
 
-**UX / wiring**
+Both `askQ` and `runQNode` already call `fetch("https://ai.gateway.lovable.dev/v1/chat/completions", ...)`. Wrap each call:
 
-9. Overview's "Refresh" button calls `refetch()` but doesn't invalidate dependent queries (latest regs uses same query — fine). Verify in browser after fix.
-10. `qCountsRes` in `listMasterUsers` pulls every `q_runs` row to count per user — fine at small scale but should move to a grouped count RPC before this list gets long. Flag only; not fixing now.
+1. `const t0 = Date.now()` before fetch
+2. After fetch, read `json.usage?.prompt_tokens` and `json.usage?.completion_tokens` (OpenAI-compatible response shape that the Lovable Gateway returns)
+3. Compute `latency_ms = Date.now() - t0`
+4. Compute `cost_micros` using a small `priceFor(model)` table in a new `src/lib/q-pricing.ts`:
+   - `google/gemini-2.5-flash`: $0.30 / 1M input, $2.50 / 1M output (list)
+   - Apply a configurable gateway multiplier (default 1.6) to approximate Lovable Gateway billing until we have real invoice data
+5. For `runQNode`, include these fields in the existing `.insert(...)` on `q_runs`
+6. For `askQ`, it currently does NOT persist anything. Add an insert of a thin telemetry row (or, cleaner: a separate `q_chat_runs` table). **Decision:** reuse `q_runs` with `node_id = 'chat:askq'` and `zones = { diagnosis: '', playbook: '', executable: '' }` so all telemetry lives in one place; one row per chat call. This also unifies the monthly cap counting in `q-usage.functions.ts` (chat already calls `assertQUnderCap`, so chat already counts — but currently doesn't write a row, which means the cap is technically off-by-one. Fixing.)
 
-## Changes
+`src/lib/q-pricing.ts` (new):
+- `PRICING: Record<string, { inPerM: number; outPerM: number }>`
+- `GATEWAY_MULTIPLIER = 1.6`
+- `computeCostMicros(model, tokensIn, tokensOut): number`
+- `formatUSD(micros): string`
 
-### `src/lib/admin.functions.ts`
-- `getAdminStats`: replace `revenueCents` calc with MRR×12 via `normalizeTier` over active subscriptions (re-use `admin-tiers`). Return `mrrCents` and `arrCents` alongside.
-- `listSubscriptions`: select `designation` too; map through `normalizeTier` server-side so UI gets `{ tier, designation, label }`.
-- `listQEntitlementsAdmin`: drop the `tier='vanguard'` filter; instead include any active subscription whose normalized designation is paid (`isPaid(...)`).
+### Reader / aggregation — `src/lib/control-panel.functions.ts`
 
-### `src/routes/admin.tsx`
-- Update the revenue tile label/value to read MRR (monthly) and ARR (annual) from the new stats response.
-- Update the subscriptions table to render the normalized `label` from the server.
+Update `getAgentObservability`:
+- Sum `cost_micros`, `tokens_in`, `tokens_out`, `avg(latency_ms)` from `q_runs` over the selected window
+- For rows where telemetry columns are NULL, fall back to the existing heuristic and tag the aggregate response with `{ telemetryCoverage: realRows / totalRows }`
+- Replace the three heuristic fields:
+  - `totalTokenBurn` → real sum, `estimated: telemetryCoverage < 1`
+  - `avgLatencyMs` → real avg over non-null rows
+  - `computeProfitMargin` → MRR – (cost over same window annualized), real numbers
 
-### `src/lib/control-panel.functions.ts`
-- `getControlPanelOverview`:
-  - Fix `tierBreakdown` label fallback → `TIER_LABEL[d]`.
-  - Replace `methodByUser` stub with real auth-provider lookup using `supabaseAdmin.auth.admin.getUserById(id)` (parallelized, capped at 25 ids = latest list).
-- `getAgentObservability`:
-  - Round-trip "Total Token Burn" / "Compute Profit Margin" / "Avg Response Latency" but mark them `estimated: true` in the payload.
+## Part B — Projected cost tile in control panel
 
-### `src/routes/admin.control-panel.tsx`
-- Overview: no UI change beyond the tier label bug auto-fixing.
-- Diagnostics: append "Estimated" suffix to the three heuristic tiles and a 1-line footnote under the metric strip: "Token, cost and latency are heuristics until per-run telemetry is captured."
+### New aggregator — `getQCostProjection` in `control-panel.functions.ts`
 
-## Out of scope (call out, don't build)
+Compute:
+- Run rate: `runs_last_30d` from `q_runs`
+- Avg cost per run: `sum(cost_micros) / count(*)` over last 30d (telemetry rows only); if coverage < 50%, fall back to heuristic blended average from the cost model already used in chat
+- Projections at 1k / 10k / 100k conversations
+- Monthly projection at current run rate: `runs_last_30d * avg_cost_per_run`
+- Annualized: `monthly * 12`
 
-- Real revenue once Paddle/Stripe is enabled — will replace the MRR fallback with `purchases.status='completed'` aggregate + active-sub MRR.
-- Persisting real `latency_ms`, `tokens_in`, `tokens_out` columns on `q_runs` — needs a migration + writer change in the Q agent path. Recommend doing it together with the payments work so the cost/margin numbers stop being estimates.
-- Replacing the per-user `q_runs` count with a grouped RPC for `listMasterUsers`.
+### UI — `src/routes/admin.control-panel.tsx` (Diagnostics tab)
+
+Add a new `SectionCard` "Projected Compute Cost" using existing `MetricCard` primitives (dashboard kit — no new tokens):
+- **Cost / run** (avg, last 30d) — with coverage % subtitle ("real telemetry on 78% of runs")
+- **Monthly run rate** (current) — `runs_last_30d`
+- **Projected monthly cost** at current rate
+- **Projected ARR cost** (monthly × 12)
+- A small inline table: cost @ 1k / 10k / 100k conversations
+- Footnote: "Includes Lovable Gateway multiplier (~1.6×). Replace with real invoice data once available." with a link to edit `GATEWAY_MULTIPLIER` (just docs, no UI editor)
+
+Existing "(est.)" suffixes on the diagnostics tiles get removed once `telemetryCoverage === 1`; until then, keep the badge but show the live number alongside.
+
+## Out of scope
+
+- A real billing reconciliation against the Lovable Gateway invoice (no API for that yet).
+- Per-user cost breakdown in `listMasterUsers` — easy follow-on, but not in this pass.
+- Per-model cost split UI (the column is captured; the chart can come later).
 
 ## Verification
 
 After build:
-1. Open `/admin` — revenue tile shows non-zero (MRR $58 / ARR $696 with current data: 2 practitioner subs × $29).
-2. Subscriptions table shows "Practitioner" label, not `vanguard`.
-3. Open `/admin/control-panel` Overview — tier chips show all 6 paid labels even when count=0, Method column shows `Google` for Google sign-ins (verify with one known Google user).
-4. Diagnostics tiles read "Total Token Burn (est.)" etc., with footnote visible.
-5. `psql` spot-check: `select count(*) from q_runs` matches "Total Runs (all-time)".
+1. Trigger one `runQNode` from a Vanguard account and one `askQ` chat → query `q_runs` and confirm `tokens_in`, `tokens_out`, `latency_ms`, `cost_micros`, `model` are populated.
+2. Control panel Diagnostics tab shows a new "Projected Compute Cost" card with non-zero values.
+3. The three previously-heuristic tiles ("Total Token Burn", "Avg Latency", "Compute Profit Margin") show real numbers for new runs, with coverage % visible.
+4. `psql` spot check: `select count(*) filter (where cost_micros is not null), count(*) from q_runs;` — coverage ratio matches what the UI reports.
+
+## Files touched
+
+- `supabase` migration — add 5 columns to `q_runs`
+- `src/lib/q-pricing.ts` — new, pricing table + helpers
+- `src/lib/q-agent.functions.ts` — capture telemetry in both `askQ` and `runQNode`
+- `src/lib/control-panel.functions.ts` — new `getQCostProjection`, update `getAgentObservability`
+- `src/routes/admin.control-panel.tsx` — new Projected Compute Cost card, refine heuristic badges
+- `.lovable/plan.md` — refresh
