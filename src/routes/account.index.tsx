@@ -10,7 +10,11 @@ import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
-import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth.functions";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { DESIGNATION_LABEL } from "@/lib/entitlements";
+import { getMe, listMyPurchases } from "@/lib/auth.functions";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 
 
