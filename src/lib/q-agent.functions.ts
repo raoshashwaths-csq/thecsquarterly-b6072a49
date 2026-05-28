@@ -215,19 +215,27 @@ export const runQNode = createServerFn({ method: "POST" })
       },
     ];
 
+    const t0 = Date.now();
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
-      body: JSON.stringify({ model: "google/gemini-2.5-flash", messages }),
+      body: JSON.stringify({ model: Q_MODEL, messages }),
     });
 
     if (res.status === 429) throw new Error("Q is at capacity — try again in a moment.");
     if (res.status === 402) throw new Error("AI credits exhausted.");
     if (!res.ok) throw new Error(`Q failed (${res.status})`);
 
-    const json = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+    const json = await res.json() as {
+      choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
     const raw = json.choices?.[0]?.message?.content ?? "";
     const zones = parseZones(raw);
+    const latencyMs = Date.now() - t0;
+    const tokensIn = json.usage?.prompt_tokens ?? 0;
+    const tokensOut = json.usage?.completion_tokens ?? 0;
+    const costMicros = computeCostMicros(Q_MODEL, tokensIn, tokensOut);
 
     // Persist (RLS scopes to user_id automatically)
     const { data: row, error } = await supabase
@@ -238,10 +246,16 @@ export const runQNode = createServerFn({ method: "POST" })
         context: data.context,
         witty: data.witty,
         zones,
+        tokens_in: tokensIn,
+        tokens_out: tokensOut,
+        latency_ms: latencyMs,
+        cost_micros: costMicros,
+        model: Q_MODEL,
       })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+
 
     return { runId: row.id as string, zones };
   });
