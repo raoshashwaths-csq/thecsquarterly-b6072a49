@@ -16,7 +16,7 @@ import { QAgentButton } from "@/components/site/QAgentButton";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
 import { EndOfDaySentimentCheckIn } from "@/components/site/EndOfDaySentimentCheckIn";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { PlaybookBadge } from "@/components/enablement/PlaybookBadge";
+
 const CommandPalette = lazy(() =>
   import("@/components/site/CommandPalette").then((m) => ({ default: m.CommandPalette })),
 );
