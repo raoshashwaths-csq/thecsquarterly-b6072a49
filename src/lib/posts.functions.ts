@@ -42,7 +42,9 @@ const SELECT_COLS =
 // Strip premium body content from a post for callers without entitlement.
 const PREVIEW_CHARS = 1200;
 function gatePremiumBody<T extends Partial<Post>>(post: T, entitled: boolean): T {
-  if (!post?.is_premium || entitled) return { ...post, locked: false };
+  // Treat ALL Vanguard-section posts as paid, plus any post explicitly flagged is_premium.
+  const needsGate = post?.is_premium === true || post?.section === "vanguard";
+  if (!needsGate || entitled) return { ...post, locked: false };
   return {
     ...post,
     body: (post.body ?? "").slice(0, PREVIEW_CHARS),

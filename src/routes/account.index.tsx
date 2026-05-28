@@ -10,7 +10,11 @@ import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
-import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth.functions";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { DESIGNATION_LABEL } from "@/lib/entitlements";
+import { getMe, listMyPurchases } from "@/lib/auth.functions";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 
 
@@ -29,9 +33,9 @@ function AccountPage() {
   const navigate = useNavigate();
   const fetchMe = useServerFn(getMe);
   const fetchPurchases = useServerFn(listMyPurchases);
-  const startSub = useServerFn(startSubscriptionPlaceholder);
+  const openPortal = useServerFn(createPortalSession);
   const { group, isRecruiterOrLead } = usePersona();
-
+  const { designation } = useEntitlements();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -39,6 +43,24 @@ function AccountPage() {
 
   const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe(), enabled: !!user });
   const purchases = useQuery({ queryKey: ["my-purchases"], queryFn: () => fetchPurchases(), enabled: !!user });
+
+  const onManageBilling = async () => {
+    try {
+      const result = await openPortal({
+        data: {
+          environment: getStripeEnvironment(),
+          returnUrl: `${window.location.origin}/account`,
+        },
+      });
+      if ("error" in result) throw new Error(result.error);
+      window.open(result.url, "_blank", "noopener");
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  const designationLabel = DESIGNATION_LABEL[designation];
+  const isPaid = designation !== "reader";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -54,8 +76,8 @@ function AccountPage() {
             <MetricGrid cols={3}>
               <MetricCard
                 eyebrow="Tier"
-                value={me.data.subscriptionTier === "vanguard" ? "Vanguard" : "Free"}
-                accent={me.data.subscriptionTier === "vanguard" ? "accent" : "neutral"}
+                value={designationLabel}
+                accent={isPaid ? "accent" : "neutral"}
                 footer={<span className="text-xs text-muted-foreground capitalize">{me.data.subscriptionStatus}</span>}
               />
               <MetricCard
@@ -78,20 +100,30 @@ function AccountPage() {
 
             <SectionCard
               eyebrow="Subscription"
-              title={me.data.subscriptionTier === "vanguard" ? "Vanguard Access" : "Free Briefing"}
-              description="Stripe checkout will replace the preview activation. For now this unlocks gated content end-to-end."
-              actions={me.data.subscriptionTier !== "vanguard" ? (
-                <button
-                  onClick={async () => {
-                    try {
-                      await startSub();
-                      toast.success("Vanguard access activated (placeholder).");
-                      me.refetch();
-                    } catch (e) { toast.error((e as Error).message); }
-                  }}
-                  className="px-5 py-2.5 bg-secondary-accent text-secondary-accent-foreground font-mono text-[11px] uppercase tracking-widest"
-                >Activate Vanguard</button>
-              ) : null}
+              title={isPaid ? `${designationLabel} access` : "Free Briefing"}
+              description={
+                isPaid
+                  ? "Manage your billing, update your card, or cancel from the secure billing portal. Access continues until the end of your current period."
+                  : "Pick a tier to unlock the Vanguard archive, the CSFactors dashboard, and the Q advisor."
+              }
+              actions={
+                isPaid ? (
+                  <button
+                    type="button"
+                    onClick={onManageBilling}
+                    className="px-5 py-2.5 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest hover:opacity-90"
+                  >
+                    Manage subscription
+                  </button>
+                ) : (
+                  <Link
+                    to="/pricing"
+                    className="px-5 py-2.5 bg-secondary-accent text-secondary-accent-foreground font-mono text-[11px] uppercase tracking-widest inline-block"
+                  >
+                    See pricing
+                  </Link>
+                )
+              }
             >
               <div className="text-sm text-muted-foreground capitalize">Status: {me.data.subscriptionStatus}</div>
             </SectionCard>

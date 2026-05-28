@@ -39,6 +39,7 @@ import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
@@ -54,6 +55,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.retention-ledger.ticker'
 import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
@@ -205,6 +207,11 @@ const CodexSlugRoute = CodexSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CodexRoute,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AiReadinessSurveyRoute = AiReadinessSurveyRouteImport.update({
   id: '/survey',
   path: '/survey',
@@ -285,6 +292,12 @@ const ApiV1BenchmarksNrrRoute = ApiV1BenchmarksNrrRouteImport.update({
   path: '/api/v1/benchmarks/nrr',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -314,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -327,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -358,6 +373,7 @@ export interface FileRoutesByTo {
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -371,6 +387,7 @@ export interface FileRoutesByTo {
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -406,6 +423,7 @@ export interface FileRoutesById {
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -419,6 +437,7 @@ export interface FileRoutesById {
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -455,6 +474,7 @@ export interface FileRouteTypes {
     | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
+    | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/email/unsubscribe'
@@ -468,6 +488,7 @@ export interface FileRouteTypes {
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
     | '/lovable/email/queue/process'
@@ -499,6 +520,7 @@ export interface FileRouteTypes {
     | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
+    | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/email/unsubscribe'
@@ -512,6 +534,7 @@ export interface FileRouteTypes {
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
     | '/lovable/email/queue/process'
@@ -546,6 +569,7 @@ export interface FileRouteTypes {
     | '/admin/control-panel'
     | '/agent/framework'
     | '/ai-readiness/survey'
+    | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/email/unsubscribe'
@@ -559,6 +583,7 @@ export interface FileRouteTypes {
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
     | '/lovable/email/queue/process'
@@ -592,6 +617,7 @@ export interface RootRouteChildren {
   AccountApiRoute: typeof AccountApiRoute
   AccountWorkspaceRoute: typeof AccountWorkspaceRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AccountExecutiveAnalyticsRoute: typeof AccountExecutiveAnalyticsRoute
@@ -599,6 +625,7 @@ export interface RootRouteChildren {
   ApiElevenlabsSttRoute: typeof ApiElevenlabsSttRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
   ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -818,6 +845,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CodexSlugRouteImport
       parentRoute: typeof CodexRoute
     }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ai-readiness/survey': {
       id: '/ai-readiness/survey'
       path: '/survey'
@@ -923,6 +957,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1BenchmarksNrrRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1014,6 +1055,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountApiRoute: AccountApiRoute,
   AccountWorkspaceRoute: AccountWorkspaceRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AccountIndexRoute: AccountIndexRoute,
   AccountExecutiveAnalyticsRoute: AccountExecutiveAnalyticsRoute,
@@ -1021,6 +1063,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiElevenlabsSttRoute: ApiElevenlabsSttRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
   ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
