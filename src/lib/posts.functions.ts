@@ -32,6 +32,7 @@ export type Post = {
   series_part: number | null;
   series_total: number | null;
   sources: string | null;
+  locked?: boolean;
 };
 
 const SELECT_COLS =
@@ -41,12 +42,13 @@ const SELECT_COLS =
 // Strip premium body content from a post for callers without entitlement.
 const PREVIEW_CHARS = 1200;
 function gatePremiumBody<T extends Partial<Post>>(post: T, entitled: boolean): T {
-  if (!post?.is_premium || entitled) return post;
+  if (!post?.is_premium || entitled) return { ...post, locked: false };
   return {
     ...post,
     body: (post.body ?? "").slice(0, PREVIEW_CHARS),
     body_mckinsey: post.body_mckinsey ? post.body_mckinsey.slice(0, PREVIEW_CHARS) : post.body_mckinsey,
     body_wodehouse: post.body_wodehouse ? post.body_wodehouse.slice(0, PREVIEW_CHARS) : post.body_wodehouse,
+    locked: true,
   };
 }
 
