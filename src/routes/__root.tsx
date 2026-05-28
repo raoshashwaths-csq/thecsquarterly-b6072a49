@@ -1,4 +1,5 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, useLayoutEffect, lazy, Suspense } from "react";
+
 import { ClientOnly } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import {
@@ -158,12 +159,20 @@ function PageTransition() {
   const router = useRouter();
   const pathname = router.state.location.pathname;
   useHeadlineReveal(pathname);
+  // Reset scroll on route change so we don't land mid-page (which on mobile
+  // immediately triggers the smart-nav hide-on-scroll and reads as a glitch).
+  useLayoutEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0);
+    }
+  }, [pathname]);
   return (
     <div key={pathname} className="page-enter">
       <Outlet />
     </div>
   );
 }
+
 
 
 function RootComponent() {
