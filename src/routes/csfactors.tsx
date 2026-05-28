@@ -14,9 +14,10 @@ import { BurningThree } from "@/components/csfactors/BurningThree";
 import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
 import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
 import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
-import { QAgentDrawer, QAgentDock } from "@/components/csfactors/QAgentDrawer";
+import { QAgentDrawer } from "@/components/csfactors/QAgentDrawer";
+import { AskQInline } from "@/components/csfactors/AskQInline";
+import { CSFLogo } from "@/components/csfactors/CSFLogo";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
-import { QMark } from "@/components/site/QMark";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
@@ -152,8 +153,8 @@ function CSFactorsPageInner() {
         {/* Mobile sticky header */}
         <div className="md:hidden sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-3 py-2 flex items-center justify-between gap-2">
           <MobileNavDrawer onOpenWorkspace={() => setWorkspaceOpen(true)} />
-          <Link to="/csfactors" className="flex items-center gap-1.5 font-display text-sm tracking-tight">
-            <QMark className="h-5 w-5" /> CSFactors
+          <Link to="/csfactors" aria-label="CSFactors home">
+            <CSFLogo size="sm" />
           </Link>
           <ThemeToggle />
         </div>
@@ -192,10 +193,29 @@ function CSFactorsPageInner() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="hidden md:inline-flex"><ThemeToggle /></span>
+              <button
+                type="button"
+                onClick={() => setQOpen(true)}
+                className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.2em] text-xs bg-accent text-accent-foreground px-3 py-1.5 hover:opacity-90 transition-opacity"
+              >
+                Ask Q
+              </button>
               <ImportCsvDialog />
               <AddAccountDialog />
             </div>
           </header>
+
+          {user ? (
+            <section className="mb-8">
+              <QErrorBoundary label="Q · CSFactors">
+                <AskQInline
+                  onSubmit={handleDockSubmit}
+                  onChip={handleChip}
+                  onOpenDrawer={() => setQOpen(true)}
+                />
+              </QErrorBoundary>
+            </section>
+          ) : null}
 
           {!authLoading && !user ? (
             <div className="border border-dashed border-border bg-card p-10 text-center">
@@ -315,7 +335,6 @@ function CSFactorsPageInner() {
 
       {/* Bottom-anchored Ask Q dock + deep drawer */}
       <QErrorBoundary label="Q · CSFactors">
-        {user ? <QAgentDock onSubmit={handleDockSubmit} onChip={handleChip} /> : null}
         <QAgentDrawer open={qOpen} onOpenChange={setQOpen} />
       </QErrorBoundary>
     </div>
