@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GripVertical, Save, Trash2 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -9,6 +9,8 @@ import { Reveal } from "@/components/site/Reveal";
 import { listMySequences, saveSequence } from "@/lib/enterprise.functions";
 import { listPosts } from "@/lib/posts.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { isAuthError } from "@/lib/auth-errors";
+
 
 export const Route = createFileRoute("/sequencer")({
   head: () => ({
