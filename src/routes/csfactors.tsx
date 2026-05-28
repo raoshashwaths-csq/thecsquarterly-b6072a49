@@ -1,250 +1,242 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
+import { AddAccountDialog } from "@/components/csfactors/AddAccountDialog";
+import { ImportCsvDialog } from "@/components/csfactors/ImportCsvDialog";
+import { BurningThree } from "@/components/csfactors/BurningThree";
+import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
+import { SectionCard } from "@/components/dashboard/SectionCard";
+import { HealthChip, QBRText } from "@/components/dashboard/HealthChip";
+import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  listAccounts, updateAccount, logAccountEvent,
+  type CSAccount, type QBRStatus,
+} from "@/lib/csfactors.functions";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/csfactors")({
   head: () => ({
     meta: [
       { title: "CSFactors — CS Quarterly Executive Pulse" },
-      {
-        name: "description",
-        content:
-          "Executive dashboard for current-quarter revenue protection and QBR tracking. Gainsight depth meets Totango agility.",
-      },
+      { name: "description", content: "Executive dashboard for current-quarter revenue protection and QBR tracking. Personalized to you." },
       { property: "og:title", content: "CSFactors — Executive Pulse" },
-      {
-        property: "og:description",
-        content: "Cross-platform CS executive dashboard for revenue protection and QBR tracking.",
-      },
+      { property: "og:description", content: "Cross-platform CS executive dashboard for revenue protection and QBR tracking." },
     ],
     links: [{ rel: "canonical", href: "/csfactors" }],
   }),
   component: CSFactorsPage,
 });
 
-type QBRStatus = "Completed" | "Scheduled" | "Overdue";
-type Tier = "Enterprise" | "Mid-Market" | "SMB";
-
-type Account = {
-  id: string;
-  name: string;
-  tier: Tier;
-  arr: number;
-  health: number;
-  qbr: QBRStatus;
-  renewal: string;
-};
-
-const INITIAL: Account[] = [
-  { id: "1", name: "Acme Corp",         tier: "Enterprise", arr: 120_000, health: 84, qbr: "Completed", renewal: "Q3-2026" },
-  { id: "2", name: "Stark Industries",  tier: "Enterprise", arr: 450_000, health: 42, qbr: "Overdue",   renewal: "Q2-2026" },
-  { id: "3", name: "Wayne Enterprises", tier: "Mid-Market", arr:  85_000, health: 68, qbr: "Scheduled", renewal: "Q2-2026" },
-];
-
-function formatCompact(n: number) {
+function compact(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
   if (n >= 1_000) return `$${Math.round(n / 1_000)}K`;
   return `$${n}`;
 }
 
-function formatFull(n: number) {
-  return `$${n.toLocaleString("en-US")}`;
-}
-
-function healthClasses(score: number) {
-  if (score >= 75) return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/40";
-  if (score >= 50) return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40";
-  return "bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/40";
-}
-
-function qbrTextClasses(status: QBRStatus) {
-  switch (status) {
-    case "Completed": return "text-emerald-600 dark:text-emerald-400";
-    case "Scheduled": return "text-amber-600 dark:text-amber-400";
-    case "Overdue":   return "text-rose-600 dark:text-rose-400 underline underline-offset-4 decoration-rose-500/70";
-  }
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
 }
 
 function CSFactorsPage() {
-  const [accounts, setAccounts] = useState<Account[]>(INITIAL);
+  const { user, loading: authLoading } = useAuth();
+  const qc = useQueryClient();
+  const list = useServerFn(listAccounts);
+  const update = useServerFn(updateAccount);
+  const logEv = useServerFn(logAccountEvent);
 
-  const totalARR = useMemo(() => accounts.reduce((s, a) => s + a.arr, 0), [accounts]);
-  const atRisk   = useMemo(() => accounts.filter(a => a.health < 50).reduce((s, a) => s + a.arr, 0), [accounts]);
+  const { data: accounts = [], isLoading } = useQuery({
+    queryKey: ["cs-accounts"],
+    queryFn: () => list(),
+    enabled: !!user,
+  });
+
+  const totalARR = useMemo(() => accounts.reduce((s, a) => s + Number(a.arr), 0), [accounts]);
+  const atRisk = useMemo(
+    () => accounts.filter((a) => a.health < 50).reduce((s, a) => s + Number(a.arr), 0),
+    [accounts],
+  );
   const compliance = useMemo(() => {
     if (!accounts.length) return 0;
-    const done = accounts.filter(a => a.qbr === "Completed").length;
+    const done = accounts.filter((a) => a.qbr_status === "Completed").length;
     return Math.round((done / accounts.length) * 100);
   }, [accounts]);
 
-  function updateQBR(id: string, next: QBRStatus) {
-    setAccounts(prev => prev.map(a => a.id === id ? { ...a, qbr: next } : a));
+  async function setQBR(a: CSAccount, next: QBRStatus) {
+    await update({ data: { id: a.id, patch: { qbr_status: next } } });
+    await logEv({ data: { account_id: a.id, kind: "qbr.override", payload: { from: a.qbr_status, to: next } } });
+    await qc.invalidateQueries({ queryKey: ["cs-accounts"] });
+    toast.success(`${a.name}: QBR ${next.toLowerCase()}`);
   }
 
+  const firstName = (user?.user_metadata?.display_name || user?.email?.split("@")[0] || "operator")
+    .split(" ")[0];
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <SiteHeader />
-
-      <main className="max-w-7xl w-full mx-auto px-6 pt-16 pb-24 animate-fade-up">
-        {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-12">
-          <div>
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-4">
-              CSFactors / Executive Console
-            </div>
-            <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight mb-4">
-              CS Quarterly <span className="italic text-accent">Executive Pulse</span>
-            </h1>
-            <p className="max-w-2xl text-foreground/70 text-pretty">
-              Cross-platform integration of Gainsight depth and Totango playbook agility.
-            </p>
-          </div>
-
-          <div className="inline-flex items-center gap-3 self-start bg-accent text-accent-foreground px-5 py-3 border border-accent shadow-sm">
-            <span className="font-mono text-[10px] uppercase tracking-[0.25em] opacity-80">Current Target</span>
-            <span className="font-mono text-xs font-semibold tracking-wide">Q2-2026 Renewal Window</span>
-          </div>
-        </header>
-
-        {/* Metric Pillars */}
-        <section className="grid md:grid-cols-3 gap-px bg-border border border-border mb-12">
-          {/* Card 1 */}
-          <div className="bg-card p-7">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">
-              Total Portfolio ARR
-            </div>
-            <div className="font-display text-5xl tracking-tight mb-3">
-              {formatCompact(totalARR)}
-            </div>
-            <div className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-              ↑ 12% vs previous quarter
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-card p-7 border-l-4 border-l-rose-600 relative">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">
-              ARR At Immediate Risk
-            </div>
-            <div className="font-display text-5xl tracking-tight mb-3 text-rose-600 dark:text-rose-400">
-              {formatCompact(atRisk)}
-            </div>
-            <div className="text-sm text-foreground/65">
-              Accounts with health below 50
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="bg-card p-7">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">
-              QBR Compliance Rate
-            </div>
-            <div className="font-display text-5xl tracking-tight mb-4">
-              {compliance}<span className="text-2xl text-muted-foreground">%</span>
-            </div>
-            <div className="h-2 w-full bg-muted overflow-hidden rounded-full">
-              <div
-                className="h-full bg-accent transition-all duration-700 ease-out rounded-full"
-                style={{ width: `${compliance}%` }}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Portfolio Grid */}
-        <section className="border border-border bg-card">
-          <div className="flex items-end justify-between px-6 pt-6 pb-4 border-b border-border">
+    <div className="min-h-screen flex bg-background">
+      <CSFactorsSidebar />
+      <main className="flex-1 min-w-0">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 pt-10 pb-24 animate-fade-up">
+          {/* Personalized header */}
+          <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 pb-6 border-b border-border">
             <div>
-              <h2 className="font-display text-2xl tracking-tight">Portfolio & Execution Grid</h2>
-              <p className="text-sm text-foreground/60 mt-1">
-                Live override. Changes recalculate the pulse layer above instantly.
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
+                CSFactors / Executive Console
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight">
+                {greeting()},{" "}
+                <span className="italic text-accent">{firstName}.</span>
+              </h1>
+              <p className="text-foreground/70 mt-3 max-w-2xl">
+                Your portfolio at a glance. Gainsight depth, Totango agility — written for one person: you.
               </p>
             </div>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {accounts.length} accounts in window
+            <div className="flex items-center gap-2">
+              <ImportCsvDialog />
+              <AddAccountDialog />
             </div>
-          </div>
+          </header>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40">
-                <tr className="text-left font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  <th className="px-6 py-4 font-semibold">Account</th>
-                  <th className="px-4 py-4 font-semibold">ARR (USD)</th>
-                  <th className="px-4 py-4 font-semibold">Renewal Frame</th>
-                  <th className="px-4 py-4 font-semibold text-center">Health Index</th>
-                  <th className="px-4 py-4 font-semibold">QBR Alignment</th>
-                  <th className="px-6 py-4 font-semibold text-right">Instant Playbook Override</th>
-                </tr>
-              </thead>
-              <tbody>
-                {accounts.map((a) => (
-                  <tr key={a.id} className="border-t border-border hover:bg-muted/30 transition-colors">
-                    <td className="px-6 py-5">
-                      <div className="font-display text-lg font-semibold leading-tight">{a.name}</div>
-                      <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
-                        {a.tier}
-                      </div>
-                    </td>
-                    <td className="px-4 py-5 font-mono tabular-nums">
-                      {formatFull(a.arr)}
-                    </td>
-                    <td className="px-4 py-5">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full bg-muted text-foreground/80 font-mono text-[11px] tracking-wide border border-border">
-                        {a.renewal}
-                      </span>
-                    </td>
-                    <td className="px-4 py-5 text-center">
-                      <span className={`inline-flex min-w-14 justify-center items-center px-3 py-1.5 rounded-md border font-mono text-xs font-semibold tabular-nums transition-colors ${healthClasses(a.health)}`}>
-                        {a.health}
-                        <span className="opacity-50 ml-0.5">/100</span>
-                      </span>
-                    </td>
-                    <td className={`px-4 py-5 font-mono text-xs font-semibold uppercase tracking-widest transition-colors ${qbrTextClasses(a.qbr)}`}>
-                      {a.qbr}
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex justify-end">
-                        <Select
-                          value={a.qbr}
-                          onValueChange={(v) => updateQBR(a.id, v as QBRStatus)}
-                        >
-                          <SelectTrigger className="w-[200px] h-10 bg-background">
-                            <SelectValue placeholder="Override…" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Completed">Mark Completed</SelectItem>
-                            <SelectItem value="Scheduled">Mark Scheduled</SelectItem>
-                            <SelectItem value="Overdue">Flag Overdue</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+          {/* Auth gate */}
+          {!authLoading && !user ? (
+            <div className="border border-dashed border-border bg-card p-10 text-center">
+              <p className="text-sm text-foreground/70 mb-4">
+                Sign in to see your personalized executive pulse.
+              </p>
+              <Link to="/login" className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+                Sign in →
+              </Link>
+            </div>
+          ) : (
+            <>
+              {/* Burning Three */}
+              <section className="mb-10">
+                <BurningThree accounts={accounts} />
+              </section>
 
-        <div className="mt-8 text-center">
-          <Link
-            to="/"
-            className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1"
-          >
-            ← Return to The CS Quarterly
-          </Link>
+              {/* Metric Pillars */}
+              <section className="mb-10">
+                <MetricGrid cols={3}>
+                  <MetricCard
+                    eyebrow="Total Portfolio ARR"
+                    value={compact(totalARR)}
+                    accent="accent"
+                    trend={accounts.length ? `${accounts.length} accounts tracked` : "Add your first account"}
+                    trendDirection="flat"
+                  />
+                  <MetricCard
+                    eyebrow="ARR At Immediate Risk"
+                    value={compact(atRisk)}
+                    accent="danger"
+                    trend="Health below 50"
+                    trendDirection="down"
+                  />
+                  <MetricCard
+                    eyebrow="QBR Compliance"
+                    value={compliance}
+                    unit="%"
+                    accent="secondary"
+                    footer={
+                      <ProgressGauge value={compliance} accent={compliance >= 75 ? "success" : compliance >= 50 ? "secondary" : "danger"} />
+                    }
+                  />
+                </MetricGrid>
+              </section>
+
+              {/* Portfolio Grid */}
+              <SectionCard
+                title="Portfolio & Execution Grid"
+                eyebrow="Accounts"
+                description="Live override. Changes recalculate the pulse layer above instantly."
+                actions={
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {accounts.length} accounts
+                  </span>
+                }
+              >
+                {isLoading ? (
+                  <p className="text-sm text-muted-foreground py-6">Loading…</p>
+                ) : accounts.length === 0 ? (
+                  <div className="py-12 text-center">
+                    <p className="text-sm text-foreground/70 mb-4">No accounts yet. Add one or import a CSV.</p>
+                    <div className="inline-flex gap-2">
+                      <AddAccountDialog />
+                      <ImportCsvDialog />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto -mx-6">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/40">
+                        <tr className="text-left font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                          <th className="px-6 py-3 font-semibold">Account</th>
+                          <th className="px-4 py-3 font-semibold">ARR</th>
+                          <th className="px-4 py-3 font-semibold">Renewal</th>
+                          <th className="px-4 py-3 font-semibold text-center">Health</th>
+                          <th className="px-4 py-3 font-semibold">QBR</th>
+                          <th className="px-6 py-3 font-semibold text-right">Override</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {accounts.map((a) => (
+                          <tr key={a.id} className="border-t border-border hover:bg-muted/30 transition-colors">
+                            <td className="px-6 py-4">
+                              <Link
+                                to="/csfactors/$accountId"
+                                params={{ accountId: a.id }}
+                                className="font-display text-base font-semibold leading-tight hover:text-accent"
+                              >
+                                {a.name}
+                              </Link>
+                              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
+                                {a.tier}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 font-mono tabular-nums">
+                              ${Number(a.arr).toLocaleString("en-US")}
+                            </td>
+                            <td className="px-4 py-4">
+                              <span className="inline-flex items-center px-2.5 py-1 bg-muted text-foreground/80 font-mono text-[11px] tracking-wide border border-border">
+                                {a.renewal_quarter}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 text-center">
+                              <HealthChip score={a.health} />
+                            </td>
+                            <td className="px-4 py-4">
+                              <QBRText status={a.qbr_status as QBRStatus} />
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <Select value={a.qbr_status} onValueChange={(v) => setQBR(a, v as QBRStatus)}>
+                                <SelectTrigger className="w-[180px] h-9 bg-background ml-auto">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="Completed">Mark Completed</SelectItem>
+                                  <SelectItem value="Scheduled">Mark Scheduled</SelectItem>
+                                  <SelectItem value="Overdue">Flag Overdue</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </SectionCard>
+            </>
+          )}
         </div>
       </main>
-
-      <SiteFooter />
     </div>
   );
 }
