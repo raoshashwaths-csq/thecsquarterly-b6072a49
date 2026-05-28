@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "vanguard": "Vanguard",
+    "retention": "Retention",
+    "outcome": "Outcome",
+    "codex": "Codex",
+    "diagnostic": "Diagnostic",
+    "canvas": "Canvas",
+    "workspace": "Workspace",
+    "search": "Hanapin",
+    "login": "Mag-login"
+  },
+  "menu": {
+    "yourWorkspace": "Iyong Workspace",
+    "account": "Account",
+    "admin": "Admin",
+    "roiCalculator": "ROI Calculator",
+    "benchmarks": "Mga Benchmark",
+    "directory": "Direktoryo",
+    "teams": "Mga Team",
+    "sequencer": "Sequencer ng Pagbasa",
+    "controlPanel": "Control Panel",
+    "signOut": "Mag-sign out",
+    "member": "Miyembro"
+  },
+  "footer": {
+    "ctaEyebrow": "Ang Briefing / Lingguhan",
+    "ctaHeadlineLine1": "Estratehikong intelihensiya para sa",
+    "ctaHeadlineLine2": "mga arkitekto ng retention.",
+    "subscribeFree": "Mag-subscribe Libre",
+    "sections": "Mga Seksyon",
+    "resources": "Mga Mapagkukunan",
+    "company": "Kumpanya",
+    "social": "Social",
+    "privacy": "Privacy",
+    "terms": "Mga Tuntunin",
+    "colophon": "Colophon",
+    "copyright": "© {{year}} The CS Quarterly",
+    "stayTuned": "Abangan",
+    "sectionLinks": {
+      "vanguard": "The CS Vanguard",
+      "retention": "Ang Retention Protocol",
+      "outcome": "Ang Outcome Forum",
+      "codex": "Ang CS Codex"
+    },
+    "resourceLinks": {
+      "diagnostic": "AI Readiness Diagnostic",
+      "calculator": "ROI Calculator",
+      "benchmarks": "NRR Benchmarks",
+      "directory": "Operator Directory",
+      "teams": "Mga Team",
+      "sequencer": "Reading Sequencer",
+      "jobBoard": "Job Board",
+      "pricing": "Presyo",
+      "subscribe": "Mag-subscribe"
+    },
+    "companyLinks": {
+      "mission": "Ang Aming Misyon",
+      "editorial": "Mga Editorial Standard",
+      "contact": "Makipag-ugnayan",
+      "login": "Mag-login"
+    }
+  },
+  "langSwitcher": {
+    "label": "Pumili ng wika ng edisyon",
+    "editions": "Mga Edisyon",
+    "regions": {
+      "global": "Pandaigdigan",
+      "sea": "Timog-Silangang Asya",
+      "mena": "Gitnang Silangan at Hilagang Africa"
+    },
+    "soon": "malapit na",
+    "activeToast": "Aktibo ang edisyong {{native}}.",
+    "soonToast": "Ilulunsad na ang edisyong {{native}}. Mag-eemail kami pagdating nito.",
+    "soonDescription": "Paglulunsad sa {{region}} · darating ang dispatch sa {{native}}."
+  }
+}

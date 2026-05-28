@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Globe, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import i18n, {
+  SUPPORTED_LOCALES,
+  type Locale,
+  persistLocale,
+} from "@/lib/i18n/config";
 
 // Editions we plan to ship next. SEA + MENA focus per editorial roadmap.
-// The English edition is live; others fall back to English with a toast for now.
+// Codes marked `live` are wired up in i18next; others toast as "soon" until
+// translations land.
 type Region = "Global" | "SEA" | "MENA";
 type Lang = {
   code: string;
@@ -26,45 +33,43 @@ const LANGUAGES: Lang[] = [
   { code: "en", label: "English", native: "English", region: "Global", live: true },
 
   // SEA
-  { code: "id", label: "Indonesian", native: "Bahasa Indonesia", region: "SEA" },
+  { code: "id", label: "Indonesian", native: "Bahasa Indonesia", region: "SEA", live: true },
   { code: "ms", label: "Malay", native: "Bahasa Melayu", region: "SEA" },
-  { code: "vi", label: "Vietnamese", native: "Tiếng Việt", region: "SEA" },
-  { code: "th", label: "Thai", native: "ภาษาไทย", region: "SEA" },
-  { code: "tl", label: "Filipino", native: "Filipino", region: "SEA" },
+  { code: "vi", label: "Vietnamese", native: "Tiếng Việt", region: "SEA", live: true },
+  { code: "th", label: "Thai", native: "ภาษาไทย", region: "SEA", live: true },
+  { code: "tl", label: "Filipino", native: "Filipino", region: "SEA", live: true },
 
   // MENA
-  { code: "ar", label: "Arabic", native: "العربية", region: "MENA", dir: "rtl" },
+  { code: "ar", label: "Arabic", native: "العربية", region: "MENA", dir: "rtl", live: true },
   { code: "fa", label: "Persian", native: "فارسی", region: "MENA", dir: "rtl" },
   { code: "he", label: "Hebrew", native: "עברית", region: "MENA", dir: "rtl" },
   { code: "tr", label: "Turkish", native: "Türkçe", region: "MENA" },
 ];
 
-const STORAGE_KEY = "tcsq.lang";
-
 export function LanguageSwitcher() {
-  const [current, setCurrent] = useState<string>("en");
+  const { t, i18n: i18nInstance } = useTranslation();
+  const [current, setCurrent] = useState<string>(i18nInstance.language || "en");
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setCurrent(saved);
-    } catch {
-      // ignore
-    }
-  }, []);
+    const onChange = (lng: string) => setCurrent(lng);
+    i18nInstance.on("languageChanged", onChange);
+    return () => {
+      i18nInstance.off("languageChanged", onChange);
+    };
+  }, [i18nInstance]);
 
   const onSelect = (lang: Lang) => {
-    setCurrent(lang.code);
-    try {
-      localStorage.setItem(STORAGE_KEY, lang.code);
-    } catch {
-      // ignore
-    }
-    if (lang.live) {
-      toast.success("English edition active.");
+    if (lang.live && (SUPPORTED_LOCALES as readonly string[]).includes(lang.code)) {
+      void i18n.changeLanguage(lang.code);
+      persistLocale(lang.code as Locale);
+      setCurrent(lang.code);
+      toast.success(t("langSwitcher.activeToast", { native: lang.native }));
     } else {
-      toast(`${lang.native} edition launching soon. We'll email you when it ships.`, {
-        description: `${lang.region} rollout · the dispatch will arrive in ${lang.native}.`,
+      toast(t("langSwitcher.soonToast", { native: lang.native }), {
+        description: t("langSwitcher.soonDescription", {
+          region: lang.region,
+          native: lang.native,
+        }),
       });
     }
   };
@@ -73,10 +78,17 @@ export function LanguageSwitcher() {
   const grouped: Record<Region, Lang[]> = { Global: [], SEA: [], MENA: [] };
   for (const l of LANGUAGES) grouped[l.region].push(l);
 
+  const regionLabel = (r: Region) =>
+    r === "Global"
+      ? t("langSwitcher.regions.global")
+      : r === "SEA"
+        ? t("langSwitcher.regions.sea")
+        : t("langSwitcher.regions.mena");
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="Choose language edition"
+        aria-label={t("langSwitcher.label")}
         className="inline-flex items-center gap-1.5 px-2 py-1 border border-transparent hover:border-border hover:text-accent transition-colors text-xs font-semibold uppercase tracking-widest"
       >
         <Globe size={13} aria-hidden />
@@ -84,13 +96,13 @@ export function LanguageSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55">
-          Editions
+          {t("langSwitcher.editions")}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {(["Global", "SEA", "MENA"] as Region[]).map((region) => (
           <div key={region}>
             <DropdownMenuLabel className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent pt-2">
-              {region === "Global" ? "Global" : region === "SEA" ? "Southeast Asia" : "Middle East & North Africa"}
+              {regionLabel(region)}
             </DropdownMenuLabel>
             {grouped[region].map((lang) => {
               const selected = lang.code === current;
@@ -105,7 +117,7 @@ export function LanguageSwitcher() {
                     <span className="text-sm leading-tight">{lang.native}</span>
                     <span className="text-xs text-muted-foreground leading-tight">
                       {lang.label}
-                      {!lang.live && " · soon"}
+                      {!lang.live && ` · ${t("langSwitcher.soon")}`}
                     </span>
                   </div>
                   {selected && <Check size={14} className="shrink-0 text-accent" aria-hidden />}

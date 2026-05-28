@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { usePersona } from "@/hooks/usePersona";
@@ -18,21 +19,21 @@ import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
 
-const sections = [
-  { to: "/vanguard", label: "Vanguard" },
-  { to: "/retention-protocol", label: "Retention" },
-  { to: "/outcome-forum", label: "Outcome" },
-  { to: "/codex", label: "Codex" },
-  { to: "/ai-readiness", label: "Diagnostic" },
-] as const;
-
 export function SiteHeader() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { canUniversalSearch, canWorkspace } = useEntitlements();
   const { isRecruiterOrLead } = usePersona();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
 
+  const sections = [
+    { to: "/vanguard", label: t("nav.vanguard") },
+    { to: "/retention-protocol", label: t("nav.retention") },
+    { to: "/outcome-forum", label: t("nav.outcome") },
+    { to: "/codex", label: t("nav.codex") },
+    { to: "/ai-readiness", label: t("nav.diagnostic") },
+  ] as const;
 
   const meta = (user?.user_metadata ?? {}) as {
     avatar_url?: string;
@@ -40,6 +41,8 @@ export function SiteHeader() {
     display_name?: string;
     full_name?: string;
   };
+
+
   const avatarUrl = meta.avatar_url ?? meta.picture ?? null;
   const displayName = meta.display_name ?? meta.full_name ?? user?.email ?? "";
   const initials = (displayName || "·")
@@ -110,19 +113,20 @@ export function SiteHeader() {
                   className="inline-flex items-center justify-center gap-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px] px-2.5 py-1.5"
                 >
                   <Compass size={13} strokeWidth={2.75} />
-                  <span className="hidden md:inline text-xs tracking-widest">Canvas</span>
+                  <span className="hidden md:inline text-xs tracking-widest">{t("nav.canvas")}</span>
                 </Link>
               )}
 
               {user && canWorkspace && (
                 <Link
                   to="/account/workspace"
-                  aria-label="Your Workspace"
-                  title="Your Workspace"
+                  aria-label={t("menu.yourWorkspace")}
+                  title={t("menu.yourWorkspace")}
                   className="inline-flex items-center justify-center gap-1.5 border border-border hover:border-accent hover:text-accent transition-colors min-h-[36px] px-2.5 py-1.5"
                 >
                   <LayoutGrid size={13} strokeWidth={2.75} />
-                  <span className="hidden md:inline text-xs tracking-widest">Workspace</span>
+                  <span className="hidden md:inline text-xs tracking-widest">{t("nav.workspace")}</span>
+
                 </Link>
               )}
             </>
@@ -147,8 +151,9 @@ export function SiteHeader() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60">
                 <DropdownMenuLabel className="font-body normal-case tracking-normal">
+
                   <div className="text-sm font-medium leading-tight truncate">
-                    {displayName || "Member"}
+                    {displayName || t("menu.member")}
                   </div>
                   {user.email && displayName !== user.email && (
                     <div className="text-xs text-muted-foreground truncate mt-0.5">
@@ -159,47 +164,47 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/account/workspace" className="font-mono text-xs uppercase tracking-widest">
-                    Your Workspace
+                    {t("menu.yourWorkspace")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/account" className="font-mono text-xs uppercase tracking-widest">
-                    Account
+                    {t("menu.account")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/admin" className="font-mono text-xs uppercase tracking-widest">
-                    Admin
+                    {t("menu.admin")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/calculator" className="font-mono text-xs uppercase tracking-widest">
-                    ROI Calculator
+                    {t("menu.roiCalculator")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/benchmarks" className="font-mono text-xs uppercase tracking-widest">
-                    Benchmarks
+                    {t("menu.benchmarks")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/directory" className="font-mono text-xs uppercase tracking-widest">
-                    Directory
+                    {t("menu.directory")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/teams" className="font-mono text-xs uppercase tracking-widest">
-                    Teams
+                    {t("menu.teams")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/sequencer" className="font-mono text-xs uppercase tracking-widest">
-                    Sequencer
+                    {t("menu.sequencer")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/admin/control-panel" className="font-mono text-xs uppercase tracking-widest">
-                    Control Panel
+                    {t("menu.controlPanel")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -209,7 +214,7 @@ export function SiteHeader() {
                   }}
                   className="font-mono text-xs uppercase tracking-widest text-foreground"
                 >
-                  Sign out
+                  {t("menu.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -218,8 +223,10 @@ export function SiteHeader() {
               to="/login"
               className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-xs md:text-xs font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
             >
-              Login
+              {t("nav.login")}
             </Link>
+
+
           )}
         </div>
       </nav>

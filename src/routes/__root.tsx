@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, lazy, Suspense } from "react";
+import { useEffect, useLayoutEffect, useState, lazy, Suspense } from "react";
 
 import { ClientOnly } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +11,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { I18nextProvider } from "react-i18next";
+import i18n from "@/lib/i18n/config";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { QAgentButton } from "@/components/site/QAgentButton";
@@ -121,20 +123,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  const [lang, setLang] = useState<string>(i18n.language || "en");
+  useEffect(() => {
+    const onChange = (lng: string) => setLang(lng);
+    i18n.on("languageChanged", onChange);
+    return () => {
+      i18n.off("languageChanged", onChange);
+    };
+  }, []);
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <HeadContent />
       </head>
       {/* paper-grain: subtle paper texture overlay on cream sections. Remove this class to disable globally. */}
       <body className="paper-grain">
         <PaymentTestModeBanner />
-        {children}
+        <I18nextProvider i18n={i18n}>{children}</I18nextProvider>
         <Scripts />
       </body>
     </html>
   );
 }
+
 
 function AuthInvalidator() {
   const router = useRouter();

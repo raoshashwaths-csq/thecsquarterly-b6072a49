@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "vanguard": "Vanguard",
+    "retention": "Retention",
+    "outcome": "Outcome",
+    "codex": "Codex",
+    "diagnostic": "Diagnostic",
+    "canvas": "Canvas",
+    "workspace": "Workspace",
+    "search": "Search",
+    "login": "Login"
+  },
+  "menu": {
+    "yourWorkspace": "Your Workspace",
+    "account": "Account",
+    "admin": "Admin",
+    "roiCalculator": "ROI Calculator",
+    "benchmarks": "Benchmarks",
+    "directory": "Directory",
+    "teams": "Teams",
+    "sequencer": "Sequencer",
+    "controlPanel": "Control Panel",
+    "signOut": "Sign out",
+    "member": "Member"
+  },
+  "footer": {
+    "ctaEyebrow": "The Briefing / Weekly",
+    "ctaHeadlineLine1": "Strategic intelligence for the",
+    "ctaHeadlineLine2": "architects of retention.",
+    "subscribeFree": "Subscribe Free",
+    "sections": "Sections",
+    "resources": "Resources",
+    "company": "Company",
+    "social": "Social",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "colophon": "Colophon",
+    "copyright": "© {{year}} The CS Quarterly",
+    "stayTuned": "Stay tuned",
+    "sectionLinks": {
+      "vanguard": "The CS Vanguard",
+      "retention": "The Retention Protocol",
+      "outcome": "The Outcome Forum",
+      "codex": "The CS Codex"
+    },
+    "resourceLinks": {
+      "diagnostic": "AI Readiness Diagnostic",
+      "calculator": "ROI Calculator",
+      "benchmarks": "NRR Benchmarks",
+      "directory": "Operator Directory",
+      "teams": "Teams",
+      "sequencer": "Reading Sequencer",
+      "jobBoard": "Job Board",
+      "pricing": "Pricing",
+      "subscribe": "Subscribe"
+    },
+    "companyLinks": {
+      "mission": "Our Mission",
+      "editorial": "Editorial Standards",
+      "contact": "Contact",
+      "login": "Login"
+    }
+  },
+  "langSwitcher": {
+    "label": "Choose language edition",
+    "editions": "Editions",
+    "regions": {
+      "global": "Global",
+      "sea": "Southeast Asia",
+      "mena": "Middle East & North Africa"
+    },
+    "soon": "soon",
+    "activeToast": "{{native}} edition active.",
+    "soonToast": "{{native}} edition launching soon. We'll email you when it ships.",
+    "soonDescription": "{{region}} rollout · the dispatch will arrive in {{native}}."
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "vanguard": "Vanguard",
+    "retention": "Retensi",
+    "outcome": "Hasil",
+    "codex": "Codex",
+    "diagnostic": "Diagnostik",
+    "canvas": "Kanvas",
+    "workspace": "Ruang Kerja",
+    "search": "Cari",
+    "login": "Masuk"
+  },
+  "menu": {
+    "yourWorkspace": "Ruang Kerja Anda",
+    "account": "Akun",
+    "admin": "Admin",
+    "roiCalculator": "Kalkulator ROI",
+    "benchmarks": "Tolok Ukur",
+    "directory": "Direktori",
+    "teams": "Tim",
+    "sequencer": "Pengatur Bacaan",
+    "controlPanel": "Panel Kontrol",
+    "signOut": "Keluar",
+    "member": "Anggota"
+  },
+  "footer": {
+    "ctaEyebrow": "Briefing / Mingguan",
+    "ctaHeadlineLine1": "Intelijen strategis untuk para",
+    "ctaHeadlineLine2": "arsitek retensi pelanggan.",
+    "subscribeFree": "Berlangganan Gratis",
+    "sections": "Bagian",
+    "resources": "Sumber Daya",
+    "company": "Perusahaan",
+    "social": "Sosial",
+    "privacy": "Privasi",
+    "terms": "Ketentuan",
+    "colophon": "Kolofon",
+    "copyright": "© {{year}} The CS Quarterly",
+    "stayTuned": "Segera hadir",
+    "sectionLinks": {
+      "vanguard": "The CS Vanguard",
+      "retention": "Protokol Retensi",
+      "outcome": "Forum Hasil",
+      "codex": "CS Codex"
+    },
+    "resourceLinks": {
+      "diagnostic": "Diagnostik Kesiapan AI",
+      "calculator": "Kalkulator ROI",
+      "benchmarks": "Tolok Ukur NRR",
+      "directory": "Direktori Operator",
+      "teams": "Tim",
+      "sequencer": "Pengatur Bacaan",
+      "jobBoard": "Papan Lowongan",
+      "pricing": "Harga",
+      "subscribe": "Berlangganan"
+    },
+    "companyLinks": {
+      "mission": "Misi Kami",
+      "editorial": "Standar Editorial",
+      "contact": "Kontak",
+      "login": "Masuk"
+    }
+  },
+  "langSwitcher": {
+    "label": "Pilih edisi bahasa",
+    "editions": "Edisi",
+    "regions": {
+      "global": "Global",
+      "sea": "Asia Tenggara",
+      "mena": "Timur Tengah & Afrika Utara"
+    },
+    "soon": "segera",
+    "activeToast": "Edisi {{native}} aktif.",
+    "soonToast": "Edisi {{native}} segera diluncurkan. Kami akan mengirim email saat tersedia.",
+    "soonDescription": "Peluncuran {{region}} · dispatch akan tiba dalam {{native}}."
+  }
+}
