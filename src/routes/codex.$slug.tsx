@@ -10,6 +10,7 @@ import { AudioBar } from "@/components/site/AudioBar";
 import { getPlaybook } from "@/lib/playbooks.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, recordPurchasePlaceholder } from "@/lib/auth.functions";
+import { PLAYBOOK_COMPONENTS } from "@/components/playbooks";
 
 const playbookQuery = (slug: string) => queryOptions({
   queryKey: ["playbook", slug],
