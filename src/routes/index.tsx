@@ -262,24 +262,8 @@ function HomePage() {
                   "CS is no longer a service department; it is a revenue engine that requires the same mechanical precision as an assembly line."
                 </p>
               </div>
-
-              {/* AI Survey Promo */}
-              <div className="bg-foreground text-background p-10">
-                <div className="font-mono text-xs uppercase tracking-[0.2em] mb-6 opacity-60">
-                  Tooling & Diagnostics
-                </div>
-                <h3 className="font-display text-3xl mb-6">The 2026 AI Readiness Audit</h3>
-                <p className="text-sm leading-relaxed opacity-80 mb-8">
-                  Is your CS organization prepared for automated orchestration? Take our 5-minute diagnostic to benchmark your team against industry leaders.
-                </p>
-                <Link
-                  to="/ai-readiness"
-                  className="inline-block w-full text-center py-4 border border-background/30 hover:bg-background hover:text-foreground transition-all font-mono text-xs uppercase tracking-widest"
-                >
-                  Start Survey
-                </Link>
-              </div>
             </aside>
+
           </div>
         </main>
       )}
