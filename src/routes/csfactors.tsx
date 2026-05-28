@@ -104,9 +104,11 @@ function CSFactorsPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <ImportCsvDialog />
               <AddAccountDialog />
             </div>
+
           </header>
 
           {!authLoading && !user ? (
