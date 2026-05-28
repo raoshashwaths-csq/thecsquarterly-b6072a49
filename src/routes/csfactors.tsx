@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { Maximize2 } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
 import { AddAccountDialog } from "@/components/csfactors/AddAccountDialog";
 import { ImportCsvDialog } from "@/components/csfactors/ImportCsvDialog";
@@ -9,11 +10,15 @@ import { BurningThree } from "@/components/csfactors/BurningThree";
 import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
 import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
 import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
+import { QAgentDrawer, QAgentLauncher } from "@/components/csfactors/QAgentDrawer";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
+
 
 export const Route = createFileRoute("/csfactors")({
   head: () => ({
@@ -53,10 +58,13 @@ function CSFactorsPage() {
   });
 
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [qOpen, setQOpen] = useState(false);
   const drawerAccount = useMemo(
     () => accounts.find((a) => a.id === drawerId) ?? null,
     [accounts, drawerId],
   );
+
 
   const totalARR = useMemo(() => accounts.reduce((s, a) => s + Number(a.arr), 0), [accounts]);
   const atRisk = useMemo(
@@ -96,9 +104,11 @@ function CSFactorsPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <ThemeToggle />
               <ImportCsvDialog />
               <AddAccountDialog />
             </div>
+
           </header>
 
           {!authLoading && !user ? (
@@ -157,6 +167,17 @@ function CSFactorsPage() {
                 eyebrow="Accounts"
                 description="32 fields per account. Click any row to open the optimization drawer. Name and UCC stay frozen as you scroll right."
                 className="mb-10"
+                actions={
+                  <button
+                    type="button"
+                    onClick={() => setFullscreen(true)}
+                    className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] border border-border hover:border-accent hover:text-accent px-3 py-1.5 transition-colors"
+                    title="Expand matrix to full screen"
+                  >
+                    <Maximize2 className="h-3 w-3" />
+                    Fullscreen
+                  </button>
+                }
               >
                 {isLoading ? (
                   <p className="text-sm text-muted-foreground py-6">Loading…</p>
@@ -176,6 +197,7 @@ function CSFactorsPage() {
               </SectionCard>
             </>
           )}
+
         </div>
       </main>
 
@@ -189,6 +211,28 @@ function CSFactorsPage() {
           }
         }}
       />
+
+      {/* Fullscreen account matrix */}
+      <Dialog open={fullscreen} onOpenChange={setFullscreen}>
+        <DialogContent className="max-w-[98vw] w-[98vw] h-[95vh] p-0 flex flex-col bg-background border-border">
+          <header className="px-6 py-4 border-b border-border flex items-center justify-between">
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-1">
+                Accounts · Fullscreen
+              </div>
+              <h2 className="font-display text-xl tracking-tight">Master Account Matrix</h2>
+            </div>
+          </header>
+          <div className="flex-1 overflow-auto p-6">
+            <AccountsGrid accounts={accounts} onRowClick={onRowClick} />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Q agent */}
+      {user && !qOpen ? <QAgentLauncher onClick={() => setQOpen(true)} /> : null}
+      <QAgentDrawer open={qOpen} onOpenChange={setQOpen} />
     </div>
   );
 }
+
