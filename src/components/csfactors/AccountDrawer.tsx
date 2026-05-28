@@ -46,21 +46,22 @@ export function AccountDrawer({
   }, [account?.id]);
 
   if (!draft || !account) return null;
+  const acc = account;
 
   async function save(patch: Patch) {
     setDraft((d) => (d ? { ...d, ...patch } : d));
     try {
-      await update({ data: { id: account.id, patch: patch as never } });
+      await update({ data: { id: acc.id, patch: patch as never } });
       qc.invalidateQueries({ queryKey: ["cs-accounts"] });
-      await logEv({ data: { account_id: account.id, kind: "field.edit", payload: patch as never } });
+      await logEv({ data: { account_id: acc.id, kind: "field.edit", payload: patch as never } });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Save failed");
     }
   }
 
   async function onDelete() {
-    if (!confirm(`Delete ${account.name}?`)) return;
-    await del({ data: { id: account.id } });
+    if (!confirm(`Delete ${acc.name}?`)) return;
+    await del({ data: { id: acc.id } });
     qc.invalidateQueries({ queryKey: ["cs-accounts"] });
     onOpenChange(false);
     toast.success("Account deleted");
