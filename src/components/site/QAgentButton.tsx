@@ -5,11 +5,12 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
 import { getMonthlyQUsage } from "@/lib/q-usage.functions";
-import { globalSearch, searchUserWorkspace, type SearchHit } from "@/lib/discovery.functions";
+import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
 import { SUGGESTED_VECTORS } from "@/lib/q-vectors";
 import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
+import { useTour } from "@/hooks/useTour";
 import {
   Sheet,
   SheetContent,
@@ -19,8 +20,11 @@ import {
 } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { QMark } from "@/components/site/QMark";
-import { BookOpen, FileText, Highlighter, Bookmark, Mic, Sparkles, Square } from "lucide-react";
+import { BookOpen, Compass, FileText, Highlighter, Bookmark, Lightbulb, Mic, Sparkles, Square } from "lucide-react";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
+import { FeatureGlossary } from "@/components/enablement/FeatureGlossary";
+import { RouteTipsList } from "@/components/enablement/RouteTipsList";
+import { PlaybookTour } from "@/components/enablement/PlaybookTour";
 
 const TRIAL_KEY = "q.trial.used";
 const DRAFT_KEY = "q.draft.global";
