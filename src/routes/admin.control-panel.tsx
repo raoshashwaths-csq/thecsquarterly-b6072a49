@@ -909,7 +909,10 @@ function UsersTab() {
     });
   }, [data, search, tierFilter]);
 
-  const act = async (user_id: string, action: "grant-vanguard" | "revoke-vanguard" | "grant-admin" | "revoke-admin" | "revoke-sessions") => {
+  type ManageAction =
+    | `grant-${typeof PAID_DESIGNATIONS[number]}`
+    | "revoke-subscription" | "grant-admin" | "revoke-admin" | "revoke-sessions";
+  const act = async (user_id: string, action: ManageAction) => {
     try {
       await mgrFn({ data: { user_id, action } });
       toast.success("Updated");
