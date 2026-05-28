@@ -49,15 +49,16 @@ vi.mock("@tanstack/react-router", () => ({
   },
 }));
 
-vi.mock("@tanstack/react-start", () => ({
-  useServerFn: () => vi.fn().mockResolvedValue({ reply: "", hits: [] }),
-}));
-
-vi.mock("@tanstack/react-query", () => ({
 const stableServerFn = vi.fn().mockResolvedValue({ reply: "", hits: [] });
 vi.mock("@tanstack/react-start", () => ({
   useServerFn: () => stableServerFn,
 }));
+
+const stableQueryResult = { data: undefined, isFetching: false, refetch: vi.fn() };
+vi.mock("@tanstack/react-query", () => ({
+  useQuery: () => stableQueryResult,
+}));
+
 vi.mock("@/lib/q-agent.functions", () => ({
   askQ: vi.fn(),
   getQEntitlement: vi.fn(),
