@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  Sheet, SheetContent, SheetHeader, SheetTitle,
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose,
 } from "@/components/ui/sheet";
+import { X } from "lucide-react";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -71,23 +72,38 @@ export function AccountDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto p-0">
-        <SheetHeader className="px-6 pt-6 pb-4 border-b border-border bg-card sticky top-0 z-10">
-          <div className="font-mono uppercase tracking-[0.3em] text-xs text-secondary-accent font-semibold">
-            Account Profile Optimization
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-2xl overflow-y-auto p-0 max-w-full"
+      >
+        <SheetHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-4 border-b border-border bg-card sticky top-0 z-20 text-left">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="font-mono uppercase tracking-[0.3em] text-[10px] md:text-xs text-secondary-accent font-semibold">
+                Account Profile Optimization
+              </div>
+              <SheetTitle className="font-display text-xl md:text-2xl tracking-tight mt-2 break-words">
+                {draft.name}
+              </SheetTitle>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <HealthChip score={draft.health} />
+                {window90.band && (
+                  <span className="font-mono uppercase tracking-widest text-[10px] md:text-xs px-2 py-0.5 border border-accent bg-accent/10 text-accent">
+                    Notice {window90.band}d
+                  </span>
+                )}
+              </div>
+            </div>
+            <SheetClose
+              className="shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-sm border border-border bg-background hover:bg-muted hover:text-accent transition-colors"
+              aria-label="Close account"
+            >
+              <X className="h-4 w-4" />
+            </SheetClose>
           </div>
-          <SheetTitle className="font-display text-2xl tracking-tight flex items-center gap-3">
-            {draft.name}
-            <HealthChip score={draft.health} />
-            {window90.band && (
-              <span className="font-mono uppercase tracking-widest text-xs px-2 py-0.5 border border-accent bg-accent/10 text-accent">
-                Notice {window90.band}d
-              </span>
-            )}
-          </SheetTitle>
         </SheetHeader>
 
-        <div className="px-6 py-4">
+        <div className="px-4 md:px-6 py-4">
           <Accordion type="multiple" defaultValue={["identity", "commercial", "stakeholders"]} className="space-y-1">
             <Section value="identity" title="Identity">
               <Grid>
