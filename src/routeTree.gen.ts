@@ -45,11 +45,16 @@ import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
 import { Route as AccountApiRouteImport } from './routes/account.api'
+import { Route as AccountAnalyticsIndexRouteImport } from './routes/account.analytics.index'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
 import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
 import { Route as AccountExecutiveAnalyticsRouteImport } from './routes/account.executive.analytics'
+import { Route as AccountAnalyticsTeamLeaderboardRouteImport } from './routes/account.analytics.team-leaderboard'
+import { Route as AccountAnalyticsStakeholderRadarRouteImport } from './routes/account.analytics.stakeholder-radar'
+import { Route as AccountAnalyticsRetentionFunnelRouteImport } from './routes/account.analytics.retention-funnel'
+import { Route as AccountAnalyticsNrrWaterfallRouteImport } from './routes/account.analytics.nrr-waterfall'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -237,6 +242,11 @@ const AccountApiRoute = AccountApiRouteImport.update({
   path: '/account/api',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountAnalyticsIndexRoute = AccountAnalyticsIndexRouteImport.update({
+  id: '/account/analytics/',
+  path: '/account/analytics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -261,6 +271,30 @@ const AccountExecutiveAnalyticsRoute =
   AccountExecutiveAnalyticsRouteImport.update({
     id: '/account/executive/analytics',
     path: '/account/executive/analytics',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AccountAnalyticsTeamLeaderboardRoute =
+  AccountAnalyticsTeamLeaderboardRouteImport.update({
+    id: '/account/analytics/team-leaderboard',
+    path: '/account/analytics/team-leaderboard',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AccountAnalyticsStakeholderRadarRoute =
+  AccountAnalyticsStakeholderRadarRouteImport.update({
+    id: '/account/analytics/stakeholder-radar',
+    path: '/account/analytics/stakeholder-radar',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AccountAnalyticsRetentionFunnelRoute =
+  AccountAnalyticsRetentionFunnelRouteImport.update({
+    id: '/account/analytics/retention-funnel',
+    path: '/account/analytics/retention-funnel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AccountAnalyticsNrrWaterfallRoute =
+  AccountAnalyticsNrrWaterfallRouteImport.update({
+    id: '/account/analytics/nrr-waterfall',
+    path: '/account/analytics/nrr-waterfall',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailTransactionalSendRoute =
@@ -336,11 +370,16 @@ export interface FileRoutesByFullPath {
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
+  '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
+  '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
+  '/account/analytics/team-leaderboard': typeof AccountAnalyticsTeamLeaderboardRoute
   '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -382,11 +421,16 @@ export interface FileRoutesByTo {
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
+  '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
+  '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
+  '/account/analytics/team-leaderboard': typeof AccountAnalyticsTeamLeaderboardRoute
   '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/account/analytics': typeof AccountAnalyticsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -432,11 +476,16 @@ export interface FileRoutesById {
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
+  '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
+  '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
+  '/account/analytics/team-leaderboard': typeof AccountAnalyticsTeamLeaderboardRoute
   '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -483,11 +532,16 @@ export interface FileRouteTypes {
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/account/analytics/nrr-waterfall'
+    | '/account/analytics/retention-funnel'
+    | '/account/analytics/stakeholder-radar'
+    | '/account/analytics/team-leaderboard'
     | '/account/executive/analytics'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/account/analytics/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -529,11 +583,16 @@ export interface FileRouteTypes {
     | '/ai-readiness'
     | '/codex'
     | '/insights'
+    | '/account/analytics/nrr-waterfall'
+    | '/account/analytics/retention-funnel'
+    | '/account/analytics/stakeholder-radar'
+    | '/account/analytics/team-leaderboard'
     | '/account/executive/analytics'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/account/analytics'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -578,11 +637,16 @@ export interface FileRouteTypes {
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/account/analytics/nrr-waterfall'
+    | '/account/analytics/retention-funnel'
+    | '/account/analytics/stakeholder-radar'
+    | '/account/analytics/team-leaderboard'
     | '/account/executive/analytics'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/account/analytics/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -620,11 +684,16 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AccountIndexRoute: typeof AccountIndexRoute
+  AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
+  AccountAnalyticsRetentionFunnelRoute: typeof AccountAnalyticsRetentionFunnelRoute
+  AccountAnalyticsStakeholderRadarRoute: typeof AccountAnalyticsStakeholderRadarRoute
+  AccountAnalyticsTeamLeaderboardRoute: typeof AccountAnalyticsTeamLeaderboardRoute
   AccountExecutiveAnalyticsRoute: typeof AccountExecutiveAnalyticsRoute
   AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
   ApiElevenlabsSttRoute: typeof ApiElevenlabsSttRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
   ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
@@ -887,6 +956,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountApiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/analytics/': {
+      id: '/account/analytics/'
+      path: '/account/analytics'
+      fullPath: '/account/analytics/'
+      preLoaderRoute: typeof AccountAnalyticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -920,6 +996,34 @@ declare module '@tanstack/react-router' {
       path: '/account/executive/analytics'
       fullPath: '/account/executive/analytics'
       preLoaderRoute: typeof AccountExecutiveAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/analytics/team-leaderboard': {
+      id: '/account/analytics/team-leaderboard'
+      path: '/account/analytics/team-leaderboard'
+      fullPath: '/account/analytics/team-leaderboard'
+      preLoaderRoute: typeof AccountAnalyticsTeamLeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/analytics/stakeholder-radar': {
+      id: '/account/analytics/stakeholder-radar'
+      path: '/account/analytics/stakeholder-radar'
+      fullPath: '/account/analytics/stakeholder-radar'
+      preLoaderRoute: typeof AccountAnalyticsStakeholderRadarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/analytics/retention-funnel': {
+      id: '/account/analytics/retention-funnel'
+      path: '/account/analytics/retention-funnel'
+      fullPath: '/account/analytics/retention-funnel'
+      preLoaderRoute: typeof AccountAnalyticsRetentionFunnelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/analytics/nrr-waterfall': {
+      id: '/account/analytics/nrr-waterfall'
+      path: '/account/analytics/nrr-waterfall'
+      fullPath: '/account/analytics/nrr-waterfall'
+      preLoaderRoute: typeof AccountAnalyticsNrrWaterfallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/transactional/send': {
@@ -1058,11 +1162,16 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AccountIndexRoute: AccountIndexRoute,
+  AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
+  AccountAnalyticsRetentionFunnelRoute: AccountAnalyticsRetentionFunnelRoute,
+  AccountAnalyticsStakeholderRadarRoute: AccountAnalyticsStakeholderRadarRoute,
+  AccountAnalyticsTeamLeaderboardRoute: AccountAnalyticsTeamLeaderboardRoute,
   AccountExecutiveAnalyticsRoute: AccountExecutiveAnalyticsRoute,
   AgentResponseRunIdRoute: AgentResponseRunIdRoute,
   ApiElevenlabsSttRoute: ApiElevenlabsSttRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
   ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
