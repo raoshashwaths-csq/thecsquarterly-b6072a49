@@ -85,14 +85,18 @@ async function isVanguardEntitled(userId: string | null): Promise<boolean> {
 }
 
 export const listPosts = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
+  const userId = await getOptionalUserId();
+  const entitled = await isVanguardEntitled(userId);
+  let query = supabaseAdmin
     .from("posts")
     .select(SELECT_COLS)
     .eq("published", true)
     .order("published_at", { ascending: false });
+  if (!entitled) {
+    query = query.lte("published_at", new Date().toISOString());
+  }
+  const { data, error } = await query;
   if (error) throw new Error(error.message);
-  const userId = await getOptionalUserId();
-  const entitled = await isVanguardEntitled(userId);
   return (data ?? []).map((p) => gatePremiumBody(p as Post, entitled)) as Post[];
 });
 
@@ -101,15 +105,19 @@ export const listPostsBySection = createServerFn({ method: "GET" })
     z.object({ section: z.string().min(1).max(40) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const { data: rows, error } = await supabaseAdmin
+    const userId = await getOptionalUserId();
+    const entitled = await isVanguardEntitled(userId);
+    let query = supabaseAdmin
       .from("posts")
       .select(SELECT_COLS)
       .eq("section", data.section)
       .eq("published", true)
       .order("published_at", { ascending: false });
+    if (!entitled) {
+      query = query.lte("published_at", new Date().toISOString());
+    }
+    const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-    const userId = await getOptionalUserId();
-    const entitled = await isVanguardEntitled(userId);
     return (rows ?? []).map((p) => gatePremiumBody(p as Post, entitled)) as Post[];
   });
 

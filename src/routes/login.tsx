@@ -57,7 +57,7 @@ function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Signed in.");
-        navigate({ to: "/account" });
+        navigate({ to: "/" });
       }
     } catch (err) {
       toast.error((err as Error).message || "Authentication failed.");
