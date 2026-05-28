@@ -9,6 +9,7 @@ import { SeriesRail } from "@/components/site/SeriesRail";
 import { AnnotationBar } from "@/components/site/AnnotationBar";
 import { AudioBar } from "@/components/site/AudioBar";
 import { HighlightedBody } from "@/components/site/HighlightedBody";
+import { Paywall, BlurredTeaser } from "@/components/site/Paywall";
 import { useAuth } from "@/hooks/useAuth";
 import { getPost } from "@/lib/posts.functions";
 
@@ -274,33 +275,50 @@ function PostPage() {
         )}
       </div>
 
-      <HighlightedBody body={body} progress={progress} className="prose-content mt-12 animate-tone-swap" key={`body-${tone}`} />
+      {post.locked ? (
+        <>
+          <BlurredTeaser>
+            <HighlightedBody body={body} progress={progress} className="prose-content mt-12" key={`body-${tone}`} />
+          </BlurredTeaser>
+          <Paywall
+            variant="card"
+            oneOffLabel={`Unlock "${post.title}"`}
+            oneOffPriceCents={900}
+            onBuyOneOff={() => navigate({ to: "/pricing" })}
+            subtitle="One essay. Or unlock the full archive with Practitioner from $29/mo."
+          />
+        </>
+      ) : (
+        <>
+          <HighlightedBody body={body} progress={progress} className="prose-content mt-12 animate-tone-swap" key={`body-${tone}`} />
 
-      <AnnotationBar slug={slug} />
+          <AnnotationBar slug={slug} />
 
-      {sources.length > 0 && (
-        <section className="mt-20 pt-10 border-t border-border">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-5">
-            Sources & further reading
-          </div>
-          <ol className="space-y-2 list-decimal pl-6 marker:text-secondary-accent marker:font-mono text-sm text-foreground/75">
-            {sources.map((src, i) => {
-              const m = src.match(/(https?:\/\/\S+)/);
-              if (m) {
-                const before = src.slice(0, m.index).replace(/[—\-:\s]+$/, "").trim();
-                return (
-                  <li key={i}>
-                    {before && <span>{before} — </span>}
-                    <a href={m[1]} target="_blank" rel="noreferrer noopener" className="underline underline-offset-2 hover:text-accent break-all">
-                      {m[1]}
-                    </a>
-                  </li>
-                );
-              }
-              return <li key={i}>{src}</li>;
-            })}
-          </ol>
-        </section>
+          {sources.length > 0 && (
+            <section className="mt-20 pt-10 border-t border-border">
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-5">
+                Sources & further reading
+              </div>
+              <ol className="space-y-2 list-decimal pl-6 marker:text-secondary-accent marker:font-mono text-sm text-foreground/75">
+                {sources.map((src, i) => {
+                  const m = src.match(/(https?:\/\/\S+)/);
+                  if (m) {
+                    const before = src.slice(0, m.index).replace(/[—\-:\s]+$/, "").trim();
+                    return (
+                      <li key={i}>
+                        {before && <span>{before} — </span>}
+                        <a href={m[1]} target="_blank" rel="noreferrer noopener" className="underline underline-offset-2 hover:text-accent break-all">
+                          {m[1]}
+                        </a>
+                      </li>
+                    );
+                  }
+                  return <li key={i}>{src}</li>;
+                })}
+              </ol>
+            </section>
+          )}
+        </>
       )}
     </article>
   );
