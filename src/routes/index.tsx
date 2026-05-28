@@ -88,6 +88,7 @@ function HomePage() {
         <div className="mt-12 flex justify-center">
           <Link
             to="/csfactors"
+            data-tour="csf-box"
             className="group relative w-full max-w-2xl bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 text-left flex flex-col md:flex-row md:items-center gap-5"
             aria-label="Open CSFactors Command Centre"
           >
