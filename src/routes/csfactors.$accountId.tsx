@@ -1,13 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { HealthChip, QBRText } from "@/components/dashboard/HealthChip";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
 import { Button } from "@/components/ui/button";
+import { BackToCommand } from "@/components/csfactors/BackToCommand";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -76,9 +76,7 @@ function AccountPage() {
   return (
     <Shell>
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 animate-fade-up">
-        <Link to="/csfactors" className="inline-flex items-center gap-2 font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent mb-6">
-          <ArrowLeft className="h-3.5 w-3.5" /> All accounts
-        </Link>
+        <BackToCommand label="All accounts" />
 
         <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10 pb-6 border-b border-border">
           <div>

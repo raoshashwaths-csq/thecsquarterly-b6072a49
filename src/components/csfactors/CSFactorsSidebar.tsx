@@ -45,13 +45,13 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
     <aside
       className={cn(
         "shrink-0 border-r border-border bg-card sticky top-0 h-screen transition-[width] duration-300 hidden md:block",
-        collapsed ? "w-14" : "w-60",
+        collapsed ? "w-16" : "w-72",
       )}
     >
       <div className="h-full flex flex-col">
         <div className="px-3 py-5 border-b border-border flex items-center justify-between gap-2">
           <Link to="/csfactors" className="min-w-0 flex items-center" aria-label="CSFactors home">
-            <CSFLogo size={collapsed ? "md" : "md"} showWordmark={!collapsed} />
+            <CSFLogo size={collapsed ? "md" : "lg"} showWordmark={!collapsed} />
           </Link>
           <button
             type="button"

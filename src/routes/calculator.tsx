@@ -1,9 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { Reveal } from "@/components/site/Reveal";
 import { Slider } from "@/components/ui/slider";
+import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
+import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
+import { SectionCard } from "@/components/dashboard/SectionCard";
+import { ArrowLeft } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -63,31 +66,84 @@ function CalculatorPage() {
   const y5 = data[5];
   const deltaY5 = y5.target - y5.current;
   const cumulativeDelta = data.reduce((s, d) => s + (d.target - d.current), 0);
+  const spread = targetNrr - currentNrr;
+  const targetMultiple = y5.current > 0 ? y5.target / y5.current : 1;
+  const confidence = Math.max(0, Math.min(100, 55 + spread * 3));
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <SiteHeader />
-      <main className="flex-1">
-        <section className="border-b border-border">
-          <div className="container mx-auto px-6 py-16 md:py-24 max-w-5xl">
-            <Reveal>
-              <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
-                The Calculator
-              </p>
-              <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance">
-                What one point of NRR is worth.
-              </h1>
-              <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                Three inputs. Five years. The number every CFO understands and
-                most CS leaders cannot quote on demand.
-              </p>
-            </Reveal>
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-10 pt-8 md:pt-12 pb-20 animate-fade-up">
+        <Link
+          to="/csfactors"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-foreground bg-card border border-border px-3 py-2 hover:border-accent hover:text-accent transition-colors mb-6"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Back to CSFactors
+        </Link>
+
+        <header className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8 md:mb-10 pb-6 border-b border-border">
+          <div>
+            <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
+              Analytics / ROI model
+            </div>
+            <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight text-balance">
+              NRR impact command model.
+            </h1>
+            <p className="text-foreground/70 mt-3 max-w-2xl text-sm md:text-base">
+              Model the five-year revenue delta between today’s retention curve and the target operating state.
+            </p>
           </div>
+          <div className="border border-border bg-card px-4 py-3 min-w-[220px]">
+            <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1">
+              NRR spread
+            </div>
+            <div className="font-display text-4xl tracking-tight text-accent tabular-nums">
+              {spread >= 0 ? "+" : ""}{spread}<span className="text-base text-muted-foreground"> pts</span>
+            </div>
+          </div>
+        </header>
+
+        <section className="mb-8">
+          <MetricGrid cols={4} className="gap-4 md:gap-px">
+            <MetricCard
+              eyebrow="Year 5 ARR delta"
+              value={`${deltaY5 >= 0 ? "+" : ""}${fmtMoney(deltaY5)}`}
+              accent="accent"
+              trend={`${targetNrr}% target NRR`}
+              trendDirection={deltaY5 >= 0 ? "up" : "down"}
+            />
+            <MetricCard
+              eyebrow="Cumulative gap"
+              value={`${cumulativeDelta >= 0 ? "+" : ""}${fmtMoney(cumulativeDelta)}`}
+              accent="secondary"
+              trend="Five-year carry"
+              trendDirection={cumulativeDelta >= 0 ? "up" : "down"}
+            />
+            <MetricCard
+              eyebrow="Target multiple"
+              value={`${targetMultiple.toFixed(2)}×`}
+              accent="neutral"
+              trend="Versus current path"
+              trendDirection="flat"
+            />
+            <MetricCard
+              eyebrow="Compounding signal"
+              value={confidence}
+              unit="/100"
+              accent={confidence >= 75 ? "success" : "secondary"}
+              footer={<ProgressGauge value={confidence} accent={confidence >= 75 ? "success" : "secondary"} />}
+            />
+          </MetricGrid>
         </section>
 
-        <section className="border-b border-border">
-          <div className="container mx-auto px-6 py-16 max-w-5xl grid md:grid-cols-2 gap-12">
-            <div className="space-y-10">
+        <div className="grid lg:grid-cols-[420px_minmax(0,1fr)] gap-6 md:gap-8 items-start">
+          <SectionCard
+            title="Model controls"
+            eyebrow="Inputs"
+            description="Tune the operating assumptions and watch the board-level revenue gap update instantly."
+          >
+            <div className="space-y-8">
               <SliderRow
                 label="Current ARR"
                 value={`$${arr}M`}
@@ -116,58 +172,32 @@ function CalculatorPage() {
                 onChange={setTargetNrr}
               />
             </div>
+          </SectionCard>
 
-            <div className="space-y-6">
-              <div>
-                <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2">
-                  Year 5 ARR delta
-                </p>
-                <p className="font-display text-5xl md:text-6xl tracking-tight text-accent">
-                  {deltaY5 >= 0 ? "+" : ""}
-                  {fmtMoney(deltaY5)}
-                </p>
-              </div>
-              <div className="border-t border-border pt-6">
-                <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-2">
-                  Cumulative 5-year revenue gap
-                </p>
-                <p className="font-display text-3xl tracking-tight">
-                  {cumulativeDelta >= 0 ? "+" : ""}
-                  {fmtMoney(cumulativeDelta)}
-                </p>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Holding logo retention and new logo growth constant, this is the
-                ARR the business carries with it into year five purely from the
-                expansion-and-churn delta.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="border-b border-border">
-          <div className="container mx-auto px-6 py-16 max-w-5xl">
-            <p className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">
-              Trajectory comparison
-            </p>
-            <div className="h-[360px] w-full">
+          <SectionCard
+            title="Trajectory comparison"
+            eyebrow="Forecast"
+            description="Current path against the improved retention operating model."
+          >
+            <div className="h-[380px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
-                  <CartesianGrid strokeDasharray="2 4" stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" />
                   <XAxis
                     dataKey="year"
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     tick={{ fontFamily: "JetBrains Mono", fontSize: 11 }}
                   />
                   <YAxis
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     tick={{ fontFamily: "JetBrains Mono", fontSize: 11 }}
                     tickFormatter={(v) => fmtMoney(Number(v))}
                   />
                   <Tooltip
                     contentStyle={{
-                      background: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
+                      background: "var(--background)",
+                      border: "1px solid var(--border)",
+                      color: "var(--foreground)",
                       fontFamily: "JetBrains Mono",
                       fontSize: 12,
                     }}
@@ -178,7 +208,7 @@ function CalculatorPage() {
                     type="monotone"
                     dataKey="current"
                     name={`Current (${currentNrr}%)`}
-                    stroke="hsl(var(--muted-foreground))"
+                    stroke="var(--muted-foreground)"
                     strokeWidth={2}
                     dot={{ r: 3 }}
                   />
@@ -186,25 +216,20 @@ function CalculatorPage() {
                     type="monotone"
                     dataKey="target"
                     name={`Target (${targetNrr}%)`}
-                    stroke="hsl(var(--accent))"
+                    stroke="var(--accent)"
                     strokeWidth={2.5}
                     dot={{ r: 3 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-          </div>
-        </section>
+          </SectionCard>
+        </div>
 
-        <section>
-          <div className="container mx-auto px-6 py-16 max-w-3xl">
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Method: ARR<sub>n</sub> equals ARR<sub>0</sub> compounded by the
-              chosen NRR rate for n years. The model holds new-logo bookings
-              flat to isolate the retention lever. Use it as a board-room
-              proxy, not an FP&amp;A substitute.
-            </p>
-          </div>
+        <section className="mt-6 border border-border bg-card px-4 md:px-6 py-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Method: ARR<sub>n</sub> equals ARR<sub>0</sub> compounded by the chosen NRR rate for n years. The model holds new-logo bookings flat to isolate the retention lever; use it as a board-room proxy, not an FP&amp;A substitute.
+          </p>
         </section>
       </main>
       <SiteFooter />

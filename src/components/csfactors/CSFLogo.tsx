@@ -14,11 +14,11 @@ export function CSFLogo({
   className?: string;
 }) {
   const tile =
-    size === "sm" ? "h-6 w-6 text-[10px]" : size === "lg" ? "h-9 w-9 text-sm" : "h-7 w-7 text-[11px]";
+    size === "sm" ? "h-8 w-8 text-[12px]" : size === "lg" ? "h-12 w-12 text-base" : "h-10 w-10 text-[14px]";
   const word =
-    size === "sm" ? "text-sm" : size === "lg" ? "text-xl" : "text-base";
+    size === "sm" ? "text-base" : size === "lg" ? "text-2xl" : "text-xl";
   return (
-    <span className={cn("inline-flex items-center gap-2 min-w-0", className)}>
+    <span className={cn("inline-flex items-center gap-2.5 min-w-0", className)}>
       <span
         aria-hidden
         className={cn(
