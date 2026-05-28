@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Mic, Send, Sparkle, Square, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { QMark } from "@/components/site/QMark";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { CSFACTORS_Q_TREE } from "@/lib/csfactors-q-tree";
 import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
+import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { cn } from "@/lib/utils";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -22,11 +24,21 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
   });
 
   const ask = useServerFn(askCSFactorsQ);
+  const fetchUsage = useServerFn(getMonthlyQUsage);
+  const usage = useQuery({
+    queryKey: ["q-monthly-usage"],
+    queryFn: () => fetchUsage(),
+    enabled: open,
+    staleTime: 30_000,
+  });
+  const capped = usage.data && usage.data.cap !== null && usage.data.used >= usage.data.cap;
+
   const mut = useMutation({
     mutationFn: async (q: string) => ask({ data: { question: q, history: messages.slice(-10) } }),
     onSuccess: (res) => {
       setMessages((m) => [...m, { role: "assistant", content: res.reply || "(no reply)" }]);
       setError(null);
+      usage.refetch();
     },
     onError: (e: Error) => setError(e.message),
   });
@@ -41,7 +53,7 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
 
   function send(text: string) {
     const q = text.trim();
-    if (!q || mut.isPending) return;
+    if (!q || mut.isPending || capped) return;
     setMessages((m) => [...m, { role: "user", content: q }]);
     setInput("");
     mut.mutate(q);
@@ -133,6 +145,23 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
           ) : null}
         </div>
 
+        {/* Cap banner */}
+        {usage.data && usage.data.cap !== null ? (
+          <div className={cn(
+            "border-t border-border px-4 py-2 font-mono text-[10px] uppercase tracking-[0.2em] flex items-center justify-between",
+            capped ? "bg-accent/10 text-accent" : "bg-card text-foreground/60",
+          )}>
+            <span>
+              {usage.data.used} / {usage.data.cap} Q interactions this month
+            </span>
+            {capped ? (
+              <Link to="/pricing" className="underline hover:text-accent">
+                Upgrade →
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
+
         {/* Composer */}
         <form
           onSubmit={(e) => {
@@ -152,14 +181,15 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
               }
             }}
             rows={2}
-            placeholder="Ask Q about an account, a renewal, a stakeholder…"
-            className="flex-1 resize-none bg-transparent border border-border focus:border-accent outline-none px-3 py-2 text-sm font-sans"
+            disabled={capped}
+            placeholder={capped ? "Monthly cap reached — upgrade to keep asking Q." : "Ask Q about an account, a renewal, a stakeholder…"}
+            className="flex-1 resize-none bg-transparent border border-border focus:border-accent outline-none px-3 py-2 text-sm font-sans disabled:opacity-50"
           />
           {speech.supported ? (
             <button
               type="button"
               onClick={speech.toggle}
-              disabled={speech.transcribing || mut.isPending}
+              disabled={speech.transcribing || mut.isPending || capped}
               className={cn(
                 "shrink-0 inline-flex items-center justify-center h-9 w-9 border border-border hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors",
                 speech.recording && "border-accent text-accent animate-pulse",
@@ -172,7 +202,7 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
           ) : null}
           <button
             type="submit"
-            disabled={!input.trim() || mut.isPending}
+            disabled={!input.trim() || mut.isPending || capped}
             className="shrink-0 inline-flex items-center justify-center h-9 w-9 bg-accent text-accent-foreground hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
             aria-label="Send"
           >

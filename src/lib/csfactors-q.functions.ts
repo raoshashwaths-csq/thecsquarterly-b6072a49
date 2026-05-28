@@ -1,6 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { assertQUnderCap } from "./q-usage.functions";
+
+
 
 
 
@@ -41,7 +45,12 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured.");
 
+    // Monthly Q interaction cap (designation-tier scoped).
+    await assertQUnderCap(context.userId);
+
     const { supabase } = context;
+
+
 
     // Pull the operator's full portfolio context.
     const [{ data: accountsRaw }, { data: stakeholdersRaw }, { data: eventsRaw }] =
@@ -172,8 +181,19 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
     if (!res.ok) throw new Error(`Q failed (${res.status})`);
 
     const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const reply = json.choices?.[0]?.message?.content ?? "";
+
+    // Log this interaction for cap accounting.
+    await supabaseAdmin.from("q_runs").insert({
+      user_id: context.userId,
+      node_id: "csfactors-ask",
+      context: { question: data.question.slice(0, 200) },
+      witty: false,
+      zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 4000) },
+    });
+
     return {
-      reply: json.choices?.[0]?.message?.content ?? "",
+      reply,
       stats: { accounts: compact.length, totalArr, atRiskArr },
     };
   });

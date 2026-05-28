@@ -1,7 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  type Designation,
+  DESIGNATION_RANK,
+  Q_MONTHLY_CAP,
+  rank,
+  tierToDesignation,
+} from "@/lib/entitlements";
 
+// Legacy alias — keep prior callers working.
 export type TierSlug =
   | "free"
   | "vanguard"
@@ -11,10 +19,9 @@ export type TierSlug =
   | "team-growth"
   | "enterprise";
 
-/** Tier hierarchy — index = capability rank. */
-const RANK: Record<TierSlug, number> = {
+const LEGACY_RANK: Record<TierSlug, number> = {
   "free": 0,
-  "vanguard": 1, // legacy alias for individual
+  "vanguard": 1,
   "vanguard-individual": 1,
   "vanguard-pro": 2,
   "team-starter": 3,
@@ -29,31 +36,62 @@ export function useEntitlements() {
     enabled: !!user,
     staleTime: 60_000,
     queryFn: async () => {
-      // Admin override
       const [{ data: isAdmin }, { data: sub }] = await Promise.all([
         supabase.rpc("has_role", { _user_id: user!.id, _role: "admin" }),
         supabase
           .from("subscriptions")
-          .select("tier, status")
+          .select("tier, status, designation")
           .eq("user_id", user!.id)
           .eq("status", "active")
           .maybeSingle(),
       ]);
+
+      // Legacy tier (for back-compat consumers).
       const tier: TierSlug = (isAdmin ? "enterprise" : (sub?.tier as TierSlug | undefined)) ?? "free";
-      return { tier, rank: RANK[tier] ?? 0 };
+
+      // New designation.
+      let designation: Designation;
+      if (isAdmin) {
+        designation = "strategic_partner";
+      } else if (sub) {
+        const raw = ((sub as { designation?: string | null }).designation ?? null) as
+          | Designation
+          | null;
+        designation = raw ?? tierToDesignation(sub.tier);
+      } else {
+        designation = "reader";
+      }
+
+      return {
+        tier,
+        rank: LEGACY_RANK[tier] ?? 0,
+        designation,
+        dRank: rank(designation),
+      };
     },
   });
 
   const tier = (q.data?.tier ?? "free") as TierSlug;
-  const rank = q.data?.rank ?? 0;
+  const legacyRank = q.data?.rank ?? 0;
+  const designation: Designation = q.data?.designation ?? "reader";
+  const dRank = q.data?.dRank ?? 0;
+
   return {
+    // legacy
     tier,
-    rank,
+    rank: legacyRank,
+    canUniversalSearch: legacyRank >= LEGACY_RANK["vanguard-individual"],
+    canWorkspace: legacyRank >= LEGACY_RANK["vanguard-pro"],
+    isPaying: legacyRank >= LEGACY_RANK["vanguard-individual"],
+    // new
+    designation,
+    dRank,
+    canExecAnalytics: dRank >= DESIGNATION_RANK.operator,
+    canTeamScope: dRank >= DESIGNATION_RANK.team,
+    canSSO: dRank >= DESIGNATION_RANK.scale,
+    canBrandAssets: dRank >= DESIGNATION_RANK.scale,
+    canApiKeys: dRank >= DESIGNATION_RANK.enterprise,
+    qMonthlyCap: Q_MONTHLY_CAP[designation],
     loading: loading || q.isLoading,
-    // Universal search → Vanguard Individual and up
-    canUniversalSearch: rank >= RANK["vanguard-individual"],
-    // Workspace → Vanguard Pro and up
-    canWorkspace: rank >= RANK["vanguard-pro"],
-    isPaying: rank >= RANK["vanguard-individual"],
   };
 }

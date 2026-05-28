@@ -43,9 +43,12 @@ import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.sur
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
+import { Route as AccountApiRouteImport } from './routes/account.api'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
 import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
+import { Route as AccountExecutiveAnalyticsRouteImport } from './routes/account.executive.analytics'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -222,9 +225,19 @@ const AccountWorkspaceRoute = AccountWorkspaceRouteImport.update({
   path: '/account/workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountApiRoute = AccountApiRouteImport.update({
+  id: '/account/api',
+  path: '/account/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
+  id: '/api/v1/$',
+  path: '/api/v1/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiElevenlabsSttRoute = ApiElevenlabsSttRouteImport.update({
@@ -237,6 +250,12 @@ const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
   path: '/agent/response/$runId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountExecutiveAnalyticsRoute =
+  AccountExecutiveAnalyticsRouteImport.update({
+    id: '/account/executive/analytics',
+    path: '/account/executive/analytics',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -290,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/account/api': typeof AccountApiRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
@@ -302,8 +322,10 @@ export interface FileRoutesByFullPath {
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -331,6 +353,7 @@ export interface FileRoutesByTo {
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/account/api': typeof AccountApiRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
@@ -343,8 +366,10 @@ export interface FileRoutesByTo {
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -376,6 +401,7 @@ export interface FileRoutesById {
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
+  '/account/api': typeof AccountApiRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/agent/framework': typeof AgentFrameworkRoute
@@ -388,8 +414,10 @@ export interface FileRoutesById {
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
+  '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -422,6 +450,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/unsubscribe'
     | '/vanguard'
+    | '/account/api'
     | '/account/workspace'
     | '/admin/control-panel'
     | '/agent/framework'
@@ -434,8 +463,10 @@ export interface FileRouteTypes {
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/account/executive/analytics'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
+    | '/api/v1/$'
     | '/lovable/email/suppression'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -463,6 +494,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/unsubscribe'
     | '/vanguard'
+    | '/account/api'
     | '/account/workspace'
     | '/admin/control-panel'
     | '/agent/framework'
@@ -475,8 +507,10 @@ export interface FileRouteTypes {
     | '/ai-readiness'
     | '/codex'
     | '/insights'
+    | '/account/executive/analytics'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
+    | '/api/v1/$'
     | '/lovable/email/suppression'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -507,6 +541,7 @@ export interface FileRouteTypes {
     | '/teams'
     | '/unsubscribe'
     | '/vanguard'
+    | '/account/api'
     | '/account/workspace'
     | '/admin/control-panel'
     | '/agent/framework'
@@ -519,8 +554,10 @@ export interface FileRouteTypes {
     | '/ai-readiness/'
     | '/codex/'
     | '/insights/'
+    | '/account/executive/analytics'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
+    | '/api/v1/$'
     | '/lovable/email/suppression'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -552,12 +589,15 @@ export interface RootRouteChildren {
   TeamsRoute: typeof TeamsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   VanguardRoute: typeof VanguardRoute
+  AccountApiRoute: typeof AccountApiRoute
   AccountWorkspaceRoute: typeof AccountWorkspaceRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AccountIndexRoute: typeof AccountIndexRoute
+  AccountExecutiveAnalyticsRoute: typeof AccountExecutiveAnalyticsRoute
   AgentResponseRunIdRoute: typeof AgentResponseRunIdRoute
   ApiElevenlabsSttRoute: typeof ApiElevenlabsSttRoute
+  ApiV1SplatRoute: typeof ApiV1SplatRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
   ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
@@ -806,11 +846,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountWorkspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/api': {
+      id: '/account/api'
+      path: '/account/api'
+      fullPath: '/account/api'
+      preLoaderRoute: typeof AccountApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/$': {
+      id: '/api/v1/$'
+      path: '/api/v1/$'
+      fullPath: '/api/v1/$'
+      preLoaderRoute: typeof ApiV1SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/elevenlabs/stt': {
@@ -825,6 +879,13 @@ declare module '@tanstack/react-router' {
       path: '/agent/response/$runId'
       fullPath: '/agent/response/$runId'
       preLoaderRoute: typeof AgentResponseRunIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/executive/analytics': {
+      id: '/account/executive/analytics'
+      path: '/account/executive/analytics'
+      fullPath: '/account/executive/analytics'
+      preLoaderRoute: typeof AccountExecutiveAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/transactional/send': {
@@ -950,12 +1011,15 @@ const rootRouteChildren: RootRouteChildren = {
   TeamsRoute: TeamsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   VanguardRoute: VanguardRoute,
+  AccountApiRoute: AccountApiRoute,
   AccountWorkspaceRoute: AccountWorkspaceRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AccountIndexRoute: AccountIndexRoute,
+  AccountExecutiveAnalyticsRoute: AccountExecutiveAnalyticsRoute,
   AgentResponseRunIdRoute: AgentResponseRunIdRoute,
   ApiElevenlabsSttRoute: ApiElevenlabsSttRoute,
+  ApiV1SplatRoute: ApiV1SplatRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
   ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
@@ -966,13 +1030,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

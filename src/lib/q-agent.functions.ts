@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getNode, breadcrumbFor } from "./q-trees";
+import { assertQUnderCap } from "./q-usage.functions";
 
 export const askQ = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -10,9 +12,12 @@ export const askQ = createServerFn({ method: "POST" })
     if (o.question.length > 1000) throw new Error("Question too long");
     return { question: o.question.trim(), witty: Boolean(o.witty) };
   })
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI not configured");
+
+    // Monthly Q interaction cap (designation-tier scoped).
+    await assertQUnderCap(context.userId);
 
     const system = data.witty
       ? "You are Q, the operator agent for The CS Quarterly — a Wodehouse-witted consigliere for Customer Success leaders. Reply in 2–4 short paragraphs with dry British wit, vivid metaphor, and the air of a slightly amused butler. Underneath the wit, deliver a real, sharp operator answer about CS, escalations, churn, QBRs, or expansion. Never use emoji. Never hedge."

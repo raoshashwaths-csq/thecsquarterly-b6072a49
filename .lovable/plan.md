@@ -1,97 +1,93 @@
-# SEO Defaults — Implementation Plan
 
-Goal: replace the static SEO scaffolding with dynamic, data-driven endpoints that always reflect what's actually published, and add Article structured data on every post route.
+# Multi-Tier Entitlement Engine
 
-Base URL across all outputs: `https://www.thecsquarterly.com`.
+## 1. Schema: new `designation` column
 
----
+Migration on `public.subscriptions`:
 
-## 1. Dynamic `/sitemap.xml` (server route)
+- Add `designation text` with check constraint over: `reader`, `practitioner`, `operator`, `team`, `scale`, `enterprise`, `strategic_partner`.
+- Backfill from existing `tier`:
+  - `free` → `reader`
+  - `vanguard` / `vanguard-individual` → `practitioner`
+  - `vanguard-pro` → `operator`
+  - `team-starter` → `team`
+  - `team-growth` → `scale`
+  - `enterprise` → `enterprise`
+- Admins (via `has_role`) resolve to `strategic_partner` in code, no DB change.
+- Add `public.has_designation(_user uuid, _min designation_rank int)` security-definer helper that returns boolean, used by future RLS where needed.
 
-New file: `src/routes/sitemap[.]xml.ts`
+## 2. Entitlements layer (code)
 
-- `GET` handler returns `application/xml`, `Cache-Control: public, max-age=3600`.
-- Static entries (one per indexable page): `/`, `/insights`, `/vanguard`, `/retention-protocol`, `/outcome-forum`, `/codex`, `/ai-readiness`, `/pricing`, `/subscribe`, `/about`, `/job-board`, `/benchmarks`, `/directory`.
-- Dynamic entries:
-  - Pull all published posts via `supabaseAdmin.from("posts").select("slug, section, published_at").eq("published", true).lte("published_at", now())`.
-  - Emit `/insights/{slug}` for every post (matches the actual route file).
-  - Pull all playbooks via `supabaseAdmin.from("playbooks").select("slug, updated_at").eq("published", true)` → emit `/codex/{slug}`.
-- Each `<url>` includes `<loc>`, `<lastmod>` (post `published_at` / playbook `updated_at`), and a reasonable `<changefreq>` / `<priority>` per section.
-- Delete `public/sitemap.xml` (the static file would shadow the route at the same path).
+Extend `src/hooks/useEntitlements.ts`:
 
-## 2. `/rss.xml` feed (server route)
+- Add `designation: Designation` and numeric `dRank`.
+- Add booleans: `canExecAnalytics` (operator+), `canTeamScope` (team+), `canSSO` (scale+), `canApiKeys` (enterprise+), `qMonthlyCap` (number).
+- Server mirror: `src/lib/entitlements.functions.ts` — `getMyDesignation()` returning the same shape; used by server-fn gates.
 
-New file: `src/routes/rss[.]xml.ts`
+## 3. New gated routes
 
-- `GET` handler returns `application/rss+xml; charset=utf-8`.
-- Channel metadata: title "The CS Quarterly", link to home, description from llms.txt intro, `language=en-us`, `lastBuildDate` = max `published_at`.
-- Items: latest 50 published posts ordered by `published_at desc`:
-  - `<title>` = post title
-  - `<link>` and `<guid isPermaLink="true">` = `https://www.thecsquarterly.com/insights/{slug}`
-  - `<description>` = excerpt (CDATA-wrapped, HTML-escaped)
-  - `<pubDate>` = RFC 822 from `published_at`
-  - `<category>` = post category
-  - `<author>` when available
-- `Cache-Control: public, max-age=900`.
-- Add `<link rel="alternate" type="application/rss+xml" href="/rss.xml" title="The CS Quarterly" />` to `__root.tsx` head `links` so feed readers auto-discover it.
+### `/account/executive/analytics`
+- New route file `src/routes/account.executive.analytics.tsx`.
+- Renders an embedded CSFactors-style command center (reuse `AccountsGrid`, `BurningThree`, `AnalyticsHeader` already in `src/components/csfactors/`).
+- `beforeLoad` reads `useEntitlements`-equivalent server check; if designation < operator, mount a `<TierGateOverlay />` (blurred Parchment modal, `backdrop-blur`, copy from spec) instead of the analytics body.
+- For `operator`: load grid scoped to current user only (already how `listAccounts` works).
+- For `team`+: surface a new "Team scope" `<Select>` (placeholder data — `getTeamMembers` server-fn returns the user's `team_members` rows; switching scope is a no-op until a real team data model lands, but the dropdown renders).
 
-## 3. JSON-LD `Article` schema on post routes
+### `/account/api`
+- New route `src/routes/account.api.tsx`.
+- Only visible if `canApiKeys`. Otherwise renders the same `<TierGateOverlay />` with enterprise copy.
+- Tab inside `/account` shell with a "Generate bearer token" form (stub button → `toast.info("Available on Enterprise — contact us")` for now; no actual key minting).
 
-Edit `src/routes/insights.$slug.tsx`:
+### `/api/v1/*` guard
+- Add server route `src/routes/api/v1.$.ts` that returns:
+  ```json
+  { "error": "unauthenticated", "message": "Enterprise API key required" }
+  ```
+  status 403, `Content-Type: application/json`. Covers any direct hit on `/api/v1/...` without a verified key. Existing `api/v1.benchmarks.nrr.ts` and `api/v1.retention-ledger.ticker.ts` remain (they're public read endpoints); the catch-all only handles unmatched `/api/v1/*` paths.
 
-- Extend the existing `head()` to add a `scripts` array with `type: "application/ld+json"` and a stringified `Article` schema using loaderData:
-  - `@context`, `@type: "Article"`, `headline`, `description` (excerpt), `image` (cover_image_url, absolute URL when present), `datePublished` (published_at), `author: { @type: "Person", name }`, `publisher: { @type: "Organization", name: "The CS Quarterly", logo }`, `mainEntityOfPage` = canonical URL, `articleSection` (category).
-- Also set `og:image` (and `twitter:image`) on the route head when `cover_image_url` exists — leaf only, per the head-meta rules.
-- Canonical and og:url upgraded from relative to absolute `https://www.thecsquarterly.com/insights/{slug}` so crawlers/feed readers resolve correctly.
+## 4. Q agent monthly cap
 
-No change needed at `__root.tsx` beyond the RSS `<link>` (Organization/WebSite JSON-LD already lives there if present; if not, this plan does not add it — out of scope).
+- New server-fn `src/lib/q-usage.functions.ts` → `getMonthlyQUsage()`:
+  - `count(*) from q_runs where user_id = me and created_at >= date_trunc('month', now())`
+  - returns `{ used, cap }` where cap derives from designation (reader 0, practitioner 30, operator 100, team 400, scale 1000, enterprise/strategic ∞).
+- In `src/lib/csfactors-q.functions.ts` (and any other Q entry server-fn): call usage check before `q_runs` insert; throw `Error("Q monthly cap reached")` when exceeded.
+- In both Q surfaces (`src/components/site/QAgentButton.tsx` and `src/components/csfactors/QAgentDrawer.tsx`):
+  - Fetch usage via `useQuery`.
+  - When `used >= cap`, render an inline notification block (uses `SectionCard` + accent border) above the composer: "You've used X / Y Q interactions this month. Upgrade to {next tier} for more."
+  - Disable mic + send when capped.
 
-## 4. Refresh `public/robots.txt`
+## 5. Scale-tier stubs
 
-Edit in place; preserve existing block:
+- In `/account` shell add two cards behind `canSSO`:
+  - **Single Sign-On (SAML)** — title + body + disabled "Configure SSO" button + small note: "Available on Scale and above". For tiers ≥ scale, button shows toast: "SSO setup is concierge — we'll reach out to provision WorkOS."
+  - **Brand assets** — disabled file input + same gating. No upload wiring.
+- Both rendered with `SectionCard` from the dashboard kit, Parchment styling.
 
-```
-User-agent: *
-Allow: /
+## 6. Shared `<TierGateOverlay />`
 
-# Block utility/auth surfaces and admin from index
-Disallow: /ai-readiness/survey
-Disallow: /admin
-Disallow: /account
-Disallow: /login
-Disallow: /unsubscribe
-Disallow: /agent/
-Disallow: /api/
+`src/components/site/TierGateOverlay.tsx`:
+- Full-bleed blurred backdrop over whatever it wraps (`backdrop-blur-xl bg-background/70`).
+- Centered Parchment card: mono eyebrow "Tier required", display headline, body copy passed via props, two CTAs (Primary → `/pricing`, ghost → "Back").
+- Used by `/account/executive/analytics`, `/account/api`, and any future gates.
 
-Sitemap: https://www.thecsquarterly.com/sitemap.xml
-```
+## 7. Files touched
 
-## 5. Refresh `public/llms.txt`
+**New**
+- `src/routes/account.executive.analytics.tsx`
+- `src/routes/account.api.tsx`
+- `src/routes/api/v1.$.ts`
+- `src/components/site/TierGateOverlay.tsx`
+- `src/lib/entitlements.functions.ts`
+- `src/lib/q-usage.functions.ts`
+- Migration: add `designation` + backfill + helper fn
 
-Rewrite to mirror the actual current route map (Vanguard, Retention Protocol, Outcome Forum, Codex, CSFactors, AI Readiness, Pricing, Subscribe, About, Job Board, Benchmarks) and list all currently published essays pulled by hand from the live DB. Keep the existing intro voice. Document the two-voice system, the 3-2-1 model, and `/rss.xml` discovery URL.
+**Edited**
+- `src/hooks/useEntitlements.ts` (designation, new booleans, caps)
+- `src/components/site/QAgentButton.tsx` + `src/components/csfactors/QAgentDrawer.tsx` (cap UI)
+- `src/lib/csfactors-q.functions.ts` + `src/lib/q-agent.functions.ts` (server cap enforcement)
+- `src/routes/account.index.tsx` (SSO + brand stubs + API tab link)
 
-(This stays a static file — llms.txt is small, low-churn, and conventionally hand-curated. Future post additions update it manually; not worth a build step.)
-
----
-
-## Files touched
-
-- New: `src/routes/sitemap[.]xml.ts`
-- New: `src/routes/rss[.]xml.ts`
-- Edit: `src/routes/insights.$slug.tsx` (add JSON-LD + og:image + absolute URLs)
-- Edit: `src/routes/__root.tsx` (add RSS `<link rel="alternate">`)
-- Edit: `public/robots.txt` (expand disallows + Sitemap directive)
-- Edit: `public/llms.txt` (refresh page list + add RSS link)
-- Delete: `public/sitemap.xml` (replaced by server route)
-
-## Verification
-
-- After build, hit `/sitemap.xml` and `/rss.xml` in preview → expect valid XML with live post slugs.
-- View source on any `/insights/{slug}` → expect one `<script type="application/ld+json">` Article block plus `og:image`.
-- Trigger an SEO rescan once shipped to clear related findings.
-
-## Out of scope
-
-- llms.txt automation (kept static).
-- Organization/WebSite JSON-LD in `__root.tsx` (already covered by existing root head, not part of this request).
-- Per-section index pages (`/vanguard`, etc.) getting JSON-LD — only post routes per the request.
+## Out of scope (explicit)
+- Real WorkOS SAML wiring, real brand-asset storage, real API-key minting, real team aggregation queries.
+- Renaming existing `tier` column or removing legacy values.
+- Migrating existing RLS policies to use `designation` (the column is additive; current `tier`-based policies keep working).
