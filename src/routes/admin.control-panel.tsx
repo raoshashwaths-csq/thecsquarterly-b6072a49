@@ -32,12 +32,14 @@ import {
   DropdownMenuItem, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MetricCard as KitMetricCard } from "@/components/dashboard/MetricCard";
 import {
   getControlPanelOverview, getAgentObservability, getQRunTranscript,
   listJobListings, moderateJobListing, updateJobFlags, seedSampleJobs,
   listEmailTemplates, sendTestBroadcast, schedulePost,
   listMasterUsers, manageUser,
 } from "@/lib/control-panel.functions";
+
 
 export const Route = createFileRoute("/admin/control-panel")({
   head: () => ({
@@ -166,8 +168,8 @@ function TabHeader({ title, subtitle, action }: { title: string; subtitle: strin
   return (
     <div className="flex items-end justify-between border-b border-border pb-4 mb-5">
       <div>
-        <div className="text-[10px] uppercase tracking-[0.3em] text-accent mb-1">Workspace</div>
-        <h1 className="font-display text-3xl leading-none">{title}</h1>
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-1">Workspace</div>
+        <h1 className="font-display text-3xl tracking-tight leading-none">{title}</h1>
         <p className="text-sm text-muted-foreground mt-1.5">{subtitle}</p>
       </div>
       {action}
@@ -175,18 +177,19 @@ function TabHeader({ title, subtitle, action }: { title: string; subtitle: strin
   );
 }
 
+// Local adapter that forwards to the shared dashboard MetricCard so every
+// admin tile inherits the kit's accent bar + typography automatically.
 function MetricCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: boolean }) {
   return (
-    <div className={[
-      "rounded-md border bg-card p-4",
-      accent ? "border-accent/40" : "border-border",
-    ].join(" ")}>
-      <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
-      <div className="font-display text-3xl mt-2 leading-none tabular-nums">{value}</div>
-      {sub && <div className="text-[11px] text-muted-foreground mt-1.5">{sub}</div>}
-    </div>
+    <KitMetricCard
+      eyebrow={label}
+      value={value}
+      accent={accent ? "accent" : "neutral"}
+      footer={sub ? <span className="text-[11px] text-muted-foreground">{sub}</span> : undefined}
+    />
   );
 }
+
 
 function SearchInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
   return (

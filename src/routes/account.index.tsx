@@ -6,9 +6,12 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { OperatorTools } from "@/components/site/OperatorTools";
+import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
+import { SectionCard } from "@/components/dashboard/SectionCard";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, startSubscriptionPlaceholder } from "@/lib/auth.functions";
+
 
 
 export const Route = createFileRoute("/account/")({
@@ -40,53 +43,62 @@ function AccountPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <main className="flex-1 max-w-4xl mx-auto px-6 py-16 w-full">
-        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-4">Members</div>
-        <h1 className="font-display text-5xl mb-8">Your account</h1>
+      <main className="flex-1 max-w-5xl mx-auto px-6 py-16 w-full">
+        <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">Members</div>
+        <h1 className="font-display text-5xl tracking-tight mb-10">Your account</h1>
 
-        {/* Recruiter / leader: tools surface BEFORE billing */}
         {isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
 
         {me.data && (
+          <div className="space-y-6">
+            <MetricGrid cols={3}>
+              <MetricCard
+                eyebrow="Tier"
+                value={me.data.subscriptionTier === "vanguard" ? "Vanguard" : "Free"}
+                accent={me.data.subscriptionTier === "vanguard" ? "accent" : "neutral"}
+                footer={<span className="text-xs text-muted-foreground capitalize">{me.data.subscriptionStatus}</span>}
+              />
+              <MetricCard
+                eyebrow="Purchases"
+                value={(purchases.data ?? []).length}
+                accent="secondary"
+                footer={<span className="text-xs text-muted-foreground">Lifetime playbook orders</span>}
+              />
+              <MetricCard
+                eyebrow="Role"
+                value={me.data.isAdmin ? "Admin" : "Member"}
+                accent={me.data.isAdmin ? "accent" : "neutral"}
+                footer={<span className="text-xs text-muted-foreground truncate block">{me.data.email}</span>}
+              />
+            </MetricGrid>
 
-          <div className="space-y-8">
-            <section className="border border-border p-8">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Identity</div>
-              <div className="text-lg">{me.data.displayName ?? me.data.email}</div>
+            <SectionCard eyebrow="Identity" title={me.data.displayName ?? me.data.email ?? "Member"}>
               <div className="text-sm text-muted-foreground">{me.data.email}</div>
-            </section>
+            </SectionCard>
 
-            <section className="border border-border p-8">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Subscription</div>
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <div className="font-display text-3xl">
-                    {me.data.subscriptionTier === "vanguard" ? "Vanguard Access" : "Free Briefing"}
-                  </div>
-                  <div className="text-sm text-muted-foreground capitalize">{me.data.subscriptionStatus}</div>
-                </div>
-                {me.data.subscriptionTier !== "vanguard" && (
-                  <button
-                    onClick={async () => {
-                      try {
-                        await startSub();
-                        toast.success("Vanguard access activated (placeholder, Stripe wires up later).");
-                        me.refetch();
-                      } catch (e) { toast.error((e as Error).message); }
-                    }}
-                    className="px-6 py-3 bg-secondary-accent text-secondary-accent-foreground font-mono text-[11px] uppercase tracking-widest"
-                  >Activate Vanguard (preview)</button>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground mt-4">
-                Stripe checkout will replace the preview button. For now this lets you experience the gated content end-to-end.
-              </p>
-            </section>
+            <SectionCard
+              eyebrow="Subscription"
+              title={me.data.subscriptionTier === "vanguard" ? "Vanguard Access" : "Free Briefing"}
+              description="Stripe checkout will replace the preview activation. For now this unlocks gated content end-to-end."
+              actions={me.data.subscriptionTier !== "vanguard" ? (
+                <button
+                  onClick={async () => {
+                    try {
+                      await startSub();
+                      toast.success("Vanguard access activated (placeholder).");
+                      me.refetch();
+                    } catch (e) { toast.error((e as Error).message); }
+                  }}
+                  className="px-5 py-2.5 bg-secondary-accent text-secondary-accent-foreground font-mono text-[11px] uppercase tracking-widest"
+                >Activate Vanguard</button>
+              ) : null}
+            >
+              <div className="text-sm text-muted-foreground capitalize">Status: {me.data.subscriptionStatus}</div>
+            </SectionCard>
 
-            <section className="border border-border p-8">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-3">Purchases</div>
+            <SectionCard eyebrow="Purchases" title="Playbook orders">
               {(purchases.data ?? []).length === 0 ? (
-                <p className="text-muted-foreground">No playbooks purchased yet. <Link to="/codex" className="underline">Browse the Codex</Link>.</p>
+                <p className="text-muted-foreground text-sm">No playbooks purchased yet. <Link to="/codex" className="underline">Browse the Codex</Link>.</p>
               ) : (
                 <ul className="divide-y divide-border">
                   {(purchases.data ?? []).map((p, i) => (
@@ -98,27 +110,29 @@ function AccountPage() {
                   ))}
                 </ul>
               )}
-            </section>
+            </SectionCard>
 
             {me.data.isAdmin && (
-              <section className="border border-accent bg-accent/5 p-8">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Editorial</div>
-                <div className="flex items-center justify-between gap-4">
-                  <p>You have admin access to the editorial dashboard.</p>
-                  <Link to="/admin" className="px-6 py-3 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest">
+              <SectionCard
+                eyebrow="Editorial"
+                title="Admin access"
+                description="You have admin access to the editorial dashboard and control panel."
+                actions={
+                  <Link to="/admin" className="px-5 py-2.5 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest">
                     Open dashboard
                   </Link>
-                </div>
-              </section>
+                }
+              >
+                <div className="text-xs text-muted-foreground">Editorial + moderation tools live behind the admin shell.</div>
+              </SectionCard>
             )}
           </div>
         )}
 
-        {/* Operator: tools surface AFTER billing */}
         {!isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
-
       </main>
       <SiteFooter />
     </div>
   );
 }
+

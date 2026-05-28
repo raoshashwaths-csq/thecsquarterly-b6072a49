@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
+import { SectionCard } from "@/components/dashboard/SectionCard";
+
 
 export const Route = createFileRoute("/ai-readiness/")({
   head: () => ({
@@ -58,23 +61,32 @@ function AiReadinessLanding() {
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
 
-      <section className="max-w-7xl w-full mx-auto px-6 py-24">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-10">
-          What we measure
-        </div>
-        <div className="grid md:grid-cols-2 gap-x-16 gap-y-12">
-          {PILLARS.map((d, i) => (
-            <div key={d.name} className="border-t border-border pt-6">
-              <div className="flex justify-between items-baseline mb-3">
-                <span className="font-mono text-[11px] text-secondary-accent">Dimension {String(i + 1).padStart(2, "0")}</span>
-                <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{d.weight} pts</span>
-              </div>
-              <h2 className="font-display text-3xl mb-3">{d.name}</h2>
-              <p className="text-foreground/75 text-pretty">{d.blurb}</p>
-            </div>
-          ))}
-        </div>
+      <section className="max-w-7xl w-full mx-auto px-6 py-20">
+        <SectionCard
+          eyebrow="What we measure"
+          title="Eight operating dimensions, thirty-two metrics."
+          description="Each dimension is weighted by its leverage on retention. Top-decile orgs score evenly; fragile orgs spike on one and crater on the rest."
+        >
+          <MetricGrid cols={4}>
+            {PILLARS.map((d, i) => (
+              <MetricCard
+                key={d.name}
+                eyebrow={`Dimension ${String(i + 1).padStart(2, "0")}`}
+                value={d.weight}
+                unit="pts"
+                accent={i % 2 === 0 ? "accent" : "secondary"}
+                footer={
+                  <div>
+                    <div className="font-display text-base leading-tight mb-2">{d.name}</div>
+                    <p className="text-xs text-foreground/70 text-pretty">{d.blurb}</p>
+                  </div>
+                }
+              />
+            ))}
+          </MetricGrid>
+        </SectionCard>
       </section>
+
 
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
