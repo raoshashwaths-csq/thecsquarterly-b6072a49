@@ -14,7 +14,8 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { QMark } from "@/components/site/QMark";
-import { FileText, BookOpen, Sparkles, Bookmark, Highlighter } from "lucide-react";
+import { BookOpen, FileText, Highlighter, Bookmark, Mic, Sparkles, Square } from "lucide-react";
+import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 
 const TRIAL_KEY = "q.trial.used";
 const SEEN_KEY = "q.attention.seen";
@@ -69,6 +70,12 @@ export function QAgentButton() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const prevUserIdRef = useRef<string | null>(null);
+  const speech = useElevenLabsSpeechInput({
+    onTranscript: (text) => {
+      setQuery((current) => (current ? `${current} ${text}` : text));
+      inputRef.current?.focus();
+    },
+  });
 
   // Sample 3 terminal-node prompt templates to seed the suggestion chips.
   const suggestions = useMemo(() => {
@@ -293,16 +300,30 @@ export function QAgentButton() {
 
             {/* Search bar with rolling placeholder */}
             <form onSubmit={handleAsk} className="mb-3">
-              <input
-                ref={inputRef}
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                disabled={loading}
-                maxLength={1000}
-                placeholder={needsSignIn ? "Sign in to ask Q." : gated ? "Subscribe to Vanguard to keep asking Q." : currentPlaceholder}
-                className="w-full border border-border bg-background px-4 py-3.5 font-body text-base focus:outline-none focus:border-foreground transition-colors disabled:opacity-50"
-              />
+              <div className="flex items-stretch border border-border focus-within:border-foreground transition-colors bg-background">
+                <input
+                  ref={inputRef}
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  disabled={loading}
+                  maxLength={1000}
+                  placeholder={needsSignIn ? "Sign in to ask Q." : gated ? "Subscribe to Vanguard to keep asking Q." : currentPlaceholder}
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3.5 font-body text-base focus:outline-none disabled:opacity-50"
+                />
+                {speech.supported ? (
+                  <button
+                    type="button"
+                    onClick={speech.toggle}
+                    disabled={loading || speech.transcribing || gated}
+                    className={`shrink-0 w-12 inline-flex items-center justify-center border-l border-border hover:text-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${speech.recording ? "text-accent animate-pulse" : ""}`}
+                    aria-label={speech.recording ? "Stop recording" : "Ask by voice"}
+                    title={speech.error ?? (speech.transcribing ? "Transcribing…" : "Ask by voice")}
+                  >
+                    {speech.recording ? <Square className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  </button>
+                ) : null}
+              </div>
               <button
                 type="submit"
                 disabled={loading || gated || !query.trim()}
