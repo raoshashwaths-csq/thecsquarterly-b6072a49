@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Reveal } from "@/components/site/Reveal";
 import { listMySequences, saveSequence } from "@/lib/enterprise.functions";
 import { listPosts } from "@/lib/posts.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/sequencer")({
   head: () => ({
@@ -31,13 +32,18 @@ export const Route = createFileRoute("/sequencer")({
 type Item = { slug: string; title: string };
 
 function SequencerPage() {
+  const { user, loading: authLoading } = useAuth();
   const fetchSeqs = useServerFn(listMySequences);
   const fetchPosts = useServerFn(listPosts);
   const save = useServerFn(saveSequence);
   const qc = useQueryClient();
 
   const { data: posts } = useQuery({ queryKey: ["posts"], queryFn: () => fetchPosts() });
-  const { data: seqs } = useQuery({ queryKey: ["mySequences"], queryFn: () => fetchSeqs() });
+  const { data: seqs } = useQuery({
+    queryKey: ["mySequences"],
+    queryFn: () => fetchSeqs(),
+    enabled: !!user,
+  });
 
   const [items, setItems] = useState<Item[]>([]);
   const [name, setName] = useState("");
