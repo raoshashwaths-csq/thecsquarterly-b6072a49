@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouterState, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
+import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { globalSearch, searchUserWorkspace, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +66,7 @@ export function QAgentButton() {
 
   const ask = useServerFn(askQ);
   const fetchEntitlement = useServerFn(getQEntitlement);
+  const fetchUsage = useServerFn(getMonthlyQUsage);
   const runUniversal = useServerFn(globalSearch);
   const runWorkspace = useServerFn(searchUserWorkspace);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
