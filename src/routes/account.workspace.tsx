@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { SentimentTrendPanel } from "@/components/site/SentimentTrendPanel";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -273,6 +274,8 @@ function WorkspacePage() {
         </div>
 
         <DailyBriefing links={links} assets={assets} annotations={annotations} />
+
+        <SentimentTrendPanel />
 
         {/* tabs — swipe-bar on mobile */}
         <div className="mt-10 -mx-4 md:mx-0 overflow-x-auto scroll-smooth snap-x snap-mandatory">
