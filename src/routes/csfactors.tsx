@@ -17,6 +17,7 @@ import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
 import { QAgentDrawer } from "@/components/csfactors/QAgentDrawer";
 import { AskQInline } from "@/components/csfactors/AskQInline";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
+import { CommandCentre } from "@/components/csfactors/reckoning/CommandCentre";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
@@ -241,6 +242,8 @@ function CSFactorsPageInner() {
               <section className="mb-10" id="reminders" data-tour="burning-three">
                 <BurningThree accounts={accounts} />
               </section>
+
+              <CommandCentre />
 
               <section className="mb-10">
                 <AnalyticsHeader accounts={accounts} />
