@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Mic, Send, Sparkle, Square, X } from "lucide-react";
+import { ArrowLeft, Mic, Send, Sparkle, Square, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { QMark } from "@/components/site/QMark";
@@ -66,8 +66,8 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
         className="w-full sm:max-w-xl p-0 flex flex-col bg-background border-l border-border"
       >
         {/* Header */}
-        <header className="px-6 py-4 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <header className="px-6 py-4 border-b border-border flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="font-display text-2xl">
               <QMark />
             </div>
@@ -78,14 +78,24 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
               <div className="font-display text-sm">Ask Q about your portfolio</div>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => onOpenChange(false)}
-            className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-border hover:border-accent hover:text-accent transition-colors"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              to="/csfactors"
+              onClick={() => onOpenChange(false)}
+              className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.2em] text-xs border border-border px-3 py-1.5 text-muted-foreground hover:border-accent hover:text-accent transition-colors"
+            >
+              <ArrowLeft className="h-3 w-3" />
+              Back
+            </Link>
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="h-8 w-8 inline-flex items-center justify-center rounded-full border border-border hover:border-accent hover:text-accent transition-colors"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </header>
 
         {/* Transcript / empty state */}
