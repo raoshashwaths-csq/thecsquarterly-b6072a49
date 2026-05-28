@@ -158,16 +158,16 @@ function CSFactorsPageInner() {
           <ThemeToggle />
         </div>
 
-        <div className="max-w-[1600px] mx-auto px-4 md:px-10 pt-6 md:pt-10 pb-32 animate-fade-up">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-10 pt-4 md:pt-10 pb-32 animate-fade-up">
           {/* Active filter badge */}
           {filter ? (
-            <div className="mb-4 flex items-center gap-2">
-              <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/40 text-accent px-3 py-1.5 font-mono text-xs uppercase tracking-[0.2em]">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/40 text-accent px-3 py-1.5 font-mono uppercase tracking-[0.2em] text-xs">
                 Active filter: {filter.label}
                 <button
                   type="button"
                   onClick={() => setFilter(null)}
-                  className="hover:opacity-70"
+                  className="hover:opacity-70 p-1 -m-1"
                   aria-label="Clear filter"
                 >
                   <X className="h-3 w-3" />
@@ -179,10 +179,10 @@ function CSFactorsPageInner() {
           {/* Header */}
           <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-8 md:mb-10 pb-6 border-b border-border">
             <div className="min-w-0">
-              <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3">
+              <div className="font-mono uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3 text-xs">
                 CSFactors / Command Center
               </div>
-              <h1 className="font-display text-3xl md:text-6xl leading-[0.95] tracking-tight">
+              <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight">
                 {greeting()},{" "}
                 <span className="italic text-accent">{firstName}.</span>
               </h1>
