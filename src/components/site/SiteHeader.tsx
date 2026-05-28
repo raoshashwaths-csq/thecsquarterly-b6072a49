@@ -149,10 +149,9 @@ export function SiteHeader() {
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-60">
                 <DropdownMenuLabel className="font-body normal-case tracking-normal">
                   <div className="text-sm font-medium leading-tight truncate">
-                    {displayName || "Member"}
+                    {displayName || t("menu.member")}
                   </div>
                   {user.email && displayName !== user.email && (
                     <div className="text-xs text-muted-foreground truncate mt-0.5">
@@ -163,47 +162,47 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link to="/account/workspace" className="font-mono text-xs uppercase tracking-widest">
-                    Your Workspace
+                    {t("menu.yourWorkspace")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/account" className="font-mono text-xs uppercase tracking-widest">
-                    Account
+                    {t("menu.account")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/admin" className="font-mono text-xs uppercase tracking-widest">
-                    Admin
+                    {t("menu.admin")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/calculator" className="font-mono text-xs uppercase tracking-widest">
-                    ROI Calculator
+                    {t("menu.roiCalculator")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/benchmarks" className="font-mono text-xs uppercase tracking-widest">
-                    Benchmarks
+                    {t("menu.benchmarks")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/directory" className="font-mono text-xs uppercase tracking-widest">
-                    Directory
+                    {t("menu.directory")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/teams" className="font-mono text-xs uppercase tracking-widest">
-                    Teams
+                    {t("menu.teams")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/sequencer" className="font-mono text-xs uppercase tracking-widest">
-                    Sequencer
+                    {t("menu.sequencer")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/admin/control-panel" className="font-mono text-xs uppercase tracking-widest">
-                    Control Panel
+                    {t("menu.controlPanel")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -213,7 +212,7 @@ export function SiteHeader() {
                   }}
                   className="font-mono text-xs uppercase tracking-widest text-foreground"
                 >
-                  Sign out
+                  {t("menu.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -221,6 +220,10 @@ export function SiteHeader() {
             <Link
               to="/login"
               className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-xs md:text-xs font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
+            >
+              {t("nav.login")}
+            </Link>
+
             >
               Login
             </Link>
