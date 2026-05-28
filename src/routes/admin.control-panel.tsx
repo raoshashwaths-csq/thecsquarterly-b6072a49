@@ -362,9 +362,15 @@ function OverviewTab() {
 function DiagnosticsTab() {
   const fn = useServerFn(getAgentObservability);
   const txFn = useServerFn(getQRunTranscript);
+  const projFn = useServerFn(getQCostProjection);
   const { data, isLoading, refetch, isFetching } = useQuery({
     queryKey: ["cp-agent-obs"],
     queryFn: () => fn(),
+    staleTime: 60_000,
+  });
+  const { data: proj, isLoading: projLoading } = useQuery({
+    queryKey: ["cp-q-cost-projection"],
+    queryFn: () => projFn(),
     staleTime: 60_000,
   });
   const [search, setSearch] = useState("");
@@ -390,6 +396,11 @@ function DiagnosticsTab() {
     }
   };
 
+  const coverage = data?.telemetryCoverage ?? 0;
+  const coveragePct = Math.round(coverage * 100);
+  const isReal = coverage >= 1;
+  const tileSuffix = isReal ? "" : " (est.)";
+
   return (
     <div>
       <TabHeader
@@ -408,16 +419,75 @@ function DiagnosticsTab() {
           [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[100px]" />)
         ) : (
           <>
-            <MetricCard accent label="Total Token Burn (est.)" value={fmtNum(data?.totalTokenBurn ?? 0)} sub={`≈ $${(data?.costUsd ?? 0).toFixed(2)} compute`} />
-            <MetricCard label="Avg Response Latency (est.)" value={`${fmtNum(data?.avgLatencyMs ?? 0)} ms`} sub="Payload-size proxy" />
-            <MetricCard label="Compute Profit Margin (est.)" value={`${data?.profitMarginPct ?? 0}%`} sub={`Rev ≈ $${(data?.revenueUsd ?? 0).toFixed(2)}`} />
+            <MetricCard accent label={`Total Token Burn${tileSuffix}`} value={fmtNum(data?.totalTokenBurn ?? 0)} sub={`≈ $${(data?.costUsd ?? 0).toFixed(2)} compute · 30d window`} />
+            <MetricCard label={`Avg Response Latency${tileSuffix}`} value={`${fmtNum(data?.avgLatencyMs ?? 0)} ms`} sub={isReal ? "Real per-run telemetry" : "Real where captured, else proxy"} />
+            <MetricCard label={`Compute Profit Margin${tileSuffix}`} value={`${data?.profitMarginPct ?? 0}%`} sub={`Rev ≈ $${(data?.revenueUsd ?? 0).toFixed(2)}`} />
             <MetricCard label="Total Runs (all-time)" value={fmtNum(data?.totalRuns ?? 0)} sub="Lifetime agent invocations" />
           </>
         )}
       </div>
       <p className="text-[10px] text-muted-foreground mb-6 font-mono uppercase tracking-[0.2em]">
-        Token, cost and latency are heuristics until per-run telemetry is captured on q_runs.
+        {isReal
+          ? `Telemetry coverage: 100% · all metrics from real per-run usage data.`
+          : `Telemetry coverage: ${coveragePct}% · ${coveragePct}% of last-30d runs have real token/latency/cost data; the rest fall back to heuristic.`}
       </p>
+
+      {/* Projected Compute Cost */}
+      <div className="rounded-md border border-border bg-card p-4 mb-6">
+        <div className="flex items-end justify-between mb-3">
+          <div>
+            <h3 className="font-display text-lg leading-none">Projected Compute Cost</h3>
+            <p className="text-[11px] text-muted-foreground mt-1">
+              Forward-looking spend at current run rate · last 30 days
+            </p>
+          </div>
+          {proj && (
+            <Badge variant="outline" className="text-[10px] uppercase tracking-[0.2em]">
+              {proj.basis === "real"
+                ? `Real · ${Math.round(proj.telemetryCoverage * 100)}% coverage`
+                : "Heuristic"}
+            </Badge>
+          )}
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+          {projLoading || !proj ? (
+            [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[100px]" />)
+          ) : (
+            <>
+              <MetricCard accent label="Cost / Run (avg)" value={formatUSD(proj.avgCostMicros)} sub={`Basis: ${proj.basis}`} />
+              <MetricCard label="Monthly Run Rate" value={fmtNum(proj.runs30d)} sub="Last 30 days · all runs" />
+              <MetricCard label="Projected Monthly Cost" value={formatUSD(proj.monthlyCostMicros, { fractionDigits: 2 })} sub="Run rate × avg cost / run" />
+              <MetricCard label="Projected Annual Cost" value={formatUSD(proj.annualCostMicros, { fractionDigits: 2 })} sub="Monthly × 12" />
+            </>
+          )}
+        </div>
+        {proj && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/30">
+                <tr className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  <th className="text-left font-normal py-2 px-3">Conversations</th>
+                  <th className="text-right font-normal py-2 px-3">Projected Cost</th>
+                  <th className="text-right font-normal py-2 px-3">Per Run</th>
+                </tr>
+              </thead>
+              <tbody>
+                {proj.projections.map((p) => (
+                  <tr key={p.conversations} className="border-t border-border">
+                    <td className="py-2 px-3 tabular-nums">{fmtNum(p.conversations)}</td>
+                    <td className="py-2 px-3 text-right tabular-nums">{formatUSD(p.costMicros, { fractionDigits: 2 })}</td>
+                    <td className="py-2 px-3 text-right tabular-nums text-muted-foreground">{formatUSD(proj.avgCostMicros)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="text-[10px] text-muted-foreground mt-3 font-mono uppercase tracking-[0.2em]">
+              Includes ~1.6× Lovable Gateway multiplier · replace with invoice data when available · edit constants in src/lib/q-pricing.ts
+            </p>
+          </div>
+        )}
+      </div>
+
 
       <div className="rounded-md border border-border bg-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">
