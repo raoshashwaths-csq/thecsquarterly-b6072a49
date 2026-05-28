@@ -115,7 +115,7 @@ function PricingPage() {
           <ComparisonTable />
         </section>
 
-        {/* Moat */}
+        {/* Value Onion */}
         <section className="max-w-6xl mx-auto px-6 pb-24">
           <BandHeader eyebrow="Let's peel the Value Onion" title="Five layers, not one." />
           <div className="grid md:grid-cols-5 gap-4">
