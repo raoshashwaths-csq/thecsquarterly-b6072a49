@@ -60,8 +60,7 @@ function SequencerPage() {
     }
   }, [seqsAuthError, qc]);
 
-    enabled: !!user,
-  });
+
 
   const [items, setItems] = useState<Item[]>([]);
   const [name, setName] = useState("");
