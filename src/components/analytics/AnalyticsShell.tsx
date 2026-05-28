@@ -23,9 +23,9 @@ export function AnalyticsShell({
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-10 pt-8 md:pt-12 pb-24 animate-fade-up">
         <Link
           to="/csfactors"
-          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-accent border-b border-transparent hover:border-accent pb-0.5 mb-6"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-foreground bg-card border border-border px-3 py-2 hover:border-accent hover:text-accent transition-colors mb-6"
         >
-          <ArrowLeft className="h-3 w-3" />
+          <ArrowLeft className="h-3.5 w-3.5" />
           Back to CSFactors
         </Link>
         <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-8 md:mb-12 pb-6 border-b border-border">
