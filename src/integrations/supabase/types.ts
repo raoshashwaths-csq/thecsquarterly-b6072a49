@@ -854,6 +854,7 @@ export type Database = {
         Row: {
           created_at: string
           current_period_end: string | null
+          designation: string | null
           id: string
           status: string
           stripe_customer_id: string | null
@@ -865,6 +866,7 @@ export type Database = {
         Insert: {
           created_at?: string
           current_period_end?: string | null
+          designation?: string | null
           id?: string
           status?: string
           stripe_customer_id?: string | null
@@ -876,6 +878,7 @@ export type Database = {
         Update: {
           created_at?: string
           current_period_end?: string | null
+          designation?: string | null
           id?: string
           status?: string
           stripe_customer_id?: string | null
