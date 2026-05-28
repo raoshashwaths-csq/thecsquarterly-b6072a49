@@ -172,41 +172,17 @@ export function QAgentButton() {
 
   return (
     <>
-      {/* Floating Meet Q. — unchanged */}
+      {/* Floating Meet Q. */}
       <button
         type="button"
         onClick={handleOpen}
         aria-label="Meet Q, the CS operator agent"
-        className={`group fixed bottom-20 right-5 md:bottom-28 md:right-8 z-40 flex items-end gap-0 pl-4 pr-3 py-2.5 md:pl-5 md:pr-4 md:py-3 bg-foreground text-background border border-foreground shadow-[0_12px_40px_-12px_rgba(0,0,0,0.55)] hover:shadow-[0_18px_50px_-12px_rgba(0,0,0,0.7)] transition-all duration-300 ${attention ? "q-attention" : ""}`}
+        className="group fixed bottom-20 right-5 md:bottom-28 md:right-8 z-40 flex items-end gap-0 pl-4 pr-3 py-2.5 md:pl-5 md:pr-4 md:py-3 bg-foreground text-background border border-foreground shadow-[0_12px_40px_-12px_rgba(0,0,0,0.55)] hover:shadow-[0_18px_50px_-12px_rgba(0,0,0,0.7)] transition-all duration-300"
       >
         <QMark className="font-display leading-none text-3xl md:text-4xl tracking-tight" periodClassName="text-accent ml-0.5 q-period" />
         <span className="sr-only">Meet Q.</span>
       </button>
 
-      {/* Rotating capability speech bubble */}
-      {bubble && (
-        <div
-          role="status"
-          aria-live="polite"
-          data-leaving={bubbleLeaving ? "true" : "false"}
-          onClick={dismissAttention}
-          className="q-hint fixed z-40 bottom-[6.25rem] right-[5.5rem] md:bottom-[8.25rem] md:right-[6.75rem] cursor-pointer select-none max-w-[260px] md:max-w-[320px]"
-          style={{ transform: "translateY(-50%)" }}
-        >
-          <div className="relative bg-foreground text-background px-4 py-2.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)]">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-1">
-              Meet <QMark periodClassName="text-accent" />
-            </div>
-            <div
-              key={bubbleIdx}
-              className="font-display text-[13px] md:text-sm leading-snug animate-fade-up"
-            >
-              {CAPABILITY_LINES[bubbleIdx]}
-            </div>
-            <span aria-hidden className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-foreground rotate-45" />
-          </div>
-        </div>
-      )}
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
@@ -250,13 +226,6 @@ export function QAgentButton() {
                 Workspace
               </button>
             </div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/55 mb-3">
-              {scope === "universal"
-                ? "Every dispatch, codex entry, playbook."
-                : user
-                  ? "Only your saved links, files, and highlights."
-                  : "Sign in to search your saved Workspace."}
-            </p>
 
             {/* Search bar with rolling placeholder */}
             <form onSubmit={handleAsk} className="mb-3">
