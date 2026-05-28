@@ -402,18 +402,21 @@ function DiagnosticsTab() {
         }
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-2">
         {isLoading ? (
           [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[100px]" />)
         ) : (
           <>
-            <MetricCard accent label="Total Token Burn" value={fmtNum(data?.totalTokenBurn ?? 0)} sub={`≈ $${(data?.costUsd ?? 0).toFixed(2)} compute`} />
-            <MetricCard label="Avg Response Latency" value={`${fmtNum(data?.avgLatencyMs ?? 0)} ms`} sub="Across last 500 runs" />
-            <MetricCard label="Compute Profit Margin" value={`${data?.profitMarginPct ?? 0}%`} sub={`Rev ≈ $${(data?.revenueUsd ?? 0).toFixed(2)}`} />
+            <MetricCard accent label="Total Token Burn (est.)" value={fmtNum(data?.totalTokenBurn ?? 0)} sub={`≈ $${(data?.costUsd ?? 0).toFixed(2)} compute`} />
+            <MetricCard label="Avg Response Latency (est.)" value={`${fmtNum(data?.avgLatencyMs ?? 0)} ms`} sub="Payload-size proxy" />
+            <MetricCard label="Compute Profit Margin (est.)" value={`${data?.profitMarginPct ?? 0}%`} sub={`Rev ≈ $${(data?.revenueUsd ?? 0).toFixed(2)}`} />
             <MetricCard label="Total Runs (all-time)" value={fmtNum(data?.totalRuns ?? 0)} sub="Lifetime agent invocations" />
           </>
         )}
       </div>
+      <p className="text-[10px] text-muted-foreground mb-6 font-mono uppercase tracking-[0.2em]">
+        Token, cost and latency are heuristics until per-run telemetry is captured on q_runs.
+      </p>
 
       <div className="rounded-md border border-border bg-card p-4 mb-6">
         <div className="flex items-center justify-between mb-3">

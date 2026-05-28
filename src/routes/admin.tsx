@@ -219,10 +219,10 @@ function DashboardSection() {
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard label="Published Articles" value={d?.posts ?? "—"} />
         <StatCard label="Codex Playbooks" value={d?.playbooks ?? "—"} />
-        <StatCard label="Active Members" value={d?.activeSubscriptions ?? "—"} hint="Community unlocks at 1,000" />
+        <StatCard label="Active Paid Members" value={d?.activeSubscriptions ?? "—"} hint="Practitioner and above" />
         <StatCard label="Newsletter Subscribers" value={d?.subscribers ?? "—"} />
         <StatCard label="Diagnostic Responses" value={d?.surveys ?? "—"} />
-        <StatCard label="Revenue" value={d ? `$${(d.revenueCents / 100).toFixed(0)}` : "—"} hint="From completed purchases" />
+        <StatCard label="MRR" value={d ? `$${(d.mrrCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : "—"} hint={d ? `ARR run-rate $${(d.arrCents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}` : "From active paid subs"} />
       </div>
       <div className="border border-border p-6">
         <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-2">Editorial cadence</div>
@@ -369,7 +369,7 @@ function SubscriptionsList() {
         empty="No members yet."
         cols={[
           { key: "user_id", label: "User", render: (r) => <code className="text-xs">{String(r.user_id).slice(0, 8)}</code> },
-          { key: "tier", label: "Tier" },
+          { key: "tier_label", label: "Tier" },
           { key: "status", label: "Status" },
           { key: "current_period_end", label: "Renews", render: (r) => fmtDate(r.current_period_end) },
           { key: "created_at", label: "Joined", render: (r) => fmtDate(r.created_at) },
