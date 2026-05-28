@@ -676,7 +676,7 @@ function JobsTab() {
 // 4. PUBLISHING (content + email)
 // ────────────────────────────────────────────────────────────────────
 
-const TIER_OPTIONS = ["Free", "Vanguard Individual", "Vanguard Pro", "Enterprise Team"];
+const TIER_OPTIONS = ["Reader", "Practitioner", "Operator", "Team", "Scale", "Enterprise", "Strategic Partner"];
 
 function PublishingTab() {
   return (
