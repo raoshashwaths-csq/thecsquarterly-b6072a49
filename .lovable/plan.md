@@ -1,70 +1,52 @@
-# CSFactors: Q Agent + Dashboard Polish
+## Context
+The CS Codex already has 6 published playbook entries in the database:
+- `cs-health-score-calculator` (Framework, 14pp)
+- `qbr-deck-template-pack` (Template, 12pp)
+- `90-day-onboarding-playbook` (Playbook, 22pp)
+- `churn-early-warning-system` (Framework, 16pp)
+- `cs-ai-readiness-diagnostic` (Diagnostic, 18pp)
+- `expansion-revenue-playbook` (Playbook, 20pp)
 
-Five additions to `/csfactors`, all frontend + one new server function. No schema changes.
+Currently, `codex.$slug.tsx` renders `pb.body` as plain markdown-style text for every playbook. The user wants these 6 playbooks replaced with rich interactive React components.
 
-## 1. Q Agent on the CSFactors dashboard
+## Plan
 
-Add a floating Q launcher (reusing `QMark` brand) in the bottom-right of `/csfactors`, opening a chat drawer scoped to the signed-in user's portfolio.
+### 1. Create `src/components/playbooks/` with 6 adapted components
+Rewrite each component to use the site's design system:
+- Replace all `bg-stone-*`, `text-stone-*`, `border-stone-*` with semantic tokens (`bg-card`, `text-foreground`, `border-border`, `bg-muted`, `text-muted-foreground`, etc.)
+- Replace `font-serif` with `font-display`; keep `font-mono` for mono sections
+- Replace hardcoded `accent-stone-800` range inputs with `accent` color via CSS custom property
+- Ensure all components render correctly in dark mode (no hardcoded light-only backgrounds)
+- Preserve all interactive logic: sliders, state, copy-to-clipboard, tab switching, live text generation
 
-**Server side** — new `src/lib/csfactors-q.functions.ts`:
-- `askCSFactorsQ` (`createServerFn` + `requireSupabaseAuth`)
-- Loads the caller's `cs_accounts` rows + related `cs_stakeholders`, `cs_contracts`, `cs_qbrs`, `cs_touchpoints` (whatever tables back the drawer today — will confirm during build by reading `csfactors.functions.ts`).
-- Compacts them into a JSON "portfolio context" (cap ~40KB; trim long notes).
-- Calls Lovable AI Gateway (`google/gemini-3-flash-preview`) via the shared `ai-gateway.server` helper with a system prompt: "You are Q, the analyst for The CS Quarterly's CSFactors command center. Answer only from the provided portfolio JSON. Cite account names verbatim. If the data does not contain the answer, say so."
-- Streams via `toUIMessageStreamResponse` to a `/api/csfactors-q` route (so we can use `useChat`).
+Components to create:
+- `HealthScoreCalculator.tsx` — 4 weighted sliders → composite score + risk status badge
+- `QbrDeckTemplatePack.tsx` — 12-slide selector with copyable raw-text templates
+- `OnboardingPlaybook.tsx` — 3-phase timeline + live handover script generator
+- `ChurnEarlyWarningSystem.tsx` — Risk-code table + accusation-audit email generator
+- `AiReadinessDiagnostic.tsx` — 3-pillar sliders → geometric mean + 90-day remediation plan
+- `ExpansionRevenuePlaybook.tsx` — Stakeholder hierarchy + expansion-motion matrix + trigger-based dispatch script
 
-**Client side** — `src/components/csfactors/QAgentDrawer.tsx`:
-- Sheet from the right (reuse `Sheet`), header with `QMark`, suggested-question chips derived from a logic tree (below), `useChat` transport pointed at `/api/csfactors-q`.
-- Floating trigger button bottom-right; hidden when drawer is open.
+### 2. Create `src/components/playbooks/index.tsx`
+Export a `PLAYBOOK_COMPONENTS` record mapping each of the 6 slugs to its component:
+```ts
+export const PLAYBOOK_COMPONENTS: Record<string, React.FC> = {
+  "cs-health-score-calculator": HealthScoreCalculator,
+  "qbr-deck-template-pack": QbrDeckTemplatePack,
+  "90-day-onboarding-playbook": OnboardingPlaybook,
+  "churn-early-warning-system": ChurnEarlyWarningSystem,
+  "cs-ai-readiness-diagnostic": AiReadinessDiagnostic,
+  "expansion-revenue-playbook": ExpansionRevenuePlaybook,
+};
+```
 
-## 2. Logic tree of starter questions
+### 3. Wire into `codex.$slug.tsx`
+In the unlocked content area of the playbook detail page, conditionally render the mapped component when `pb.slug` matches a key in `PLAYBOOK_COMPONENTS`. For all other slugs, keep the existing body-text rendering. The component renders inside the same `prose-content` container after a small eyebrow label indicating "Interactive Playbook".
 
-Mirror the original Q tree pattern (`src/lib/q-trees.ts`). Add `src/lib/csfactors-q-tree.ts` with grouped prompts the user clicks to seed the chat:
+No database changes are required — the 6 entries already exist with the correct slugs.
 
-- **Stakeholders** — "Who is the primary stakeholder at {account}?", "Which accounts have no exec sponsor mapped?"
-- **QBRs** — "Which QBRs were conducted last quarter?", "Which accounts are overdue for a QBR?"
-- **Sentiment** — "What's the sentiment trend across my book?", "Which Critical accounts moved from Positive in the last 30 days?"
-- **Leadership connects** — "When was the last leadership connect for {account}?", "Which accounts haven't had a leadership touch in 60+ days?"
-- **Renewals** — "What's at risk in the next 90 days?", "Top 3 renewals by ARR this quarter."
-
-Chips render inside the drawer's empty state and inject text into the composer.
-
-## 3. Light/dark theme toggle in the CSFactors top bar
-
-Add the existing `ThemeToggle` (already in `src/components/site/ThemeToggle.tsx`) to the `/csfactors` header row, immediately left of `ImportCsvDialog` / `AddAccountDialog`. No new component needed.
-
-## 4. Expand-on-hover for NPS + Sentiment cards
-
-Modify `AnalyticsHeader.tsx`:
-- Wrap each metric block in a `HoverCard` (already in `src/components/ui/hover-card.tsx`).
-- Hover content: enlarged chart + breakdown (NPS: promoters/passives/detractors counts and trailing trend bars from `RhythmBars`; Sentiment: per-bucket account list with `HealthChip`).
-- Trigger keeps the compact card; content is `w-[480px]` with `align="start"`.
-
-## 5. Fullscreen view for Master Account Matrix
-
-In `csfactors.tsx`'s `SectionCard` for the matrix:
-- Add a small icon button (`Maximize2` from lucide) in the section header's right slot.
-- Clicking opens a `Dialog` with `max-w-[98vw] h-[95vh]` rendering the same `<AccountsGrid />` with all 32 columns and the full row set. ESC / X to close.
-- State is local (`const [fullscreen, setFullscreen] = useState(false)`).
-
-## Files
-
-**New**
-- `src/lib/csfactors-q.functions.ts` — `askCSFactorsQ` server fn (portfolio context + Lovable AI)
-- `src/lib/csfactors-q-tree.ts` — starter-question groups
-- `src/routes/api/csfactors-q.ts` — streaming chat route (POST)
-- `src/components/csfactors/QAgentDrawer.tsx` — sheet + `useChat` + chip tree
-
-**Edited**
-- `src/routes/csfactors.tsx` — mount drawer, add theme toggle + fullscreen state + matrix dialog
-- `src/components/csfactors/AnalyticsHeader.tsx` — wrap NPS + sentiment in `HoverCard`
-- `src/components/csfactors/SectionCard.tsx` *(if it supports an actions slot; otherwise add inline trigger above the grid)*
-
-## Notes / assumptions
-
-- Q runs auth-gated (matches the security fix from earlier — no anonymous trial here).
-- No new DB tables; chat history is in-memory for the session (matches "no persistence" — confirm if you want threads later).
-- Reuses existing design tokens (`--accent`, `--secondary-accent`, emerald/destructive). No new colors.
-- Mono labels + `QMark` for brand consistency.
-
-Confirm and I'll build it.
+## Technical notes
+- All 6 components are client-only (useState, useMemo, clipboard API). No SSR concerns.
+- The copy-to-clipboard calls use `navigator.clipboard.writeText`.
+- The `OnboardingPlaybook.tsx` has a bug in the original (`navigator.clipboard.text = script`) — fix to `writeText`.
+- No new dependencies needed. Lucide icons are already available.
