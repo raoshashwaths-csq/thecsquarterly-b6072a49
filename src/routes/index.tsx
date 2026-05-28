@@ -88,6 +88,7 @@ function HomePage() {
         <div className="mt-12 flex justify-center">
           <Link
             to="/csfactors"
+            data-tour="csf-box"
             className="group relative w-full max-w-2xl bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 text-left flex flex-col md:flex-row md:items-center gap-5"
             aria-label="Open CSFactors Command Centre"
           >
@@ -118,6 +119,7 @@ function HomePage() {
         <div className="mt-4 flex justify-center">
           <Link
             to="/account/workspace"
+            data-tour="workspace-icon"
             className="group w-full max-w-2xl inline-flex items-center gap-4 bg-card border border-border hover:border-accent transition-colors p-4 md:p-5 text-left"
             aria-label="Open your Workspace"
           >

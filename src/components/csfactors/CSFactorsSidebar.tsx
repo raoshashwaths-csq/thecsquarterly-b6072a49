@@ -87,7 +87,7 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
           </div>
 
           {/* Analytics group */}
-          <div className="mt-4 px-2">
+          <div className="mt-4 px-2" data-tour="analytics-dropdown">
             <button
               type="button"
               onClick={toggleAnalytics}

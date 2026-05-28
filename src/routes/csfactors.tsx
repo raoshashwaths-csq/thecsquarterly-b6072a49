@@ -214,7 +214,7 @@ function CSFactorsPageInner() {
           </header>
 
           {user ? (
-            <section className="mb-8">
+            <section className="mb-8" data-tour="ask-q">
               <QErrorBoundary label="Q · CSFactors">
                 <AskQInline
                   onSubmit={handleDockSubmit}
