@@ -189,6 +189,7 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       node_id: "csfactors-ask",
       context: { question: data.question.slice(0, 200) },
       witty: false,
+      zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 4000) },
     });
 
     return {
