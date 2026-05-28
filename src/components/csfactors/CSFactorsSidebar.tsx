@@ -135,7 +135,7 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
           </div>
 
           {/* Standalone */}
-          <div className="mt-4 px-2">
+          <div className="mt-4 px-2" data-tour="standalone-modules">
             {!collapsed && (
               <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-xs font-semibold text-foreground/50">
                 Modules
