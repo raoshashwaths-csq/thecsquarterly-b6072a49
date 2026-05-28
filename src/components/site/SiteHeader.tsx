@@ -158,47 +158,47 @@ export function SiteHeader() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/account/workspace" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/account/workspace" className="font-mono text-xs uppercase tracking-widest">
                     Your Workspace
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/account" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/account" className="font-mono text-xs uppercase tracking-widest">
                     Account
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/admin" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/admin" className="font-mono text-xs uppercase tracking-widest">
                     Admin
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/calculator" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/calculator" className="font-mono text-xs uppercase tracking-widest">
                     ROI Calculator
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/benchmarks" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/benchmarks" className="font-mono text-xs uppercase tracking-widest">
                     Benchmarks
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/directory" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/directory" className="font-mono text-xs uppercase tracking-widest">
                     Directory
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/teams" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/teams" className="font-mono text-xs uppercase tracking-widest">
                     Teams
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/sequencer" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/sequencer" className="font-mono text-xs uppercase tracking-widest">
                     Sequencer
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/admin/control-panel" className="font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/admin/control-panel" className="font-mono text-xs uppercase tracking-widest">
                     Control Panel
                   </Link>
                 </DropdownMenuItem>
@@ -207,7 +207,7 @@ export function SiteHeader() {
                   onSelect={() => {
                     void supabase.auth.signOut();
                   }}
-                  className="font-mono text-[11px] uppercase tracking-widest text-foreground"
+                  className="font-mono text-xs uppercase tracking-widest text-foreground"
                 >
                   Sign out
                 </DropdownMenuItem>
@@ -216,7 +216,7 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/login"
-              className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-xs md:text-[11px] font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
+              className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-xs md:text-xs font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
             >
               Login
             </Link>

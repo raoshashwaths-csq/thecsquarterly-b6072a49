@@ -190,7 +190,7 @@ function MetricCard({ label, value, sub, accent }: { label: string; value: strin
       eyebrow={label}
       value={value}
       accent={accent ? "accent" : "neutral"}
-      footer={sub ? <span className="text-[11px] text-muted-foreground">{sub}</span> : undefined}
+      footer={sub ? <span className="text-xs text-muted-foreground">{sub}</span> : undefined}
     />
   );
 }
@@ -280,7 +280,7 @@ function OverviewTab() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-display text-lg leading-none">Sessions vs Registrations</h3>
-            <p className="text-[11px] text-muted-foreground mt-1">Rolling 30-day window</p>
+            <p className="text-xs text-muted-foreground mt-1">Rolling 30-day window</p>
           </div>
           <Badge variant="outline" className="text-xs uppercase tracking-[0.2em]">Live</Badge>
         </div>
@@ -310,7 +310,7 @@ function OverviewTab() {
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div>
             <h3 className="font-display text-lg leading-none">Latest User Registrations</h3>
-            <p className="text-[11px] text-muted-foreground mt-1">Most recent 25 sign-ups</p>
+            <p className="text-xs text-muted-foreground mt-1">Most recent 25 sign-ups</p>
           </div>
           <div className="w-64"><SearchInput value={search} onChange={setSearch} placeholder="Search email or tier…" /></div>
         </div>
@@ -437,7 +437,7 @@ function DiagnosticsTab() {
         <div className="flex items-end justify-between mb-3">
           <div>
             <h3 className="font-display text-lg leading-none">Projected Compute Cost</h3>
-            <p className="text-[11px] text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Forward-looking spend at current run rate · last 30 days
             </p>
           </div>
@@ -493,7 +493,7 @@ function DiagnosticsTab() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-display text-lg leading-none">Path Frequency Heatmap</h3>
-            <p className="text-[11px] text-muted-foreground mt-1">Interaction tree usage (last 30 days)</p>
+            <p className="text-xs text-muted-foreground mt-1">Interaction tree usage (last 30 days)</p>
           </div>
         </div>
         <div className="h-[220px]">
@@ -515,7 +515,7 @@ function DiagnosticsTab() {
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div>
             <h3 className="font-display text-lg leading-none">Execution Logs</h3>
-            <p className="text-[11px] text-muted-foreground mt-1">Last 100 runs · click View Transcript for scrubbed payload</p>
+            <p className="text-xs text-muted-foreground mt-1">Last 100 runs · click View Transcript for scrubbed payload</p>
           </div>
           <div className="w-64"><SearchInput value={search} onChange={setSearch} placeholder="Search operator or node…" /></div>
         </div>
@@ -543,7 +543,7 @@ function DiagnosticsTab() {
                   <tr key={r.id} className="border-t border-border hover:bg-muted/20">
                     <td className="py-2 px-3 text-muted-foreground tabular-nums">{fmtDateTime(r.created_at)}</td>
                     <td className="py-2 px-3 truncate max-w-[220px]">{r.operator_email}</td>
-                    <td className="py-2 px-3 font-mono text-[11px]">{r.node_id}</td>
+                    <td className="py-2 px-3 font-mono text-xs">{r.node_id}</td>
                     <td className="py-2 px-3 tabular-nums">{r.latency_ms} ms</td>
                     <td className="py-2 px-3">
                       <Badge variant={r.sentiment === "up" ? "default" : "secondary"} className="text-xs">
@@ -657,7 +657,7 @@ function JobsTab() {
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div>
               <h3 className="font-display text-lg leading-none">Pending Approval</h3>
-              <p className="text-[11px] text-muted-foreground mt-1">{pending.length} inbound posting{pending.length === 1 ? "" : "s"}</p>
+              <p className="text-xs text-muted-foreground mt-1">{pending.length} inbound posting{pending.length === 1 ? "" : "s"}</p>
             </div>
             <div className="w-48"><SearchInput value={pendingSearch} onChange={setPendingSearch} placeholder="Search…" /></div>
           </div>
@@ -700,7 +700,7 @@ function JobsTab() {
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div>
               <h3 className="font-display text-lg leading-none">Live Inventory</h3>
-              <p className="text-[11px] text-muted-foreground mt-1">{active.length} active listing{active.length === 1 ? "" : "s"}</p>
+              <p className="text-xs text-muted-foreground mt-1">{active.length} active listing{active.length === 1 ? "" : "s"}</p>
             </div>
             <div className="w-48"><SearchInput value={activeSearch} onChange={setActiveSearch} placeholder="Search…" /></div>
           </div>
@@ -739,7 +739,7 @@ function JobsTab() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-md border border-border bg-card p-3 text-[11px] text-muted-foreground">
+      <div className="mt-4 rounded-md border border-border bg-card p-3 text-xs text-muted-foreground">
         Listing package tiers: {JOB_TIERS.map((t) => `$${t}`).join(" · ")}
       </div>
     </div>
@@ -807,7 +807,7 @@ function ArticleComposer() {
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div>
           <h3 className="font-display text-lg leading-none">Article Composer</h3>
-          <p className="text-[11px] text-muted-foreground mt-1">Markdown body · tier-gated publish</p>
+          <p className="text-xs text-muted-foreground mt-1">Markdown body · tier-gated publish</p>
         </div>
         <Badge variant="outline" className="text-xs">Drafts not auto-saved</Badge>
       </div>
@@ -899,7 +899,7 @@ function MailerCenter() {
     <div className="rounded-md border border-border bg-card">
       <div className="p-4 border-b border-border">
         <h3 className="font-display text-lg leading-none">Mailer Center</h3>
-        <p className="text-[11px] text-muted-foreground mt-1">Transactional loops · rewrite body & broadcast test</p>
+        <p className="text-xs text-muted-foreground mt-1">Transactional loops · rewrite body & broadcast test</p>
       </div>
 
       <div className="divide-y divide-border">
@@ -916,7 +916,7 @@ function MailerCenter() {
               <div className="font-medium text-sm">{t.displayName}</div>
               <Badge variant="outline" className="text-xs">{t.cadence}</Badge>
             </div>
-            <div className="text-[11px] text-muted-foreground mt-0.5 truncate">{t.subject}</div>
+            <div className="text-xs text-muted-foreground mt-0.5 truncate">{t.subject}</div>
           </button>
         ))}
       </div>
@@ -1015,7 +1015,7 @@ function UsersTab() {
               ))}
             </SelectContent>
           </Select>
-          <div className="text-[11px] text-muted-foreground tabular-nums">{filtered.length} users</div>
+          <div className="text-xs text-muted-foreground tabular-nums">{filtered.length} users</div>
         </div>
 
         <div className="overflow-x-auto max-h-[640px]">
@@ -1042,7 +1042,7 @@ function UsersTab() {
                   <tr key={u.id} className="border-t border-border hover:bg-muted/20">
                     <td className="py-2 px-3 font-medium">
                       {u.display_name || "—"}
-                      {u.is_admin && <Badge variant="default" className="ml-2 text-[9px]">admin</Badge>}
+                      {u.is_admin && <Badge variant="default" className="ml-2 text-xs">admin</Badge>}
                     </td>
                     <td className="py-2 px-3 text-muted-foreground">{u.email}</td>
                     <td className="py-2 px-3">

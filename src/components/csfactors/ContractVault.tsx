@@ -189,7 +189,7 @@ export function ContractVault({
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                 <div>
-                  <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Type</label>
+                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Type</label>
                   <Select value={r.doc_type} onValueChange={(v) => patch(r, { doc_type: v })}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -201,7 +201,7 @@ export function ContractVault({
                   </Select>
                 </div>
                 <div>
-                  <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Signed value ($)</label>
+                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Signed value ($)</label>
                   <Input
                     type="number"
                     defaultValue={r.signed_value_cents !== null ? r.signed_value_cents / 100 : ""}
@@ -213,7 +213,7 @@ export function ContractVault({
                   />
                 </div>
                 <div>
-                  <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Executed on</label>
+                  <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Executed on</label>
                   <Input
                     type="date"
                     defaultValue={r.executed_on ?? ""}

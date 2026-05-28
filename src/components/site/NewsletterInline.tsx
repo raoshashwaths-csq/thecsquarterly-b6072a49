@@ -45,7 +45,7 @@ export function NewsletterInline({
         <button
           type="submit"
           disabled={status === "loading" || status === "ok"}
-          className="font-mono text-[11px] uppercase tracking-widest font-bold whitespace-nowrap sm:pl-4 hover:text-accent disabled:opacity-50 py-2 sm:py-0 border border-foreground sm:border-0 self-start sm:self-auto px-4 sm:px-0 hover:bg-foreground hover:text-background sm:hover:bg-transparent sm:hover:text-accent transition-colors"
+          className="font-mono text-xs uppercase tracking-widest font-bold whitespace-nowrap sm:pl-4 hover:text-accent disabled:opacity-50 py-2 sm:py-0 border border-foreground sm:border-0 self-start sm:self-auto px-4 sm:px-0 hover:bg-foreground hover:text-background sm:hover:bg-transparent sm:hover:text-accent transition-colors"
         >
           {status === "loading" ? "Subscribing…" : status === "ok" ? "Subscribed" : cta}
         </button>

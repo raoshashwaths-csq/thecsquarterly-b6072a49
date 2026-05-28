@@ -53,7 +53,7 @@ function InsightsPage() {
           <button
             key={c}
             onClick={() => setActive(c)}
-            className={`font-mono text-[11px] uppercase tracking-widest px-4 py-2 border transition-colors ${
+            className={`font-mono text-xs uppercase tracking-widest px-4 py-2 border transition-colors ${
               active === c
                 ? "bg-foreground text-background border-foreground"
                 : "border-border hover:border-foreground"

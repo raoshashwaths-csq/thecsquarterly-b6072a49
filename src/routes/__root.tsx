@@ -27,14 +27,14 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-accent mb-4">404</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-accent mb-4">404</p>
         <h1 className="font-display text-5xl mb-4">Page not found.</h1>
         <p className="text-muted-foreground mb-8">
           That dispatch was never published. Head back to the front page.
         </p>
         <Link
           to="/"
-          className="inline-block px-6 py-3 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest"
+          className="inline-block px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-widest"
         >
           Go home
         </Link>
@@ -49,7 +49,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <p className="font-mono text-[11px] uppercase tracking-widest text-accent mb-4">Error</p>
+        <p className="font-mono text-xs uppercase tracking-widest text-accent mb-4">Error</p>
         <h1 className="font-display text-4xl mb-4">This page didn't load.</h1>
         <p className="text-muted-foreground mb-8">{error.message || "Something went wrong."}</p>
         <button
@@ -57,7 +57,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             router.invalidate();
             reset();
           }}
-          className="px-6 py-3 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest"
+          className="px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-widest"
         >
           Try again
         </button>

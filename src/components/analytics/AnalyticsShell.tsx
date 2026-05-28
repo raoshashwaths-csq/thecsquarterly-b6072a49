@@ -53,7 +53,7 @@ export function AnalyticsEmpty({ message }: { message: string }) {
       <p className="text-sm text-foreground/70 mb-4">{message}</p>
       <Link
         to="/csfactors"
-        className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1"
+        className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1"
       >
         Add accounts in CSFactors →
       </Link>

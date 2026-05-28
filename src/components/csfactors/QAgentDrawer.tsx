@@ -219,7 +219,7 @@ export function QAgentLauncher({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 pl-4 pr-5 py-3 bg-accent text-accent-foreground shadow-lg hover:opacity-95 transition-opacity font-mono text-[11px] uppercase tracking-[0.2em] font-semibold"
+      className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 pl-4 pr-5 py-3 bg-accent text-accent-foreground shadow-lg hover:opacity-95 transition-opacity font-mono text-xs uppercase tracking-[0.2em] font-semibold"
       aria-label="Ask Q about your portfolio"
     >
       <span className="font-display text-base normal-case tracking-normal">

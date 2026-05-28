@@ -138,7 +138,7 @@ function AccountPage() {
               {events.map((e) => (
                 <li key={e.id} className="py-3 flex items-baseline justify-between gap-4">
                   <div>
-                    <div className="font-mono text-[11px] uppercase tracking-widest text-accent">{e.kind}</div>
+                    <div className="font-mono text-xs uppercase tracking-widest text-accent">{e.kind}</div>
                     <div className="text-xs text-muted-foreground">{JSON.stringify(e.payload)}</div>
                   </div>
                   <time className="font-mono text-xs text-muted-foreground tabular-nums">

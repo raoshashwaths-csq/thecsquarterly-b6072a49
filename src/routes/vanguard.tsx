@@ -35,7 +35,7 @@ export const Route = createFileRoute("/vanguard")({
               to="/codex"
               className="group block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-8"
             >
-              <div className="font-mono text-[11px] text-secondary-accent font-semibold mb-3">The Codex</div>
+              <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">The Codex</div>
               <h3 className="font-display text-2xl md:text-3xl mb-2 leading-tight">
                 Vanguard playbooks, ready to run.
               </h3>
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/vanguard")({
               to="/ai-readiness"
               className="group block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-8"
             >
-              <div className="font-mono text-[11px] text-secondary-accent font-semibold mb-3">The Diagnostic</div>
+              <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">The Diagnostic</div>
               <h3 className="font-display text-2xl md:text-3xl mb-2 leading-tight">
                 Benchmark your Vanguard motion.
               </h3>

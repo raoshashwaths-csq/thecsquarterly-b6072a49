@@ -229,7 +229,7 @@ function PostPage() {
         {post.excerpt}
       </p>
       <AudioBar text={body} title={post.title} inline onProgress={setProgress} />
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-10 border-b border-border font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-10 border-b border-border font-mono text-xs uppercase tracking-widest text-muted-foreground">
         <div className="flex items-center gap-4">
           <span>By {post.author}</span>
           <span>·</span>
@@ -357,7 +357,7 @@ function PostPage() {
       <div className="max-w-3xl mx-auto px-6 py-12">
         <Link
           to="/insights"
-          className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
+          className="font-mono text-xs uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
         >
           ← Back to all insights
         </Link>

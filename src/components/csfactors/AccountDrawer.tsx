@@ -210,7 +210,7 @@ function Section({ value, title, children }: { value: string; title: string; chi
   return (
     <AccordionItem value={value} className="border border-border bg-card">
       <AccordionTrigger className="px-4 py-3 hover:no-underline">
-        <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-foreground/80">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/80">
           {title}
         </span>
       </AccordionTrigger>

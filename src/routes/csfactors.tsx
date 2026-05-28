@@ -202,7 +202,7 @@ function CSFactorsPageInner() {
               <p className="text-sm text-foreground/70 mb-4">
                 Sign in to see your personalized command center.
               </p>
-              <Link to="/login" className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+              <Link to="/login" className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
                 Sign in →
               </Link>
             </div>

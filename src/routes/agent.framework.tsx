@@ -107,7 +107,7 @@ function AgentFrameworkPage() {
                     : "border-border hover:border-foreground"
                 }`}
               >
-                <div className={`font-mono text-[9px] uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
+                <div className={`font-mono text-xs uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
                   {cleanEyebrow(t.eyebrow)}
                 </div>
                 <div className="font-display text-base leading-tight break-words">{t.title}</div>
@@ -253,7 +253,7 @@ function TerminalCard({
         </span>
         <div className="min-w-0 flex-1">
           {parent && (
-            <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/45 mb-1 break-words">
+            <div className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/45 mb-1 break-words">
               {parent.label}
             </div>
           )}
@@ -446,7 +446,7 @@ function RunHistory() {
                     <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55">
                       {date.toLocaleDateString()}
                     </div>
-                    <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-foreground/40 mt-1">
+                    <div className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40 mt-1">
                       {r.witty ? "Witty" : "Analytical"}{r.shared ? " · Shared" : ""}
                     </div>
                   </div>

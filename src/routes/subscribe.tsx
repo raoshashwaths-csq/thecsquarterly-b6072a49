@@ -187,13 +187,13 @@ function TierConfirm({ designation }: { designation: Designation }) {
 
         <div className="grid grid-cols-2 gap-3 my-6 pb-6 border-b border-border">
           <div>
-            <div className="font-mono text-[9px] uppercase tracking-widest text-foreground/50 mb-1">
+            <div className="font-mono text-xs uppercase tracking-widest text-foreground/50 mb-1">
               Seats
             </div>
             <div className="text-sm font-medium">{tier.seatCap}</div>
           </div>
           <div>
-            <div className="font-mono text-[9px] uppercase tracking-widest text-foreground/50 mb-1">
+            <div className="font-mono text-xs uppercase tracking-widest text-foreground/50 mb-1">
               <QMark /> sessions
             </div>
             <div className="text-sm font-medium">{tier.qCap}</div>

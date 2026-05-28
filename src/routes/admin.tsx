@@ -104,7 +104,7 @@ function AdminPage() {
           </div>
           <Link
             to="/admin/control-panel"
-            className="font-mono text-[11px] uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
+            className="font-mono text-xs uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
           >
             Open Control Panel →
           </Link>
@@ -134,7 +134,7 @@ function AdminPage() {
                               <Icon className="h-4 w-4 shrink-0" />
                               <span className="flex-1 truncate">{item.key === "q-agent" ? <><QMark /> Operator Agent</> : item.label}</span>
                               {item.soon && (
-                                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground border border-border px-1.5 py-0.5">
+                                <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground border border-border px-1.5 py-0.5">
                                   Soon
                                 </span>
                               )}
@@ -663,7 +663,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
     <label className="block">
       <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">{label}</div>
       {children}
-      {hint && <div className="text-[11px] text-muted-foreground mt-1.5 leading-snug">{hint}</div>}
+      {hint && <div className="text-xs text-muted-foreground mt-1.5 leading-snug">{hint}</div>}
     </label>
   );
 }

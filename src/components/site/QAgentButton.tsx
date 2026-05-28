@@ -266,7 +266,7 @@ export function QAgentButton() {
               <button
                 type="submit"
                 disabled={loading || gated || !query.trim()}
-                className="w-full mt-2 py-3.5 bg-foreground text-background font-mono text-[11px] uppercase tracking-[0.3em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full mt-2 py-3.5 bg-foreground text-background font-mono text-xs uppercase tracking-[0.3em] hover:bg-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {loading ? <><QMark periodClassName="text-accent-foreground/70" /> is thinking…</> : needsSignIn ? "Sign in to ask" : gated ? "Trial used" : <>Ask <QMark periodClassName="text-accent-foreground/70" /></>}
               </button>
@@ -275,7 +275,7 @@ export function QAgentButton() {
             {/* Suggested Vectors — premium parchment pills, always visible */}
             {!answer && (
               <div className="mb-5">
-                <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+                <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
                   Suggested Vectors
                 </div>
                 <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">

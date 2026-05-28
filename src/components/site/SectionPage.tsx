@@ -80,7 +80,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
           <div className="grid md:grid-cols-3 gap-x-12 gap-y-12">
             {pillars.map((p) => (
               <article key={p.number} className="border-t border-border pt-6">
-                <div className="font-mono text-[11px] text-secondary-accent mb-3">{p.number}</div>
+                <div className="font-mono text-xs text-secondary-accent mb-3">{p.number}</div>
                 <h3 className="font-display text-2xl mb-3 leading-tight">{p.title}</h3>
                 <p className="text-foreground/70 text-pretty">{p.body}</p>
               </article>
@@ -97,7 +97,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
           <div className="grid md:grid-cols-3 gap-x-12 gap-y-12">
             {pillars.map((p) => (
               <article key={p.number} className="border-t border-border pt-6">
-                <div className="font-mono text-[11px] text-secondary-accent mb-3">{p.number}</div>
+                <div className="font-mono text-xs text-secondary-accent mb-3">{p.number}</div>
                 <h3 className="font-display text-xl mb-3 leading-tight">{p.title}</h3>
                 <p className="text-sm text-foreground/70 text-pretty">{p.body}</p>
               </article>

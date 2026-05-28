@@ -64,7 +64,7 @@ export function SeriesRail({
                 <div className={`text-sm leading-snug ${isCurrent ? "font-semibold" : ""}`}>
                   {p.title}
                 </div>
-                <div className="font-mono text-[9px] uppercase tracking-widest mt-1 text-muted-foreground">
+                <div className="font-mono text-xs uppercase tracking-widest mt-1 text-muted-foreground">
                   {released ? (
                     isCurrent ? "Reading now" : "Available"
                   ) : (

@@ -84,7 +84,7 @@ function ExecutiveAnalyticsPage() {
         <SiteHeader />
         <main className="flex-1 max-w-5xl mx-auto px-6 py-16 w-full text-center">
           <p className="text-foreground/70 mb-4">Sign in to view executive analytics.</p>
-          <Link to="/login" className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+          <Link to="/login" className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
             Sign in →
           </Link>
         </main>
@@ -183,7 +183,7 @@ function ExecutiveAnalyticsPage() {
           ) : accounts.length === 0 ? (
             <div className="py-12 text-center">
               <p className="text-sm text-foreground/70 mb-4">No accounts yet.</p>
-              <Link to="/csfactors" className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+              <Link to="/csfactors" className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
                 Open CSFactors to add →
               </Link>
             </div>

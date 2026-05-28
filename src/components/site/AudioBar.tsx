@@ -231,7 +231,7 @@ export function AudioBar({
         )}
         <button
           onClick={(e) => { e.stopPropagation(); cycleRate(); }}
-          className="flex items-center gap-1.5 px-2 py-1.5 text-[11px] font-mono uppercase tracking-wider hover:bg-muted rounded"
+          className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-mono uppercase tracking-wider hover:bg-muted rounded"
           aria-label="Change playback speed"
         >
           <Gauge className="w-3.5 h-3.5" /> {rate}x

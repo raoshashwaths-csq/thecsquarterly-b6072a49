@@ -39,7 +39,7 @@ function ApiManagementPage() {
         <SiteHeader />
         <main className="flex-1 max-w-3xl mx-auto px-6 py-16 w-full text-center">
           <p className="text-foreground/70 mb-4">Sign in to manage API access.</p>
-          <Link to="/login" className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+          <Link to="/login" className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
             Sign in →
           </Link>
         </main>
@@ -68,7 +68,7 @@ function ApiManagementPage() {
             <button
               type="button"
               onClick={() => toast.info("Token minting is concierge — we'll provision your first key. Contact us at ops@thecsquarterly.com.")}
-              className="px-5 py-2.5 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest hover:opacity-90 transition-opacity"
+              className="px-5 py-2.5 bg-foreground text-background font-mono text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
             >
               Generate token
             </button>

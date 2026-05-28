@@ -184,7 +184,7 @@ export function ImportCsvDialog() {
             <summary className="cursor-pointer font-mono uppercase tracking-widest text-xs text-muted-foreground">
               View full column list ({HEADERS.length})
             </summary>
-            <div className="block mt-2 text-[11px] font-mono bg-muted p-3 border border-border overflow-x-auto leading-relaxed">
+            <div className="block mt-2 text-xs font-mono bg-muted p-3 border border-border overflow-x-auto leading-relaxed">
               {HEADERS.map((h, i) => (
                 <span key={h}>
                   {i > 0 && ", "}

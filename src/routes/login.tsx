@@ -81,12 +81,12 @@ function LoginPage() {
             <button
               type="button"
               onClick={() => setMode("signin")}
-              className={`flex-1 py-3 font-mono text-[11px] uppercase tracking-widest ${mode === "signin" ? "bg-foreground text-background" : "hover:bg-muted"}`}
+              className={`flex-1 py-3 font-mono text-xs uppercase tracking-widest ${mode === "signin" ? "bg-foreground text-background" : "hover:bg-muted"}`}
             >Sign in</button>
             <button
               type="button"
               onClick={() => setMode("signup")}
-              className={`flex-1 py-3 font-mono text-[11px] uppercase tracking-widest ${mode === "signup" ? "bg-foreground text-background" : "hover:bg-muted"}`}
+              className={`flex-1 py-3 font-mono text-xs uppercase tracking-widest ${mode === "signup" ? "bg-foreground text-background" : "hover:bg-muted"}`}
             >Create account</button>
           </div>
           <form onSubmit={onSubmit} className="space-y-4">
@@ -153,7 +153,7 @@ function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest hover:bg-accent transition-colors disabled:opacity-50"
+              className="w-full py-4 bg-foreground text-background font-mono text-xs uppercase tracking-widest hover:bg-accent transition-colors disabled:opacity-50"
             >
               {loading ? "…" : mode === "signin" ? "Sign in" : "Create account"}
             </button>

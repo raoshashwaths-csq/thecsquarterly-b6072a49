@@ -70,7 +70,7 @@ function NoticeBadge({ a }: { a: CSAccount }) {
   };
   if (!band) return null;
   return (
-    <span className="inline-flex items-center px-1.5 py-0.5 ml-2 font-mono uppercase tracking-widest text-[9px] border border-accent/60 bg-accent/10 text-accent">
+    <span className="inline-flex items-center px-1.5 py-0.5 ml-2 font-mono uppercase tracking-widest text-xs border border-accent/60 bg-accent/10 text-accent">
       {band}d · {days}d out
     </span>
   );
