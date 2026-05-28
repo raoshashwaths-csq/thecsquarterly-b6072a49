@@ -70,16 +70,16 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
           Rewrite with Q.
         </Button>
       </div>
-      <div className="grid md:grid-cols-3 gap-px bg-border border border-border">
+      <div className="grid md:grid-cols-3 gap-4 md:gap-px bg-transparent md:bg-border border-0 md:border border-border">
         {items.map((it) => (
           <div
             key={it.id}
             className={cn(
-              "bg-card p-5 border-l-[3px] flex flex-col gap-2",
+              "bg-card p-5 border-l-[3px] border-r border-t border-b md:border-r-0 md:border-t-0 md:border-b-0 border-border flex flex-col gap-2",
               ACCENT[it.accent],
             )}
           >
-            <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            <div className="font-mono uppercase tracking-[0.25em] text-xs text-muted-foreground">
               {it.accent === "danger" ? "At risk" : it.accent === "warn" ? "Overdue" : "Upcoming"}
             </div>
             <div className="font-display text-lg leading-snug tracking-tight">{it.headline}</div>

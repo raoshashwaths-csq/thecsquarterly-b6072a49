@@ -128,7 +128,7 @@ function HomePage() {
       {/* Sections strip */}
       <section className="max-w-7xl w-full mx-auto px-6 py-16 animate-fade-up [animation-delay:300ms]">
         <div className="flex items-end justify-between mb-10">
-          <div className="font-mono text-[11px] uppercase tracking-widest text-foreground font-semibold">
+          <div className="font-mono text-xs uppercase tracking-widest text-foreground font-semibold">
             The Sections
           </div>
           <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
@@ -143,7 +143,7 @@ function HomePage() {
               className="group relative block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-6 pt-7"
             >
               <span aria-hidden className="absolute top-0 left-6 right-6 h-px bg-foreground/80" />
-              <div className="font-mono text-[11px] text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
+              <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
               <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">{s.name}</h2>
               <p className="text-sm text-foreground/65 text-pretty mb-4">{s.blurb}</p>
               <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors">
@@ -165,7 +165,7 @@ function HomePage() {
 
           <div className="grid lg:grid-cols-12 gap-16">
             <div className="lg:col-span-7">
-              <div className="mb-8 font-mono text-[11px] text-accent font-medium">
+              <div className="mb-8 font-mono text-xs text-accent font-medium">
                 Insight #{posts.length.toString().padStart(3, "0")}, {featured.read_minutes} min read
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
@@ -188,7 +188,7 @@ function HomePage() {
               <Link
                 to="/insights/$slug"
                 params={{ slug: featured.slug }}
-                className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
+                className="font-mono text-xs uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
               >
                 Read the full essay
               </Link>
@@ -215,7 +215,7 @@ function HomePage() {
                 </p>
                 <Link
                   to="/ai-readiness"
-                  className="inline-block w-full text-center py-4 border border-background/30 hover:bg-background hover:text-foreground transition-all font-mono text-[11px] uppercase tracking-widest"
+                  className="inline-block w-full text-center py-4 border border-background/30 hover:bg-background hover:text-foreground transition-all font-mono text-xs uppercase tracking-widest"
                 >
                   Start Survey
                 </Link>
@@ -232,7 +232,7 @@ function HomePage() {
             <h2 className="font-display text-4xl">Recent Dispatches</h2>
             <Link
               to="/insights"
-              className="font-mono text-[11px] uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
+              className="font-mono text-xs uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
             >
               View all
             </Link>

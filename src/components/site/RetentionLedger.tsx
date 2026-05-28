@@ -20,7 +20,7 @@ export function RetentionLedger() {
           The Retention Ledger
         </div>
         <div className="overflow-hidden flex-1 relative">
-          <div className="flex gap-10 py-2 animate-marquee whitespace-nowrap font-mono text-[11px] tracking-wide">
+          <div className="flex gap-10 py-2 animate-marquee whitespace-nowrap font-mono text-xs tracking-wide">
             {items.map((t, i) => (
               <span key={i} className="opacity-80">
                 <span className="text-secondary-accent mr-2">◆</span>{t}

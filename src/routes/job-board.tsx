@@ -186,12 +186,12 @@ function JobBoardPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       {j.featured && (
-                        <span className="inline-flex items-center gap-1 font-mono text-[9px] uppercase tracking-widest text-secondary-accent">
+                        <span className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-widest text-secondary-accent">
                           <Star size={10} /> Featured
                         </span>
                       )}
                       {j.confidential && (
-                        <span className="font-mono text-[9px] uppercase tracking-widest text-accent">
+                        <span className="font-mono text-xs uppercase tracking-widest text-accent">
                           · Confidential search
                         </span>
                       )}

@@ -61,13 +61,13 @@ function CheckoutReturn() {
         <div className="flex gap-3 justify-center">
           <Link
             to="/account"
-            className="px-6 py-3 bg-foreground text-background font-mono text-[11px] uppercase tracking-[0.25em]"
+            className="px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.25em]"
           >
             Go to account
           </Link>
           <Link
             to="/vanguard"
-            className="px-6 py-3 border border-border font-mono text-[11px] uppercase tracking-[0.25em] hover:border-foreground"
+            className="px-6 py-3 border border-border font-mono text-xs uppercase tracking-[0.25em] hover:border-foreground"
           >
             Read Vanguard
           </Link>

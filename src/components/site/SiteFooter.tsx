@@ -40,7 +40,7 @@ export function SiteFooter() {
       <div className="border-b border-background/10">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-12 md:py-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div className="max-w-2xl">
-            <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-secondary-accent mb-4">
+            <p className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-4">
               The Briefing / Weekly
             </p>
             <h2 className="font-display text-3xl md:text-5xl leading-[1.05] tracking-tight">
@@ -63,7 +63,7 @@ export function SiteFooter() {
           <FooterCol title="Resources" links={RESOURCES} />
           <FooterCol title="Company" links={COMPANY} />
           <div>
-            <h4 className="font-mono text-[11px] uppercase tracking-[0.25em] text-background/40 mb-6">
+            <h4 className="font-mono text-xs uppercase tracking-[0.25em] text-background/40 mb-6">
               Social
             </h4>
             <ul className="space-y-3">
@@ -96,14 +96,14 @@ export function SiteFooter() {
       <div className="border-t border-background/10">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex items-center gap-6 flex-wrap">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-background/40">
               © {new Date().getFullYear()} The CS Quarterly
             </p>
           </div>
           <div className="flex items-center gap-6">
-            <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Privacy</a>
-            <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Terms</a>
-            <a href="#" className="font-mono text-[11px] uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Colophon</a>
+            <a href="#" className="font-mono text-xs uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Privacy</a>
+            <a href="#" className="font-mono text-xs uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Terms</a>
+            <a href="#" className="font-mono text-xs uppercase tracking-[0.2em] text-background/40 hover:text-background transition-colors">Colophon</a>
           </div>
         </div>
       </div>
@@ -120,7 +120,7 @@ function FooterCol({
 }) {
   return (
     <div>
-      <h4 className="font-mono text-[11px] uppercase tracking-[0.25em] text-background/40 mb-6">
+      <h4 className="font-mono text-xs uppercase tracking-[0.25em] text-background/40 mb-6">
         {title}
       </h4>
       <ul className="space-y-3">
@@ -129,7 +129,7 @@ function FooterCol({
             {l.comingSoon ? (
               <span className="inline-flex items-center gap-2 font-body text-sm">
                 <span className="text-background/40 blur-[5px] select-none">{l.label}</span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
+                <span className="font-mono text-xs uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
                   Stay tuned ✨
                 </span>
               </span>

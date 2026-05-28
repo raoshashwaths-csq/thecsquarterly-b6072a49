@@ -63,14 +63,14 @@ export function TierGateOverlay({
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
             to="/pricing"
-            className="inline-flex items-center justify-center px-6 py-3 bg-accent text-accent-foreground font-mono text-[11px] uppercase tracking-[0.25em] hover:opacity-90 transition-opacity"
+            className="inline-flex items-center justify-center px-6 py-3 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.25em] hover:opacity-90 transition-opacity"
           >
             {ctaLabel ?? `Upgrade to ${tierLabel}`}
           </Link>
           <button
             type="button"
             onClick={() => router.history.back()}
-            className="inline-flex items-center justify-center px-6 py-3 border border-border text-foreground font-mono text-[11px] uppercase tracking-[0.25em] hover:border-foreground transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 border border-border text-foreground font-mono text-xs uppercase tracking-[0.25em] hover:border-foreground transition-colors"
           >
             {secondaryLabel}
           </button>

@@ -42,7 +42,7 @@ function ExpandedNPS({ accounts }: { accounts: CSAccount[] }) {
   return (
     <div className="space-y-4">
       <div>
-        <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-2">
+        <div className="font-mono uppercase tracking-[0.25em] text-xs text-accent font-semibold mb-2">
           NPS Distribution
         </div>
         <SplitBar
@@ -56,7 +56,7 @@ function ExpandedNPS({ accounts }: { accounts: CSAccount[] }) {
       </div>
       {detractors.length ? (
         <div>
-          <div className="font-mono text-xs uppercase tracking-[0.25em] text-destructive font-semibold mb-2">
+          <div className="font-mono uppercase tracking-[0.25em] text-xs text-destructive font-semibold mb-2">
             Detractors ({detractors.length})
           </div>
           <ul className="space-y-1 max-h-40 overflow-y-auto pr-1">
@@ -74,7 +74,7 @@ function ExpandedNPS({ accounts }: { accounts: CSAccount[] }) {
       ) : null}
       {promoters.length ? (
         <div>
-          <div className="font-mono text-xs uppercase tracking-[0.25em] text-emerald-700 dark:text-emerald-300 font-semibold mb-2">
+          <div className="font-mono uppercase tracking-[0.25em] text-xs text-emerald-700 dark:text-emerald-300 font-semibold mb-2">
             Promoters ({promoters.length})
           </div>
           <ul className="space-y-1 max-h-32 overflow-y-auto pr-1">
@@ -101,7 +101,7 @@ function ExpandedSentiment({ accounts }: { accounts: CSAccount[] }) {
   return (
     <div className="space-y-4">
       <div>
-        <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent font-semibold mb-2">
+        <div className="font-mono uppercase tracking-[0.25em] text-xs text-accent font-semibold mb-2">
           Sentiment Distribution
         </div>
         <SplitBar
@@ -115,7 +115,7 @@ function ExpandedSentiment({ accounts }: { accounts: CSAccount[] }) {
       </div>
       {critical.length ? (
         <div>
-          <div className="font-mono text-xs uppercase tracking-[0.25em] text-destructive font-semibold mb-2">
+          <div className="font-mono uppercase tracking-[0.25em] text-xs text-destructive font-semibold mb-2">
             Critical accounts ({critical.length})
           </div>
           <ul className="space-y-1 max-h-48 overflow-y-auto pr-1">
@@ -145,7 +145,7 @@ export function AnalyticsHeader({ accounts }: { accounts: CSAccount[] }) {
   const sentiment = useMemo(() => computeSentimentIndex(accounts), [accounts]);
 
   return (
-    <MetricGrid cols={2}>
+    <MetricGrid cols={2} className="gap-4 md:gap-px">
       <HoverCard openDelay={120} closeDelay={80}>
         <HoverCardTrigger asChild>
           <div className="cursor-help transition-transform hover:-translate-y-0.5">
@@ -170,7 +170,7 @@ export function AnalyticsHeader({ accounts }: { accounts: CSAccount[] }) {
             />
           </div>
         </HoverCardTrigger>
-        <HoverCardContent align="start" className="w-[420px] p-5 border-border">
+        <HoverCardContent align="start" className="w-[calc(100vw-2rem)] sm:w-[420px] p-5 border-border">
           <ExpandedNPS accounts={accounts} />
         </HoverCardContent>
       </HoverCard>
@@ -199,7 +199,7 @@ export function AnalyticsHeader({ accounts }: { accounts: CSAccount[] }) {
             />
           </div>
         </HoverCardTrigger>
-        <HoverCardContent align="start" className="w-[440px] p-5 border-border">
+        <HoverCardContent align="start" className="w-[calc(100vw-2rem)] sm:w-[440px] p-5 border-border">
           <ExpandedSentiment accounts={accounts} />
         </HoverCardContent>
       </HoverCard>

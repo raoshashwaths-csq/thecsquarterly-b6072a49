@@ -72,7 +72,7 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
               <QMark />
             </div>
             <div>
-              <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent font-semibold">
+              <div className="font-mono uppercase tracking-[0.25em] text-xs text-secondary-accent font-semibold">
                 CSFactors / Analyst
               </div>
               <div className="font-display text-sm">Ask Q about your portfolio</div>
@@ -97,7 +97,7 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
               </p>
               {CSFACTORS_Q_TREE.map((group) => (
                 <div key={group.id} className="space-y-2">
-                  <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent font-semibold">
+                  <div className="font-mono uppercase tracking-[0.25em] text-xs text-accent font-semibold">
                     {group.label}
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -148,7 +148,7 @@ export function QAgentDrawer({ open, onOpenChange }: { open: boolean; onOpenChan
         {/* Cap banner */}
         {usage.data && usage.data.cap !== null ? (
           <div className={cn(
-            "border-t border-border px-4 py-2 font-mono text-xs uppercase tracking-[0.2em] flex items-center justify-between",
+            "border-t border-border px-4 py-2 font-mono uppercase tracking-[0.2em] text-xs flex items-center justify-between",
             capped ? "bg-accent/10 text-accent" : "bg-card text-foreground/60",
           )}>
             <span>
@@ -219,7 +219,7 @@ export function QAgentLauncher({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 pl-4 pr-5 py-3 bg-accent text-accent-foreground shadow-lg hover:opacity-95 transition-opacity font-mono text-[11px] uppercase tracking-[0.2em] font-semibold"
+      className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 pl-4 pr-5 py-3 bg-accent text-accent-foreground shadow-lg hover:opacity-95 transition-opacity font-mono uppercase tracking-[0.2em] text-xs font-semibold"
       aria-label="Ask Q about your portfolio"
     >
       <span className="font-display text-base normal-case tracking-normal">
@@ -254,7 +254,7 @@ export function QAgentDock({
               key={p}
               type="button"
               onClick={() => onChip(p)}
-              className="font-mono text-xs uppercase tracking-[0.18em] border border-border bg-card/95 backdrop-blur px-2.5 py-1.5 hover:border-accent hover:text-accent transition-colors"
+              className="font-mono uppercase tracking-[0.18em] text-xs border border-border bg-card/95 backdrop-blur px-2.5 py-1.5 hover:border-accent hover:text-accent transition-colors"
             >
               {p}
             </button>
@@ -282,7 +282,7 @@ export function QAgentDock({
           />
           <button
             type="submit"
-            className="font-mono text-xs uppercase tracking-[0.2em] bg-accent text-accent-foreground px-3 py-1.5 hover:opacity-90 disabled:opacity-40"
+            className="font-mono uppercase tracking-[0.2em] text-xs bg-accent text-accent-foreground px-3 py-1.5 hover:opacity-90 disabled:opacity-40"
             disabled={!value.trim()}
           >
             Ask

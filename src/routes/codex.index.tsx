@@ -52,7 +52,7 @@ function CodexPage() {
                 </div>
                 <div className="absolute top-4 right-4 font-mono text-xs opacity-50">{p.pages}pp</div>
                 <FileText size={48} className="opacity-30" />
-                <div className="absolute bottom-4 left-4 right-4 font-mono text-[9px] uppercase tracking-widest opacity-50">
+                <div className="absolute bottom-4 left-4 right-4 font-mono text-xs uppercase tracking-widest opacity-50">
                   {p.category}
                 </div>
               </div>
@@ -94,7 +94,7 @@ function CodexPage() {
           <p className="text-background/70 mb-10 text-pretty">
             One Vanguard subscription pays for itself the moment you open a second playbook. Everything in the Codex, every premium dispatch, every Custom Blueprint, included.
           </p>
-          <Link to="/pricing" className="inline-block px-8 py-4 bg-secondary-accent text-secondary-accent-foreground font-mono text-[11px] uppercase tracking-widest hover:opacity-90">
+          <Link to="/pricing" className="inline-block px-8 py-4 bg-secondary-accent text-secondary-accent-foreground font-mono text-xs uppercase tracking-widest hover:opacity-90">
             See Vanguard pricing
           </Link>
         </div>

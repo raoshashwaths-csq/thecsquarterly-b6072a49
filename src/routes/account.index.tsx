@@ -111,14 +111,14 @@ function AccountPage() {
                   <button
                     type="button"
                     onClick={onManageBilling}
-                    className="px-5 py-2.5 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest hover:opacity-90"
+                    className="px-5 py-2.5 bg-foreground text-background font-mono text-xs uppercase tracking-widest hover:opacity-90"
                   >
                     Manage subscription
                   </button>
                 ) : (
                   <Link
                     to="/pricing"
-                    className="px-5 py-2.5 bg-secondary-accent text-secondary-accent-foreground font-mono text-[11px] uppercase tracking-widest inline-block"
+                    className="px-5 py-2.5 bg-secondary-accent text-secondary-accent-foreground font-mono text-xs uppercase tracking-widest inline-block"
                   >
                     See pricing
                   </Link>
@@ -149,7 +149,7 @@ function AccountPage() {
               title="Portfolio command center"
               description="Stakeholder risk matrices, real-time NPS, and renewal pressure across your book."
               actions={
-                <Link to="/account/executive/analytics" className="px-5 py-2.5 border border-foreground font-mono text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
+                <Link to="/account/executive/analytics" className="px-5 py-2.5 border border-foreground font-mono text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
                   Open analytics
                 </Link>
               }
@@ -162,7 +162,7 @@ function AccountPage() {
               title="Four lenses on the portfolio"
               description="Retention funnel, NRR waterfall, stakeholder radar, and team leaderboard — all built from your CSFactors data."
               actions={
-                <Link to="/account/analytics" className="px-5 py-2.5 border border-foreground font-mono text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
+                <Link to="/account/analytics" className="px-5 py-2.5 border border-foreground font-mono text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
                   Open dashboards
                 </Link>
               }
@@ -180,7 +180,7 @@ function AccountPage() {
                   type="button"
                   disabled={!me.data.isAdmin && me.data.subscriptionTier !== "vanguard"}
                   onClick={() => toast.info("SSO setup is concierge — we'll reach out to provision WorkOS.")}
-                  className="px-5 py-2.5 border border-border font-mono text-[11px] uppercase tracking-widest hover:border-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 border border-border font-mono text-xs uppercase tracking-widest hover:border-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Configure SSO
                 </button>
@@ -197,7 +197,7 @@ function AccountPage() {
                 <button
                   type="button"
                   disabled
-                  className="px-5 py-2.5 border border-border font-mono text-[11px] uppercase tracking-widest opacity-40 cursor-not-allowed"
+                  className="px-5 py-2.5 border border-border font-mono text-xs uppercase tracking-widest opacity-40 cursor-not-allowed"
                 >
                   Upload brand kit
                 </button>
@@ -211,7 +211,7 @@ function AccountPage() {
               title="API management"
               description="Generate bearer tokens and call the /api/v1 REST surface."
               actions={
-                <Link to="/account/api" className="px-5 py-2.5 border border-foreground font-mono text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
+                <Link to="/account/api" className="px-5 py-2.5 border border-foreground font-mono text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
                   Manage API
                 </Link>
               }
@@ -225,7 +225,7 @@ function AccountPage() {
                 title="Admin access"
                 description="You have admin access to the editorial dashboard and control panel."
                 actions={
-                  <Link to="/admin" className="px-5 py-2.5 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest">
+                  <Link to="/admin" className="px-5 py-2.5 bg-foreground text-background font-mono text-xs uppercase tracking-widest">
                     Open dashboard
                   </Link>
                 }

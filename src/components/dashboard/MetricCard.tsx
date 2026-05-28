@@ -65,8 +65,8 @@ export function MetricCard({
   );
 }
 
-export function MetricGrid({ children, cols = 3 }: { children: ReactNode; cols?: 2 | 3 | 4 }) {
+export function MetricGrid({ children, cols = 3, className }: { children: ReactNode; cols?: 2 | 3 | 4; className?: string }) {
   const c =
     cols === 2 ? "md:grid-cols-2" : cols === 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3";
-  return <div className={cn("grid gap-px bg-border border border-border", c)}>{children}</div>;
+  return <div className={cn("grid gap-px bg-border border border-border", c, className)}>{children}</div>;
 }

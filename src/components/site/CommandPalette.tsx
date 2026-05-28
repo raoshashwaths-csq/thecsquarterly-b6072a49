@@ -166,7 +166,7 @@ function HitItem({
         <div className="flex items-center gap-2">
           <span className="font-display text-base truncate">{hit.title}</span>
           {hit.readMinutes !== undefined && (
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground shrink-0">
+            <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground shrink-0">
               {hit.readMinutes} {hit.kind === "playbook" ? "pp" : "min"}
             </span>
           )}

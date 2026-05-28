@@ -22,7 +22,7 @@ export function RhythmBars({
                 style={{ height: `${h}%` }}
               />
             </div>
-            <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
               {labels?.[i] ?? i + 1}
             </div>
           </div>

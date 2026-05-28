@@ -199,7 +199,7 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
       }
     >
       {emphasized && tier.highlightLabel && (
-        <div className="absolute -top-3 left-7 bg-accent text-accent-foreground px-3 py-1 font-mono text-[9px] uppercase tracking-widest">
+        <div className="absolute -top-3 left-7 bg-accent text-accent-foreground px-3 py-1 font-mono text-xs uppercase tracking-widest">
           {tier.highlightLabel}
         </div>
       )}
@@ -219,13 +219,13 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
 
       <div className="grid grid-cols-2 gap-3 mb-6 pb-6 border-b border-border">
         <div>
-          <div className="font-mono text-[9px] uppercase tracking-widest text-foreground/50 mb-1">
+          <div className="font-mono text-xs uppercase tracking-widest text-foreground/50 mb-1">
             Seats
           </div>
           <div className="text-sm font-medium">{tier.seatCap}</div>
         </div>
         <div>
-          <div className="font-mono text-[9px] uppercase tracking-widest text-foreground/50 mb-1">
+          <div className="font-mono text-xs uppercase tracking-widest text-foreground/50 mb-1">
             <QMark /> sessions
           </div>
           <div className="text-sm font-medium">{tier.qCap}</div>
@@ -242,7 +242,7 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
               {isJob ? (
                 <span className="flex flex-wrap items-center gap-2">
                   <span className="text-foreground/50 blur-[5px] select-none">{text}</span>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
+                  <span className="font-mono text-xs uppercase tracking-[0.2em] text-secondary-accent whitespace-nowrap">
                     Stay tuned ✨
                   </span>
                 </span>

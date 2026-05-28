@@ -89,7 +89,7 @@ export function LanguageSwitcher() {
         <DropdownMenuSeparator />
         {(["Global", "SEA", "MENA"] as Region[]).map((region) => (
           <div key={region}>
-            <DropdownMenuLabel className="font-mono text-[9px] uppercase tracking-[0.25em] text-secondary-accent pt-2">
+            <DropdownMenuLabel className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent pt-2">
               {region === "Global" ? "Global" : region === "SEA" ? "Southeast Asia" : "Middle East & North Africa"}
             </DropdownMenuLabel>
             {grouped[region].map((lang) => {
@@ -103,7 +103,7 @@ export function LanguageSwitcher() {
                 >
                   <div className="flex flex-col">
                     <span className="text-sm leading-tight">{lang.native}</span>
-                    <span className="text-[11px] text-muted-foreground leading-tight">
+                    <span className="text-xs text-muted-foreground leading-tight">
                       {lang.label}
                       {!lang.live && " · soon"}
                     </span>

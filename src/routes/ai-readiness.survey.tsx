@@ -131,7 +131,7 @@ function SurveyPage() {
             </div>
             <div className="flex justify-end mt-12 pt-8 border-t border-border">
               {email.trim() && !emailValid && (
-                <p className="text-destructive font-mono text-[11px] uppercase tracking-widest">
+                <p className="text-destructive font-mono text-xs uppercase tracking-widest">
                   Enter a valid work email to start.
                 </p>
               )}
@@ -147,7 +147,7 @@ function SurveyPage() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 disabled={!leadValid}
-                className="px-8 py-4 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest font-bold disabled:opacity-30 hover:bg-accent transition-colors"
+                className="px-8 py-4 bg-foreground text-background font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-30 hover:bg-accent transition-colors"
               >
                 Start the diagnostic →
               </button>
@@ -178,7 +178,7 @@ function SurveyPage() {
                           key={opt.value}
                           onClick={() => setAnswers((a) => ({ ...a, [m.id]: opt.value }))}
                           title={opt.desc}
-                          className={`px-4 py-2 border font-mono text-[11px] uppercase tracking-widest transition-colors ${
+                          className={`px-4 py-2 border font-mono text-xs uppercase tracking-widest transition-colors ${
                             selected
                               ? "bg-foreground text-background border-foreground"
                               : "border-border hover:border-foreground"
@@ -194,7 +194,7 @@ function SurveyPage() {
             </div>
 
             {error && (
-              <p className="text-destructive font-mono text-[11px] uppercase tracking-widest mt-8">
+              <p className="text-destructive font-mono text-xs uppercase tracking-widest mt-8">
                 {error}
               </p>
             )}
@@ -202,7 +202,7 @@ function SurveyPage() {
             <div className="flex justify-between items-center mt-16 pt-8 border-t border-border">
               <button
                 onClick={() => { setStep((s) => Math.max(-1, s - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                className="font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
               >
                 ← Back
               </button>
@@ -210,7 +210,7 @@ function SurveyPage() {
                 <button
                   onClick={() => { setStep((s) => s + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }}
                   disabled={!allCurrentAnswered}
-                  className="px-8 py-4 bg-foreground text-background font-mono text-[11px] uppercase tracking-widest font-bold disabled:opacity-30 hover:bg-accent transition-colors"
+                  className="px-8 py-4 bg-foreground text-background font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-30 hover:bg-accent transition-colors"
                 >
                   Next →
                 </button>
@@ -218,7 +218,7 @@ function SurveyPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={submitting || !allCurrentAnswered}
-                  className="px-8 py-4 bg-accent text-accent-foreground font-mono text-[11px] uppercase tracking-widest font-bold disabled:opacity-50"
+                  className="px-8 py-4 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-widest font-bold disabled:opacity-50"
                 >
                   {submitting ? "Scoring…" : "See my score →"}
                 </button>
@@ -254,7 +254,7 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
           </div>
           <div className="md:col-span-2">
             <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-2">Tier</div>
-            <span className={`inline-block px-4 py-2 font-mono text-[11px] uppercase tracking-widest ${TIER_TINT[result.tier]}`}>
+            <span className={`inline-block px-4 py-2 font-mono text-xs uppercase tracking-widest ${TIER_TINT[result.tier]}`}>
               {result.tierLabel}
             </span>
             <div className="mt-4 font-mono uppercase tracking-widest text-xs text-muted-foreground">
@@ -286,7 +286,7 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
                 <li key={d.id} className="border-t border-border pt-6">
                   <div className="flex justify-between items-baseline mb-2">
                     <div className="flex items-baseline gap-4">
-                      <span className="font-mono text-[11px] text-secondary-accent">GAP 0{i + 1}</span>
+                      <span className="font-mono text-xs text-secondary-accent">GAP 0{i + 1}</span>
                       <span className="font-display text-2xl">{d.label}</span>
                     </div>
                     <span className="font-mono text-sm text-muted-foreground">{pct}% of max</span>
@@ -332,7 +332,7 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
               <li key={i} className="border-t border-border pt-6">
                 <div className="flex justify-between items-baseline mb-3">
                   <h3 className="font-display text-2xl">{i + 1}. {p.title}</h3>
-                  <span className="font-mono text-[11px] uppercase tracking-widest text-secondary-accent">{p.week}</span>
+                  <span className="font-mono text-xs uppercase tracking-widest text-secondary-accent">{p.week}</span>
                 </div>
                 <ul className="space-y-2">
                   {p.items.map((it, j) => (
@@ -354,7 +354,7 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
           </p>
           <Link
             to="/insights"
-            className="inline-block px-6 py-3 border border-background/30 font-mono text-[11px] uppercase tracking-widest hover:bg-background hover:text-foreground transition-colors"
+            className="inline-block px-6 py-3 border border-background/30 font-mono text-xs uppercase tracking-widest hover:bg-background hover:text-foreground transition-colors"
           >
             Browse the archive
           </Link>
@@ -369,7 +369,7 @@ function Breakdown({ title, max, total, items }: { title: string; max: number; t
   return (
     <div>
       <h3 className="font-display text-2xl mb-1">{title}</h3>
-      <div className="font-mono text-[11px] uppercase tracking-widest text-muted-foreground mb-6">
+      <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-6">
         {Math.round(total)} / {max} pts
       </div>
       <ul className="space-y-4">

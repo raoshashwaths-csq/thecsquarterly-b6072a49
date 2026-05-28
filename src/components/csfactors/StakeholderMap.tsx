@@ -101,7 +101,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
       {/* Add row */}
       <div className="grid grid-cols-12 gap-2 items-end p-3 bg-muted/30 border border-border">
         <div className="col-span-12 md:col-span-3">
-          <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Contact</label>
+          <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Contact</label>
           <Input
             value={draft.contact_name}
             onChange={(e) => setDraft({ ...draft, contact_name: e.target.value })}
@@ -110,7 +110,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
           />
         </div>
         <div className="col-span-12 md:col-span-3">
-          <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Title</label>
+          <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Title</label>
           <Input
             value={draft.title}
             onChange={(e) => setDraft({ ...draft, title: e.target.value })}
@@ -119,7 +119,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
           />
         </div>
         <div className="col-span-6 md:col-span-2">
-          <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Role</label>
+          <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Role</label>
           <Select value={draft.buying_role} onValueChange={(v) => setDraft({ ...draft, buying_role: v as BuyingRole })}>
             <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -130,7 +130,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
           </Select>
         </div>
         <div className="col-span-3 md:col-span-2">
-          <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Influence</label>
+          <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Influence</label>
           <Select value={draft.influence} onValueChange={(v) => setDraft({ ...draft, influence: v as Influence })}>
             <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -141,7 +141,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
           </Select>
         </div>
         <div className="col-span-3 md:col-span-2">
-          <label className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Sentiment</label>
+          <label className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Sentiment</label>
           <Select value={draft.sentiment} onValueChange={(v) => setDraft({ ...draft, sentiment: v as Sentiment })}>
             <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
             <SelectContent>
@@ -221,7 +221,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
 
       {/* 2x2 power matrix */}
       <div>
-        <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent font-semibold mb-2">
+        <div className="font-mono uppercase tracking-[0.25em] text-xs text-secondary-accent font-semibold mb-2">
           Power Matrix
         </div>
         <div className="grid grid-cols-2 gap-px bg-border border border-border">
@@ -230,7 +230,7 @@ export function StakeholderMap({ accountId }: { accountId: string }) {
           <Quadrant title="Supportive — nurture" tone="neutral" rows={quad.supporters} />
           <Quadrant title="Background drag" tone="muted" rows={quad.drag} />
         </div>
-        <div className="flex justify-between font-mono text-[9px] uppercase tracking-widest text-muted-foreground mt-1">
+        <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mt-1">
           <span>← Lower influence</span>
           <span>Higher influence →</span>
         </div>
@@ -268,7 +268,7 @@ function Quadrant({
           rows.map((r) => (
             <span
               key={r.id}
-              className="inline-flex px-2 py-0.5 bg-muted border border-border text-[11px] font-mono"
+              className="inline-flex px-2 py-0.5 bg-muted border border-border text-xs font-mono"
               title={`${ROLE_LABEL[r.buying_role]} · ${r.influence}`}
             >
               {r.contact_name}

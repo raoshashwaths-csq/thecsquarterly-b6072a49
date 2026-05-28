@@ -287,7 +287,7 @@ function WorkspacePage() {
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  className={`snap-start min-h-[44px] min-w-[44px] inline-flex items-center gap-2 px-4 py-3 font-mono text-[11px] uppercase tracking-widest border-b-2 transition-colors ${
+                  className={`snap-start min-h-[44px] min-w-[44px] inline-flex items-center gap-2 px-4 py-3 font-mono text-xs uppercase tracking-widest border-b-2 transition-colors ${
                     active
                       ? "border-accent text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground"
@@ -891,7 +891,7 @@ function LedgerPanel({
           <div className="space-y-4">
             {tagGroups.map(([tag, group]) => (
               <details key={tag} open className="border border-border">
-                <summary className="cursor-pointer p-3 flex items-center justify-between font-mono text-[11px] uppercase tracking-widest min-h-[44px]">
+                <summary className="cursor-pointer p-3 flex items-center justify-between font-mono text-xs uppercase tracking-widest min-h-[44px]">
                   <span className="text-accent">{tag}</span>
                   <span className="text-muted-foreground">
                     {group.links.length + group.assets.length}
