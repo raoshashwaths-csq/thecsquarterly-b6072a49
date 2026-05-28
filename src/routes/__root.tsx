@@ -5,6 +5,7 @@ import {
   Outlet,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -166,13 +167,17 @@ function PageTransition() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const hideGlobalQ = pathname.startsWith("/csfactors");
   return (
     <QueryClientProvider client={queryClient}>
       <AuthInvalidator />
       <PageTransition />
-      <QErrorBoundary label="Q">
-        <QAgentButton />
-      </QErrorBoundary>
+      {!hideGlobalQ ? (
+        <QErrorBoundary label="Q">
+          <QAgentButton />
+        </QErrorBoundary>
+      ) : null}
       <EndOfDaySentimentCheckIn />
       <ClientOnly fallback={null}>
         <Suspense fallback={null}>
