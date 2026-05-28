@@ -22,11 +22,11 @@ export function AnalyticsShell({
       <SiteHeader />
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-4 md:px-10 pt-8 md:pt-12 pb-24 animate-fade-up">
         <Link
-          to="/account/analytics"
-          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-accent mb-6"
+          to="/csfactors"
+          className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-accent border-b border-transparent hover:border-accent pb-0.5 mb-6"
         >
           <ArrowLeft className="h-3 w-3" />
-          All analytics
+          Back to CSFactors
         </Link>
         <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-8 md:mb-12 pb-6 border-b border-border">
           <div>
