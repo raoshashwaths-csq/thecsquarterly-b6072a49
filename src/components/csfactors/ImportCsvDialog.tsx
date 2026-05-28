@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { bulkImportAccounts } from "@/lib/csfactors.functions";
 import { toast } from "sonner";
 
+const REQUIRED = new Set(["name","tier","arr","health","qbr_status","renewal_quarter"]);
+
 const HEADERS = [
   "name","tier","arr","health","qbr_status","renewal_quarter","champion","economic_buyer","blocker","notes",
   "ucc","account_manager","csm_name","associate_director","backup_owner","customer_success","key_account_manager",
@@ -17,6 +19,10 @@ const HEADERS = [
   "implementation_progress","da_project_manager","project_manager_ii","server_location","server_name",
   "marquee_client","existing_erp","existing_crm","region","payroll_service_type","final_cs_nps","industry",
 ];
+
+// Header row in the CSV template marks required columns with a trailing asterisk
+// (e.g. `name*`). The parser strips the asterisk before validation.
+const TEMPLATE_HEADERS = HEADERS.map((h) => (REQUIRED.has(h) ? `${h}*` : h));
 
 const SAMPLE = [
   HEADERS.join(","),
