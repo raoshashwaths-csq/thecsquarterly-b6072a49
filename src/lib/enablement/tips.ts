@@ -106,6 +106,12 @@ export const TIP_GROUPS: TipGroup[] = [
     label: "Home",
     tips: [
       {
+        id: "home-ai-readiness",
+        title: "Start with the diagnostic",
+        body: "The 5-minute AI Readiness Audit places you on a band (Reactive → Operational → Predictive), surfaces your weakest of 11 dimensions, and names the one fix that moves the band. Take it before anything else — it frames every other tool here.",
+        cta: { label: "Take the audit", to: "/ai-readiness" },
+      },
+      {
         id: "home-csf-box",
         title: "The CSF Box is the homepage on purpose",
         body: "It's the only surface that ties health, revenue and stakeholder posture together. If you check one thing per day, check this.",
@@ -117,9 +123,40 @@ export const TIP_GROUPS: TipGroup[] = [
         body: "Drop notes, drafts and account context into Workspace. Q reads from it when answering, so the more you put there, the sharper your answers get.",
         cta: { label: "Open Workspace", to: "/account/workspace" },
       },
+      {
+        id: "home-section-vanguard",
+        title: "Vanguard — news & field reports",
+        body: "Open Vanguard when you want this week's signal on what other CS orgs are actually doing — proactive plays, not commentary.",
+        cta: { label: "Enter Vanguard", to: "/vanguard" },
+      },
+      {
+        id: "home-section-retention",
+        title: "Retention Protocol — playbooks",
+        body: "Go here when you have a specific motion to run: churn save, expansion, QBR, onboarding. Pick one playbook per quarter and run it across the full book.",
+        cta: { label: "Open Retention Protocol", to: "/retention-protocol" },
+      },
+      {
+        id: "home-section-outcome",
+        title: "Outcome Forum — validated case studies",
+        body: "Open Outcome when you need receipts for a board deck or a stakeholder argument — every essay here ships with the underlying numbers.",
+        cta: { label: "Enter Outcome Forum", to: "/outcome-forum" },
+      },
+      {
+        id: "home-section-codex",
+        title: "Codex — the reference library",
+        body: "Treat the Codex like a dictionary, not a feed. Jump in when you need a definition, framework or template — leave when you have it.",
+        cta: { label: "Open Codex", to: "/codex" },
+      },
+      {
+        id: "home-section-diagnostic",
+        title: "Diagnostic — benchmark your team",
+        body: "11 dimensions, 44 metrics. Use the Diagnostic to compare your org against the cohort and identify the single transition that unlocks the next band.",
+        cta: { label: "Run Diagnostic", to: "/ai-readiness" },
+      },
     ],
   },
 ];
+
 
 export function tipsForPath(pathname: string): TipGroup {
   // longest-prefix match
