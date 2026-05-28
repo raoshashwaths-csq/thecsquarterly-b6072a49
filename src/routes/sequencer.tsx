@@ -39,11 +39,27 @@ function SequencerPage() {
   const fetchPosts = useServerFn(listPosts);
   const save = useServerFn(saveSequence);
   const qc = useQueryClient();
-
-  const { data: posts } = useQuery({ queryKey: ["posts"], queryFn: () => fetchPosts() });
-  const { data: seqs } = useQuery({
+  const {
+    data: seqs,
+    error: seqsError,
+    isError: seqsIsError,
+  } = useQuery({
     queryKey: ["mySequences"],
     queryFn: () => fetchSeqs(),
+    enabled: !!user,
+    retry: (failureCount, err) => !isAuthError(err) && failureCount < 2,
+  });
+
+  const seqsAuthError = seqsIsError && isAuthError(seqsError);
+
+  // If the server tells us the session is gone, drop the stale cache so we
+  // don't show another user's sequences after a re-login.
+  useEffect(() => {
+    if (seqsAuthError) {
+      qc.removeQueries({ queryKey: ["mySequences"] });
+    }
+  }, [seqsAuthError, qc]);
+
     enabled: !!user,
   });
 
