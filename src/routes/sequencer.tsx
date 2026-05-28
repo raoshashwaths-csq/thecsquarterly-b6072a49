@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GripVertical, Save, Trash2 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -9,6 +9,8 @@ import { Reveal } from "@/components/site/Reveal";
 import { listMySequences, saveSequence } from "@/lib/enterprise.functions";
 import { listPosts } from "@/lib/posts.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { isAuthError } from "@/lib/auth-errors";
+
 
 export const Route = createFileRoute("/sequencer")({
   head: () => ({
@@ -39,11 +41,29 @@ function SequencerPage() {
   const qc = useQueryClient();
 
   const { data: posts } = useQuery({ queryKey: ["posts"], queryFn: () => fetchPosts() });
-  const { data: seqs } = useQuery({
+
+  const {
+    data: seqs,
+    error: seqsError,
+    isError: seqsIsError,
+  } = useQuery({
     queryKey: ["mySequences"],
     queryFn: () => fetchSeqs(),
     enabled: !!user,
+    retry: (failureCount, err) => !isAuthError(err) && failureCount < 2,
   });
+
+  const seqsAuthError = seqsIsError && isAuthError(seqsError);
+
+  // If the server tells us the session is gone, drop the stale cache so we
+  // don't show another user's sequences after a re-login.
+  useEffect(() => {
+    if (seqsAuthError) {
+      qc.removeQueries({ queryKey: ["mySequences"] });
+    }
+  }, [seqsAuthError, qc]);
+
+
 
   const [items, setItems] = useState<Item[]>([]);
   const [name, setName] = useState("");
@@ -182,7 +202,22 @@ function SequencerPage() {
               ))}
             </ol>
 
-            {seqs && seqs.length > 0 && (
+            {seqsAuthError ? (
+              <div className="mt-10 border border-border rounded p-5 bg-muted/30">
+                <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">
+                  Session expired
+                </p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Your sign-in expired while you were away. Sign back in to load your saved sequences.
+                </p>
+                <Link
+                  to="/login"
+                  className="inline-block px-4 py-2 bg-foreground text-background font-mono text-xs uppercase tracking-widest hover:bg-accent transition-colors"
+                >
+                  Sign in →
+                </Link>
+              </div>
+            ) : seqs && seqs.length > 0 ? (
               <div className="mt-10">
                 <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
                   Saved
@@ -201,7 +236,8 @@ function SequencerPage() {
                   ))}
                 </ul>
               </div>
-            )}
+            ) : null}
+
           </div>
         </div>
       </main>
