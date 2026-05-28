@@ -227,6 +227,8 @@ export const getAgentObservability = createServerFn({ method: "GET" })
       profitMarginPct,
       treeFrequency,
       executionLogs,
+      // True until we persist per-run tokens/latency on q_runs.
+      estimated: true,
     };
   });
 
