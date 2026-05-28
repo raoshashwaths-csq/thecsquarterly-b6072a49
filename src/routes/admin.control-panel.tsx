@@ -933,10 +933,9 @@ function UsersTab() {
             <SelectTrigger className="h-9 w-44 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All tiers</SelectItem>
-              <SelectItem value="free">Free</SelectItem>
-              <SelectItem value="vanguard">Vanguard</SelectItem>
-              <SelectItem value="vanguard-pro">Vanguard Pro</SelectItem>
-              <SelectItem value="enterprise">Enterprise</SelectItem>
+              {ALL_DESIGNATIONS.map((d) => (
+                <SelectItem key={d} value={d}>{TIER_LABEL[d] ?? d}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <div className="text-[11px] text-muted-foreground tabular-nums">{filtered.length} users</div>
@@ -949,7 +948,7 @@ function UsersTab() {
                 <th className="text-left font-normal py-2 px-3">Name</th>
                 <th className="text-left font-normal py-2 px-3">Email</th>
                 <th className="text-left font-normal py-2 px-3">Tier</th>
-                <th className="text-left font-normal py-2 px-3">Affiliation</th>
+                <th className="text-left font-normal py-2 px-3">Renewal</th>
                 <th className="text-left font-normal py-2 px-3">Sessions</th>
                 <th className="text-right font-normal py-2 px-3">Manage</th>
               </tr>
@@ -970,20 +969,36 @@ function UsersTab() {
                     </td>
                     <td className="py-2 px-3 text-muted-foreground">{u.email}</td>
                     <td className="py-2 px-3">
-                      <Badge variant={u.tier === "free" ? "secondary" : "default"} className="text-[10px] capitalize">{u.tier}</Badge>
+                      <Badge variant={isPaid(u.tier) ? "default" : "secondary"} className="text-[10px]">{u.tier_label}</Badge>
                     </td>
-                    <td className="py-2 px-3 text-muted-foreground text-xs">{u.tier === "enterprise" ? "Enterprise Team" : "—"}</td>
-                    <td className="py-2 px-3 font-mono tabular-nums text-xs">{u.sessions_used} / {u.seat_cap}</td>
+                    <td className="py-2 px-3 text-muted-foreground text-xs tabular-nums">
+                      {u.current_period_end ? new Date(u.current_period_end).toLocaleDateString() : "—"}
+                    </td>
+                    <td className="py-2 px-3 font-mono tabular-nums text-xs">
+                      {u.sessions_used} / {u.q_cap >= 9999 ? "∞" : u.q_cap}
+                    </td>
                     <td className="py-2 px-3 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="sm" className="h-7 w-7 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56">
-                          {u.tier === "vanguard" || u.tier === "vanguard-pro" || u.tier === "enterprise" ? (
-                            <DropdownMenuItem onClick={() => act(u.id, "revoke-vanguard")}>Revoke Vanguard</DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem onClick={() => act(u.id, "grant-vanguard")}>Grant Vanguard (1y)</DropdownMenuItem>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>Grant subscription</DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                {PAID_DESIGNATIONS.map((d) => (
+                                  <DropdownMenuItem key={d} onClick={() => act(u.id, `grant-${d}` as ManageAction)}>
+                                    {TIER_LABEL[d]}
+                                  </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                          {isPaid(u.tier) && (
+                            <DropdownMenuItem onClick={() => act(u.id, "revoke-subscription")}>
+                              Revoke subscription
+                            </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
                           {u.is_admin ? (
