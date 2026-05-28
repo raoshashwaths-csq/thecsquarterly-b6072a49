@@ -55,7 +55,7 @@ export const Route = createFileRoute("/vanguard")({
                 Benchmark your Vanguard motion.
               </h3>
               <p className="text-sm text-foreground/70 mb-4">
-                The Super Agent Readiness Diagnostic scores your team across 11 dimensions and ships a 90-day plan.
+                The Super Agent Readiness Diagnostic scores your team across 8 dimensions and ships a 90-day plan.
               </p>
               <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors">
                 Take the diagnostic →

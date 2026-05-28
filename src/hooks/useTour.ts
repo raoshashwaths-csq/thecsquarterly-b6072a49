@@ -102,7 +102,7 @@ const TOUR_STEPS_BY_ROUTE: Record<string, TourStep[]> = {
       id: "ai-survey",
       target: "ai-survey",
       title: "Run the survey",
-      body: "Eleven dimensions, 44 metrics. Ten minutes for a band you can defend to your CRO.",
+      body: "Eight dimensions, 32 metrics. Ten minutes for a band you can defend to your CRO.",
     },
   ],
   "/retention-protocol": [
