@@ -149,7 +149,9 @@ export function SiteHeader() {
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-60">
                 <DropdownMenuLabel className="font-body normal-case tracking-normal">
+
                   <div className="text-sm font-medium leading-tight truncate">
                     {displayName || t("menu.member")}
                   </div>
