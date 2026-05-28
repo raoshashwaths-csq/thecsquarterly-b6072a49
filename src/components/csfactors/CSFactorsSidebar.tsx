@@ -20,6 +20,7 @@ export function CSFactorsSidebar() {
     <aside
       className={cn(
         "shrink-0 border-r border-border bg-card sticky top-0 h-screen transition-[width] duration-300",
+        "hidden md:block",
         collapsed ? "w-14" : "w-56",
       )}
     >
