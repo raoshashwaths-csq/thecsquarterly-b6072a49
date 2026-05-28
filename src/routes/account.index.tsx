@@ -112,6 +112,67 @@ function AccountPage() {
               )}
             </SectionCard>
 
+            <SectionCard
+              eyebrow="Executive analytics"
+              title="Portfolio command center"
+              description="Stakeholder risk matrices, real-time NPS, and renewal pressure across your book."
+              actions={
+                <Link to="/account/executive/analytics" className="px-5 py-2.5 border border-foreground font-mono text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
+                  Open analytics
+                </Link>
+              }
+            >
+              <div className="text-xs text-muted-foreground">Available to Operator and above.</div>
+            </SectionCard>
+
+            <SectionCard
+              eyebrow="Enterprise · SSO"
+              title="Single Sign-On (SAML)"
+              description="Provision WorkOS-backed SAML SSO for your organization."
+              actions={
+                <button
+                  type="button"
+                  disabled={!me.data.isAdmin && me.data.subscriptionTier !== "vanguard"}
+                  onClick={() => toast.info("SSO setup is concierge — we'll reach out to provision WorkOS.")}
+                  className="px-5 py-2.5 border border-border font-mono text-[11px] uppercase tracking-widest hover:border-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Configure SSO
+                </button>
+              }
+            >
+              <div className="text-xs text-muted-foreground">Available on Scale and above.</div>
+            </SectionCard>
+
+            <SectionCard
+              eyebrow="Enterprise · Brand"
+              title="White-label brand assets"
+              description="Upload logos and color tokens for white-labeled board deck PDFs."
+              actions={
+                <button
+                  type="button"
+                  disabled
+                  className="px-5 py-2.5 border border-border font-mono text-[11px] uppercase tracking-widest opacity-40 cursor-not-allowed"
+                >
+                  Upload brand kit
+                </button>
+              }
+            >
+              <div className="text-xs text-muted-foreground">Available on Scale and above.</div>
+            </SectionCard>
+
+            <SectionCard
+              eyebrow="Enterprise · API"
+              title="API management"
+              description="Generate bearer tokens and call the /api/v1 REST surface."
+              actions={
+                <Link to="/account/api" className="px-5 py-2.5 border border-foreground font-mono text-[11px] uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
+                  Manage API
+                </Link>
+              }
+            >
+              <div className="text-xs text-muted-foreground">Available to Enterprise and Strategic Partner.</div>
+            </SectionCard>
+
             {me.data.isAdmin && (
               <SectionCard
                 eyebrow="Editorial"
