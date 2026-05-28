@@ -70,7 +70,7 @@ function NoticeBadge({ a }: { a: CSAccount }) {
   };
   if (!band) return null;
   return (
-    <span className="inline-flex items-center px-1.5 py-0.5 ml-2 font-mono text-[9px] uppercase tracking-widest border border-accent/60 bg-accent/10 text-accent">
+    <span className="inline-flex items-center px-1.5 py-0.5 ml-2 font-mono uppercase tracking-widest text-[9px] border border-accent/60 bg-accent/10 text-accent">
       {band}d · {days}d out
     </span>
   );
@@ -209,9 +209,9 @@ export function AccountsGrid({
                     key={c.key as string}
                     className={cn(
                       "px-3 py-2.5 border-b border-border whitespace-nowrap font-semibold text-xs uppercase tracking-[0.15em] text-muted-foreground",
-                      isSticky && "sticky bg-muted/40 z-10",
-                      idx === 0 && "left-0",
-                      idx === 1 && "left-[200px] border-r border-border",
+                      isSticky && "md:sticky bg-muted/40 z-10",
+                      idx === 0 && "md:left-0",
+                      idx === 1 && "md:left-[200px] border-r border-border",
                     )}
                     style={{ minWidth: c.width }}
                   >
@@ -251,9 +251,9 @@ export function AccountsGrid({
                       key={c.key as string}
                       className={cn(
                         "px-3 py-2.5 whitespace-nowrap",
-                        isSticky && "sticky bg-card z-10",
-                        idx === 0 && "left-0",
-                        idx === 1 && "left-[200px] border-r border-border",
+                        isSticky && "md:sticky bg-card z-10",
+                        idx === 0 && "md:left-0",
+                        idx === 1 && "md:left-[200px] border-r border-border",
                       )}
                       onClick={(e) => {
                         if (c.key === "name") e.stopPropagation();
