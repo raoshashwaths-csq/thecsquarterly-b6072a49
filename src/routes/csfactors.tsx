@@ -211,6 +211,28 @@ function CSFactorsPage() {
           }
         }}
       />
+
+      {/* Fullscreen account matrix */}
+      <Dialog open={fullscreen} onOpenChange={setFullscreen}>
+        <DialogContent className="max-w-[98vw] w-[98vw] h-[95vh] p-0 flex flex-col bg-background border-border">
+          <header className="px-6 py-4 border-b border-border flex items-center justify-between">
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-1">
+                Accounts · Fullscreen
+              </div>
+              <h2 className="font-display text-xl tracking-tight">Master Account Matrix</h2>
+            </div>
+          </header>
+          <div className="flex-1 overflow-auto p-6">
+            <AccountsGrid accounts={accounts} onRowClick={onRowClick} />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Q agent */}
+      {user && !qOpen ? <QAgentLauncher onClick={() => setQOpen(true)} /> : null}
+      <QAgentDrawer open={qOpen} onOpenChange={setQOpen} />
     </div>
   );
 }
+
