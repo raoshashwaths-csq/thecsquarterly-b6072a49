@@ -43,13 +43,6 @@ export function SiteHeader() {
   };
 
 
-
-  const meta = (user?.user_metadata ?? {}) as {
-    avatar_url?: string;
-    picture?: string;
-    display_name?: string;
-    full_name?: string;
-  };
   const avatarUrl = meta.avatar_url ?? meta.picture ?? null;
   const displayName = meta.display_name ?? meta.full_name ?? user?.email ?? "";
   const initials = (displayName || "·")
