@@ -30,7 +30,13 @@ export function useSmartNav(threshold = 96): NavState {
         const y = window.scrollY;
         const scrolled = y > 24;
         const goingDown = y > lastY;
-        const visible = reduce ? true : !(goingDown && y > threshold);
+        // Only hide the header on >= md viewports. On mobile, momentum scroll
+        // causes the translate to flicker during route transitions — keep the
+        // header pinned instead.
+        const isDesktop =
+          typeof window !== "undefined" &&
+          window.matchMedia?.("(min-width: 768px)").matches;
+        const visible = reduce || !isDesktop ? true : !(goingDown && y > threshold);
         setState((prev) =>
           prev.scrolled === scrolled && prev.visible === visible ? prev : { scrolled, visible },
         );
@@ -38,6 +44,7 @@ export function useSmartNav(threshold = 96): NavState {
         ticking = false;
       });
     };
+
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();

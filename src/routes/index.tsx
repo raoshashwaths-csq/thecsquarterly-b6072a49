@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
+import { QHint } from "@/components/site/QHint";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -18,12 +19,13 @@ const postsQuery = queryOptions({
 });
 
 const SECTIONS = [
-  { to: "/vanguard", name: "The CS Vanguard", blurb: "Proactive plays for fruitful engagement." },
-  { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically." },
-  { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts." },
-  { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators." },
-  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 11 dimensions, 44 metrics." },
+  { to: "/vanguard", name: "The CS Vanguard", blurb: "Proactive plays for fruitful engagement.", hint: "Q: open when you want this week's signal on what other CS orgs are doing." },
+  { to: "/retention-protocol", name: "The Retention Protocol", blurb: "Identify churn early. Reverse it systematically.", hint: "Q: pick one playbook per quarter and run it end-to-end across the book." },
+  { to: "/outcome-forum", name: "The Outcome Forum", blurb: "Validated case studies, with the receipts.", hint: "Q: bring receipts here when you need numbers for a board or stakeholder argument." },
+  { to: "/codex", name: "The CS Codex", blurb: "The reference library for serious operators.", hint: "Q: use it like a dictionary — jump in, grab the framework, leave." },
+  { to: "/ai-readiness", name: "The Diagnostics", blurb: "Benchmark your team. 11 dimensions, 44 metrics.", hint: "Q: the single transition that unlocks your next band is the one to fund first." },
 ] as const;
+
 
 
 export const Route = createFileRoute("/")({
@@ -61,9 +63,7 @@ function HomePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center animate-fade-up">
-        {/* (Workspace anchor moved below the CSF Command Centre card) */}
-
+      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center md:animate-fade-up">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           Weekly Dispatch for the 1% of Customer Success Operators
         </div>
@@ -84,8 +84,42 @@ function HomePage() {
           </p>
         )}
 
-        {/* Elevated CSF Command Centre card */}
+        {/* AI Readiness Audit — primary value-prop card for first-time visitors */}
         <div className="mt-12 flex justify-center">
+          <Link
+            to="/ai-readiness"
+            data-tour="ai-readiness-box"
+            className="group relative w-full max-w-2xl bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7 text-left flex flex-col md:flex-row md:items-center gap-5"
+            aria-label="Take the AI Readiness Audit"
+          >
+            <span
+              aria-hidden
+              className="flex h-14 w-14 shrink-0 items-center justify-center bg-secondary-accent text-background rounded-sm font-mono text-base font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
+            >
+              AR
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
+                AI Readiness · Diagnostic
+              </div>
+              <div className="font-display text-xl md:text-2xl leading-tight mb-1">
+                Benchmark your CS org in 5 minutes
+              </div>
+              <p className="text-sm text-foreground/70 leading-snug mb-2">
+                11 dimensions, 44 metrics. See where you sit between Reactive, Operational and Predictive — and what to fix first.
+              </p>
+              <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
+                Take the free diagnostic →
+              </div>
+              <QHint>
+                Q: the 5-min audit pinpoints your weakest of 11 dimensions and names the single fix that moves your band.
+              </QHint>
+            </div>
+          </Link>
+        </div>
+
+        {/* Elevated CSF Command Centre card */}
+        <div className="mt-4 flex justify-center">
           <Link
             to="/csfactors"
             data-tour="csf-box"
@@ -111,6 +145,9 @@ function HomePage() {
               <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
                 Unlock at Operator tier →
               </div>
+              <QHint>
+                Q: your daily operator console — start here every morning to triage the burning three.
+              </QHint>
             </div>
           </Link>
         </div>
@@ -166,13 +203,15 @@ function HomePage() {
               <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
               <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">{s.name}</h2>
               <p className="text-sm text-foreground/65 text-pretty mb-4">{s.blurb}</p>
-              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors">
+              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors mb-3">
                 Enter section →
               </div>
+              <QHint>{s.hint}</QHint>
             </Link>
           ))}
         </div>
       </section>
+
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto" />
 
@@ -223,24 +262,8 @@ function HomePage() {
                   "CS is no longer a service department; it is a revenue engine that requires the same mechanical precision as an assembly line."
                 </p>
               </div>
-
-              {/* AI Survey Promo */}
-              <div className="bg-foreground text-background p-10">
-                <div className="font-mono text-xs uppercase tracking-[0.2em] mb-6 opacity-60">
-                  Tooling & Diagnostics
-                </div>
-                <h3 className="font-display text-3xl mb-6">The 2026 AI Readiness Audit</h3>
-                <p className="text-sm leading-relaxed opacity-80 mb-8">
-                  Is your CS organization prepared for automated orchestration? Take our 5-minute diagnostic to benchmark your team against industry leaders.
-                </p>
-                <Link
-                  to="/ai-readiness"
-                  className="inline-block w-full text-center py-4 border border-background/30 hover:bg-background hover:text-foreground transition-all font-mono text-xs uppercase tracking-widest"
-                >
-                  Start Survey
-                </Link>
-              </div>
             </aside>
+
           </div>
         </main>
       )}
