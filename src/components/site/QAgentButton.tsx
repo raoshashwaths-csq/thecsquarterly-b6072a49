@@ -197,40 +197,57 @@ export function QAgentButton() {
           className="w-full sm:max-w-[460px] md:max-w-[42vw] bg-background border-l border-border p-0 overflow-y-auto"
         >
           <div className="p-7 md:p-9">
-            <SheetHeader className="text-left mb-7">
+            <SheetHeader className="text-left mb-6">
               <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-5">
                 Operator Agent · Beta
               </div>
               <SheetTitle asChild>
                 <h2 className="font-display text-5xl md:text-6xl leading-[0.9] tracking-tight">
-                  Ask <QMark />
+                  Meet <QMark />
                 </h2>
               </SheetTitle>
-              <SheetDescription className="font-body text-base text-foreground/75 leading-relaxed pt-3">
-                Type the question. <QMark /> searches as you type and reasons when you ask.
+              <SheetDescription className="sr-only">
+                Ask Q, take a guided tour of this page, browse quick tips, or open the feature glossary.
               </SheetDescription>
             </SheetHeader>
 
-            {/* Scope toggle — ABOVE the search bar */}
-            <div className="mb-3 inline-flex items-stretch border border-border">
+            {/* Action row — tour / tips / glossary */}
+            <div className="mb-5 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => { setScope("universal"); setHits([]); }}
-                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
-                  scope === "universal" ? "bg-foreground text-background" : "hover:bg-muted"
-                }`}
+                onClick={() => {
+                  if (!tour.hasTour) return;
+                  setOpen(false);
+                  tour.start();
+                }}
+                disabled={!tour.hasTour}
+                title={tour.hasTour ? "Tour this page" : "No tour for this page yet"}
+                className="inline-flex items-center gap-1.5 px-3 py-2 border border-border font-mono text-[10px] uppercase tracking-[0.25em] hover:border-accent hover:text-accent transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                Universal
+                <Compass className="h-3 w-3" />
+                {tour.hasTour ? "Tour page" : "No tour"}
               </button>
               <button
                 type="button"
-                onClick={() => { setScope("workspace"); setHits([]); }}
-                disabled={!user}
-                className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                  scope === "workspace" ? "bg-foreground text-background" : "hover:bg-muted"
+                onClick={() => setPanel((p) => (p === "tips" ? null : "tips"))}
+                aria-pressed={panel === "tips"}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 border font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                  panel === "tips" ? "border-accent text-accent" : "border-border hover:border-accent hover:text-accent"
                 }`}
               >
-                Workspace
+                <Lightbulb className="h-3 w-3" />
+                Quick Tips
+              </button>
+              <button
+                type="button"
+                onClick={() => setPanel((p) => (p === "glossary" ? null : "glossary"))}
+                aria-pressed={panel === "glossary"}
+                className={`inline-flex items-center gap-1.5 px-3 py-2 border font-mono text-[10px] uppercase tracking-[0.25em] transition-colors ${
+                  panel === "glossary" ? "border-accent text-accent" : "border-border hover:border-accent hover:text-accent"
+                }`}
+              >
+                <BookOpen className="h-3 w-3" />
+                Glossary
               </button>
             </div>
 
@@ -269,46 +286,69 @@ export function QAgentButton() {
               </button>
             </form>
 
-            {/* Suggested Vectors — premium parchment pills, always visible */}
-            {!answer && (
-              <div className="mb-5">
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
-                  Suggested Vectors
+            {/* Q replies */}
+            {answer && (
+              <div className="mb-5 border-l-2 border-accent pl-4 py-1">
+                <div className="font-mono uppercase tracking-widest text-xs text-foreground/50 mb-2">
+                  <QMark /> replies
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
-                  {SUGGESTED_VECTORS.map((v) => (
-                    <button
-                      key={v}
-                      type="button"
-                      onClick={() => { setQuery(v); inputRef.current?.focus(); }}
-                      className="snap-start shrink-0 max-w-[280px] text-left text-xs font-body leading-snug border border-border bg-card/70 px-3 py-2.5 hover:border-accent hover:text-accent transition-colors"
-                    >
-                      {v}
-                    </button>
-                  ))}
+                <div className="font-body text-[15px] text-foreground/85 leading-relaxed whitespace-pre-wrap">
+                  {answer}
                 </div>
               </div>
             )}
 
-
-            {/* Live search results */}
-            {query && (
-              <div className="mb-5 space-y-2">
-                {searchLoading && hits.length === 0 && (
-                  <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Searching…</div>
-                )}
-                {!searchLoading && hits.length === 0 && (
-                  <div className="text-sm text-foreground/60">
-                    {scope === "workspace"
-                      ? <>Nothing in your Workspace matches. <Link to="/account/workspace" onClick={() => setOpen(false)} className="underline">Open Workspace →</Link></>
-                      : <>No matches — ask <QMark /> directly instead.</>}
+            {/* Inline panel (tips / glossary) — replaces vectors + results when open */}
+            {panel === "tips" ? (
+              <div className="mb-5 animate-fade-in">
+                <RouteTipsList onNavigate={() => setOpen(false)} />
+              </div>
+            ) : panel === "glossary" ? (
+              <div className="mb-5 animate-fade-in">
+                <FeatureGlossary />
+              </div>
+            ) : (
+              <>
+                {/* Suggested Vectors — premium parchment pills */}
+                {!answer && (
+                  <div className="mb-5">
+                    <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
+                      Suggested Vectors
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
+                      {SUGGESTED_VECTORS.map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => { setQuery(v); inputRef.current?.focus(); }}
+                          className="snap-start shrink-0 max-w-[280px] text-left text-xs font-body leading-snug border border-border bg-card/70 px-3 py-2.5 hover:border-accent hover:text-accent transition-colors"
+                        >
+                          {v}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
-                {hits.slice(0, 6).map((h) => (
-                  <ResultRow key={`${h.kind}-${h.id}`} hit={h} onClose={() => setOpen(false)} />
-                ))}
-              </div>
+
+                {/* Live search results */}
+                {query && (
+                  <div className="mb-5 space-y-2">
+                    {searchLoading && hits.length === 0 && (
+                      <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">Searching…</div>
+                    )}
+                    {!searchLoading && hits.length === 0 && (
+                      <div className="text-sm text-foreground/60">
+                        No matches — ask <QMark /> directly instead.
+                      </div>
+                    )}
+                    {hits.slice(0, 6).map((h) => (
+                      <ResultRow key={`${h.kind}-${h.id}`} hit={h} onClose={() => setOpen(false)} />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
+
 
             {/* Q replies */}
             {answer && (
