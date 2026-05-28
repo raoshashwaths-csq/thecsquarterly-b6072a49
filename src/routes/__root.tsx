@@ -12,6 +12,7 @@ import { Link } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { QAgentButton } from "@/components/site/QAgentButton";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 const CommandPalette = lazy(() =>
   import("@/components/site/CommandPalette").then((m) => ({ default: m.CommandPalette })),
 );
@@ -122,6 +123,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
       </head>
       {/* paper-grain: subtle paper texture overlay on cream sections. Remove this class to disable globally. */}
       <body className="paper-grain">
+        <PaymentTestModeBanner />
         {children}
         <Scripts />
       </body>
