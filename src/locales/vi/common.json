@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "vanguard": "Tiên phong",
+    "retention": "Giữ chân",
+    "outcome": "Kết quả",
+    "codex": "Codex",
+    "diagnostic": "Chẩn đoán",
+    "canvas": "Canvas",
+    "workspace": "Không gian làm việc",
+    "search": "Tìm",
+    "login": "Đăng nhập"
+  },
+  "menu": {
+    "yourWorkspace": "Không gian của bạn",
+    "account": "Tài khoản",
+    "admin": "Quản trị",
+    "roiCalculator": "Máy tính ROI",
+    "benchmarks": "Chuẩn mực",
+    "directory": "Danh bạ",
+    "teams": "Đội nhóm",
+    "sequencer": "Trình tự đọc",
+    "controlPanel": "Bảng điều khiển",
+    "signOut": "Đăng xuất",
+    "member": "Thành viên"
+  },
+  "footer": {
+    "ctaEyebrow": "Bản tin / Hàng tuần",
+    "ctaHeadlineLine1": "Tình báo chiến lược cho các",
+    "ctaHeadlineLine2": "kiến trúc sư của sự giữ chân.",
+    "subscribeFree": "Đăng ký miễn phí",
+    "sections": "Chuyên mục",
+    "resources": "Tài nguyên",
+    "company": "Công ty",
+    "social": "Mạng xã hội",
+    "privacy": "Riêng tư",
+    "terms": "Điều khoản",
+    "colophon": "Thông tin xuất bản",
+    "copyright": "© {{year}} The CS Quarterly",
+    "stayTuned": "Sắp ra mắt",
+    "sectionLinks": {
+      "vanguard": "The CS Vanguard",
+      "retention": "Giao thức Giữ chân",
+      "outcome": "Diễn đàn Kết quả",
+      "codex": "CS Codex"
+    },
+    "resourceLinks": {
+      "diagnostic": "Chẩn đoán sẵn sàng AI",
+      "calculator": "Máy tính ROI",
+      "benchmarks": "Chuẩn mực NRR",
+      "directory": "Danh bạ chuyên gia",
+      "teams": "Đội nhóm",
+      "sequencer": "Trình tự đọc",
+      "jobBoard": "Bảng tuyển dụng",
+      "pricing": "Bảng giá",
+      "subscribe": "Đăng ký"
+    },
+    "companyLinks": {
+      "mission": "Sứ mệnh",
+      "editorial": "Tiêu chuẩn biên tập",
+      "contact": "Liên hệ",
+      "login": "Đăng nhập"
+    }
+  },
+  "langSwitcher": {
+    "label": "Chọn phiên bản ngôn ngữ",
+    "editions": "Phiên bản",
+    "regions": {
+      "global": "Toàn cầu",
+      "sea": "Đông Nam Á",
+      "mena": "Trung Đông & Bắc Phi"
+    },
+    "soon": "sắp có",
+    "activeToast": "Phiên bản {{native}} đã kích hoạt.",
+    "soonToast": "Phiên bản {{native}} sắp ra mắt. Chúng tôi sẽ gửi email khi sẵn sàng.",
+    "soonDescription": "Triển khai {{region}} · bản tin sẽ đến bằng {{native}}."
+  }
+}

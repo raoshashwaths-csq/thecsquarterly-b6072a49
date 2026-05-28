@@ -1,0 +1,77 @@
+{
+  "nav": {
+    "vanguard": "الطليعة",
+    "retention": "الاحتفاظ",
+    "outcome": "النتائج",
+    "codex": "المرجع",
+    "diagnostic": "التشخيص",
+    "canvas": "اللوحة",
+    "workspace": "مساحة العمل",
+    "search": "بحث",
+    "login": "تسجيل الدخول"
+  },
+  "menu": {
+    "yourWorkspace": "مساحة عملك",
+    "account": "الحساب",
+    "admin": "الإدارة",
+    "roiCalculator": "حاسبة العائد",
+    "benchmarks": "المقاييس المرجعية",
+    "directory": "الدليل",
+    "teams": "الفرق",
+    "sequencer": "منظّم القراءة",
+    "controlPanel": "لوحة التحكم",
+    "signOut": "تسجيل الخروج",
+    "member": "عضو"
+  },
+  "footer": {
+    "ctaEyebrow": "النشرة / أسبوعياً",
+    "ctaHeadlineLine1": "ذكاء استراتيجي لمهندسي",
+    "ctaHeadlineLine2": "الاحتفاظ بالعملاء.",
+    "subscribeFree": "اشترك مجاناً",
+    "sections": "الأقسام",
+    "resources": "الموارد",
+    "company": "الشركة",
+    "social": "التواصل",
+    "privacy": "الخصوصية",
+    "terms": "الشروط",
+    "colophon": "بيانات النشر",
+    "copyright": "© {{year}} The CS Quarterly",
+    "stayTuned": "قريباً",
+    "sectionLinks": {
+      "vanguard": "طليعة نجاح العملاء",
+      "retention": "بروتوكول الاحتفاظ",
+      "outcome": "منتدى النتائج",
+      "codex": "مرجع نجاح العملاء"
+    },
+    "resourceLinks": {
+      "diagnostic": "تشخيص الجاهزية للذكاء الاصطناعي",
+      "calculator": "حاسبة العائد على الاستثمار",
+      "benchmarks": "مقاييس صافي الإيرادات المتكررة",
+      "directory": "دليل المختصين",
+      "teams": "الفرق",
+      "sequencer": "منظّم القراءة",
+      "jobBoard": "لوحة الوظائف",
+      "pricing": "الأسعار",
+      "subscribe": "اشترك"
+    },
+    "companyLinks": {
+      "mission": "مهمتنا",
+      "editorial": "المعايير التحريرية",
+      "contact": "تواصل معنا",
+      "login": "تسجيل الدخول"
+    }
+  },
+  "langSwitcher": {
+    "label": "اختر لغة الإصدار",
+    "editions": "الإصدارات",
+    "regions": {
+      "global": "عالمي",
+      "sea": "جنوب شرق آسيا",
+      "mena": "الشرق الأوسط وشمال أفريقيا"
+    },
+    "soon": "قريباً",
+    "activeToast": "إصدار {{native}} مفعّل.",
+    "soonToast": "إصدار {{native}} قيد الإطلاق قريباً. سنرسل لك بريداً عند توفره.",
+    "soonDescription": "إطلاق {{region}} · ستصلك النشرة باللغة {{native}}."
+  }
+}
