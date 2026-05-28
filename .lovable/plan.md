@@ -1,108 +1,71 @@
-# Multilingual support — Phase 1
+# Why nothing appeared to change
 
-UI chrome only. English default (bare paths). Five additional locales prefixed: `/ar`, `/id`, `/th`, `/vi`, `/tl`. AI-assisted draft translations. LTR layout for everyone (Arabic deferred RTL until Phase 2). Editorial content (essays, codex, vanguard, etc.) stays English-only.
+The i18n wiring works — `i18n.changeLanguage` fires, the toast confirms, the footer (CTA strip + link columns) does re-render in the chosen language. The problem is what's visible above the fold on `/`:
 
-## 1. Scope
+- **SiteHeader on mobile (400px), logged in**: only icons + `AR` code + avatar are visible. No text token in the header changes.
+- **Homepage hero, "The Sections" strip, "Recent Dispatches" heading, AI Readiness card, CSF card, Workspace anchor**: all hardcoded English strings, not wired to `t()`.
 
-**In scope (Phase 1)**
-- Site chrome: header nav, footer, buttons, form labels, auth screens, paywall, Q hints, tour copy, pricing tier names/descriptions, dashboard primitive labels, error & empty states.
-- Locale switcher in the header (last item before sign-in / avatar).
-- SEO: per-route `hreflang` alternates + localized `<title>` / `<meta description>` for translated chrome.
-- Sitemap entries for each locale prefix.
+So a user on the home page sees a toast and no visible language change until they scroll to the footer. Reads as broken.
 
-**Out of scope (deferred)**
-- Editorial content: posts, codex entries, playbooks, vanguard, retention-protocol bodies. These render in English regardless of locale.
-- RTL layout mirroring (Arabic ships in LTR for now).
-- Translated email templates, AI agent (Q) responses, Lovable AI prompts.
-- Admin control-panel UI (English only — internal tool).
+# Plan — extend Stage A coverage to the visible home chrome
 
-## 2. URL strategy
+Scope stays "UI chrome only" (no editorial body copy). Touch only frontend / presentation.
 
-- `/about` → English (default, no prefix)
-- `/ar/about`, `/id/about`, `/th/about`, `/vi/about`, `/tl/about` → translated chrome
-- Editorial routes (`/insights/$slug`, `/codex/$slug`, etc.) accept the prefix but render English body; only chrome around them translates.
-- Locale detected from URL only (no cookie/Accept-Language redirect in Phase 1 — simpler, predictable, SEO-safe).
+## 1. Add `home` translation keys to all six locale JSONs
 
-## 3. Architecture
+Add a `home` namespace block to `src/locales/{en,ar,id,th,vi,tl}/common.json`:
 
-### Routing
-- Wrap all routes in a pathless layout `src/routes/{-$lang}.tsx` (optional path param). `{-$lang}` makes the segment optional, so both `/about` and `/ar/about` resolve.
-- The layout validates `lang` against `['ar','id','th','vi','tl']`; anything else 404s. `undefined` = English.
-- `beforeLoad` sets the active locale on router context so `head()` and components read it without prop drilling.
+```text
+home.eyebrow                # "Weekly Dispatch for the 1% of CS Operators"
+home.hero.line1             # "Stop managing accounts."
+home.hero.line2             # "Start engineering trajectory."
+home.hero.sub               # the 1-paragraph subhead
+home.welcomeBack            # "Welcome back —"
+home.openAccount            # "open your account →"
+home.aiCard.eyebrow         # "AI Readiness · Diagnostic"
+home.aiCard.title           # "Benchmark your CS org in 5 minutes"
+home.aiCard.body
+home.aiCard.cta             # "Take the free diagnostic →"
+home.csfCard.eyebrow        # "CSF · Command Centre"
+home.csfCard.title          # "Your personal CS dashboard"
+home.csfCard.body
+home.csfCard.cta            # "Unlock at Operator tier →"
+home.workspace.eyebrow      # "Your Workspace"
+home.workspace.title        # "Notes · Highlights · Links →"
+home.sections.eyebrow       # "The Sections"
+home.sections.count         # "{{count}} disciplines"
+home.sections.enter         # "Enter section →"
+home.sections.items.vanguard.{name,blurb}
+home.sections.items.retention.{name,blurb}
+home.sections.items.outcome.{name,blurb}
+home.sections.items.codex.{name,blurb}
+home.sections.items.diagnostic.{name,blurb}
+home.thesis.eyebrow         # "The Thesis"
+home.recent.title           # "Recent Dispatches"
+home.recent.viewAll         # "View all"
+home.insightLabel           # "Insight #{{n}}, {{min}} min read"
+home.readFull               # "Read the full essay"
+```
 
-### i18n runtime
-- Install `i18next` + `react-i18next` + `i18next-resources-to-backend` (lazy chunk per locale).
-- Create one i18next instance **per request** inside `src/router.tsx` `createRouter()` so SSR stays isolated (no shared mutable state across requests).
-- Translation files live at `src/locales/{lang}/{namespace}.json`. Namespaces: `common`, `nav`, `auth`, `pricing`, `qHints`, `tour`, `dashboard`, `seo`.
-- English (`en`) is the source of truth — written by hand. Other locales generated via the AI-drafted workflow (§5).
+EN gets the existing copy verbatim. AR / ID / TH / VI / TL get AI-assisted drafts (already agreed workflow). Brand names ("CSF", "CSQ", "Q", section proper nouns like "The CS Vanguard") stay in English per the editorial rules; only the surrounding chrome labels translate.
 
-### Components
-- Replace hardcoded strings with `useTranslation('namespace').t('key')`.
-- `<LangSwitcher />` added to `SiteHeader` as the last item when logged out (before sign-in), and inside the avatar dropdown when logged in.
-- `<Link>` calls use a small helper `localizedTo(path, lang)` that prepends the prefix when `lang !== 'en'`.
+## 2. Wire `useTranslation` into the homepage
 
-### SEO per route
-- `head()` reads `lang` from route context and:
-  - sets localized `title` / `description` from the `seo` namespace
-  - emits `<link rel="alternate" hreflang="...">` for every locale + `x-default`
-  - sets `<html lang="...">` via root route (already supports dynamic lang).
-- `sitemap.xml` server route enumerates each indexable path × each locale.
+In `src/routes/index.tsx`, swap the hardcoded strings in the hero, the AI Readiness card, the CSF card, the Workspace anchor, the Sections strip, the Thesis sidebar, and the Recent Dispatches strip for `t("home.…")` calls. The `SECTIONS` array's `name` / `blurb` / `hint` move into the JSON; the component reads them via `t()`.
 
-## 4. Files to add / modify
+The hint copy stays under `home.sections.items.*.hint` so Q hints translate too.
 
-**New**
-- `src/routes/{-$lang}.tsx` — pathless locale layout
-- `src/lib/i18n/config.ts` — i18next instance factory
-- `src/lib/i18n/locales.ts` — `SUPPORTED_LOCALES`, `DEFAULT_LOCALE`, helpers (`localizedTo`, `getAlternates`)
-- `src/components/site/LangSwitcher.tsx`
-- `src/locales/en/{common,nav,auth,pricing,qHints,tour,dashboard,seo}.json` (source)
-- `src/locales/{ar,id,th,vi,tl}/*.json` (AI-drafted)
-- `scripts/translate-locales.ts` — one-off script that reads `en/*.json` and uses Lovable AI Gateway (`google/gemini-2.5-pro`) to produce drafts for the other five locales. Re-runnable, only fills missing keys.
+## 3. Confirm the wiring loop on screen
 
-**Modified**
-- `src/router.tsx` — wire per-request i18n instance into router context
-- `src/routes/__root.tsx` — set `<html lang>` dynamically, mount `I18nextProvider`
-- `src/components/site/SiteHeader.tsx` — add `<LangSwitcher />`, route `<Link>`s through `localizedTo`
-- `src/components/site/SiteFooter.tsx` — same
-- `src/components/site/QHint.tsx`, `src/hooks/useTour.ts`, `src/lib/enablement/tips.ts` — pull strings from `qHints` / `tour` namespaces
-- `src/lib/tiers.ts` consumers (pricing card components) — translate names/descriptions via `pricing` namespace; tier IDs stay English
-- `src/routes/sitemap[.]xml.ts` — emit one entry per locale
-- All shareable route files' `head()` — switch to `seo` namespace + add `hreflang` alternates
+Once the homepage strings flip, switching to AR will visibly:
+- repaint the eyebrow, hero, all three cards, sections strip, and "Recent Dispatches" header in Arabic,
+- in addition to the footer (already wired).
 
-## 5. Translation workflow
+No other behavior, business logic, or routing changes — Stage B (URL prefixes, `hreflang`, RTL layout mirroring) remains as previously agreed and is out of scope here.
 
-1. Engineer/PM edits `src/locales/en/*.json` (source of truth).
-2. Run `bun scripts/translate-locales.ts` — script diffs source against each locale, sends missing keys to Lovable AI Gateway with a tone-preserving prompt (Economist / Stratechery register, operator audience, no hype/emoji), writes JSON back.
-3. Optional human review pass before commit.
-4. CI/typecheck guard (later phase) ensures every key in `en` exists in every locale.
+## Files touched
 
-## 6. Phasing inside this PR
+- `src/locales/{en,ar,id,th,vi,tl}/common.json` — append `home.*` block.
+- `src/routes/index.tsx` — add `useTranslation`, replace hardcoded strings with `t()` calls, move `SECTIONS` content into JSON.
 
-Step A — Foundation (no visible change)
-- Install deps, add i18n config, locale layout route, English source files, locale helpers.
-
-Step B — Header / footer / auth / pricing chrome
-- Migrate strings, add `<LangSwitcher />`, route links through `localizedTo`.
-
-Step C — Q hints, tour, dashboard primitives, paywall, error/empty states.
-
-Step D — SEO
-- Per-route `seo` namespace, `hreflang` alternates, sitemap × locales.
-
-Step E — Translation script + first AI draft pass for all five locales.
-
-Each step is independently reviewable; nothing breaks English while in progress.
-
-## 7. Risks & non-goals
-
-- **RTL**: Arabic will look awkward (punctuation, alignment) until Phase 2 adds `dir="rtl"` and logical CSS properties. Acceptable trade-off per your call.
-- **Editorial content drift**: readers landing on `/ar/insights/some-essay` see translated chrome around English body. We'll surface a small note ("Essay available in English") in the article header for non-`en` locales.
-- **Build size**: lazy per-locale chunks keep initial bundle flat; only the active locale loads.
-- **No locale auto-detect**: users must click the switcher or land on a prefixed URL. Intentional — avoids redirect loops and SEO ambiguity in Phase 1.
-
-## 8. What you'll see when it ships
-
-- A small `EN / AR / ID / TH / VI / TL` switcher in the header.
-- Translated nav, buttons, pricing cards, Q hints, tour, footer.
-- English essays/codex unchanged.
-- Each translated page indexable separately by Google with correct `hreflang`.
+Nothing else changes; no new components, no infra changes.
