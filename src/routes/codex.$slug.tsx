@@ -95,6 +95,8 @@ function PlaybookPage() {
           <div className="prose-content border-t border-border pt-10">
             <div className="font-mono text-[10px] uppercase tracking-widest text-accent mb-3">Unlocked</div>
             {(() => {
+              const Interactive = PLAYBOOK_COMPONENTS[pb.slug];
+              if (Interactive) return <Interactive />;
               const normalized = pb.body
                 .replace(/\r\n/g, "\n")
                 .replace(/([^\n])\n(#{1,6}[^#\n])/g, "$1\n\n$2")
