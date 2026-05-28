@@ -2,10 +2,7 @@ import {
   Activity,
   LayoutGrid,
   Users as UsersIcon,
-  TrendingUp,
-  Shield,
-  Heart,
-  Flame,
+  LayoutDashboard,
   BarChart3,
   Calculator,
   Gauge,
@@ -26,13 +23,7 @@ export const TOP_LINKS: NavLink[] = [
   { to: "/csfactors", label: "Pulse", icon: Activity },
   { to: "/csfactors", hash: "#accounts", label: "Accounts", icon: LayoutGrid },
   { to: "/csfactors", hash: "#renewals", label: "Renewals", icon: UsersIcon },
-];
-
-export const ANALYTICS_LINKS: NavLink[] = [
-  { to: "/account/analytics", label: "Executive Portfolio", icon: TrendingUp },
-  { to: "/account/analytics/nrr-waterfall", label: "Retention Analysis", icon: Shield },
-  { to: "/account/analytics/stakeholder-radar", label: "Account Health Matrix", icon: Heart },
-  { to: "/account/analytics/retention-funnel", label: "Churn Risk & Expansion", icon: Flame },
+  { to: "/csfactors/360", label: "360 Dashboard", icon: LayoutDashboard },
 ];
 
 // Workspace handled separately (opens a Sheet)
