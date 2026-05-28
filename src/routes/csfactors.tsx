@@ -217,7 +217,7 @@ function CSFactorsPageInner() {
               </section>
 
               <section className="mb-10" id="renewals">
-                <MetricGrid cols={3}>
+                <MetricGrid cols={3} className="gap-4 md:gap-px">
                   <MetricCard
                     eyebrow="Total Portfolio ARR"
                     value={compact(totalARR)}
