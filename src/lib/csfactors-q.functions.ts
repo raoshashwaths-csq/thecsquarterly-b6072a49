@@ -151,11 +151,8 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       portfolioJson,
     ].join("\n");
 
-    const messages: Msg[] = [
-      { role: "user", content: system },
-      ...data.history,
-      { role: "user", content: data.question },
-    ];
+
+
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
