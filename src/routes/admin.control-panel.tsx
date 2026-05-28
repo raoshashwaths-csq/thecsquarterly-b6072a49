@@ -34,11 +34,12 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { MetricCard as KitMetricCard } from "@/components/dashboard/MetricCard";
 import {
-  getControlPanelOverview, getAgentObservability, getQRunTranscript,
+  getControlPanelOverview, getAgentObservability, getQRunTranscript, getQCostProjection,
   listJobListings, moderateJobListing, updateJobFlags, seedSampleJobs,
   listEmailTemplates, sendTestBroadcast, schedulePost,
   listMasterUsers, manageUser,
 } from "@/lib/control-panel.functions";
+import { formatUSD } from "@/lib/q-pricing";
 import { TIER_LABEL, ALL_DESIGNATIONS, PAID_DESIGNATIONS, isPaid } from "@/lib/admin-tiers";
 import {
   DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, DropdownMenuPortal,
