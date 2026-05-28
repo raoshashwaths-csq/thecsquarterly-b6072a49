@@ -72,7 +72,7 @@ function AccountPage() {
               />
             </MetricGrid>
 
-            <SectionCard eyebrow="Identity" title={me.data.displayName ?? me.data.email}>
+            <SectionCard eyebrow="Identity" title={me.data.displayName ?? me.data.email ?? "Member"}>
               <div className="text-sm text-muted-foreground">{me.data.email}</div>
             </SectionCard>
 
