@@ -35,6 +35,7 @@ import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.inde
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
@@ -178,6 +179,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CsfactorsAccountIdRoute = CsfactorsAccountIdRouteImport.update({
+  id: '/$accountId',
+  path: '/$accountId',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
 const CodexSlugRoute = CodexSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -251,7 +257,7 @@ export interface FileRoutesByFullPath {
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
-  '/csfactors': typeof CsfactorsRoute
+  '/csfactors': typeof CsfactorsRouteWithChildren
   '/directory': typeof DirectoryRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
@@ -269,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
+  '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -289,7 +296,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
-  '/csfactors': typeof CsfactorsRoute
+  '/csfactors': typeof CsfactorsRouteWithChildren
   '/directory': typeof DirectoryRoute
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
@@ -306,6 +313,7 @@ export interface FileRoutesByTo {
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
+  '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account': typeof AccountIndexRoute
@@ -329,7 +337,7 @@ export interface FileRoutesById {
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
-  '/csfactors': typeof CsfactorsRoute
+  '/csfactors': typeof CsfactorsRouteWithChildren
   '/directory': typeof DirectoryRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
@@ -347,6 +355,7 @@ export interface FileRoutesById {
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/codex/$slug': typeof CodexSlugRoute
+  '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -389,6 +398,7 @@ export interface FileRouteTypes {
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
+    | '/csfactors/$accountId'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -426,6 +436,7 @@ export interface FileRouteTypes {
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
+    | '/csfactors/$accountId'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account'
@@ -466,6 +477,7 @@ export interface FileRouteTypes {
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/codex/$slug'
+    | '/csfactors/$accountId'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -489,7 +501,7 @@ export interface RootRouteChildren {
   BenchmarksRoute: typeof BenchmarksRoute
   CalculatorRoute: typeof CalculatorRoute
   CodexRoute: typeof CodexRouteWithChildren
-  CsfactorsRoute: typeof CsfactorsRoute
+  CsfactorsRoute: typeof CsfactorsRouteWithChildren
   DirectoryRoute: typeof DirectoryRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JobBoardRoute: typeof JobBoardRoute
@@ -699,6 +711,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/csfactors/$accountId': {
+      id: '/csfactors/$accountId'
+      path: '/$accountId'
+      fullPath: '/csfactors/$accountId'
+      preLoaderRoute: typeof CsfactorsAccountIdRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
     '/codex/$slug': {
       id: '/codex/$slug'
       path: '/$slug'
@@ -822,6 +841,18 @@ const CodexRouteChildren: CodexRouteChildren = {
 
 const CodexRouteWithChildren = CodexRoute._addFileChildren(CodexRouteChildren)
 
+interface CsfactorsRouteChildren {
+  CsfactorsAccountIdRoute: typeof CsfactorsAccountIdRoute
+}
+
+const CsfactorsRouteChildren: CsfactorsRouteChildren = {
+  CsfactorsAccountIdRoute: CsfactorsAccountIdRoute,
+}
+
+const CsfactorsRouteWithChildren = CsfactorsRoute._addFileChildren(
+  CsfactorsRouteChildren,
+)
+
 interface InsightsRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
@@ -844,7 +875,7 @@ const rootRouteChildren: RootRouteChildren = {
   BenchmarksRoute: BenchmarksRoute,
   CalculatorRoute: CalculatorRoute,
   CodexRoute: CodexRouteWithChildren,
-  CsfactorsRoute: CsfactorsRoute,
+  CsfactorsRoute: CsfactorsRouteWithChildren,
   DirectoryRoute: DirectoryRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JobBoardRoute: JobBoardRoute,

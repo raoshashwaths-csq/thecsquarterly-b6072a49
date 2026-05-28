@@ -1,0 +1,72 @@
+import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
+
+type Accent = "neutral" | "accent" | "secondary" | "danger" | "success";
+
+export type MetricCardProps = {
+  eyebrow: string;
+  value: ReactNode;
+  unit?: string;
+  trend?: string;
+  trendDirection?: "up" | "down" | "flat";
+  accent?: Accent;
+  footer?: ReactNode;
+  className?: string;
+};
+
+const ACCENT_BAR: Record<Accent, string> = {
+  neutral: "bg-border",
+  accent: "bg-accent",
+  secondary: "bg-secondary-accent",
+  danger: "bg-destructive",
+  success: "bg-emerald-600",
+};
+
+const TREND_COLOR: Record<NonNullable<MetricCardProps["trendDirection"]>, string> = {
+  up: "text-emerald-700 dark:text-emerald-400",
+  down: "text-destructive",
+  flat: "text-muted-foreground",
+};
+
+export function MetricCard({
+  eyebrow,
+  value,
+  unit,
+  trend,
+  trendDirection = "flat",
+  accent = "neutral",
+  footer,
+  className,
+}: MetricCardProps) {
+  return (
+    <div
+      className={cn(
+        "relative bg-card p-6 border border-border overflow-hidden group",
+        "transition-colors hover:border-foreground/30",
+        className,
+      )}
+    >
+      <div className={cn("absolute left-0 top-0 bottom-0 w-[3px]", ACCENT_BAR[accent])} />
+      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-4">
+        {eyebrow}
+      </div>
+      <div className="font-display text-4xl md:text-5xl tracking-tight leading-none mb-3 flex items-baseline gap-1">
+        <span>{value}</span>
+        {unit ? <span className="text-xl text-muted-foreground">{unit}</span> : null}
+      </div>
+      {trend ? (
+        <div className={cn("text-xs font-mono uppercase tracking-wider", TREND_COLOR[trendDirection])}>
+          {trendDirection === "up" ? "↑ " : trendDirection === "down" ? "↓ " : "→ "}
+          {trend}
+        </div>
+      ) : null}
+      {footer ? <div className="mt-4 pt-4 border-t border-border/60">{footer}</div> : null}
+    </div>
+  );
+}
+
+export function MetricGrid({ children, cols = 3 }: { children: ReactNode; cols?: 2 | 3 | 4 }) {
+  const c =
+    cols === 2 ? "md:grid-cols-2" : cols === 4 ? "md:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3";
+  return <div className={cn("grid gap-px bg-border border border-border", c)}>{children}</div>;
+}

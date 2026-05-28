@@ -86,6 +86,95 @@ export type Database = {
         }
         Relationships: []
       }
+      cs_account_events: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          kind: string
+          occurred_at: string
+          payload: Json
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          occurred_at?: string
+          payload?: Json
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          occurred_at?: string
+          payload?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cs_account_events_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "cs_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cs_accounts: {
+        Row: {
+          arr: number
+          blocker: string | null
+          champion: string | null
+          created_at: string
+          economic_buyer: string | null
+          health: number
+          id: string
+          name: string
+          notes: string | null
+          qbr_status: string
+          renewal_quarter: string
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          arr?: number
+          blocker?: string | null
+          champion?: string | null
+          created_at?: string
+          economic_buyer?: string | null
+          health?: number
+          id?: string
+          name: string
+          notes?: string | null
+          qbr_status?: string
+          renewal_quarter?: string
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          arr?: number
+          blocker?: string | null
+          champion?: string | null
+          created_at?: string
+          economic_buyer?: string | null
+          health?: number
+          id?: string
+          name?: string
+          notes?: string | null
+          qbr_status?: string
+          renewal_quarter?: string
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       directory_profiles: {
         Row: {
           bio: string | null
