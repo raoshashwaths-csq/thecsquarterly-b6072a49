@@ -43,7 +43,7 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
                   className="flex items-center gap-3 px-3 py-3 text-sm border-l-2 border-transparent text-foreground/80 hover:bg-muted/60"
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  <span className="font-mono uppercase tracking-wider text-[11px]">{item.label}</span>
+                  <span className="font-mono uppercase tracking-wider text-xs">{item.label}</span>
                 </a>
               );
             })}
