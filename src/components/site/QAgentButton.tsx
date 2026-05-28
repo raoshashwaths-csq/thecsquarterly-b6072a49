@@ -7,6 +7,8 @@ import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
 import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { globalSearch, searchUserWorkspace, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
+import { SUGGESTED_VECTORS } from "@/lib/q-vectors";
+import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Sheet,
@@ -15,24 +17,14 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { QMark } from "@/components/site/QMark";
 import { BookOpen, FileText, Highlighter, Bookmark, Mic, Sparkles, Square } from "lucide-react";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 
 const TRIAL_KEY = "q.trial.used";
-const SEEN_KEY = "q.attention.seen";
-const LOGIN_HINT_KEY = "q.hint.login";
-
-// Rotating capability messages for the floating Meet Q. speech bubble.
-const CAPABILITY_LINES = [
-  "I can defuse a board-level escalation in 24 hours.",
-  "I can rebuild a QBR a customer actually wants to attend.",
-  "I can map a new champion after a reorg.",
-  "I can read renewal risk 90 days out.",
-  "I can write your appraisal narrative — retained ARR first.",
-  "I can break a 60-day silence without sounding desperate.",
-  "I can call upsell from coverage masking churn.",
-];
+const DRAFT_KEY = "q.draft.global";
+const FLAG_KEY = "q.flagged.today";
 
 // Rolling placeholder prompts pulled from the 8 trees' terminal nodes,
 // reframed as the question an operator would actually type.
@@ -49,16 +41,13 @@ const ROLLING_PROMPTS = [
 
 export function QAgentButton() {
   const [open, setOpen] = useState(false);
-  const [attention, setAttention] = useState(false);
-  const [bubble, setBubble] = useState(false);
-  const [bubbleLeaving, setBubbleLeaving] = useState(false);
-  const [bubbleIdx, setBubbleIdx] = useState(0);
   const [scope, setScope] = useState<"universal" | "workspace">("universal");
   const [query, setQuery] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [trialUsed, setTrialUsed] = useState(false);
   const [unlimited, setUnlimited] = useState(false);
+  const [gateModal, setGateModal] = useState(false);
 
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -72,7 +61,6 @@ export function QAgentButton() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
-  const prevUserIdRef = useRef<string | null>(null);
   const speech = useElevenLabsSpeechInput({
     onTranscript: (text) => {
       setQuery((current) => (current ? `${current} ${text}` : text));
@@ -80,39 +68,24 @@ export function QAgentButton() {
     },
   });
 
-  // Sample 3 terminal-node prompt templates to seed the suggestion chips.
-  const suggestions = useMemo(() => {
-    const terminals = NODES.filter((n) => n.isTerminal && n.promptTemplate);
-    const picks: string[] = [];
-    const step = Math.max(1, Math.floor(terminals.length / 3));
-    for (let i = 0; i < terminals.length && picks.length < 3; i += step) {
-      picks.push(terminals[i].label);
-    }
-    return picks;
-  }, []);
-
+  // Hydrate trial state + draft cache on mount.
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       setTrialUsed(localStorage.getItem(TRIAL_KEY) === "1");
-      if (localStorage.getItem(SEEN_KEY) !== "1") {
-        const t = setTimeout(() => {
-          setAttention(true);
-          setBubble(true);
-        }, 1200);
-        return () => clearTimeout(t);
-      }
+      const draft = sessionStorage.getItem(DRAFT_KEY);
+      if (draft) setQuery(draft);
     } catch { /* */ }
   }, []);
 
-  // Rotate capability messages in the floating speech bubble.
+  // Persist draft as user types (resilience layer).
   useEffect(() => {
-    if (!bubble) return;
-    const t = setInterval(() => {
-      setBubbleIdx((i) => (i + 1) % CAPABILITY_LINES.length);
-    }, 3800);
-    return () => clearInterval(t);
-  }, [bubble]);
+    if (typeof window === "undefined") return;
+    try {
+      if (query) sessionStorage.setItem(DRAFT_KEY, query);
+      else sessionStorage.removeItem(DRAFT_KEY);
+    } catch { /* */ }
+  }, [query]);
 
   // Rotate placeholder prompts inside the search bar.
   useEffect(() => {
@@ -136,26 +109,6 @@ export function QAgentButton() {
     if (open && inputRef.current) inputRef.current.focus();
   }, [open]);
 
-  useEffect(() => {
-    const prev = prevUserIdRef.current;
-    const current = user?.id ?? null;
-    prevUserIdRef.current = current;
-    if (!current || prev === current) return;
-    try {
-      const key = `${LOGIN_HINT_KEY}.${current}`;
-      if (localStorage.getItem(key) === "1") return;
-      localStorage.setItem(key, "1");
-    } catch { /* */ }
-    const inT = window.setTimeout(() => {
-      setAttention(true);
-      setBubbleLeaving(false);
-      setBubble(true);
-    }, 800);
-    const leaveT = window.setTimeout(() => setBubbleLeaving(true), 800 + 8000);
-    const outT = window.setTimeout(() => setBubble(false), 800 + 8000 + 320);
-    return () => { window.clearTimeout(inT); window.clearTimeout(leaveT); window.clearTimeout(outT); };
-  }, [user?.id]);
-
   // Debounced live search as the operator types.
   useEffect(() => {
     const q = query.trim();
@@ -174,14 +127,8 @@ export function QAgentButton() {
     return () => clearTimeout(t);
   }, [query, scope, user, runUniversal, runWorkspace]);
 
-  const dismissAttention = () => {
-    setAttention(false);
-    setBubbleLeaving(true);
-    window.setTimeout(() => setBubble(false), 300);
-    try { localStorage.setItem(SEEN_KEY, "1"); } catch { /* */ }
-  };
+  const handleOpen = () => { setOpen(true); };
 
-  const handleOpen = () => { setOpen(true); dismissAttention(); };
 
   // Monthly Q interaction cap (designation-tier scoped).
   const usage = useQuery({
@@ -198,7 +145,14 @@ export function QAgentButton() {
   const handleAsk = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!query.trim() || loading) return;
-    if (gated) return;
+    if (gated) { if (!user) setGateModal(true); return; }
+    // Friction keyword detection — flag for end-of-day check-in.
+    if (user && typeof window !== "undefined") {
+      const kws = detectFrictionKeywords(query);
+      if (kws.length > 0) {
+        try { sessionStorage.setItem(FLAG_KEY, `${new Date().toISOString().slice(0,10)}|${kws.join(",")}`); } catch { /* */ }
+      }
+    }
     setLoading(true);
     setAnswer(null);
     try {
@@ -207,10 +161,12 @@ export function QAgentButton() {
         : "";
       const { reply } = await ask({ data: { question: prefix + query, witty: false } });
       setAnswer(reply);
+      try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* */ }
       usage.refetch();
       if (!unlimited) {
         try { localStorage.setItem(TRIAL_KEY, "1"); } catch { /* */ }
         setTrialUsed(true);
+        if (!user) setGateModal(true);
       }
     } catch (err) {
       toast.error((err as Error).message || "Q couldn't reply.");
@@ -219,47 +175,24 @@ export function QAgentButton() {
     }
   };
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/agent") || pathname.startsWith("/csfactors")) return null;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/csfactors")) return null;
+
 
   const currentPlaceholder = ROLLING_PROMPTS[placeholderIdx];
 
   return (
     <>
-      {/* Floating Meet Q. — unchanged */}
+      {/* Floating Meet Q. */}
       <button
         type="button"
         onClick={handleOpen}
         aria-label="Meet Q, the CS operator agent"
-        className={`group fixed bottom-20 right-5 md:bottom-28 md:right-8 z-40 flex items-end gap-0 pl-4 pr-3 py-2.5 md:pl-5 md:pr-4 md:py-3 bg-foreground text-background border border-foreground shadow-[0_12px_40px_-12px_rgba(0,0,0,0.55)] hover:shadow-[0_18px_50px_-12px_rgba(0,0,0,0.7)] transition-all duration-300 ${attention ? "q-attention" : ""}`}
+        className="group fixed bottom-20 right-5 md:bottom-28 md:right-8 z-40 flex items-end gap-0 pl-4 pr-3 py-2.5 md:pl-5 md:pr-4 md:py-3 bg-foreground text-background border border-foreground shadow-[0_12px_40px_-12px_rgba(0,0,0,0.55)] hover:shadow-[0_18px_50px_-12px_rgba(0,0,0,0.7)] transition-all duration-300"
       >
         <QMark className="font-display leading-none text-3xl md:text-4xl tracking-tight" periodClassName="text-accent ml-0.5 q-period" />
         <span className="sr-only">Meet Q.</span>
       </button>
 
-      {/* Rotating capability speech bubble */}
-      {bubble && (
-        <div
-          role="status"
-          aria-live="polite"
-          data-leaving={bubbleLeaving ? "true" : "false"}
-          onClick={dismissAttention}
-          className="q-hint fixed z-40 bottom-[6.25rem] right-[5.5rem] md:bottom-[8.25rem] md:right-[6.75rem] cursor-pointer select-none max-w-[260px] md:max-w-[320px]"
-          style={{ transform: "translateY(-50%)" }}
-        >
-          <div className="relative bg-foreground text-background px-4 py-2.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.5)]">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-1">
-              Meet <QMark periodClassName="text-accent" />
-            </div>
-            <div
-              key={bubbleIdx}
-              className="font-display text-[13px] md:text-sm leading-snug animate-fade-up"
-            >
-              {CAPABILITY_LINES[bubbleIdx]}
-            </div>
-            <span aria-hidden className="absolute top-1/2 -right-1.5 -translate-y-1/2 w-3 h-3 bg-foreground rotate-45" />
-          </div>
-        </div>
-      )}
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
@@ -303,13 +236,6 @@ export function QAgentButton() {
                 Workspace
               </button>
             </div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/55 mb-3">
-              {scope === "universal"
-                ? "Every dispatch, codex entry, playbook."
-                : user
-                  ? "Only your saved links, files, and highlights."
-                  : "Sign in to search your saved Workspace."}
-            </p>
 
             {/* Search bar with rolling placeholder */}
             <form onSubmit={handleAsk} className="mb-3">
@@ -346,26 +272,27 @@ export function QAgentButton() {
               </button>
             </form>
 
-            {/* Suggestion chips — only when empty */}
-            {!query && !answer && suggestions.length > 0 && (
+            {/* Suggested Vectors — premium parchment pills, always visible */}
+            {!answer && (
               <div className="mb-5">
-                <div className="font-mono text-[9px] uppercase tracking-[0.25em] text-foreground/45 mb-2">
-                  Try
+                <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-secondary-accent mb-3">
+                  Suggested Vectors
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {suggestions.map((s) => (
+                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
+                  {SUGGESTED_VECTORS.map((v) => (
                     <button
-                      key={s}
+                      key={v}
                       type="button"
-                      onClick={() => { setQuery(s); inputRef.current?.focus(); }}
-                      className="text-left text-xs font-body border border-border px-2.5 py-1.5 hover:border-foreground hover:bg-foreground/5 transition-colors max-w-full break-words"
+                      onClick={() => { setQuery(v); inputRef.current?.focus(); }}
+                      className="snap-start shrink-0 max-w-[280px] text-left text-xs font-body leading-snug border border-border bg-card/70 px-3 py-2.5 hover:border-accent hover:text-accent transition-colors"
                     >
-                      {s}
+                      {v}
                     </button>
                   ))}
                 </div>
               </div>
             )}
+
 
             {/* Live search results */}
             {query && (
