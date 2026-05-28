@@ -13,7 +13,9 @@ import { Route as VanguardRouteImport } from './routes/vanguard'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SequencerRouteImport } from './routes/sequencer'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
@@ -70,9 +72,19 @@ const SubscribeRoute = SubscribeRouteImport.update({
   path: '/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SequencerRoute = SequencerRouteImport.update({
   id: '/sequencer',
   path: '/sequencer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RetentionProtocolRoute = RetentionProtocolRouteImport.update({
@@ -271,7 +283,9 @@ export interface FileRoutesByFullPath {
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/sequencer': typeof SequencerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -310,7 +324,9 @@ export interface FileRoutesByTo {
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/sequencer': typeof SequencerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -353,7 +369,9 @@ export interface FileRoutesById {
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
   '/retention-protocol': typeof RetentionProtocolRoute
+  '/rss.xml': typeof RssDotxmlRoute
   '/sequencer': typeof SequencerRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscribe': typeof SubscribeRoute
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -397,7 +415,9 @@ export interface FileRouteTypes {
     | '/outcome-forum'
     | '/pricing'
     | '/retention-protocol'
+    | '/rss.xml'
     | '/sequencer'
+    | '/sitemap.xml'
     | '/subscribe'
     | '/teams'
     | '/unsubscribe'
@@ -436,7 +456,9 @@ export interface FileRouteTypes {
     | '/outcome-forum'
     | '/pricing'
     | '/retention-protocol'
+    | '/rss.xml'
     | '/sequencer'
+    | '/sitemap.xml'
     | '/subscribe'
     | '/teams'
     | '/unsubscribe'
@@ -478,7 +500,9 @@ export interface FileRouteTypes {
     | '/outcome-forum'
     | '/pricing'
     | '/retention-protocol'
+    | '/rss.xml'
     | '/sequencer'
+    | '/sitemap.xml'
     | '/subscribe'
     | '/teams'
     | '/unsubscribe'
@@ -521,7 +545,9 @@ export interface RootRouteChildren {
   OutcomeForumRoute: typeof OutcomeForumRoute
   PricingRoute: typeof PricingRoute
   RetentionProtocolRoute: typeof RetentionProtocolRoute
+  RssDotxmlRoute: typeof RssDotxmlRoute
   SequencerRoute: typeof SequencerRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SubscribeRoute: typeof SubscribeRoute
   TeamsRoute: typeof TeamsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -570,11 +596,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sequencer': {
       id: '/sequencer'
       path: '/sequencer'
       fullPath: '/sequencer'
       preLoaderRoute: typeof SequencerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/retention-protocol': {
@@ -903,7 +943,9 @@ const rootRouteChildren: RootRouteChildren = {
   OutcomeForumRoute: OutcomeForumRoute,
   PricingRoute: PricingRoute,
   RetentionProtocolRoute: RetentionProtocolRoute,
+  RssDotxmlRoute: RssDotxmlRoute,
   SequencerRoute: SequencerRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SubscribeRoute: SubscribeRoute,
   TeamsRoute: TeamsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
