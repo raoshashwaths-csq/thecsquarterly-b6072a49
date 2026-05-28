@@ -4,12 +4,12 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { QMark } from "@/components/site/QMark";
 
-const NAV = [
+const NAV: { to: string; label: string; icon: typeof Activity; hash?: string }[] = [
   { to: "/csfactors", label: "Pulse", icon: Activity },
   { to: "/csfactors", label: "Accounts", icon: LayoutGrid, hash: "#accounts" },
   { to: "/csfactors", label: "Renewals", icon: Users, hash: "#renewals" },
   { to: "/csfactors", label: "Reminders", icon: Bell, hash: "#reminders" },
-] as const;
+];
 
 export function CSFactorsSidebar() {
   const [collapsed, setCollapsed] = useState(false);
