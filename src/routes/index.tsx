@@ -73,7 +73,16 @@ function HomePage() {
         <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-10">
           Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships.
         </p>
-        <NewsletterInline source="home-hero" />
+        {!user ? (
+          <NewsletterInline source="home-hero" />
+        ) : (
+          <p className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
+            Welcome back —{" "}
+            <Link to="/account" className="text-accent border-b border-accent/40 hover:border-accent pb-0.5">
+              open your account →
+            </Link>
+          </p>
+        )}
 
         {/* Elevated CSF Command Centre card */}
         <div className="mt-12 flex justify-center">
@@ -102,6 +111,30 @@ function HomePage() {
                 Unlock at Operator tier →
               </div>
             </div>
+          </Link>
+        </div>
+
+        {/* Workspace anchor — placed directly below the CSF card */}
+        <div className="mt-4 flex justify-center">
+          <Link
+            to="/account/workspace"
+            className="group w-full max-w-2xl inline-flex items-center gap-4 bg-card border border-border hover:border-accent transition-colors p-4 md:p-5 text-left"
+            aria-label="Open your Workspace"
+          >
+            <span
+              aria-hidden
+              className="flex h-10 w-10 shrink-0 items-center justify-center bg-foreground text-background rounded-sm group-hover:scale-105 transition-transform"
+            >
+              <LayoutGrid size={18} strokeWidth={2.5} />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground leading-tight mb-1">
+                Your Workspace
+              </span>
+              <span className="block font-display text-base md:text-lg leading-tight">
+                Notes · Highlights · Links →
+              </span>
+            </span>
           </Link>
         </div>
       </header>
