@@ -87,7 +87,7 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
                   title={collapsed ? item.label : undefined}
                 >
                   <Icon className="h-4 w-4 shrink-0" />
-                  {!collapsed && <span className="font-mono uppercase tracking-wider text-[11px]">{item.label}</span>}
+                  {!collapsed && <span className="font-mono uppercase tracking-wider text-xs">{item.label}</span>}
                 </a>
               );
             })}
