@@ -202,7 +202,22 @@ function SequencerPage() {
               ))}
             </ol>
 
-            {seqs && seqs.length > 0 && (
+            {seqsAuthError ? (
+              <div className="mt-10 border border-border rounded p-5 bg-muted/30">
+                <p className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">
+                  Session expired
+                </p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Your sign-in expired while you were away. Sign back in to load your saved sequences.
+                </p>
+                <Link
+                  to="/login"
+                  className="inline-block px-4 py-2 bg-foreground text-background font-mono text-xs uppercase tracking-widest hover:bg-accent transition-colors"
+                >
+                  Sign in →
+                </Link>
+              </div>
+            ) : seqs && seqs.length > 0 ? (
               <div className="mt-10">
                 <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
                   Saved
@@ -221,7 +236,8 @@ function SequencerPage() {
                   ))}
                 </ul>
               </div>
-            )}
+            ) : null}
+
           </div>
         </div>
       </main>
