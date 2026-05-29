@@ -1,98 +1,54 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, ArrowRight, TrendingDown, GitMerge, Radar, Trophy } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
 import { MobileNavDrawer } from "@/components/csfactors/MobileNavDrawer";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
 import { WorkspacePane } from "@/components/csfactors/WorkspacePane";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
-import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
-import { HealthChip } from "@/components/dashboard/HealthChip";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { TierGateOverlay } from "@/components/site/TierGateOverlay";
-import { listAccounts } from "@/lib/csfactors.functions";
-import { useState } from "react";
+import { NrrWaterfallView } from "@/components/csfactors/threeSixty/NrrWaterfallView";
+import { RetentionFunnelView } from "@/components/csfactors/threeSixty/RetentionFunnelView";
+import { StakeholderRadarView } from "@/components/csfactors/threeSixty/StakeholderRadarView";
+import { TeamLeaderboardView } from "@/components/csfactors/threeSixty/TeamLeaderboardView";
 
 export const Route = createFileRoute("/csfactors/360")({
   head: () => ({
     meta: [
       { title: "360 Dashboard — CSFactors" },
       { name: "robots", content: "noindex" },
-      { name: "description", content: "Consolidated analytics view: retention funnel, NRR movement, stakeholder radar, and team performance — together on one page." },
+      { name: "description", content: "All four analytics lenses on a single consolidated page: NRR waterfall, retention funnel, stakeholder radar, and team leaderboard." },
     ],
   }),
   component: ThreeSixtyPage,
 });
 
-function compact(n: number) {
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
-  if (n >= 1_000) return `$${Math.round(n / 1_000)}K`;
-  return `$${n}`;
-}
-
 const LENSES = [
-  {
-    to: "/account/analytics" as const,
-    eyebrow: "Executive",
-    title: "Executive Portfolio",
-    desc: "Open the four-lens index page in its own view.",
-    Icon: Trophy,
-  },
-  {
-    to: "/account/analytics/nrr-waterfall" as const,
-    eyebrow: "Revenue Movement",
-    title: "NRR Waterfall",
-    desc: "Starting ARR through expansion, contraction, churn to ending ARR.",
-    Icon: GitMerge,
-  },
-  {
-    to: "/account/analytics/stakeholder-radar" as const,
-    eyebrow: "Account Health",
-    title: "Stakeholder Radar",
-    desc: "Five-axis pentagon across health, NPS, implementation, QBR, sentiment.",
-    Icon: Radar,
-  },
-  {
-    to: "/account/analytics/retention-funnel" as const,
-    eyebrow: "Cohort",
-    title: "Retention Funnel",
-    desc: "Stage-by-stage drop-off across the customer lifecycle.",
-    Icon: TrendingDown,
-  },
+  { id: "nrr",          label: "NRR Waterfall",      to: "/account/analytics/nrr-waterfall" as const },
+  { id: "retention",    label: "Retention Funnel",   to: "/account/analytics/retention-funnel" as const },
+  { id: "stakeholders", label: "Stakeholder Radar",  to: "/account/analytics/stakeholder-radar" as const },
+  { id: "team",         label: "Team Leaderboard",   to: "/account/analytics/team-leaderboard" as const },
 ];
+
+function StandaloneLink({ to }: { to: typeof LENSES[number]["to"] }) {
+  return (
+    <Link
+      to={to}
+      className="inline-flex items-center gap-1 font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-accent border border-border hover:border-accent px-2.5 py-1 transition-colors"
+    >
+      Standalone
+      <ArrowUpRight className="h-3 w-3" />
+    </Link>
+  );
+}
 
 function ThreeSixtyPage() {
   const { user, loading: authLoading } = useAuth();
   const { designation, loading: entLoading } = useEntitlements();
-  const list = useServerFn(listAccounts);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-
-  const { data: accounts = [], isLoading } = useQuery({
-    queryKey: ["cs-accounts"],
-    queryFn: () => list(),
-    enabled: !!user,
-  });
-
-  const summary = useMemo(() => {
-    const total = accounts.length;
-    const arr = accounts.reduce((s, a) => s + Number(a.arr || 0), 0);
-    const atRiskArr = accounts.filter((a) => a.health < 50).reduce((s, a) => s + Number(a.arr || 0), 0);
-    const avgHealth = total ? Math.round(accounts.reduce((s, a) => s + a.health, 0) / total) : 0;
-    const qbrDone = accounts.filter((a) => a.qbr_status === "Completed").length;
-    const qbrPct = total ? Math.round((qbrDone / total) * 100) : 0;
-    const npsVals = accounts.map((a) => a.final_cs_nps).filter((n): n is number => n != null);
-    const avgNps = npsVals.length ? Math.round(npsVals.reduce((s, n) => s + n, 0) / npsVals.length) : 0;
-    return { total, arr, atRiskArr, avgHealth, qbrPct, avgNps };
-  }, [accounts]);
-
-  const lowest = useMemo(
-    () => [...accounts].sort((a, b) => a.health - b.health).slice(0, 5),
-    [accounts],
-  );
 
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
@@ -138,86 +94,83 @@ function ThreeSixtyPage() {
                 Every lens, <span className="italic text-accent">one page.</span>
               </h1>
               <p className="text-foreground/70 mt-3 max-w-2xl text-sm md:text-base">
-                Portfolio-wide health, retention movement, and the accounts that need you most — consolidated.
+                NRR movement, retention drop-off, stakeholder posture, and team performance — read in one scroll.
               </p>
             </div>
             <span className="hidden md:inline-flex"><ThemeToggle /></span>
           </header>
 
-          {isLoading ? (
-            <p className="text-sm text-muted-foreground py-12">Loading…</p>
+          <nav
+            aria-label="Jump to lens"
+            className="mb-8 md:mb-10 -mx-4 md:mx-0 px-4 md:px-0 overflow-x-auto md:sticky md:top-4 md:z-20"
+          >
+            <ul className="flex items-center gap-1 md:gap-2 min-w-max md:min-w-0 bg-card/80 backdrop-blur border border-border md:w-fit px-2 py-2">
+              {LENSES.map((l) => (
+                <li key={l.id}>
+                  <a
+                    href={`#${l.id}`}
+                    className="inline-flex font-mono uppercase tracking-[0.2em] text-xs text-foreground/70 hover:text-accent px-3 py-1.5 whitespace-nowrap transition-colors"
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {!authLoading && !user ? (
+            <div className="border border-dashed border-border bg-card p-10 text-center">
+              <p className="text-sm text-foreground/70 mb-4">Sign in to see the 360 Dashboard.</p>
+              <Link to="/login" className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+                Sign in →
+              </Link>
+            </div>
           ) : (
-            <>
-              <MetricGrid cols={4} className="mb-10">
-                <MetricCard eyebrow="Accounts" value={summary.total} accent="neutral" trend="In portfolio" trendDirection="flat" />
-                <MetricCard eyebrow="Total ARR" value={compact(summary.arr)} accent="accent" />
-                <MetricCard
-                  eyebrow="Avg Health"
-                  value={summary.avgHealth}
-                  accent={summary.avgHealth >= 75 ? "success" : summary.avgHealth >= 50 ? "secondary" : "danger"}
-                  trend={`${summary.avgNps || "—"} avg NPS`}
-                  trendDirection="flat"
-                />
-                <MetricCard
-                  eyebrow="ARR at Risk"
-                  value={compact(summary.atRiskArr)}
-                  accent="danger"
-                  trend={`${summary.qbrPct}% QBR done`}
-                  trendDirection="down"
-                />
-              </MetricGrid>
+            <div className="space-y-10">
+              <section id="nrr" className="scroll-mt-24">
+                <SectionCard
+                  eyebrow="Lens 01 / Revenue Movement"
+                  title="NRR Waterfall"
+                  description="Starting ARR through expansion, contraction, and churn to ending ARR."
+                  actions={<StandaloneLink to="/account/analytics/nrr-waterfall" />}
+                >
+                  <NrrWaterfallView />
+                </SectionCard>
+              </section>
 
-              <SectionCard
-                eyebrow="Attention Required"
-                title="Lowest-health accounts"
-                description="Sorted by lowest health first — your highest-leverage attention."
-                className="mb-10"
-              >
-                {lowest.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-6">No accounts yet. Add accounts in CSFactors.</p>
-                ) : (
-                  <ul className="divide-y divide-border">
-                    {lowest.map((a) => (
-                      <li key={a.id} className="py-3 flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="font-display text-base truncate">{a.name}</div>
-                          <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mt-0.5">
-                            {a.tier} · {compact(Number(a.arr || 0))} · {a.csm_name ?? "Unassigned"}
-                          </div>
-                        </div>
-                        <HealthChip score={a.health} />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </SectionCard>
+              <section id="retention" className="scroll-mt-24">
+                <SectionCard
+                  eyebrow="Lens 02 / Cohort"
+                  title="Retention Funnel"
+                  description="Stage-by-stage drop-off across the customer lifecycle."
+                  actions={<StandaloneLink to="/account/analytics/retention-funnel" />}
+                >
+                  <RetentionFunnelView />
+                </SectionCard>
+              </section>
 
-              <SectionCard
-                eyebrow="Deep dives"
-                title="All four analytics lenses"
-                description="Each lens opens its own dedicated dashboard with the full visualisation set."
-              >
-                <div className="grid md:grid-cols-2 gap-px bg-border border border-border">
-                  {LENSES.map((l) => (
-                    <Link
-                      key={l.to}
-                      to={l.to}
-                      className="group bg-card p-6 md:p-8 hover:bg-muted/30 transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-6">
-                        <l.Icon className="h-6 w-6 text-accent" />
-                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
-                      </div>
-                      <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
-                        {l.eyebrow}
-                      </div>
-                      <h3 className="font-display text-2xl md:text-3xl tracking-tight mb-2">{l.title}</h3>
-                      <p className="text-sm text-foreground/65">{l.desc}</p>
-                    </Link>
-                  ))}
-                </div>
-              </SectionCard>
-            </>
+              <section id="stakeholders" className="scroll-mt-24">
+                <SectionCard
+                  eyebrow="Lens 03 / Account Health"
+                  title="Stakeholder Radar"
+                  description="Five-axis pentagon across health, NPS, implementation, QBR cadence, and sentiment."
+                  actions={<StandaloneLink to="/account/analytics/stakeholder-radar" />}
+                >
+                  <StakeholderRadarView />
+                </SectionCard>
+              </section>
+
+              <section id="team" className="scroll-mt-24">
+                <SectionCard
+                  eyebrow="Lens 04 / People"
+                  title="Team Leaderboard"
+                  description="CSM-level performance: book of business, average health, and QBR completion."
+                  actions={<StandaloneLink to="/account/analytics/team-leaderboard" />}
+                >
+                  <TeamLeaderboardView />
+                </SectionCard>
+              </section>
+            </div>
           )}
         </div>
       </main>
