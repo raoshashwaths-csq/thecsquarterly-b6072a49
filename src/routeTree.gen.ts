@@ -47,6 +47,7 @@ import { Route as AdminControlPanelRouteImport } from './routes/admin.control-pa
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
 import { Route as AccountApiRouteImport } from './routes/account.api'
 import { Route as AccountAnalyticsIndexRouteImport } from './routes/account.analytics.index'
+import { Route as QResponseRunIdRouteImport } from './routes/q.response.$runId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
 import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
@@ -253,6 +254,11 @@ const AccountAnalyticsIndexRoute = AccountAnalyticsIndexRouteImport.update({
   path: '/account/analytics/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QResponseRunIdRoute = QResponseRunIdRouteImport.update({
+  id: '/q/response/$runId',
+  path: '/q/response/$runId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -386,6 +392,7 @@ export interface FileRoutesByFullPath {
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
@@ -438,6 +445,7 @@ export interface FileRoutesByTo {
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics': typeof AccountAnalyticsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
@@ -494,6 +502,7 @@ export interface FileRoutesById {
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
@@ -551,6 +560,7 @@ export interface FileRouteTypes {
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/q/response/$runId'
     | '/account/analytics/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
@@ -603,6 +613,7 @@ export interface FileRouteTypes {
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/q/response/$runId'
     | '/account/analytics'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
@@ -658,6 +669,7 @@ export interface FileRouteTypes {
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
     | '/lovable/email/suppression'
+    | '/q/response/$runId'
     | '/account/analytics/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
@@ -705,6 +717,7 @@ export interface RootRouteChildren {
   ApiElevenlabsSttRoute: typeof ApiElevenlabsSttRoute
   ApiV1SplatRoute: typeof ApiV1SplatRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  QResponseRunIdRoute: typeof QResponseRunIdRoute
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
@@ -982,6 +995,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAnalyticsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/q/response/$runId': {
+      id: '/q/response/$runId'
+      path: '/q/response/$runId'
+      fullPath: '/q/response/$runId'
+      preLoaderRoute: typeof QResponseRunIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -1192,6 +1212,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiElevenlabsSttRoute: ApiElevenlabsSttRoute,
   ApiV1SplatRoute: ApiV1SplatRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  QResponseRunIdRoute: QResponseRunIdRoute,
   AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
@@ -1203,3 +1224,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
