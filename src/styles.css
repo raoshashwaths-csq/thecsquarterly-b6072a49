@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600;700&display=swap');
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -8,10 +8,10 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 0.125rem;
+  --radius-md: 0.125rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -38,59 +38,59 @@
   --font-display: "Newsreader", "Source Serif 4", Georgia, serif;
   --font-body: "Source Serif 4", "Lora", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-ui: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
-  --radius: 0.25rem;
+  --radius: 0rem;
 
-  /* Editorial palette, warm paper, ink black, oxblood accent + patina gold */
-  --background: oklch(0.957 0.008 95);
-  --foreground: oklch(0.205 0 0);
-  --muted: oklch(0.92 0.005 95);
-  --muted-foreground: oklch(0.205 0 0 / 0.55);
-  --accent: oklch(0.41 0.13 28);
-  --accent-foreground: oklch(0.98 0 0);
-  /* Patina gold, deepened for legibility on warm paper */
-  --secondary-accent: oklch(0.52 0.13 70);
-  --secondary-accent-foreground: oklch(0.98 0 0);
-  --border: oklch(0.205 0 0 / 0.1);
-  --input: oklch(0.205 0 0 / 0.15);
-  --ring: oklch(0.41 0.13 28);
+  /* Swan Wing cream + Royal Blue ink + Quicksand gold (editorial executive palette) */
+  --background: oklch(0.953 0.012 80);          /* #F5F0E9 Swan Wing */
+  --foreground: oklch(0.247 0.085 271);         /* #112250 Royal Blue */
+  --muted: oklch(0.86 0.018 55);                /* #D9CBC2 Shellstone */
+  --muted-foreground: oklch(0.45 0.075 268);    /* #3C507D Sapphire */
+  --accent: oklch(0.835 0.082 86);              /* #E0C58F Quicksand */
+  --accent-foreground: oklch(0.247 0.085 271);
+  --secondary-accent: oklch(0.45 0.075 268);    /* Sapphire */
+  --secondary-accent-foreground: oklch(0.97 0.01 85);
+  --border: oklch(0.247 0.085 271 / 0.18);
+  --input: oklch(0.247 0.085 271 / 0.18);
+  --ring: oklch(0.835 0.082 86);
 
-  --card: oklch(0.957 0.008 95);
-  --card-foreground: oklch(0.205 0 0);
-  --popover: oklch(0.957 0.008 95);
-  --popover-foreground: oklch(0.205 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.92 0.005 95);
-  --secondary-foreground: oklch(0.205 0 0);
+  --card: oklch(0.973 0.01 85);                 /* #FBF7F1 raised paper */
+  --card-foreground: oklch(0.247 0.085 271);
+  --popover: oklch(0.973 0.01 85);
+  --popover-foreground: oklch(0.247 0.085 271);
+  --primary: oklch(0.247 0.085 271);
+  --primary-foreground: oklch(0.953 0.012 80);
+  --secondary: oklch(0.86 0.018 55);
+  --secondary-foreground: oklch(0.247 0.085 271);
   --destructive: oklch(0.55 0.22 27);
   --destructive-foreground: oklch(0.98 0 0);
 }
 
 .dark {
-  --background: oklch(0.18 0 0);
-  --foreground: oklch(0.96 0.005 95);
-  --muted: oklch(0.25 0 0);
-  --muted-foreground: oklch(0.96 0 0 / 0.6);
-  --accent: oklch(0.55 0.16 28);
-  --accent-foreground: oklch(0.98 0 0);
-  --secondary-accent: oklch(0.72 0.12 75);
-  --secondary-accent-foreground: oklch(0.18 0 0);
-  --border: oklch(1 0 0 / 0.1);
-  --input: oklch(1 0 0 / 0.15);
-  --ring: oklch(0.55 0.16 28);
-  --card: oklch(0.18 0 0);
-  --card-foreground: oklch(0.96 0 0);
-  --popover: oklch(0.18 0 0);
-  --popover-foreground: oklch(0.96 0 0);
-  --primary: oklch(0.96 0 0);
-  --primary-foreground: oklch(0.18 0 0);
-  --secondary: oklch(0.25 0 0);
-  --secondary-foreground: oklch(0.96 0 0);
+  --background: oklch(0.247 0.085 271);         /* #112250 Royal Blue */
+  --foreground: oklch(0.953 0.012 80);          /* Swan Wing */
+  --muted: oklch(0.45 0.075 268);               /* Sapphire */
+  --muted-foreground: oklch(0.835 0.082 86 / 0.7);
+  --accent: oklch(0.835 0.082 86);              /* Quicksand */
+  --accent-foreground: oklch(0.247 0.085 271);
+  --secondary-accent: oklch(0.45 0.075 268);
+  --secondary-accent-foreground: oklch(0.953 0.012 80);
+  --border: oklch(0.835 0.082 86 / 0.22);
+  --input: oklch(0.835 0.082 86 / 0.22);
+  --ring: oklch(0.835 0.082 86);
+  --card: oklch(0.29 0.09 270);                 /* #1A2D63 raised */
+  --card-foreground: oklch(0.953 0.012 80);
+  --popover: oklch(0.29 0.09 270);
+  --popover-foreground: oklch(0.953 0.012 80);
+  --primary: oklch(0.835 0.082 86);
+  --primary-foreground: oklch(0.247 0.085 271);
+  --secondary: oklch(0.45 0.075 268);
+  --secondary-foreground: oklch(0.953 0.012 80);
   --destructive: oklch(0.65 0.22 27);
   --destructive-foreground: oklch(0.98 0 0);
 }
@@ -131,7 +131,7 @@
    The grain only renders in light mode (cream sections) by design.
    --------------------------------------------------------------- */
 .paper-grain {
-  --paper-grain-opacity: 0.06;
+  --paper-grain-opacity: 0.04;
   position: relative;
 }
 .paper-grain::before {
@@ -162,6 +162,8 @@
 /* Bump weight on small mono labels so gold/oxblood eyebrows stay legible */
 .font-mono { font-weight: 600; letter-spacing: 0.08em; font-size: max(12px, 1em); }
 .text-secondary-accent.font-mono, .text-accent.font-mono { font-weight: 700; }
+/* Editorial eyebrow: uppercase mono labels with wide tracking. Opt-in via class. */
+.eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.28em; font-size: 11px; font-weight: 600; }
 
 @layer base {
   * {
