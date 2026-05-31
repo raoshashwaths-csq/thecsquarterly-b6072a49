@@ -131,7 +131,7 @@
    The grain only renders in light mode (cream sections) by design.
    --------------------------------------------------------------- */
 .paper-grain {
-  --paper-grain-opacity: 0.06;
+  --paper-grain-opacity: 0.04;
   position: relative;
 }
 .paper-grain::before {
