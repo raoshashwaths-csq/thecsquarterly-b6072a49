@@ -160,8 +160,10 @@
 .tone-witty .prose-content { font-style: normal; }
 
 /* Bump weight on small mono labels so gold/oxblood eyebrows stay legible */
-.font-mono { font-weight: 600; letter-spacing: 0.28em; font-size: max(11px, 0.95em); text-transform: uppercase; }
+.font-mono { font-weight: 600; letter-spacing: 0.08em; font-size: max(12px, 1em); }
 .text-secondary-accent.font-mono, .text-accent.font-mono { font-weight: 700; }
+/* Editorial eyebrow: uppercase mono labels with wide tracking. Opt-in via class. */
+.eyebrow { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.28em; font-size: 11px; font-weight: 600; }
 
 @layer base {
   * {
