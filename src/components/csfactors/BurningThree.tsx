@@ -52,11 +52,11 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Flame className="h-4 w-4 text-accent" />
-          <h2 className="font-display text-xl tracking-tight">
-            Today's <span className="italic text-accent">burning three</span>
+      <div className="flex items-end justify-between gap-4 border-b border-border pb-2">
+        <div>
+          <div className="eyebrow text-secondary-accent mb-1">The Burning Three</div>
+          <h2 className="font-display text-2xl md:text-3xl tracking-tight leading-tight">
+            The burning three<span className="italic text-accent">.</span>
           </h2>
         </div>
         <Button
@@ -64,10 +64,10 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
           size="sm"
           onClick={onRewrite}
           disabled={busy}
-          className="gap-2 font-mono uppercase tracking-widest text-xs"
+          className="gap-2 font-mono uppercase tracking-[0.22em] text-[11px] shrink-0"
         >
           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          Powered by Q
+          Powered by Lumi
         </Button>
       </div>
       <div className="grid md:grid-cols-3 gap-4 md:gap-px bg-transparent md:bg-border border-0 md:border border-border">
