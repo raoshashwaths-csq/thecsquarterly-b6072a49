@@ -23,12 +23,6 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 import { TierGateOverlay } from "@/components/site/TierGateOverlay";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useAuth } from "@/hooks/useAuth";
-import { useEntitlements } from "@/hooks/useEntitlements";
-import { TierGateOverlay } from "@/components/site/TierGateOverlay";
-import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
-import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
 import { toast } from "sonner";
 
 
