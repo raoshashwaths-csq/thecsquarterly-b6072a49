@@ -41,21 +41,21 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        "relative bg-card p-5 md:p-6 border border-border overflow-hidden group",
-        "transition-colors hover:border-foreground/30",
+        "relative bg-card p-5 md:p-6 border border-border overflow-hidden group rounded-none",
+        "transition-colors hover:border-foreground/40",
         className,
       )}
     >
-      <div className={cn("absolute left-0 top-0 bottom-0 w-[3px]", ACCENT_BAR[accent])} />
-      <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">
+      <div className={cn("absolute left-0 top-0 h-[2px] w-10", ACCENT_BAR[accent])} />
+      <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-muted-foreground mb-4 font-semibold">
         {eyebrow}
       </div>
       <div className="font-display text-4xl md:text-5xl tracking-tight leading-none mb-3 flex items-baseline gap-1">
         <span>{value}</span>
-        {unit ? <span className="text-xl text-muted-foreground">{unit}</span> : null}
+        {unit ? <span className="text-2xl text-muted-foreground">{unit}</span> : null}
       </div>
       {trend ? (
-        <div className={cn("text-xs font-mono uppercase tracking-wider", TREND_COLOR[trendDirection])}>
+        <div className={cn("text-[11px] font-mono uppercase tracking-[0.22em]", TREND_COLOR[trendDirection])}>
           {trendDirection === "up" ? "↑ " : trendDirection === "down" ? "↓ " : "→ "}
           {trend}
         </div>

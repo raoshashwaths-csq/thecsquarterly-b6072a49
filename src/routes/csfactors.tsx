@@ -10,18 +10,12 @@ import { WorkspacePane } from "@/components/csfactors/WorkspacePane";
 import { QFilterProvider, useQFilter, applyQFilter } from "@/components/csfactors/QFilterContext";
 import { AddAccountDialog } from "@/components/csfactors/AddAccountDialog";
 import { ImportCsvDialog } from "@/components/csfactors/ImportCsvDialog";
-import { BurningThree } from "@/components/csfactors/BurningThree";
-import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
 import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
 import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
 import { QAgentDrawer } from "@/components/csfactors/QAgentDrawer";
-import { AskQInline } from "@/components/csfactors/AskQInline";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
-import { CommandCentre } from "@/components/csfactors/reckoning/CommandCentre";
+import { PulseDashboard } from "@/components/csfactors/pulse/PulseDashboard";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
-import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
-import { SectionCard } from "@/components/dashboard/SectionCard";
-import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
@@ -188,46 +182,6 @@ function CSFactorsPageInner() {
             </div>
           ) : null}
 
-          {/* Header */}
-          <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-6 mb-8 md:mb-10 pb-6 border-b border-border">
-            <div className="min-w-0">
-              <div className="font-mono uppercase tracking-[0.3em] text-secondary-accent font-semibold mb-3 text-xs">
-                CSFactors / Command Center
-              </div>
-              <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight" suppressHydrationWarning>
-                {greet},{" "}
-                <span className="italic text-accent">{firstName}.</span>
-              </h1>
-              <p className="text-foreground/70 mt-3 max-w-2xl text-sm md:text-base">
-                Your portfolio at a glance. Account matrix, stakeholder power-map, and contract vault — written for one person: you.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="hidden md:inline-flex"><ThemeToggle /></span>
-              <button
-                type="button"
-                onClick={() => setQOpen(true)}
-                className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.2em] text-xs bg-accent text-accent-foreground px-3 py-1.5 hover:opacity-90 transition-opacity"
-              >
-                Ask Q
-              </button>
-              <ImportCsvDialog />
-              <AddAccountDialog />
-            </div>
-          </header>
-
-          {user ? (
-            <section className="mb-8" data-tour="ask-q">
-              <QErrorBoundary label="Q · CSFactors">
-                <AskQInline
-                  onSubmit={handleDockSubmit}
-                  onChip={handleChip}
-                  onOpenDrawer={() => setQOpen(true)}
-                />
-              </QErrorBoundary>
-            </section>
-          ) : null}
-
           {!authLoading && !user ? (
             <div className="border border-dashed border-border bg-card p-10 text-center">
               <p className="text-sm text-foreground/70 mb-4">
@@ -237,81 +191,30 @@ function CSFactorsPageInner() {
                 Sign in →
               </Link>
             </div>
+          ) : isLoading ? (
+            <p className="text-sm text-muted-foreground py-6">Loading your portfolio…</p>
           ) : (
             <>
-              <section className="mb-10" id="reminders" data-tour="burning-three">
-                <BurningThree accounts={accounts} />
-              </section>
+              <div className="mb-6 flex flex-wrap items-center justify-end gap-2">
+                <span className="hidden md:inline-flex"><ThemeToggle /></span>
+                <button
+                  type="button"
+                  onClick={() => setQOpen(true)}
+                  className="inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.22em] text-[11px] bg-accent text-accent-foreground px-3 py-1.5 hover:opacity-90 transition-opacity"
+                >
+                  Ask Lumi
+                </button>
+                <ImportCsvDialog />
+                <AddAccountDialog />
+              </div>
 
-              <CommandCentre />
-
-              <section className="mb-10">
-                <AnalyticsHeader accounts={accounts} />
-              </section>
-
-              <section className="mb-10" id="renewals">
-                <MetricGrid cols={3} className="gap-4 md:gap-px">
-                  <MetricCard
-                    eyebrow="Total Portfolio ARR"
-                    value={compact(totalARR)}
-                    accent="accent"
-                    trend={accounts.length ? `${accounts.length} accounts tracked` : "Add your first account"}
-                    trendDirection="flat"
-                  />
-                  <MetricCard
-                    eyebrow="ARR At Immediate Risk"
-                    value={compact(atRisk)}
-                    accent="danger"
-                    trend="Health below 50"
-                    trendDirection="down"
-                  />
-                  <MetricCard
-                    eyebrow="QBR Compliance"
-                    value={compliance}
-                    unit="%"
-                    accent="secondary"
-                    footer={
-                      <ProgressGauge value={compliance} accent={compliance >= 75 ? "success" : compliance >= 50 ? "secondary" : "danger"} />
-                    }
-                  />
-                </MetricGrid>
-              </section>
-
-              <SectionCard
-                title="Master Account Matrix"
-                eyebrow="Accounts"
-                description="32 fields per account. Click any row to open the optimization drawer. Name and UCC stay frozen as you scroll right."
-                className="mb-10"
-                actions={
-                  <button
-                    type="button"
-                    onClick={() => setFullscreen(true)}
-                    className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] border border-border hover:border-accent hover:text-accent px-3 py-1.5 transition-colors"
-                    title="Expand matrix to full screen"
-                  >
-                    <Maximize2 className="h-3 w-3" />
-                    Fullscreen
-                  </button>
-                }
-              >
-                {isLoading ? (
-                  <p className="text-sm text-muted-foreground py-6">Loading…</p>
-                ) : accounts.length === 0 ? (
-                  <div className="py-12 text-center" id="accounts">
-                    <p className="text-sm text-foreground/70 mb-4">
-                      {filter ? "No accounts match the active filter." : "No accounts yet. Add one or import a CSV."}
-                    </p>
-                    <div className="inline-flex gap-2">
-                      <AddAccountDialog />
-                      <ImportCsvDialog />
-                    </div>
-                  </div>
-                ) : (
-                  <div id="accounts">
-                    <AccountsGrid accounts={accounts} onRowClick={onRowClick} />
-                  </div>
-                )}
-              </SectionCard>
+              <QErrorBoundary label="Pulse">
+                <PulseDashboard
+                  accounts={accounts}
+                  firstName={firstName}
+                  onRowClick={onRowClick}
+                />
+              </QErrorBoundary>
             </>
           )}
         </div>
