@@ -1,132 +1,108 @@
-# Sequential Build Plan — Reskin First, Then Pulse, Then Lumi Rebrand
 
-Three phases, executed in order. Stop after each phase so you can review before spending more credits.
+## Scope
 
----
+Refine the existing CSFactors Pulse dashboard to match `csq-mockup-pulse-dark.png` pixel-for-pixel, complete the Q → Lumi rebrand using the uploaded lighthouse mark, and wire the Ask Lumi slide-out drawer with ledger-driven context. Data values stay frozen.
 
-## Phase 1 — Global reskin (palette + fonts) [PRIORITY]
+## 1. Lumi brand asset
 
-Smallest possible diff that re-skins the entire app to the mockup design language. Touches tokens only; no component logic changes.
+- Upload `IMG_20260531_020324-2.png` via `lovable-assets` → `src/assets/lumi-mark.png.asset.json`.
+- New `src/components/site/LumiMark.tsx`:
+  - Props: `variant: "emblem" | "lockup"`, `size`, `animated`, `className`.
+  - `emblem` = lighthouse only (cropped via CSS `object-position` or a pre-cropped emblem-only asset). `lockup` = emblem + serif "Lumi" wordmark (font-display, gold).
+  - Built-in beam/star/lantern animation hooks toggled by `animated` + parent `data-state="active"`.
+- Replace every `<QMark />` usage with `<LumiMark variant="emblem" />` (inline) or `<LumiMark variant="lockup" />` (hero spots). Keep `QMark.tsx` as a one-line re-export shim during this pass to avoid churn — delete in a follow-up.
+- Copy sweep: "Ask Q" → "Ask Lumi", "Powered by Q" → "Powered by Lumi", "Q Insight" → "Lumi Insight", tooltips, aria-labels, toasts, suggested vectors header.
 
-**Files edited**
-- `src/styles.css` — replace palette + radius tokens.
-- `src/routes/__root.tsx` — add Inter Tight `<link>` next to existing font links.
+## 2. Lighthouse activation animation
 
-**Token changes in `src/styles.css`** (all `oklch()`):
+In `src/styles.css` add keyframes + utilities (semantic only, no hex in components):
 
-Light (Swan Wing):
-- `--background` `#F5F0E9` · `--foreground` `#112250`
-- `--card` `#FBF7F1` · `--card-foreground` `#112250`
-- `--popover` `#FBF7F1`
-- `--primary` `#112250` (Royal Blue) · `--primary-foreground` `#F5F0E9`
-- `--secondary` `#D9CBC2` (Shellstone) · `--secondary-foreground` `#112250`
-- `--muted` `#D9CBC2` · `--muted-foreground` `#3C507D` (Sapphire)
-- `--accent` `#E0C58F` (Quicksand) · `--accent-foreground` `#112250`
-- `--secondary-accent` `#3C507D`
-- `--border` Royal Blue @ 18% · `--rule` same · `--input` same
-- `--ring` Quicksand
-- Paper grain opacity → `0.04`
+```text
+@keyframes lumi-beam   { 0% { transform: rotate(-30deg) } 100% { transform: rotate(30deg) } }
+@keyframes lumi-twinkle{ 0%,100% { opacity:.4 } 50% { opacity:1 } }
+@keyframes lumi-lantern{ 0%,100% { opacity:.5 } 50% { opacity:1; filter: blur(6px) } }
+```
 
-Dark (Royal Blue):
-- `--background` `#112250` · `--foreground` `#F5F0E9`
-- `--card` `#1A2D63` · `--popover` `#1A2D63`
-- `--primary` `#E0C58F` · `--primary-foreground` `#112250`
-- `--secondary` `#3C507D` · `--muted` `#3C507D` · `--muted-foreground` Quicksand @ 70%
-- `--accent` `#E0C58F` · `--secondary-accent` `#3C507D`
-- `--border` muted gold @ 22%
-- Paper grain disabled
+- `.lumi-beam` — absolute conic-gradient overlay, masked to lantern origin, 2.4s ease-in-out infinite alternate, gated by `data-state="hover"|"active"`.
+- `.lumi-star` (×3) — staggered 1.8s/2.4s/3.0s delays.
+- `.lumi-lantern` — radial blur pulse on drawer open.
+- Reduced-motion: `@media (prefers-reduced-motion)` disables all three.
 
-Other tokens:
-- `--radius` → `0` (flat). Keep `rounded-sm` utility for tags/badges.
-- Remove or zero out card box-shadow tokens; rely on hairlines.
+## 3. Top utility bar — Ask Lumi trigger
 
-**Typography**
-- Keep Newsreader + Source Serif 4 as-is (already match mockup serif voice).
-- Add Inter Tight `<link>` in `__root.tsx`; expose as `--font-ui`.
-- Bump default mono tracking to `[0.28em]` via existing eyebrow utilities (single CSS edit, no per-component changes).
+In `src/routes/csfactors.tsx` header zone (next to Import CSV / + Add Account):
 
-**Verification**
-- Visual sweep `/`, `/insights`, `/csfactors`, `/account/executive/analytics` in both modes.
-- Confirm no hardcoded hex/`text-white`/`bg-black` regressions (token sweep only — components inherit).
-- Build passes.
+- New `AskLumiTrigger` button — flat (radius 0), 1px gold hairline (`border-accent`), 36px height, gold text. Embeds `<LumiMark variant="emblem" size={18} animated />` left of "Ask Lumi".
+- Click → opens the new Ask Lumi drawer with no preset context.
+- Hover → beam sweep + lantern pulse activate.
 
-**Stop point.** Review before approving Phase 2.
+## 4. Ask Lumi drawer (slide-out copilot)
 
----
+New `src/components/csfactors/AskLumiDrawer.tsx`:
 
-## Phase 2 — CSFactors Pulse rebuild
+- 420px fixed right slide-out, `ease-out` 240ms; backdrop `bg-foreground/40 backdrop-blur-sm`.
+- Header: lockup logo left, "[ Close ]" mono text trigger right.
+- Body sections:
+  - Context briefing card (rendered when invoked from a ledger row) — dark card, gold hairline top, mono eyebrow "Lumi Insight · <event time>", serif headline, body summary, "Open account →" link.
+  - Composer (textarea + send) wired to the existing `askQ` server function (reused as-is; rename in copy only).
+- State managed by a new `LumiDrawerContext` (`src/components/csfactors/LumiDrawerContext.tsx`) exposing `open(briefing?)` / `close()`. Provider mounted in `csfactors.tsx`.
+- Replaces the legacy `QAgentDrawer` slot on CSFactors only; site-wide `QAgentButton` is untouched.
+- Reuses existing `useElevenLabsSpeechInput` hook for dictation.
 
-Rebuild `/csfactors` to match `csq-mockup-pulse-dark.png`. Reuses Phase 1 tokens. No DB changes.
+## 5. Reckoning Ledger interactivity
 
-**Files created**
-- `src/components/csfactors/pulse/PulseDashboard.tsx`
-- `src/components/csfactors/pulse/PulseHeader.tsx`
-- `src/components/csfactors/pulse/RiskHeatmap.tsx` (5×5, hairline cells, Quicksand dots sized by ARR, mobile horizontal scroll)
-- `src/components/csfactors/pulse/ReckoningLedger.tsx` (vertical timeline, hairline rail, mono timestamps)
-- `src/lib/mocks/pulseSeed.ts` (~12 fixture accounts when real list is empty)
+`src/components/csfactors/pulse/ReckoningLedger.tsx`:
 
-**Files edited**
-- `src/routes/csfactors.tsx` — swap main column to `<PulseDashboard />`. Keep sidebar shell, mobile drawer, entitlement guard, Q drawer trigger.
-- `src/components/csfactors/BurningThree.tsx` — headline restyle only: `The burning three.` serif + italic Quicksand period.
-- `src/components/dashboard/MetricCard.tsx` — drop radius, tighten to single hairline.
+- Convert each event row to a `<button>` with full-width hit target.
+- Fix timeline rail: move rail to `left: 11px` and center each `8px` dot via `translate-x-[-50%] left-[11px]`; rows use `pl-7` so text never crosses the rail.
+- onClick → `lumiDrawer.open({ kind: "ledger", event, account })` builds a briefing payload from the event (escalation/usage drop/health change → templated runbook copy).
+- Briefing renderer: a small `buildLedgerBriefing(event, account)` pure function in `src/lib/lumi-briefings.ts` returning `{ eyebrow, headline, body, accountId }`.
 
-**Composition (top → bottom)**
-1. Editorial header (eyebrow · serif H1 with italic accent · date stamp · My/Whole team toggle).
-2. KPI ribbon — 4 `MetricCard`s (Portfolio ARR, ARR at Risk, QBR Compliance %, NRR 90d). Same aggregations already used in `/account/executive/analytics`.
-3. Burning Three (restyled headline only).
-4. Impact × Likelihood heatmap → clicking a cell opens existing `AccountDrawer`.
-5. Reckoning Ledger (derived client-side from accounts: renewals due, QBR overdue, NPS drops). Rows link to `/csfactors/$accountId`.
-6. Existing `AccountsGrid` wrapped in `SectionCard` ("Accounts at risk" eyebrow).
+## 6. Burning Three — populate third card
 
-**Removed from current `/csfactors`**: standalone `CommandCentre` block (absorbed into Burning Three + Ledger), ad-hoc filter chips above the grid.
+`deriveBurningThree` in `src/lib/csfactors.functions.ts` currently returns up to 3 but seeds only 2 entries with content; add a third `info`-accent slot ("Renewal upcoming") derived from the soonest `renewal_date` in the next 60 days. For demo (seed) data, ensure `pulseSeed.ts` has at least one account with a renewal in that window so the third card renders (TechCore Q2-2027 already qualifies — verify and adjust contract date if needed).
 
-**Verification**
-- Pulse renders in light + dark at 400px and ≥1280px.
-- Heatmap horizontal-scrolls on mobile (`min-w-[520px]`).
-- AccountDrawer still opens from grid and heatmap.
-- Burning Three server fn still wired.
+## 7. KPI metric card accent rails
 
-**Stop point.** Review before approving Phase 3.
+`src/components/dashboard/MetricCard.tsx`:
 
----
+- Add a `topAccent?: "gold" | "success" | "danger" | "warn"` prop.
+- Render as a `2px` flat bar pinned to the card top (absolute, full width), color from semantic tokens (`--accent`, `--success` / emerald, `--destructive`, `--secondary-accent`).
+- Update `PulseDashboard.tsx` to pass `topAccent="gold" | "success" | "danger" | "success"` to NRR / GRR / Churn / Health respectively. Keep the existing accent prop for trend color only.
 
-## Phase 3 — Q → Lumi rebrand
+## 8. Heatmap hover state
 
-Brand mark swap + naming sweep. No DB column/table renames, no server runtime changes.
+`RiskHeatmap.tsx`:
 
-**Brand mark**
-- Copy `user-uploads://IMG_20260531_020324.png` → `src/assets/lumi-mark.png`.
-- New `src/components/site/LumiMark.tsx` (lighthouse + optional "Lumi." wordmark, period in `text-accent`). Props: `size`, `withWordmark`, `monogram`.
-- `QMark.tsx` becomes a one-line re-export of `LumiMark`, then deleted once all imports are migrated in the same pass.
+- On hover, swap border to `outline outline-1 outline-accent` (already partly there) and reveal a floating mono tooltip via Radix `HoverCard` or a simple absolute-positioned `div` showing `Impact <i> · Likelihood <l>` and first 2 account names.
+- Keep current click → row-drawer behavior intact.
 
-**Renamed files** (file move + identifier rename + import sweep)
-- `QAgentButton.tsx` → `LumiButton.tsx` (label "Ask Lumi")
-- `QAgentDrawer.tsx` → `LumiDrawer.tsx` (drawer title "Lumi", "Lumi is thinking…")
-- `AskQInline.tsx` → `AskLumiInline.tsx`
-- `QFilterContext.tsx` → `LumiFilterContext.tsx`
-- `QHint.tsx` → `LumiHint.tsx`
-- `QErrorBoundary.tsx` → `LumiErrorBoundary.tsx`
-- `q-agent.functions.ts`, `q-gallery.functions.ts`, `q-usage.functions.ts`, `q-pricing.ts`, `q-trees.ts`, `q-vectors.ts`, `csfactors-q.functions.ts`, `csfactors-q-tree.ts` → `lumi-*` equivalents
-- `routes/q.response.$runId.tsx` → `routes/lumi.response.$runId.tsx`
+## 9. Typography / spacing polish
 
-**Copy edits**
-- Header, sidebar, tooltips, ARIA labels, marketing copy on `/`, `/pricing`, `/about`, retention-protocol/codex blurbs — "Q" → "Lumi".
-- `BurningThree.tsx` — "Powered by Q" → "Powered by Lumi".
+- `PulseHeader.tsx`: tighten serif headline — wrap the italic emphasis in `<em class="italic font-display tracking-tight pr-[0.05em]">` so the trailing period doesn't crowd. Date stamp `MONDAY, 1 JUNE 2026` — force `font-mono uppercase tracking-[0.28em] text-[11px] text-muted-foreground`.
+- Unify all dashboard eyebrows on the shared `.eyebrow` utility (already in `styles.css`) — sweep `BurningThree`, `RiskHeatmap`, `PulseDashboard`, `ReckoningLedger`, `SectionCard` to remove ad-hoc tracking values.
 
-**Memory update**
-- `mem://index.md` Core rule: "agent is always called Lumi"; mark path → `src/assets/lumi-mark.png`; component → `<LumiMark />`.
+## 10. Sidebar rail tightening
 
-**Not changed**
-- DB tables/columns, Supabase functions, secret names (`ELEVENLABS_API_KEY` stays).
-- Two-surface isolation (site Lumi vs CSFactors Lumi) preserved verbatim.
+`CSFactorsSidebar.tsx`: reduce horizontal padding to `px-3`, icon row gap to `gap-1`, icon button to `h-9 w-9` so the rail reads as a flush shell. No nav items added or removed.
 
-**Verification**
-- `rg -i 'QMark|QAgent|QFilter|q-agent|"Q\."'` returns zero non-comment hits (allow-list: `Q4`, query var `q`, URL params).
-- Typecheck passes.
-- Visual sweep: brand mark renders in header, FAB, drawer, footer.
+## 11. Account drawer cross-fade
 
----
+Existing "Open account →" links already route to `/csfactors/$accountId`. Add a `view-transition-name` on the `<main>` container and the account drawer root + a small `.fade-cross` utility (200ms `opacity` + 2px translate) for browsers without view-transition support. No router changes.
 
-## Out of scope (still deferred)
+## Out of scope (deferred)
 
-Article reader drop-cap, Workspace slash-menu, Lumi drawer chat redesign with embedded cards, Stakeholder Canvas page, 360 lens visual rework beyond token inheritance.
+- Renaming Q files (`QAgentDrawer`, `QFilterContext`, `q-agent.functions.ts`, etc.) — copy/visual rebrand only this turn; file/server-fn renames in a follow-up to keep this diff reviewable.
+- Stakeholder Canvas, 360 lens rework, drop-cap polish on `/insights`.
+
+## Technical notes
+
+- All new colors come from existing semantic tokens (`--accent`, `--secondary-accent`, `--destructive`, plus emerald via existing `--success` token if defined; otherwise add `--success: oklch(0.72 0.12 150)` once in `styles.css`).
+- No new dependencies.
+- No DB/schema changes; ledger briefings are derived client-side.
+- `askQ` server fn reused unchanged; rebrand is presentation-only.
+
+## Files touched
+
+- new: `src/assets/lumi-mark.png.asset.json`, `src/components/site/LumiMark.tsx`, `src/components/csfactors/AskLumiDrawer.tsx`, `src/components/csfactors/LumiDrawerContext.tsx`, `src/lib/lumi-briefings.ts`
+- edited: `src/styles.css`, `src/components/site/QMark.tsx` (shim → LumiMark), `src/components/dashboard/MetricCard.tsx`, `src/components/csfactors/pulse/{PulseDashboard,PulseHeader,RiskHeatmap,ReckoningLedger}.tsx`, `src/components/csfactors/{CSFactorsSidebar,BurningThree,QAgentDrawer (copy only)}.tsx`, `src/routes/csfactors.tsx`, `src/lib/csfactors.functions.ts` (third Burning Three slot), `src/lib/mocks/pulseSeed.ts` (verify renewal-window account), `src/components/site/QHint.tsx` (copy)
