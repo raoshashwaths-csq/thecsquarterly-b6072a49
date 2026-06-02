@@ -71,8 +71,6 @@ function CSFactorsPageInner() {
   const list = useServerFn(listAccounts);
   const { filter, setFilter } = useQFilter();
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-  const [greet, setGreet] = useState("Hello");
-  useEffect(() => { setGreet(greeting()); }, []);
 
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
