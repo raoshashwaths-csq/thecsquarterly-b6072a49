@@ -8,12 +8,15 @@ function greeting() {
 }
 
 function todayStamp() {
-  return new Date().toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const d = new Date();
+  return d
+    .toLocaleDateString(undefined, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+    .toUpperCase();
 }
 
 export function PulseHeader({
@@ -34,9 +37,9 @@ export function PulseHeader({
 
   return (
     <header className="pb-6 border-b border-border mb-8">
-      <div className="flex items-center justify-between gap-4 mb-4">
+      <div className="flex items-center justify-between gap-4 mb-5">
         <div className="eyebrow text-secondary-accent">CSFactors / Pulse</div>
-        <div className="hidden md:block font-mono text-[11px] uppercase tracking-[0.28em] text-muted-foreground">
+        <div className="hidden md:block font-mono text-[10px] uppercase tracking-[0.32em] text-muted-foreground tabular-nums">
           {stamp}
         </div>
       </div>
@@ -45,8 +48,11 @@ export function PulseHeader({
           className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight"
           suppressHydrationWarning
         >
-          {greet}, <span className="italic">{firstName}</span>
-          <span className="text-accent">.</span>
+          {greet},{" "}
+          <em className="italic font-display tracking-tight pr-[0.04em]">
+            {firstName}
+          </em>
+          <span className="text-accent not-italic">.</span>
         </h1>
         <div
           role="tablist"

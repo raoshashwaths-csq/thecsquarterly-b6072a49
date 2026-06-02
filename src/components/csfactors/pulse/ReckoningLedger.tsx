@@ -1,6 +1,7 @@
 import { useMemo } from "react";
-import { Link } from "@tanstack/react-router";
 import type { CSAccount } from "@/lib/csfactors.functions";
+import { useLumiDrawer } from "@/components/csfactors/AskLumiDrawer";
+import { buildLedgerBriefing } from "@/lib/lumi-briefings";
 
 type LedgerEntry = {
   id: string;
@@ -99,37 +100,52 @@ function deriveLedger(accounts: CSAccount[]): LedgerEntry[] {
 
 export function ReckoningLedger({ accounts }: { accounts: CSAccount[] }) {
   const entries = useMemo(() => deriveLedger(accounts), [accounts]);
+  const lumi = useLumiDrawer();
+
   return (
     <aside className="lg:sticky lg:top-6">
       <div className="eyebrow text-secondary-accent mb-4">Reckoning Ledger</div>
-      <ol className="relative pl-5 border-l border-border space-y-5">
-        {entries.map((e) => (
-          <li key={e.id} className="relative">
-            <span
-              aria-hidden
-              className="absolute -left-[23px] top-1.5 h-2 w-2 rounded-full bg-accent ring-2 ring-background"
-            />
-            <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground mb-1 tabular-nums">
-              {e.time}
-            </div>
-            {e.accountId ? (
-              <Link
-                to="/csfactors/$accountId"
-                params={{ accountId: e.accountId }}
-                className="block font-display text-[15px] leading-snug tracking-tight text-foreground hover:text-accent transition-colors"
+      <ol className="relative space-y-4">
+        {/* vertical rail centered behind the dots */}
+        <span
+          aria-hidden
+          className="absolute top-2 bottom-2 left-[3px] w-px bg-border"
+        />
+        {entries.map((e) => {
+          const account = e.accountId ? accounts.find((a) => a.id === e.accountId) ?? null : null;
+          return (
+            <li key={e.id} className="relative pl-6">
+              <span
+                aria-hidden
+                className="absolute left-0 top-[7px] h-[7px] w-[7px] rounded-full bg-accent ring-2 ring-background"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  lumi.open(
+                    buildLedgerBriefing({
+                      time: e.time,
+                      tag: e.tag,
+                      headline: e.headline,
+                      account,
+                    }),
+                  )
+                }
+                className="block w-full text-left group hover:bg-muted/30 -mx-2 px-2 py-1 transition-colors"
               >
-                {e.headline}
-              </Link>
-            ) : (
-              <div className="font-display text-[15px] leading-snug tracking-tight text-foreground">
-                {e.headline}
-              </div>
-            )}
-            <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground">
-              {e.who.split(" · ")[0]} <span className="text-accent">·</span> {e.tag}
-            </div>
-          </li>
-        ))}
+                <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground mb-1 tabular-nums">
+                  {e.time}
+                </div>
+                <div className="font-display text-[15px] leading-snug tracking-tight text-foreground group-hover:text-accent transition-colors">
+                  {e.headline}
+                </div>
+                <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+                  {e.who.split(" · ")[0]} <span className="text-accent">·</span> {e.tag}
+                </div>
+              </button>
+            </li>
+          );
+        })}
       </ol>
     </aside>
   );

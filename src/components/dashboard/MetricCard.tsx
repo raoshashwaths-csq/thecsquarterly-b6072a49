@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 type Accent = "neutral" | "accent" | "secondary" | "danger" | "success";
+type TopAccent = "gold" | "success" | "danger" | "warn" | "secondary";
 
 export type MetricCardProps = {
   eyebrow: string;
@@ -10,6 +11,8 @@ export type MetricCardProps = {
   trend?: string;
   trendDirection?: "up" | "down" | "flat";
   accent?: Accent;
+  /** Thin colored rail pinned to the very top edge of the card. */
+  topAccent?: TopAccent;
   footer?: ReactNode;
   className?: string;
 };
@@ -19,7 +22,15 @@ const ACCENT_BAR: Record<Accent, string> = {
   accent: "bg-accent",
   secondary: "bg-secondary-accent",
   danger: "bg-destructive",
-  success: "bg-emerald-600",
+  success: "bg-emerald-500",
+};
+
+const TOP_RAIL: Record<TopAccent, string> = {
+  gold: "bg-accent",
+  success: "bg-emerald-500",
+  danger: "bg-destructive",
+  warn: "bg-secondary-accent",
+  secondary: "bg-secondary-accent",
 };
 
 const TREND_COLOR: Record<NonNullable<MetricCardProps["trendDirection"]>, string> = {
@@ -35,6 +46,7 @@ export function MetricCard({
   trend,
   trendDirection = "flat",
   accent = "neutral",
+  topAccent,
   footer,
   className,
 }: MetricCardProps) {
@@ -46,7 +58,11 @@ export function MetricCard({
         className,
       )}
     >
-      <div className={cn("absolute left-0 top-0 h-[2px] w-10", ACCENT_BAR[accent])} />
+      {topAccent ? (
+        <span aria-hidden className={cn("absolute inset-x-0 top-0 h-[2px]", TOP_RAIL[topAccent])} />
+      ) : (
+        <div className={cn("absolute left-0 top-0 h-[2px] w-10", ACCENT_BAR[accent])} />
+      )}
       <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-muted-foreground mb-4 font-semibold">
         {eyebrow}
       </div>
