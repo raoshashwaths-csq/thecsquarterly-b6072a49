@@ -49,7 +49,6 @@ export function PulseDashboard({
     return Number(((detractors / accounts.length) * 5).toFixed(1));
   }, [accounts]);
 
-  // Approximate NRR / GRR from health & arr (purely display-side)
   const nrr = Math.max(80, Math.min(140, 100 + Math.round((avgHealth - 60) * 0.9)));
   const grr = Math.max(70, Math.min(100, 80 + Math.round((avgHealth - 50) * 0.4)));
 
@@ -70,7 +69,7 @@ export function PulseDashboard({
               eyebrow="NRR"
               value={nrr}
               unit="%"
-              accent="accent"
+              topAccent="gold"
               trend={`${nrr >= 100 ? "+" : ""}${nrr - 100}pp vs 30d`}
               trendDirection={nrr >= 100 ? "up" : "down"}
             />
@@ -78,7 +77,7 @@ export function PulseDashboard({
               eyebrow="GRR"
               value={grr}
               unit="%"
-              accent="secondary"
+              topAccent="success"
               trend="2pp vs 30d"
               trendDirection="up"
             />
@@ -86,14 +85,14 @@ export function PulseDashboard({
               eyebrow="Churn (TTM)"
               value={churnPct}
               unit="%"
-              accent="danger"
+              topAccent="danger"
               trend="0.4pp vs 30d"
               trendDirection="down"
             />
             <MetricCard
               eyebrow="Health (portfolio)"
               value={avgHealth}
-              accent={avgHealth >= 70 ? "success" : avgHealth >= 55 ? "secondary" : "danger"}
+              topAccent="success"
               trend={`${atRisk > 0 ? compact(atRisk) + " at risk" : "stable"}`}
               trendDirection={avgHealth >= 70 ? "up" : "down"}
             />

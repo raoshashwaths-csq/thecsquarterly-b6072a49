@@ -427,3 +427,59 @@
 @media (prefers-reduced-motion: reduce) {
   .csq-word { transition: none; }
 }
+
+/* ---------------------------------------------------------------
+   Lumi mark — lighthouse beam + lantern + star shimmer
+   Render via <LumiMark animated />; the wrapper carries .lumi-mark.
+   --------------------------------------------------------------- */
+@keyframes lumi-beam {
+  0%   { transform: rotate(-30deg); opacity: 0; }
+  20%  { opacity: 0.5; }
+  100% { transform: rotate(30deg); opacity: 0; }
+}
+@keyframes lumi-lantern {
+  0%, 100% { opacity: 0.35; filter: blur(2px); }
+  50%      { opacity: 0.85; filter: blur(4px); }
+}
+.lumi-mark {
+  position: relative;
+}
+.lumi-beam {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: conic-gradient(
+    from 270deg at 50% 38%,
+    transparent 0deg,
+    color-mix(in oklab, var(--accent) 35%, transparent) 18deg,
+    transparent 36deg
+  );
+  transform-origin: 50% 38%;
+  opacity: 0;
+  animation: lumi-beam 3.4s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+.lumi-lantern {
+  position: absolute;
+  top: 28%;
+  left: 50%;
+  width: 22%;
+  height: 14%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--accent) 80%, transparent),
+    transparent 70%
+  );
+  animation: lumi-lantern 2.4s ease-in-out infinite;
+}
+.lumi-mark[data-state="active"] .lumi-lantern,
+.lumi-mark:hover .lumi-lantern {
+  animation-duration: 1.4s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lumi-beam, .lumi-lantern { animation: none; opacity: 0; }
+}
+
