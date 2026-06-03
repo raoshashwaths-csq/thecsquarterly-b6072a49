@@ -96,10 +96,10 @@ export function PulseDashboard({
             />
             <MetricCard
               eyebrow="Health (portfolio)"
-              value={avgHealth}
+              value={healthDisplay}
               topAccent="success"
               trend={`${atRisk > 0 ? compact(atRisk) + " at risk" : "stable"}`}
-              trendDirection={avgHealth >= 70 ? "up" : "down"}
+              trendDirection={healthDisplay >= 70 ? "up" : "down"}
             />
           </MetricGrid>
         </section>
