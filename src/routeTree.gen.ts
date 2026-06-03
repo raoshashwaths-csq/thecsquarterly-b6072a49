@@ -17,6 +17,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SequencerRouteImport } from './routes/sequencer'
 import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
 import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
+import { Route as PulseDemoRouteImport } from './routes/pulse-demo'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
 import { Route as LoginRouteImport } from './routes/login'
@@ -102,6 +103,11 @@ const RssDotxmlRoute = RssDotxmlRouteImport.update({
 const RetentionProtocolRoute = RetentionProtocolRouteImport.update({
   id: '/retention-protocol',
   path: '/retention-protocol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PulseDemoRoute = PulseDemoRouteImport.update({
+  id: '/pulse-demo',
+  path: '/pulse-demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -360,6 +366,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
+  '/pulse-demo': typeof PulseDemoRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sequencer': typeof SequencerRoute
@@ -413,6 +420,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
+  '/pulse-demo': typeof PulseDemoRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sequencer': typeof SequencerRoute
@@ -470,6 +478,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
   '/pricing': typeof PricingRoute
+  '/pulse-demo': typeof PulseDemoRoute
   '/retention-protocol': typeof RetentionProtocolRoute
   '/rss.xml': typeof RssDotxmlRoute
   '/sequencer': typeof SequencerRoute
@@ -528,6 +537,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/outcome-forum'
     | '/pricing'
+    | '/pulse-demo'
     | '/retention-protocol'
     | '/rss.xml'
     | '/sequencer'
@@ -581,6 +591,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/outcome-forum'
     | '/pricing'
+    | '/pulse-demo'
     | '/retention-protocol'
     | '/rss.xml'
     | '/sequencer'
@@ -637,6 +648,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/outcome-forum'
     | '/pricing'
+    | '/pulse-demo'
     | '/retention-protocol'
     | '/rss.xml'
     | '/sequencer'
@@ -694,6 +706,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   OutcomeForumRoute: typeof OutcomeForumRoute
   PricingRoute: typeof PricingRoute
+  PulseDemoRoute: typeof PulseDemoRoute
   RetentionProtocolRoute: typeof RetentionProtocolRoute
   RssDotxmlRoute: typeof RssDotxmlRoute
   SequencerRoute: typeof SequencerRoute
@@ -783,6 +796,13 @@ declare module '@tanstack/react-router' {
       path: '/retention-protocol'
       fullPath: '/retention-protocol'
       preLoaderRoute: typeof RetentionProtocolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pulse-demo': {
+      id: '/pulse-demo'
+      path: '/pulse-demo'
+      fullPath: '/pulse-demo'
+      preLoaderRoute: typeof PulseDemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -1189,6 +1209,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   OutcomeForumRoute: OutcomeForumRoute,
   PricingRoute: PricingRoute,
+  PulseDemoRoute: PulseDemoRoute,
   RetentionProtocolRoute: RetentionProtocolRoute,
   RssDotxmlRoute: RssDotxmlRoute,
   SequencerRoute: SequencerRoute,
@@ -1224,13 +1245,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
