@@ -63,12 +63,12 @@ export function PulseDashboard({
         <PulseHeader firstName={firstName} scope={scope} onScopeChange={setScope} />
 
         {usingSeed ? (
-          <div className="mb-6 inline-flex items-center gap-2 border border-dashed border-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+          <div className="mb-4 inline-flex items-center gap-2 border border-dashed border-border px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
             Demo portfolio · add your first account to replace
           </div>
         ) : null}
 
-        <section className="mb-10" aria-label="Portfolio metrics">
+        <section className="mb-6" aria-label="Portfolio metrics">
           <MetricGrid cols={4}>
             <MetricCard
               eyebrow="NRR"
@@ -104,7 +104,7 @@ export function PulseDashboard({
           </MetricGrid>
         </section>
 
-        <section className="mb-10" id="reminders">
+        <section className="mb-6" id="reminders">
           <BurningThree accounts={accounts} />
         </section>
 
@@ -117,7 +117,7 @@ export function PulseDashboard({
           title="Portfolio overview"
           eyebrow="Accounts"
           description={`${accounts.length} accounts · ${compact(totalARR)} ARR tracked`}
-          className="mb-10"
+          className="mb-6"
         >
           <AccountsGrid accounts={accounts} onRowClick={onRowClick} />
         </SectionCard>
