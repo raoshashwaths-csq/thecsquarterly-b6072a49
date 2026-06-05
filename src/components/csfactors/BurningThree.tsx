@@ -70,7 +70,15 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
           Powered by Lumi
         </Button>
       </div>
-      <div className="grid md:grid-cols-3 gap-4 md:gap-px bg-transparent md:bg-border border-0 md:border border-border">
+      <div
+        className={cn(
+          "grid gap-4 md:gap-px bg-transparent md:bg-border border-0 md:border border-border",
+          items.length === 1 && "md:grid-cols-1",
+          items.length === 2 && "md:grid-cols-2",
+          items.length >= 3 && "md:grid-cols-3",
+        )}
+      >
+
         {items.map((it) => (
           <div
             key={it.id}
