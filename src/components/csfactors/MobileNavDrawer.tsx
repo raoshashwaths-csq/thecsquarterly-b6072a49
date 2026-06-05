@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { QMark } from "@/components/site/QMark";
+import { LumiMark } from "@/components/site/LumiMark";
 import { cn } from "@/lib/utils";
 import { TOP_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
 
@@ -26,7 +26,7 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
       <SheetContent side="left" className="p-0 w-72 bg-card border-r border-border flex flex-col">
         <SheetHeader className="px-4 py-4 border-b border-border">
           <SheetTitle className="flex items-center gap-2 font-display text-base tracking-tight">
-            <QMark className="h-6 w-6" /> CSFactors
+            <LumiMark variant="emblem" size={22} /> CSFactors
           </SheetTitle>
         </SheetHeader>
 
