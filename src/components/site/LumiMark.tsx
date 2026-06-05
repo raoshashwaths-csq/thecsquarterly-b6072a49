@@ -1,15 +1,20 @@
 import { cn } from "@/lib/utils";
 import lumiAsset from "@/assets/lumi-mark.png.asset.json";
+import lumiDarkAsset from "@/assets/lumi-mark-dark.jpg.asset.json";
+import lumiGoldAsset from "@/assets/lumi-lighthouse-gold.png.asset.json";
 
 /**
  * LumiMark — the operator agent's brand mark.
  *
- * The uploaded asset contains the gold lighthouse emblem above the serif
- * "Lumi" wordmark on a royal-blue field. We crop to just the lighthouse
- * for the `emblem` variant, and show the full lockup for `lockup`.
+ * Variants:
+ *  - `emblem`  : the original royal-blue plate with gold lighthouse (cropped).
+ *  - `lockup`  : the full vertical lockup (lighthouse + "Lumi" wordmark).
+ *  - `gold`    : transparent gold line-art lighthouse — use this inside
+ *                colored buttons / on tinted surfaces where the navy plate
+ *                would clash. Stars + beams are part of the artwork.
  */
 type Props = {
-  variant?: "emblem" | "lockup";
+  variant?: "emblem" | "lockup" | "gold";
   size?: number;
   /** Enable beam/star/lantern shimmer (gated by parent data-state). */
   animated?: boolean;
@@ -35,13 +40,44 @@ export function LumiMark({
         aria-label={alt}
       >
         <img
-          src={lumiAsset.url}
+          src={lumiDarkAsset.url}
           alt=""
           aria-hidden
           style={{ width: size, height: size * (1.36) }}
           className="object-contain select-none pointer-events-none"
           draggable={false}
         />
+      </span>
+    );
+  }
+
+  if (variant === "gold") {
+    return (
+      <span
+        className={cn(
+          "relative inline-block align-middle",
+          animated && "lumi-mark",
+          className,
+        )}
+        aria-label={alt}
+        style={{ width: size, height: size }}
+      >
+        <img
+          src={lumiGoldAsset.url}
+          alt=""
+          aria-hidden
+          draggable={false}
+          className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none"
+        />
+        {animated ? (
+          <>
+            <span aria-hidden className="lumi-beam" />
+            <span aria-hidden className="lumi-lantern" />
+            <span aria-hidden className="lumi-twinkle lumi-twinkle--a" />
+            <span aria-hidden className="lumi-twinkle lumi-twinkle--b" />
+            <span aria-hidden className="lumi-twinkle lumi-twinkle--c" />
+          </>
+        ) : null}
       </span>
     );
   }
