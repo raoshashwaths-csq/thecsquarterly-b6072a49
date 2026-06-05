@@ -58,7 +58,7 @@ export function PulseDashboard({
   const healthDisplay = usingSeed ? 68 : avgHealth;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_320px] gap-10">
+    <div className="grid grid-cols-1 lg:grid-cols-[3fr_1fr] gap-6">
       <div className="min-w-0">
         <PulseHeader firstName={firstName} scope={scope} onScopeChange={setScope} />
 
