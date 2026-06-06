@@ -237,31 +237,35 @@ export function PulseDashboard({
         <Eyebrow>The Burning Three</Eyebrow>
         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[color:var(--color-accent)]/25 border border-[color:var(--color-accent)]/25">
           {BURNERS.map((b) => (
-            <article key={b.name} className="p-5 grid grid-cols-[1fr_auto_auto] gap-5 items-start">
-              <div>
+            <article key={b.name} className="p-5 flex flex-col gap-4">
+              <div className="flex items-start justify-between gap-3">
                 <span className="inline-block px-2 py-0.5 bg-red-500/15 text-red-400 font-mono text-[10px] uppercase tracking-[0.22em] border border-red-500/40">
                   {b.tag}
                 </span>
-                <div className="mt-3 font-display text-2xl leading-tight tracking-tight">{b.name}</div>
+              </div>
+              <div>
+                <div className="font-display text-[26px] leading-[1.05] tracking-tight">{b.name}</div>
                 <div className="mt-1 text-sm text-foreground/65">{b.plan}</div>
               </div>
-              <div className="flex flex-col items-start gap-1.5">
-                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent/80">Owner</div>
-                <div className="flex items-center gap-2">
-                  <img src={b.avatar} alt="" className="h-7 w-7 rounded-full bg-card/60 ring-1 ring-accent/30" />
-                  <div className="leading-tight">
-                    <div className="text-sm">{b.owner}</div>
-                    <div className="text-xs text-foreground/55">Strategic</div>
+              <div className="mt-auto flex items-end justify-between gap-4">
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent/80 mb-1.5">Owner</div>
+                  <div className="flex items-center gap-2">
+                    <img src={b.avatar} alt="" className="h-7 w-7 rounded-full bg-card/60 ring-1 ring-accent/30" />
+                    <div className="leading-tight">
+                      <div className="text-sm">{b.owner}</div>
+                      <div className="text-xs text-foreground/55">Strategic</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent/80">Days to Renewal</div>
-                <div className={cn("font-display text-3xl mt-1 tabular-nums", b.state === "Overdue" ? "text-red-400" : "text-amber-300")}>
-                  {b.days}
-                </div>
-                <div className={cn("text-xs mt-0.5", b.state === "Overdue" ? "text-red-400" : "text-amber-300")}>
-                  {b.state}
+                <div className="text-right">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent/80 mb-1">Days to Renewal</div>
+                  <div className={cn("font-display text-[34px] leading-none tabular-nums", b.state === "Overdue" ? "text-red-400" : "text-amber-300")}>
+                    {b.days}
+                  </div>
+                  <div className={cn("text-xs mt-1", b.state === "Overdue" ? "text-red-400" : "text-amber-300")}>
+                    {b.state}
+                  </div>
                 </div>
               </div>
             </article>
