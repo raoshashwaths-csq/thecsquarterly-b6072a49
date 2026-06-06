@@ -315,8 +315,9 @@ export function PulseDashboard({
               {/* X axis */}
               <div className="mt-2 grid grid-cols-5 gap-[6px]">
                 {LIKELIHOOD_COLS.map((c) => (
-                  <div key={c.n} className="text-center font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/65">
-                    <span className="tabular-nums">{c.n}</span> {c.label}
+                  <div key={c.n} className="text-center font-mono text-[9px] uppercase tracking-[0.18em] text-foreground/65 leading-tight">
+                    <div className="tabular-nums">{c.n}</div>
+                    <div className="whitespace-nowrap">{c.label}</div>
                   </div>
                 ))}
               </div>
