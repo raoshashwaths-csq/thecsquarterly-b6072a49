@@ -72,26 +72,28 @@
 }
 
 .dark {
-  --background: oklch(0.247 0.085 271);         /* #112250 Royal Blue */
-  --foreground: oklch(0.953 0.012 80);          /* Swan Wing */
-  --muted: oklch(0.45 0.075 268);               /* Sapphire */
-  --muted-foreground: oklch(0.835 0.082 86 / 0.7);
-  --accent: oklch(0.835 0.082 86);              /* Quicksand */
-  --accent-foreground: oklch(0.247 0.085 271);
+  /* Midnight Slate canvas + layered navy cards + white-gold hairline borders */
+  --background: oklch(0.19 0.045 268);          /* #0c1226 deep midnight slate */
+  --foreground: oklch(0.955 0.012 80);          /* cream off-white */
+  --muted: oklch(0.34 0.05 268);
+  --muted-foreground: oklch(0.78 0.02 85 / 0.72);
+  --accent: oklch(0.835 0.082 86);              /* Quicksand gold */
+  --accent-foreground: oklch(0.19 0.045 268);
   --secondary-accent: oklch(0.45 0.075 268);
-  --secondary-accent-foreground: oklch(0.953 0.012 80);
-  --border: oklch(0.835 0.082 86 / 0.22);
-  --input: oklch(0.835 0.082 86 / 0.22);
+  --secondary-accent-foreground: oklch(0.955 0.012 80);
+  /* Filament hairline: white-gold blend at ~7% — used for all borders */
+  --border: oklch(1 0 0 / 0.07);
+  --input: oklch(1 0 0 / 0.07);
   --ring: oklch(0.835 0.082 86);
-  --card: oklch(0.29 0.09 270);                 /* #1A2D63 raised */
-  --card-foreground: oklch(0.953 0.012 80);
-  --popover: oklch(0.29 0.09 270);
-  --popover-foreground: oklch(0.953 0.012 80);
+  --card: oklch(0.235 0.05 268);                /* #161d38 layered navy */
+  --card-foreground: oklch(0.955 0.012 80);
+  --popover: oklch(0.235 0.05 268);
+  --popover-foreground: oklch(0.955 0.012 80);
   --primary: oklch(0.835 0.082 86);
-  --primary-foreground: oklch(0.247 0.085 271);
-  --secondary: oklch(0.45 0.075 268);
-  --secondary-foreground: oklch(0.953 0.012 80);
-  --destructive: oklch(0.65 0.22 27);
+  --primary-foreground: oklch(0.19 0.045 268);
+  --secondary: oklch(0.28 0.05 268);
+  --secondary-foreground: oklch(0.955 0.012 80);
+  --destructive: oklch(0.62 0.2 25);
   --destructive-foreground: oklch(0.98 0 0);
 }
 
