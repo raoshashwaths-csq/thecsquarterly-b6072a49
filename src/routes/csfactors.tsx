@@ -75,6 +75,15 @@ function CSFactorsPageInner() {
   const { filter, setFilter } = useQFilter();
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
 
+  // Pulse dashboard is designed for the midnight slate theme — force dark on this route.
+  useMemo(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.add("dark");
+    }
+    return null;
+  }, []);
+
+
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
     if (rank[designation] < rank.operator) {
