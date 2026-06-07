@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import type { CSAccount } from "@/lib/csfactors.functions";
 import { pulseSeedAccounts } from "@/lib/mocks/pulseSeed";
 
 /* ------------------------------------------------------------------ *
- * Pulse — editorial dark dashboard.
- * Visual reference: csq-mockup-pulse-dark. Navy ground, gold hairline
- * dividers, large Didone-ish display headlines, mono micro-labels.
- * Everything below is composed inline so the layout matches 1:1.
+ * Pulse — editorial midnight dashboard.
+ * Midnight slate canvas, layered navy cards, hairline filament borders,
+ * KPI accent rails (gold/emerald/crimson/teal), live view switching.
  * ------------------------------------------------------------------ */
 
-/* ============ Mockup-locked data (used when seed portfolio) ========= */
+/* ============ Mockup-locked data ========= */
 
 type DemoAccount = {
   name: string;
@@ -21,7 +21,7 @@ type DemoAccount = {
   renewal: string;
   nrr: number;
   health: number;
-  trend: number[]; // sparkline values
+  trend: number[];
   risk: "Critical" | "High" | "Medium" | "Low";
   daysToRenewal: number;
 };
@@ -37,27 +37,27 @@ const DEMO: DemoAccount[] = [
   { name: "Vertex Biotech",       plan: "Growth",     owner: "Sophie Turner",avatar: AVA("Sophie"), arr: 1_850_000, renewal: "Jun 30, 2025", nrr: 118, health: 82, trend: [70,72,74,76,78,79,80,81,82,82], risk: "Low",      daysToRenewal: 40  },
   { name: "Summit Retail",        plan: "Core",       owner: "Jordan Blake", avatar: AVA("Jordan"), arr:   540_000, renewal: "Jul 12, 2025", nrr:  92, health: 62, trend: [70,68,67,66,65,64,63,63,62,62], risk: "Medium",   daysToRenewal: 53  },
   { name: "Clearwater Insurance", plan: "Core",       owner: "Ava Chen",     avatar: AVA("Ava"),    arr:   420_000, renewal: "Aug 2, 2025",  nrr:  89, health: 49, trend: [62,60,58,56,54,52,51,50,49,49], risk: "High",     daysToRenewal: 74  },
+  { name: "TechCore Solutions",   plan: "Enterprise", owner: "Daniel Reyes", avatar: AVA("Daniel"), arr: 2_140_000, renewal: "Aug 18, 2025", nrr:  91, health: 51, trend: [66,64,62,60,58,56,54,53,52,51], risk: "Critical", daysToRenewal: 90  },
 ];
 
-type Burner = { tag: string; name: string; plan: string; owner: string; avatar: string; days: number; state: "Overdue" | "At Risk" };
+type Burner = { tag: string; name: string; plan: string; owner: string; ownerType: string; avatar: string; days: number; state: "Overdue" | "At Risk" | "Critical Renewal Risk"; context: string };
 const BURNERS: Burner[] = [
-  { tag: "ESCALATED", name: "Northbridge Global",    plan: "Enterprise Plan", owner: "Maya Patel", avatar: AVA("Maya"),  days: -14, state: "Overdue" },
-  { tag: "ESCALATED", name: "Pioneer Manufacturing", plan: "Growth Plan",     owner: "Ethan Cole", avatar: AVA("Ethan"), days:   2, state: "At Risk" },
-  { tag: "ESCALATED", name: "Helix Financial",       plan: "Enterprise Plan", owner: "Lina Park",  avatar: AVA("Lina"),  days:   9, state: "At Risk" },
+  { tag: "ESCALATED", name: "Northbridge Global",    plan: "Enterprise Plan", owner: "Maya Patel",   ownerType: "Strategic",   avatar: AVA("Maya"),   days: -14, state: "Overdue",                context: "$3.25M ARR · Champion departed Q4" },
+  { tag: "ESCALATED", name: "Pioneer Manufacturing", plan: "Growth Plan",     owner: "Ethan Cole",   ownerType: "Velocity",    avatar: AVA("Ethan"),  days:   2, state: "At Risk",                context: "$1.12M ARR · Usage off 18% MoM" },
+  { tag: "ESCALATED", name: "TechCore Solutions",    plan: "Enterprise Plan", owner: "Daniel Reyes", ownerType: "Strategic",   avatar: AVA("Daniel"), days:  90, state: "Critical Renewal Risk",  context: "$2.14M ARR · Procurement loop stalled" },
 ];
 
 type LedgerRow = { time: string; headline: string; account: string; detail: string };
 const LEDGER: LedgerRow[] = [
-  { time: "9:02 AM", headline: "Usage drop detected",    account: "Northbridge Global",    detail: "↓ 28% in Weekly Active Users" },
-  { time: "8:41 AM", headline: "Exec sponsor change",    account: "Pioneer Manufacturing", detail: "New: Jennifer Lee (VP Operations)" },
+  { time: "9:02 AM", headline: "Usage drop detected",    account: "Northbridge Global",    detail: "↓ 28% Weekly Active Users" },
+  { time: "8:41 AM", headline: "Exec sponsor change",    account: "Pioneer Manufacturing", detail: "New: Jennifer Lee (VP Ops)" },
   { time: "8:17 AM", headline: "Support escalation",     account: "Helix Financial",       detail: "Severity 2 → Severity 1" },
-  { time: "7:56 AM", headline: "Renewal date updated",   account: "Atlas Logistics",       detail: "May 28, 2025 → Jun 15, 2025" },
+  { time: "7:56 AM", headline: "Renewal date updated",   account: "Atlas Logistics",       detail: "May 28 → Jun 15, 2025" },
   { time: "7:32 AM", headline: "Expansion opportunity",  account: "Vertex Biotech",        detail: "$185K ARR identified" },
   { time: "7:05 AM", headline: "Health score change",    account: "Summit Retail",         detail: "76 → 62 (↓ 14)" },
   { time: "6:48 AM", headline: "Churn risk increased",   account: "Clearwater Insurance",  detail: "Likelihood 2 → 4" },
 ];
 
-// 5x5 [row=impact 5..1][col=likelihood 1..5] count
 const HEATMAP: number[][] = [
   [ 0,  1,  2,  4,  7],
   [ 1,  2,  4,  6,  9],
@@ -80,19 +80,14 @@ const LIKELIHOOD_COLS = [
   { n: 5, label: "Almost Certain" },
 ];
 
-/* ============ Tiny helpers ============ */
+/* ============ Helpers ============ */
 
-function fmtUSD(n: number) {
-  return `$${n.toLocaleString("en-US")}`;
-}
+function fmtUSD(n: number) { return `$${n.toLocaleString("en-US")}`; }
 
 function heatColor(v: number) {
-  // 0 → near-transparent cream, max → red. Tuned for the mockup ramp.
   if (v === 0) return { bg: "rgba(245,232,200,0.92)", fg: "#1a2a4a" };
   const max = 16;
   const t = Math.min(1, v / max);
-  // cream → orange → red
-  // anchor stops: 0:#f5e8c8, 0.45:#f3c66a, 0.7:#e98a3a, 1:#c63a2e
   const stops = [
     { t: 0.00, c: [245, 232, 200] },
     { t: 0.30, c: [243, 198, 106] },
@@ -141,6 +136,16 @@ const TREND_COLOR: Record<DemoAccount["risk"], string> = {
   Low:      "#34d399",
 };
 
+/* KPI accent rail tones — flush top edge, zero radius */
+const ACCENT_RAIL: Record<string, string> = {
+  gold:    "#e0c58f",
+  emerald: "#10b981",
+  crimson: "#c0392b",
+  teal:    "#5eead4",
+};
+
+type ViewKey = "pulse" | "accounts" | "renewals" | "360";
+
 /* ================== Component ================== */
 
 export function PulseDashboard({
@@ -170,8 +175,6 @@ export function PulseDashboard({
         daysToRenewal: 30,
       }));
 
-  // KPI values lock to the mockup for the demo portfolio
-  const totalARR = useMemo(() => rows.reduce((s, r) => s + r.arr, 0), [rows]);
   const nrr   = usingSeed ? 112  : Math.round(rows.reduce((s, r) => s + r.nrr, 0) / Math.max(1, rows.length));
   const grr   = usingSeed ?  94  : 92;
   const churn = usingSeed ? 2.1  : 3.2;
@@ -186,25 +189,43 @@ export function PulseDashboard({
     });
   }, []);
 
-  // Map our rows to CSAccount for click-out
+  /* ---- Live view switching: synced to URL hash from sidebar nav ---- */
+  const hash = useRouterState({ select: (r) => r.location.hash });
+  const [activeView, setActiveView] = useState<ViewKey>("pulse");
+  useEffect(() => {
+    const h = (hash || "").replace(/^#/, "");
+    if (h === "accounts") setActiveView("accounts");
+    else if (h === "renewals") setActiveView("renewals");
+    else if (h === "360") setActiveView("360");
+    else setActiveView("pulse");
+  }, [hash]);
+
   const matchLive = (name: string): CSAccount | undefined =>
     liveOrSeed.find((a) => a.name === name) ?? liveOrSeed[0];
+
+  const tabs: { id: ViewKey; label: string }[] = [
+    { id: "pulse",    label: "Pulse" },
+    { id: "accounts", label: "Accounts" },
+    { id: "renewals", label: "Renewals" },
+    { id: "360",      label: "360 Dashboard" },
+  ];
 
   return (
     <div className="text-foreground">
       {/* ============== HEADER ============== */}
-      <header className="pb-8">
+      <header className="pb-7">
         <div className="flex items-start justify-between gap-6">
-          <div className="font-mono text-[10px] uppercase tracking-[0.32em] text-accent/80">
+          <div className="font-mono text-[11px] font-medium uppercase tracking-widest text-accent/85">
             CSFACTORS&nbsp;&nbsp;/&nbsp;&nbsp;PULSE
           </div>
-          <div className="text-right font-mono text-[10px] uppercase tracking-[0.32em] text-accent/80 tabular-nums leading-relaxed">
+          <div className="text-right font-mono text-[11px] font-medium uppercase tracking-widest text-accent/80 tabular-nums leading-relaxed">
             <div>{stamp.date || "—"}</div>
             <div>{stamp.time || "—"}</div>
           </div>
         </div>
         <h1
-          className="mt-6 font-display text-[64px] md:text-[88px] leading-[0.95] tracking-[-0.02em] text-foreground"
+          className="mt-6 font-serif text-[48px] md:text-[80px] leading-[0.98] tracking-[-0.015em] text-foreground"
+          style={{ fontFamily: '"Cormorant Garamond", "Newsreader", Georgia, serif' }}
           suppressHydrationWarning
         >
           {(() => {
@@ -212,7 +233,10 @@ export function PulseDashboard({
             const g = h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
             return (
               <>
-                {g}, <span className="italic">{firstName}</span>
+                {g},{" "}
+                <span className="italic tracking-[0.005em]" style={{ fontStyle: "italic" }}>
+                  {firstName}
+                </span>
                 <span className="text-accent">.</span>
               </>
             );
@@ -220,50 +244,118 @@ export function PulseDashboard({
         </h1>
       </header>
 
-      <GoldRule />
+      {/* ============== TAB STRIP ============== */}
+      <div className="border-t border-border">
+        <div className="flex gap-1 -mb-px">
+          {tabs.map((t) => {
+            const active = activeView === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setActiveView(t.id)}
+                className={cn(
+                  "px-4 py-3 font-mono text-[11px] font-medium uppercase tracking-widest transition-colors border-t-2",
+                  active
+                    ? "border-accent text-accent bg-card/60"
+                    : "border-transparent text-foreground/55 hover:text-foreground/80",
+                )}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
+      {activeView === "pulse" && (
+        <PulseView
+          rows={rows}
+          nrr={nrr}
+          grr={grr}
+          churn={churn}
+          portfolioHealth={portfolioHealth}
+          matchLive={matchLive}
+          onRowClick={onRowClick}
+        />
+      )}
+      {activeView === "accounts" && (
+        <AccountsView rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
+      )}
+      {activeView === "renewals" && <RenewalsView rows={rows} />}
+      {activeView === "360" && <ThreeSixtyView rows={rows} />}
+    </div>
+  );
+}
+
+/* ================== Pulse view ================== */
+
+function PulseView({
+  rows, nrr, grr, churn, portfolioHealth, matchLive, onRowClick,
+}: {
+  rows: DemoAccount[];
+  nrr: number; grr: number; churn: number; portfolioHealth: number;
+  matchLive: (n: string) => CSAccount | undefined;
+  onRowClick: (a: CSAccount) => void;
+}) {
+  return (
+    <>
       {/* ============== KPI STRIP ============== */}
-      <section className="grid grid-cols-2 md:grid-cols-4 divide-x divide-[color:var(--color-accent)]/30 py-7">
-        <Kpi label="NRR"             value={`${nrr}%`}    trend={`↑ ${Math.abs(nrr - 106)}pp vs prior 30 days`} up />
-        <Kpi label="GRR"             value={`${grr}%`}    trend="↑ 2pp vs prior 30 days" up />
-        <Kpi label="Logo Churn"      value={`${churn}%`}  trend="↓ 0.4pp vs prior 30 days" up />
-        <Kpi label="Portfolio Health" value={String(portfolioHealth)} trend="↑ 5 vs prior 30 days" up />
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 py-7">
+        <Kpi rail={ACCENT_RAIL.gold}    label="NRR"              value={`${nrr}%`}    trend={`↑ ${Math.abs(nrr - 106)}pp vs prior 30 days`} />
+        <Kpi rail={ACCENT_RAIL.emerald} label="GRR"              value={`${grr}%`}    trend="↑ 2pp vs prior 30 days" />
+        <Kpi rail={ACCENT_RAIL.crimson} label="Logo Churn"       value={`${churn}%`}  trend="↓ 0.4pp vs prior 30 days" />
+        <Kpi rail={ACCENT_RAIL.teal}    label="Portfolio Health" value={String(portfolioHealth)} trend="↑ 5 vs prior 30 days" />
       </section>
 
-      <GoldRule />
+      <Hairline />
 
       {/* ============== BURNING THREE ============== */}
       <section className="pt-6 pb-8">
         <Eyebrow>The Burning Three</Eyebrow>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[color:var(--color-accent)]/25 border border-[color:var(--color-accent)]/25">
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           {BURNERS.map((b) => (
-            <article key={b.name} className="p-5 flex flex-col gap-4">
+            <article key={b.name} className="bg-card border border-border p-5 flex flex-col gap-4 min-h-[220px]">
               <div className="flex items-start justify-between gap-3">
-                <span className="inline-block px-2 py-0.5 bg-red-500/15 text-red-400 font-mono text-[10px] uppercase tracking-[0.22em] border border-red-500/40">
+                <span className="inline-block px-2 py-0.5 bg-red-500/15 text-red-400 font-mono text-[10px] uppercase tracking-widest border border-red-500/40">
                   {b.tag}
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-widest text-foreground/45">
+                  {b.context}
                 </span>
               </div>
               <div>
-                <div className="font-display text-[26px] leading-[1.05] tracking-tight">{b.name}</div>
-                <div className="mt-1 text-sm text-foreground/65">{b.plan}</div>
+                <div
+                  className="text-[24px] leading-[1.1] tracking-tight"
+                  style={{ fontFamily: '"Cormorant Garamond", "Newsreader", Georgia, serif' }}
+                >
+                  {b.name}
+                </div>
+                <div className="mt-1 text-sm text-foreground/60">{b.plan}</div>
               </div>
               <div className="mt-auto flex items-end justify-between gap-4">
                 <div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent/80 mb-1.5">Owner</div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-accent/80 mb-1.5">Owner</div>
                   <div className="flex items-center gap-2">
                     <img src={b.avatar} alt="" className="h-7 w-7 rounded-full bg-card/60 ring-1 ring-accent/30" />
                     <div className="leading-tight">
                       <div className="text-sm">{b.owner}</div>
-                      <div className="text-xs text-foreground/55">Strategic</div>
+                      <div className="text-xs text-foreground/55">{b.ownerType}</div>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent/80 mb-1">Days to Renewal</div>
-                  <div className={cn("font-display text-[34px] leading-none tabular-nums", b.state === "Overdue" ? "text-red-400" : "text-amber-300")}>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-accent/80 mb-1">Days to Renewal</div>
+                  <div className={cn(
+                    "font-mono text-[32px] leading-none tabular-nums",
+                    b.state === "Overdue" ? "text-red-400" : b.days < 14 ? "text-amber-300" : "text-orange-300",
+                  )}>
                     {b.days}
                   </div>
-                  <div className={cn("text-xs mt-1", b.state === "Overdue" ? "text-red-400" : "text-amber-300")}>
+                  <div className={cn(
+                    "text-[11px] mt-1 font-mono uppercase tracking-widest",
+                    b.state === "Overdue" ? "text-red-400" : "text-amber-300",
+                  )}>
                     {b.state}
                   </div>
                 </div>
@@ -273,28 +365,26 @@ export function PulseDashboard({
         </div>
       </section>
 
-      <GoldRule />
+      <Hairline />
 
-      {/* ============== HEATMAP + LEDGER (side-by-side) ============== */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x divide-[color:var(--color-accent)]/25 py-8">
+      {/* ============== HEATMAP + LEDGER ============== */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 lg:gap-10 py-8">
         {/* Heatmap */}
-        <div className="lg:pr-10">
+        <div>
           <Eyebrow>Accounts at Risk</Eyebrow>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/55">
+          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-foreground/55">
             Impact × Likelihood
           </div>
 
           <div className="mt-5 flex">
-            {/* Y axis */}
-            <div className="flex flex-col gap-[6px] pr-3 pt-0">
+            <div className="flex flex-col gap-[6px] pr-3">
               {IMPACT_ROWS.map((r) => (
-                <div key={r.n} className="h-[44px] flex items-center justify-end gap-2 font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/65">
+                <div key={r.n} className="h-[44px] flex items-center justify-end gap-2 font-mono text-[10px] uppercase tracking-widest text-foreground/65">
                   <span className="tabular-nums">{r.n}</span>
                   <span>{r.label}</span>
                 </div>
               ))}
             </div>
-            {/* Grid */}
             <div className="flex-1">
               <div className="grid grid-cols-5 gap-[6px]">
                 {HEATMAP.flatMap((row, ri) =>
@@ -303,7 +393,7 @@ export function PulseDashboard({
                     return (
                       <div
                         key={`${ri}-${ci}`}
-                        className="h-[44px] flex items-center justify-center font-display text-xl tabular-nums"
+                        className="h-[44px] flex items-center justify-center font-mono text-base tabular-nums"
                         style={{ background: bg, color: fg }}
                       >
                         {v}
@@ -312,142 +402,285 @@ export function PulseDashboard({
                   }),
                 )}
               </div>
-              {/* X axis */}
               <div className="mt-2 grid grid-cols-5 gap-[6px]">
                 {LIKELIHOOD_COLS.map((c) => (
-                  <div key={c.n} className="text-center font-mono text-[9px] uppercase tracking-[0.18em] text-foreground/65 leading-tight">
+                  <div key={c.n} className="text-center font-mono text-[9px] uppercase tracking-widest text-foreground/65 leading-tight">
                     <div className="tabular-nums">{c.n}</div>
                     <div className="whitespace-nowrap">{c.label}</div>
                   </div>
                 ))}
               </div>
-              <div className="mt-2 text-center font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/55">
+              <div className="mt-2 text-center font-mono text-[10px] uppercase tracking-widest text-foreground/55">
                 Likelihood
-              </div>
-            </div>
-            <div className="pl-2 hidden md:flex items-center">
-              <div
-                aria-hidden
-                className="rotate-180 font-mono text-[10px] uppercase tracking-[0.32em] text-foreground/55"
-                style={{ writingMode: "vertical-rl" }}
-              >
-                Impact
               </div>
             </div>
           </div>
         </div>
 
-        {/* Ledger */}
-        <div className="lg:pl-10 mt-10 lg:mt-0">
+        {/* Ledger — vertical rail aligned through dot centers */}
+        <div className="mt-10 lg:mt-0">
           <Eyebrow>Reckoning Ledger</Eyebrow>
           <ol className="mt-5 relative">
+            {/* Vertical rail: anchored to the dot column (left=78px), spans dot centers */}
             <span
               aria-hidden
-              className="absolute left-[58px] top-2 bottom-2 w-px bg-[color:var(--color-accent)]/30"
+              className="absolute w-px bg-accent/30"
+              style={{ left: "78px", top: "20px", bottom: "20px" }}
             />
             {LEDGER.map((e) => (
-              <li key={e.time} className="grid grid-cols-[60px_1fr_180px_1fr] items-center gap-4 py-2.5">
-                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/65 tabular-nums">
+              <li
+                key={e.time}
+                className="grid grid-cols-[64px_14px_1fr_140px] items-center gap-3 py-2 min-h-[40px]"
+              >
+                <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/65 tabular-nums leading-none">
                   {e.time}
                 </div>
-                <div className="relative pl-4">
+                {/* Dot cell — exactly 14px wide, centered, dot is 10px → keeps perfect alignment */}
+                <div className="flex items-center justify-center h-full">
                   <span
                     aria-hidden
-                    className="absolute left-[-9px] top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full border border-[color:var(--color-accent)]/70 bg-background"
+                    className="block h-2.5 w-2.5 rounded-full border border-accent/70 bg-background"
                   />
-                  <span className="text-sm text-foreground/85">{e.headline}</span>
                 </div>
-                <div className="text-sm text-accent">{e.account}</div>
-                <div className="text-sm text-foreground/70 text-right">{e.detail}</div>
+                <div className="text-[13px] leading-tight text-foreground/85 truncate">
+                  <span className="font-medium">{e.headline}</span>
+                  <span className="text-foreground/45"> · </span>
+                  <span className="text-accent/90">{e.account}</span>
+                </div>
+                <div className="text-[12px] text-foreground/65 text-right leading-tight truncate">
+                  {e.detail}
+                </div>
               </li>
             ))}
           </ol>
         </div>
       </section>
 
-      <GoldRule />
+      <Hairline />
 
       {/* ============== PORTFOLIO OVERVIEW ============== */}
       <section className="pt-6 pb-12">
         <Eyebrow>Portfolio Overview</Eyebrow>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left font-mono text-[10px] uppercase tracking-[0.22em] text-accent/80 border-b border-[color:var(--color-accent)]/30">
-                <Th>Account</Th><Th>Plan</Th><Th>Owner</Th>
-                <Th align="right">ARR (USD)</Th>
-                <Th>Renewal Date</Th>
-                <Th align="right">NRR %</Th>
-                <Th align="right">Health Score</Th>
-                <Th>Trend (30d)</Th>
-                <Th>Risk</Th>
-                <Th align="right">Days to Renewal</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr
-                  key={r.name}
-                  className="border-b border-[color:var(--color-accent)]/15 hover:bg-accent/[0.04] cursor-pointer transition-colors"
-                  onClick={() => {
-                    const a = matchLive(r.name);
-                    if (a) onRowClick(a);
-                  }}
-                >
-                  <Td><span className="font-display text-base">{r.name}</span></Td>
-                  <Td><span className="text-foreground/80">{r.plan}</span></Td>
-                  <Td>
-                    <span className="inline-flex items-center gap-2">
-                      <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60" />
-                      <span className="text-foreground/85">{r.owner}</span>
-                    </span>
-                  </Td>
-                  <Td align="right"><span className="font-mono tabular-nums">{fmtUSD(r.arr)}</span></Td>
-                  <Td><span className="text-foreground/80">{r.renewal}</span></Td>
-                  <Td align="right"><span className="font-mono tabular-nums">{r.nrr}%</span></Td>
-                  <Td align="right"><span className="font-mono tabular-nums">{r.health}</span></Td>
-                  <Td><Sparkline data={r.trend} color={TREND_COLOR[r.risk]} /></Td>
-                  <Td><span className={cn("font-mono uppercase tracking-[0.18em] text-xs", RISK_COLOR[r.risk])}>{r.risk}</span></Td>
-                  <Td align="right">
-                    <span className={cn("font-mono tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/85")}>
-                      {r.daysToRenewal}
-                    </span>
-                  </Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <AccountsTable rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
       </section>
+    </>
+  );
+}
+
+/* ================== Accounts view ================== */
+
+function AccountsView({
+  rows, matchLive, onRowClick,
+}: {
+  rows: DemoAccount[];
+  matchLive: (n: string) => CSAccount | undefined;
+  onRowClick: (a: CSAccount) => void;
+}) {
+  const totalARR = rows.reduce((s, r) => s + r.arr, 0);
+  return (
+    <section className="pt-7 pb-12">
+      <div className="flex items-end justify-between mb-5">
+        <div>
+          <Eyebrow>Active Client Ledger</Eyebrow>
+          <div className="mt-2 text-foreground/65 text-sm">
+            {rows.length} accounts · {fmtUSD(totalARR)} aggregate ARR footprint
+          </div>
+        </div>
+      </div>
+      <AccountsTable rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
+    </section>
+  );
+}
+
+function AccountsTable({
+  rows, matchLive, onRowClick,
+}: {
+  rows: DemoAccount[];
+  matchLive: (n: string) => CSAccount | undefined;
+  onRowClick: (a: CSAccount) => void;
+}) {
+  return (
+    <div className="mt-4 overflow-x-auto border border-border">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-left font-mono text-[10px] uppercase tracking-widest text-accent/80 border-b border-border bg-card/40">
+            <Th>Account</Th><Th>Plan</Th><Th>Owner</Th>
+            <Th align="right">ARR (USD)</Th>
+            <Th>Renewal Date</Th>
+            <Th align="right">NRR %</Th>
+            <Th align="right">Health</Th>
+            <Th>Trend (30d)</Th>
+            <Th>Risk</Th>
+            <Th align="right">Days</Th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr
+              key={r.name}
+              className="border-b border-border last:border-b-0 hover:bg-accent/[0.04] cursor-pointer transition-colors"
+              onClick={() => { const a = matchLive(r.name); if (a) onRowClick(a); }}
+            >
+              <Td><span style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[17px]">{r.name}</span></Td>
+              <Td><span className="text-foreground/80">{r.plan}</span></Td>
+              <Td>
+                <span className="inline-flex items-center gap-2">
+                  <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60" />
+                  <span className="text-foreground/85">{r.owner}</span>
+                </span>
+              </Td>
+              <Td align="right"><span className="font-mono tabular-nums">{fmtUSD(r.arr)}</span></Td>
+              <Td><span className="text-foreground/80">{r.renewal}</span></Td>
+              <Td align="right"><span className="font-mono tabular-nums">{r.nrr}%</span></Td>
+              <Td align="right"><span className="font-mono tabular-nums">{r.health}</span></Td>
+              <Td><Sparkline data={r.trend} color={TREND_COLOR[r.risk]} /></Td>
+              <Td><span className={cn("font-mono uppercase tracking-widest text-[11px] font-medium", RISK_COLOR[r.risk])}>{r.risk}</span></Td>
+              <Td align="right">
+                <span className={cn("font-mono tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/85")}>
+                  {r.daysToRenewal}
+                </span>
+              </Td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
 
-/* ============ tiny presentational primitives ============ */
+/* ================== Renewals view ================== */
 
-function GoldRule() {
-  return <div aria-hidden className="h-px w-full bg-[color:var(--color-accent)]/40" />;
+function RenewalsView({ rows }: { rows: DemoAccount[] }) {
+  const sorted = [...rows].sort((a, b) => a.daysToRenewal - b.daysToRenewal);
+  const totalPending = sorted.reduce((s, r) => s + r.arr, 0);
+  const upliftEst = Math.round(totalPending * 0.12);
+  return (
+    <section className="pt-7 pb-12">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <Kpi rail={ACCENT_RAIL.gold}    label="Pending Renewal ARR" value={fmtUSD(totalPending)} trend={`${sorted.length} contracts in window`} />
+        <Kpi rail={ACCENT_RAIL.emerald} label="Uplift Estimate"     value={fmtUSD(upliftEst)}    trend="12% blended expansion target" />
+        <Kpi rail={ACCENT_RAIL.crimson} label="At-Risk Renewals"    value={String(sorted.filter(r => r.risk === "Critical" || r.risk === "High").length)} trend="Critical + High risk contracts" />
+      </div>
+
+      <Eyebrow>Contract Lifecycle Timeline</Eyebrow>
+      <ol className="mt-5 relative border-l border-border ml-3">
+        {sorted.map((r) => {
+          const tone = r.daysToRenewal < 0 ? "text-red-400 border-red-400" : r.daysToRenewal < 30 ? "text-amber-300 border-amber-300" : "text-emerald-400 border-emerald-400";
+          return (
+            <li key={r.name} className="relative pl-6 py-4 border-b border-border last:border-b-0">
+              <span className={cn("absolute -left-[7px] top-6 h-3 w-3 rounded-full bg-background border-2", tone)} />
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/55">{r.renewal}</div>
+                  <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[22px] leading-tight mt-1">{r.name}</div>
+                  <div className="text-sm text-foreground/65 mt-1">{r.plan} · {r.owner}</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-mono tabular-nums text-lg">{fmtUSD(r.arr)}</div>
+                  <div className={cn("font-mono text-[11px] uppercase tracking-widest mt-1", tone.split(" ")[0])}>
+                    {r.daysToRenewal < 0 ? `${Math.abs(r.daysToRenewal)} days overdue` : `${r.daysToRenewal} days out`}
+                  </div>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
+/* ================== 360 view ================== */
+
+function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
+  const cohorts = [
+    { label: "Enterprise", filter: (r: DemoAccount) => r.plan === "Enterprise" },
+    { label: "Growth",     filter: (r: DemoAccount) => r.plan === "Growth" },
+    { label: "Core",       filter: (r: DemoAccount) => r.plan === "Core" },
+  ];
+  return (
+    <section className="pt-7 pb-12 space-y-10">
+      <div>
+        <Eyebrow>Cohort Trend Arrays</Eyebrow>
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {cohorts.map((c) => {
+            const subset = rows.filter(c.filter);
+            const avg = subset.length ? Math.round(subset.reduce((s, r) => s + r.health, 0) / subset.length) : 0;
+            const arr = subset.reduce((s, r) => s + r.arr, 0);
+            return (
+              <div key={c.label} className="bg-card border border-border p-5">
+                <div className="font-mono text-[10px] uppercase tracking-widest text-accent/80">{c.label}</div>
+                <div className="mt-3 font-mono text-[48px] leading-none tabular-nums">{avg}</div>
+                <div className="mt-1 text-sm text-foreground/60">Avg health · {fmtUSD(arr)} ARR</div>
+                <div className="mt-4 space-y-2">
+                  {subset.map((r) => (
+                    <div key={r.name} className="flex items-center justify-between text-xs">
+                      <span className="text-foreground/80 truncate pr-3">{r.name}</span>
+                      <Sparkline data={r.trend} color={TREND_COLOR[r.risk]} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <Hairline />
+
+      <div>
+        <Eyebrow>Historical Health Distribution</Eyebrow>
+        <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-px bg-border border border-border">
+          {rows.map((r) => (
+            <div key={r.name} className="bg-card p-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <img src={r.avatar} alt="" className="h-8 w-8 rounded-full ring-1 ring-accent/30 bg-card/60" />
+                <div className="min-w-0">
+                  <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-base truncate">{r.name}</div>
+                  <div className="text-xs text-foreground/55">{r.owner}</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <Sparkline data={r.trend} color={TREND_COLOR[r.risk]} />
+                <div className="font-mono tabular-nums text-lg w-10 text-right">{r.health}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============ Presentational primitives ============ */
+
+function Hairline() {
+  return <div aria-hidden className="h-px w-full bg-border" />;
 }
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="font-mono text-[10px] uppercase tracking-[0.32em] text-accent/85">{children}</div>
+    <div className="font-mono text-[11px] font-medium uppercase tracking-widest text-accent/85">
+      {children}
+    </div>
   );
 }
 
-function Kpi({ label, value, trend, up }: { label: string; value: string; trend: string; up?: boolean }) {
+function Kpi({ rail, label, value, trend }: { rail: string; label: string; value: string; trend: string }) {
   return (
-    <div className="px-6 first:pl-0 last:pr-0">
-      <div className="font-mono text-[10px] uppercase tracking-[0.32em] text-accent/80">{label}</div>
-      <div className="mt-3 font-display text-[64px] leading-none tracking-[-0.02em] tabular-nums">{value}</div>
-      <div className={cn("mt-3 text-sm", up ? "text-foreground/75" : "text-foreground/75")}>{trend}</div>
+    <div className="relative bg-card border border-border p-5 pt-6 overflow-hidden">
+      {/* Flush top accent rail — 100% width, zero radius */}
+      <span aria-hidden className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: rail }} />
+      <div className="font-mono text-[11px] font-medium uppercase tracking-widest text-foreground/65">{label}</div>
+      <div className="mt-3 font-mono text-[44px] md:text-[52px] leading-none tabular-nums text-foreground">{value}</div>
+      <div className="mt-3 text-[12px] text-foreground/65">{trend}</div>
     </div>
   );
 }
 
 function Th({ children, align = "left" }: { children: React.ReactNode; align?: "left" | "right" }) {
   return (
-    <th className={cn("py-3 px-3 font-semibold", align === "right" ? "text-right" : "text-left")}>{children}</th>
+    <th className={cn("py-3 px-3 font-medium", align === "right" ? "text-right" : "text-left")}>{children}</th>
   );
 }
 
