@@ -676,12 +676,11 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 function Kpi({ rail, label, value, trend }: { rail: string; label: string; value: string; trend: string }) {
   return (
-    <div className="relative bg-card border border-border p-5 pt-6 overflow-hidden">
-      {/* Flush top accent rail — 100% width, zero radius */}
+    <div className="relative bg-card border border-border p-4 sm:p-5 pt-5 sm:pt-6 overflow-hidden">
       <span aria-hidden className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: rail }} />
-      <div className="font-mono text-[11px] font-medium uppercase tracking-widest text-foreground/65">{label}</div>
-      <div className="mt-3 font-mono text-[44px] md:text-[52px] leading-none tabular-nums text-foreground">{value}</div>
-      <div className="mt-3 text-[12px] text-foreground/65">{trend}</div>
+      <div className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-foreground/65">{label}</div>
+      <div className="mt-2 sm:mt-3 font-mono text-[34px] sm:text-[44px] md:text-[52px] leading-none tabular-nums text-foreground font-medium">{value}</div>
+      <div className="mt-2 sm:mt-3 text-[11px] sm:text-[12px] text-foreground/65 leading-snug">{trend}</div>
     </div>
   );
 }
