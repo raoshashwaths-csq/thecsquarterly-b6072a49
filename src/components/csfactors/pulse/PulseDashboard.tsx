@@ -628,26 +628,76 @@ function RenewalsView({ rows }: { rows: DemoAccount[] }) {
         <Kpi rail={ACCENT_RAIL.crimson} label="At-Risk Renewals"    value={String(sorted.filter(r => r.risk === "Critical" || r.risk === "High").length)} trend="Critical + High risk contracts" />
       </div>
 
-      <Eyebrow>Contract Lifecycle Timeline</Eyebrow>
-      <ol className="mt-5 relative border-l border-border ml-3">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <Eyebrow>Contract Lifecycle Timeline</Eyebrow>
+          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-foreground/55">
+            Renewal motion · uplift estimates · risk milestones
+          </div>
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-widest text-accent/85 tabular-nums">
+          Next 180 days
+        </div>
+      </div>
+
+      <ol className="mt-6 relative space-y-0">
+        <span
+          aria-hidden
+          className="absolute top-7 bottom-7 left-[11px] sm:left-[132px] w-[3px] -translate-x-1/2"
+          style={{
+            backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--accent) 72%, transparent) 1.35px, transparent 1.55px)",
+            backgroundSize: "3px 8px",
+            backgroundRepeat: "repeat-y",
+          }}
+        />
         {sorted.map((r) => {
-          const tone = r.daysToRenewal < 0 ? "text-red-400 border-red-400" : r.daysToRenewal < 30 ? "text-amber-300 border-amber-300" : "text-emerald-400 border-emerald-400";
+          const overdue = r.daysToRenewal < 0;
+          const urgent = !overdue && r.daysToRenewal < 30;
+          const tone = overdue ? "text-red-400 border-red-400" : urgent ? "text-amber-300 border-amber-300" : "text-emerald-400 border-emerald-400";
+          const stage = overdue ? "Escalate" : urgent ? "Mutual plan" : r.daysToRenewal < 75 ? "Commercial align" : "Monitor";
+          const uplift = Math.round(r.arr * (r.risk === "Low" ? 0.18 : r.risk === "Medium" ? 0.1 : 0.04));
           return (
-            <li key={r.name} className="relative pl-6 py-4 border-b border-border last:border-b-0">
-              <span className={cn("absolute -left-[7px] top-6 h-3 w-3 rounded-full bg-background border-2", tone)} />
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/55">{r.renewal}</div>
-                  <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[22px] leading-tight mt-1">{r.name}</div>
-                  <div className="text-sm text-foreground/65 mt-1">{r.plan} · {r.owner}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono tabular-nums text-lg">{fmtUSD(r.arr)}</div>
-                  <div className={cn("font-mono text-[11px] uppercase tracking-widest mt-1", tone.split(" ")[0])}>
-                    {r.daysToRenewal < 0 ? `${Math.abs(r.daysToRenewal)} days overdue` : `${r.daysToRenewal} days out`}
+            <li key={r.name} className="relative grid grid-cols-[22px_minmax(0,1fr)] sm:grid-cols-[108px_28px_minmax(0,1fr)] gap-3 sm:gap-4 py-3">
+              <div className="hidden sm:block pt-5 text-right font-mono text-[10px] uppercase tracking-widest text-foreground/58 leading-tight tabular-nums">
+                <span className="block">{r.renewal}</span>
+                <span className={cn("block mt-1", tone.split(" ")[0])}>{overdue ? `${Math.abs(r.daysToRenewal)} overdue` : `${r.daysToRenewal} days`}</span>
+              </div>
+              <div className="relative z-10 flex justify-center pt-5">
+                <span className={cn("h-4 w-4 rounded-full bg-background border-2 shadow-[0_0_0_5px_var(--background)]", tone)} />
+              </div>
+              <article className="bg-card border border-border p-4 sm:p-5 hover:bg-accent/[0.035] transition-colors">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="sm:hidden font-mono text-[10px] uppercase tracking-widest text-foreground/55 mb-1">{r.renewal}</div>
+                    <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[23px] sm:text-[26px] leading-[1.05] truncate">{r.name}</div>
+                    <div className="mt-1 text-[13px] text-foreground/65">{r.plan} · {r.owner}</div>
+                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-[10px] uppercase tracking-widest">
+                      <div>
+                        <span className="block text-foreground/45">Stage</span>
+                        <span className="mt-1 block text-foreground/82">{stage}</span>
+                      </div>
+                      <div>
+                        <span className="block text-foreground/45">Risk</span>
+                        <span className={cn("mt-1 block", RISK_COLOR[r.risk])}>{r.risk}</span>
+                      </div>
+                      <div>
+                        <span className="block text-foreground/45">Health</span>
+                        <span className="mt-1 block text-foreground/82 tabular-nums">{r.health}</span>
+                      </div>
+                      <div>
+                        <span className="block text-foreground/45">Uplift</span>
+                        <span className="mt-1 block text-accent/90 tabular-nums">{fmtUSD(uplift)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lg:text-right shrink-0">
+                    <div className="font-mono tabular-nums text-[20px] leading-none">{fmtUSD(r.arr)}</div>
+                    <div className={cn("font-mono text-[10px] uppercase tracking-widest mt-2", tone.split(" ")[0])}>
+                      {overdue ? `${Math.abs(r.daysToRenewal)} days overdue` : `${r.daysToRenewal} days out`}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </article>
             </li>
           );
         })}
