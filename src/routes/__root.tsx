@@ -193,7 +193,7 @@ function PageTransition() {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const hideGlobalQ = pathname.startsWith("/csfactors") || pathname === "/calculator";
+  const hideGlobalQ = pathname.startsWith("/csfactors") || pathname.startsWith("/pulse-demo") || pathname === "/calculator";
   return (
     <QueryClientProvider client={queryClient}>
       <AuthInvalidator />

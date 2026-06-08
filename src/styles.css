@@ -51,13 +51,13 @@
   --foreground: oklch(0.247 0.085 271);         /* #112250 Royal Blue */
   --muted: oklch(0.86 0.018 55);                /* #D9CBC2 Shellstone */
   --muted-foreground: oklch(0.45 0.075 268);    /* #3C507D Sapphire */
-  --accent: oklch(0.835 0.082 86);              /* #E0C58F Quicksand */
-  --accent-foreground: oklch(0.247 0.085 271);
+  --accent: oklch(0.58 0.13 72);                /* deepened patina gold for legibility on cream */
+  --accent-foreground: oklch(0.97 0.01 85);
   --secondary-accent: oklch(0.45 0.075 268);    /* Sapphire */
   --secondary-accent-foreground: oklch(0.97 0.01 85);
   --border: oklch(0.247 0.085 271 / 0.18);
   --input: oklch(0.247 0.085 271 / 0.18);
-  --ring: oklch(0.835 0.082 86);
+  --ring: oklch(0.58 0.13 72);
 
   --card: oklch(0.973 0.01 85);                 /* #FBF7F1 raised paper */
   --card-foreground: oklch(0.247 0.085 271);

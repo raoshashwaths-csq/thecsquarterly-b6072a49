@@ -224,7 +224,7 @@ export function PulseDashboard({
           </div>
         </div>
         <h1
-          className="mt-6 font-serif text-[48px] md:text-[80px] leading-[0.98] tracking-[-0.015em] text-foreground"
+          className="mt-5 font-serif text-[40px] sm:text-[56px] md:text-[80px] leading-[0.98] tracking-[-0.015em] text-foreground"
           style={{ fontFamily: '"Cormorant Garamond", "Newsreader", Georgia, serif' }}
           suppressHydrationWarning
         >
@@ -245,8 +245,8 @@ export function PulseDashboard({
       </header>
 
       {/* ============== TAB STRIP ============== */}
-      <div className="border-t border-border">
-        <div className="flex gap-1 -mb-px">
+      <div className="border-t border-border overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+        <div className="flex gap-1 -mb-px min-w-max">
           {tabs.map((t) => {
             const active = activeView === t.id;
             return (
@@ -255,7 +255,7 @@ export function PulseDashboard({
                 type="button"
                 onClick={() => setActiveView(t.id)}
                 className={cn(
-                  "px-4 py-3 font-mono text-[11px] font-medium uppercase tracking-widest transition-colors border-t-2",
+                  "px-3 md:px-4 py-3 font-mono text-[10px] md:text-[11px] font-semibold uppercase tracking-widest transition-colors border-t-2 whitespace-nowrap",
                   active
                     ? "border-accent text-accent bg-card/60"
                     : "border-transparent text-foreground/55 hover:text-foreground/80",
@@ -317,43 +317,43 @@ function PulseView({
           {BURNERS.map((b) => (
             <article key={b.name} className="bg-card border border-border p-5 flex flex-col gap-4 min-h-[220px]">
               <div className="flex items-start justify-between gap-3">
-                <span className="inline-block px-2 py-0.5 bg-red-500/15 text-red-400 font-mono text-[10px] uppercase tracking-widest border border-red-500/40">
+                <span className="inline-block px-2 py-0.5 bg-red-500/15 text-red-400 font-mono text-[10px] font-semibold uppercase tracking-widest border border-red-500/40 whitespace-nowrap">
                   {b.tag}
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-widest text-foreground/45">
-                  {b.context}
                 </span>
               </div>
               <div>
                 <div
-                  className="text-[24px] leading-[1.1] tracking-tight"
+                  className="text-[22px] sm:text-[24px] leading-[1.1] tracking-tight"
                   style={{ fontFamily: '"Cormorant Garamond", "Newsreader", Georgia, serif' }}
                 >
                   {b.name}
                 </div>
-                <div className="mt-1 text-sm text-foreground/60">{b.plan}</div>
+                <div className="mt-1 text-[13px] text-foreground/60">{b.plan}</div>
+                <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-foreground/55 leading-snug">
+                  {b.context}
+                </div>
               </div>
               <div className="mt-auto flex items-end justify-between gap-4">
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-accent/80 mb-1.5">Owner</div>
+                <div className="min-w-0">
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent/85 mb-1.5">Owner</div>
                   <div className="flex items-center gap-2">
-                    <img src={b.avatar} alt="" className="h-7 w-7 rounded-full bg-card/60 ring-1 ring-accent/30" />
-                    <div className="leading-tight">
-                      <div className="text-sm">{b.owner}</div>
-                      <div className="text-xs text-foreground/55">{b.ownerType}</div>
+                    <img src={b.avatar} alt="" className="h-7 w-7 rounded-full bg-card/60 ring-1 ring-accent/30 shrink-0" />
+                    <div className="leading-tight min-w-0">
+                      <div className="text-[13px] truncate">{b.owner}</div>
+                      <div className="text-[11px] text-foreground/55">{b.ownerType}</div>
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-accent/80 mb-1">Days to Renewal</div>
+                <div className="text-right shrink-0">
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent/85 mb-1">Days to Renewal</div>
                   <div className={cn(
-                    "font-mono text-[32px] leading-none tabular-nums",
+                    "font-mono text-[28px] sm:text-[32px] leading-none tabular-nums font-medium",
                     b.state === "Overdue" ? "text-red-400" : b.days < 14 ? "text-amber-300" : "text-orange-300",
                   )}>
                     {b.days}
                   </div>
                   <div className={cn(
-                    "text-[11px] mt-1 font-mono uppercase tracking-widest",
+                    "text-[10px] mt-1 font-mono font-semibold uppercase tracking-widest leading-tight max-w-[110px] ml-auto",
                     b.state === "Overdue" ? "text-red-400" : "text-amber-300",
                   )}>
                     {b.state}
@@ -368,7 +368,7 @@ function PulseView({
       <Hairline />
 
       {/* ============== HEATMAP + LEDGER ============== */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 lg:gap-10 py-8">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 py-8">
         {/* Heatmap */}
         <div>
           <Eyebrow>Accounts at Risk</Eyebrow>
@@ -376,16 +376,21 @@ function PulseView({
             Impact × Likelihood
           </div>
 
-          <div className="mt-5 flex">
-            <div className="flex flex-col gap-[6px] pr-3">
+          <div className="mt-5 grid grid-cols-[auto_1fr] gap-x-3">
+            {/* Y-axis labels */}
+            <div className="flex flex-col gap-[6px]">
               {IMPACT_ROWS.map((r) => (
-                <div key={r.n} className="h-[44px] flex items-center justify-end gap-2 font-mono text-[10px] uppercase tracking-widest text-foreground/65">
-                  <span className="tabular-nums">{r.n}</span>
+                <div
+                  key={r.n}
+                  className="h-[40px] sm:h-[44px] flex items-center justify-end gap-2 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-foreground/65 whitespace-nowrap"
+                >
+                  <span className="tabular-nums opacity-60">{r.n}</span>
                   <span>{r.label}</span>
                 </div>
               ))}
             </div>
-            <div className="flex-1">
+            {/* Grid + X-axis */}
+            <div className="min-w-0">
               <div className="grid grid-cols-5 gap-[6px]">
                 {HEATMAP.flatMap((row, ri) =>
                   row.map((v, ci) => {
@@ -393,7 +398,7 @@ function PulseView({
                     return (
                       <div
                         key={`${ri}-${ci}`}
-                        className="h-[44px] flex items-center justify-center font-mono text-base tabular-nums"
+                        className="h-[40px] sm:h-[44px] flex items-center justify-center font-mono text-sm sm:text-base tabular-nums font-semibold"
                         style={{ background: bg, color: fg }}
                       >
                         {v}
@@ -404,9 +409,12 @@ function PulseView({
               </div>
               <div className="mt-2 grid grid-cols-5 gap-[6px]">
                 {LIKELIHOOD_COLS.map((c) => (
-                  <div key={c.n} className="text-center font-mono text-[9px] uppercase tracking-widest text-foreground/65 leading-tight">
-                    <div className="tabular-nums">{c.n}</div>
-                    <div className="whitespace-nowrap">{c.label}</div>
+                  <div
+                    key={c.n}
+                    className="text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-foreground/65 leading-tight"
+                  >
+                    <div className="tabular-nums opacity-60">{c.n}</div>
+                    <div className="truncate">{c.label}</div>
                   </div>
                 ))}
               </div>
@@ -417,37 +425,37 @@ function PulseView({
           </div>
         </div>
 
-        {/* Ledger — vertical rail aligned through dot centers */}
-        <div className="mt-10 lg:mt-0">
+        {/* Ledger — dotted vertical rail aligned through dot centers */}
+        <div>
           <Eyebrow>Reckoning Ledger</Eyebrow>
           <ol className="mt-5 relative">
-            {/* Vertical rail: anchored to the dot column (left=78px), spans dot centers */}
+            {/* Dotted vertical rail */}
             <span
               aria-hidden
-              className="absolute w-px bg-accent/30"
-              style={{ left: "78px", top: "20px", bottom: "20px" }}
+              className="absolute top-[20px] bottom-[20px] w-0 border-l border-dotted border-accent/45"
+              style={{ left: "70px" }}
             />
             {LEDGER.map((e) => (
               <li
                 key={e.time}
-                className="grid grid-cols-[64px_14px_1fr_140px] items-center gap-3 py-2 min-h-[40px]"
+                className="grid grid-cols-[56px_14px_1fr_minmax(0,140px)] items-center gap-3 py-2 min-h-[40px]"
               >
                 <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/65 tabular-nums leading-none">
                   {e.time}
                 </div>
-                {/* Dot cell — exactly 14px wide, centered, dot is 10px → keeps perfect alignment */}
+                {/* Dot cell */}
                 <div className="flex items-center justify-center h-full">
                   <span
                     aria-hidden
                     className="block h-2.5 w-2.5 rounded-full border border-accent/70 bg-background"
                   />
                 </div>
-                <div className="text-[13px] leading-tight text-foreground/85 truncate">
+                <div className="text-[12px] sm:text-[13px] leading-tight text-foreground/85 min-w-0 truncate">
                   <span className="font-medium">{e.headline}</span>
                   <span className="text-foreground/45"> · </span>
                   <span className="text-accent/90">{e.account}</span>
                 </div>
-                <div className="text-[12px] text-foreground/65 text-right leading-tight truncate">
+                <div className="text-[11px] sm:text-[12px] text-foreground/65 text-right leading-tight truncate">
                   {e.detail}
                 </div>
               </li>
@@ -668,12 +676,11 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 
 function Kpi({ rail, label, value, trend }: { rail: string; label: string; value: string; trend: string }) {
   return (
-    <div className="relative bg-card border border-border p-5 pt-6 overflow-hidden">
-      {/* Flush top accent rail — 100% width, zero radius */}
+    <div className="relative bg-card border border-border p-4 sm:p-5 pt-5 sm:pt-6 overflow-hidden">
       <span aria-hidden className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: rail }} />
-      <div className="font-mono text-[11px] font-medium uppercase tracking-widest text-foreground/65">{label}</div>
-      <div className="mt-3 font-mono text-[44px] md:text-[52px] leading-none tabular-nums text-foreground">{value}</div>
-      <div className="mt-3 text-[12px] text-foreground/65">{trend}</div>
+      <div className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-foreground/65">{label}</div>
+      <div className="mt-2 sm:mt-3 font-mono text-[34px] sm:text-[44px] md:text-[52px] leading-none tabular-nums text-foreground font-medium">{value}</div>
+      <div className="mt-2 sm:mt-3 text-[11px] sm:text-[12px] text-foreground/65 leading-snug">{trend}</div>
     </div>
   );
 }

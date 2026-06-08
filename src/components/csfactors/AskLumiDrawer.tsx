@@ -124,12 +124,13 @@ function AskLumiDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Ask Lumi"
+        aria-hidden={!open}
         data-state={open ? "active" : "idle"}
         className={cn(
           "fixed top-0 right-0 z-50 h-screen w-full sm:w-[420px] bg-background border-l border-border",
           "flex flex-col shadow-[-20px_0_60px_-30px_rgba(0,0,0,0.5)]",
           "transition-transform duration-[240ms] ease-out",
-          open ? "translate-x-0" : "translate-x-full",
+          open ? "translate-x-0" : "translate-x-full invisible pointer-events-none",
         )}
       >
         {/* Header */}

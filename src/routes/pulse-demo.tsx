@@ -35,7 +35,7 @@ function PulseDemoPage() {
             <CSFactorsSidebar onOpenWorkspace={() => {}} />
           </aside>
           <main className="flex-1 min-w-0">
-            <div className="max-w-[1500px] mx-auto px-6 md:px-12 pt-10 md:pt-12 pb-32">
+            <div className="max-w-[1500px] mx-auto px-4 sm:px-6 md:px-12 pt-6 md:pt-12 pb-32">
               <QErrorBoundary label="Pulse demo">
                 <PulseDashboard
                   accounts={[]}
