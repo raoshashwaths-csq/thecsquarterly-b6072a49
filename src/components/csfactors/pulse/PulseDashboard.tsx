@@ -709,6 +709,10 @@ function RenewalsView({ rows }: { rows: DemoAccount[] }) {
 /* ================== 360 view ================== */
 
 function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
+  const [range, setRange] = useState<TrendRange>("90D");
+  const [metric, setMetric] = useState<TrendMetric>("health");
+  const activeSeries = TREND_SERIES[range];
+  const activeMetric = TREND_METRICS.find((m) => m.key === metric) ?? TREND_METRICS[1];
   const cohorts = [
     { label: "Enterprise", filter: (r: DemoAccount) => r.plan === "Enterprise" },
     { label: "Growth",     filter: (r: DemoAccount) => r.plan === "Growth" },
@@ -716,6 +720,77 @@ function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
   ];
   return (
     <section className="pt-7 pb-12 space-y-10">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.55fr)] gap-4">
+        <div className="bg-card border border-border p-4 sm:p-5">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-5">
+            <div>
+              <Eyebrow>Interactive Trend Graph</Eyebrow>
+              <div className="mt-1 text-[13px] text-foreground/62 leading-snug">
+                Customer success signal velocity across retention, health, adoption, and risk.
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {RANGE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={range === option.id}
+                  onClick={() => setRange(option.id)}
+                  className={cn(
+                    "h-8 px-3 border font-mono text-[10px] uppercase tracking-widest transition-colors",
+                    range === option.id
+                      ? "border-accent bg-accent text-accent-foreground"
+                      : "border-border text-foreground/65 hover:text-foreground hover:border-accent/50",
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <TrendGraph points={activeSeries} metric={activeMetric} />
+
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {TREND_METRICS.map((m) => {
+              const latest = activeSeries[activeSeries.length - 1][m.key];
+              const first = activeSeries[0][m.key];
+              const delta = latest - first;
+              return (
+                <button
+                  key={m.key}
+                  type="button"
+                  aria-pressed={metric === m.key}
+                  onClick={() => setMetric(m.key)}
+                  className={cn(
+                    "border p-3 text-left transition-colors",
+                    metric === m.key ? "border-accent bg-accent/[0.08]" : "border-border hover:border-accent/45 hover:bg-accent/[0.035]",
+                  )}
+                >
+                  <span className="block font-mono text-[10px] uppercase tracking-widest text-foreground/58">{m.label}</span>
+                  <span className="mt-2 flex items-baseline justify-between gap-2">
+                    <span className="font-mono text-[24px] leading-none tabular-nums" style={{ color: m.color }}>
+                      {latest}{m.suffix}
+                    </span>
+                    <span className={cn("font-mono text-[10px] uppercase tracking-widest tabular-nums", delta >= 0 ? "text-emerald-400" : "text-red-400")}>
+                      {delta >= 0 ? "+" : ""}{delta}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-4">
+          <Kpi rail={ACCENT_RAIL.gold} label="Expansion Momentum" value="+$1.4M" trend="Qualified expansion surfaced from healthy cohorts" />
+          <Kpi rail={ACCENT_RAIL.teal} label="Signal Coverage" value="92%" trend="Accounts with current product + support signals" />
+          <Kpi rail={ACCENT_RAIL.crimson} label="Risk Compression" value="-14" trend="High-severity accounts reduced in 90 days" />
+        </div>
+      </div>
+
+      <Hairline />
+
       <div>
         <Eyebrow>Cohort Trend Arrays</Eyebrow>
         <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -765,6 +840,94 @@ function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function TrendGraph({ points, metric }: { points: TrendPoint[]; metric: { key: TrendMetric; label: string; color: string; suffix: string } }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const w = 720;
+  const h = 280;
+  const padX = 44;
+  const padY = 30;
+  const values = points.map((p) => p[metric.key]);
+  const min = Math.floor(Math.min(...values) / 5) * 5;
+  const max = Math.ceil(Math.max(...values) / 5) * 5;
+  const span = Math.max(1, max - min);
+  const coords = points.map((p, i) => {
+    const x = padX + (i * (w - padX * 2)) / Math.max(1, points.length - 1);
+    const y = h - padY - ((p[metric.key] - min) / span) * (h - padY * 2);
+    return { x, y, point: p };
+  });
+  const path = coords.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+  const area = `${path} L ${coords[coords.length - 1].x.toFixed(1)} ${h - padY} L ${coords[0].x.toFixed(1)} ${h - padY} Z`;
+  const active = coords[hovered ?? coords.length - 1];
+
+  return (
+    <div className="relative" data-testid="trend-graph">
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[260px] sm:h-[320px] overflow-visible" role="img" aria-label={`${metric.label} trend graph`}>
+        <defs>
+          <linearGradient id={`trend-fill-${metric.key}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={metric.color} stopOpacity="0.28" />
+            <stop offset="100%" stopColor={metric.color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[0, 1, 2, 3].map((line) => {
+          const y = padY + (line * (h - padY * 2)) / 3;
+          const label = Math.round(max - (line * span) / 3);
+          return (
+            <g key={line}>
+              <line x1={padX} x2={w - padX} y1={y} y2={y} stroke="var(--border)" strokeWidth="1" />
+              <text x={12} y={y + 4} fill="var(--muted-foreground)" fontSize="10" fontFamily="var(--font-mono)">{label}</text>
+            </g>
+          );
+        })}
+        <path d={area} fill={`url(#trend-fill-${metric.key})`} />
+        <path d={path} fill="none" stroke={metric.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        {coords.map((p, i) => (
+          <g key={p.point.label} onMouseEnter={() => setHovered(i)} onFocus={() => setHovered(i)} tabIndex={0} className="outline-none">
+            <rect
+              x={i === 0 ? padX - 18 : p.x - ((w - padX * 2) / Math.max(1, points.length - 1)) / 2}
+              y={padY - 8}
+              width={(w - padX * 2) / Math.max(1, points.length - 1)}
+              height={h - padY * 2 + 16}
+              fill="transparent"
+            />
+            <circle cx={p.x} cy={p.y} r={hovered === i ? 5 : 3.5} fill="var(--background)" stroke={metric.color} strokeWidth="2" />
+          </g>
+        ))}
+        {active && (
+          <g pointerEvents="none">
+            <line x1={active.x} x2={active.x} y1={padY} y2={h - padY} stroke={metric.color} strokeOpacity="0.45" strokeDasharray="3 6" />
+            <circle cx={active.x} cy={active.y} r="6" fill={metric.color} />
+          </g>
+        )}
+        {coords.map((p, i) => (
+          <text key={`${p.point.label}-axis`} x={p.x} y={h - 7} textAnchor="middle" fill="var(--muted-foreground)" fontSize="9" fontFamily="var(--font-mono)" opacity={i % 2 === 0 || points.length <= 6 ? 1 : 0.45}>
+            {p.point.label}
+          </text>
+        ))}
+      </svg>
+      {active && (
+        <div
+          className="pointer-events-none absolute min-w-[150px] border border-accent/45 bg-card px-3 py-2 shadow-2xl"
+          style={{ left: `${Math.min(82, Math.max(14, (active.x / w) * 100))}%`, top: `${Math.min(72, Math.max(12, (active.y / h) * 100))}%`, transform: "translate(-50%, -115%)" }}
+        >
+          <div className="font-mono text-[10px] uppercase tracking-widest text-accent/85">{active.point.label}</div>
+          <div className="mt-1 flex items-baseline justify-between gap-4">
+            <span className="text-[13px] text-foreground/62">{metric.label}</span>
+            <span className="font-mono text-[20px] tabular-nums leading-none" style={{ color: metric.color }}>
+              {active.point[metric.key]}{metric.suffix}
+            </span>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-[9px] uppercase tracking-widest text-foreground/58">
+            <span>NRR {active.point.nrr}%</span>
+            <span>Health {active.point.health}</span>
+            <span>Adoption {active.point.adoption}%</span>
+            <span>Risk {active.point.risk}</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
