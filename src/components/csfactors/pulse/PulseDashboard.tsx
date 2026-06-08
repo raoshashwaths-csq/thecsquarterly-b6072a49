@@ -565,51 +565,99 @@ function AccountsTable({
   matchLive: (n: string) => CSAccount | undefined;
   onRowClick: (a: CSAccount) => void;
 }) {
+  const openAccount = (name: string) => {
+    const account = matchLive(name);
+    if (account) onRowClick(account);
+  };
   return (
-    <div className="mt-4 overflow-x-auto border border-border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left font-mono text-[10px] uppercase tracking-widest text-accent/80 border-b border-border bg-card/40">
-            <Th>Account</Th><Th>Plan</Th><Th>Owner</Th>
-            <Th align="right">ARR (USD)</Th>
-            <Th>Renewal Date</Th>
-            <Th align="right">NRR %</Th>
-            <Th align="right">Health</Th>
-            <Th>Trend (30d)</Th>
-            <Th>Risk</Th>
-            <Th align="right">Days</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr
-              key={r.name}
-              className="border-b border-border last:border-b-0 hover:bg-accent/[0.04] cursor-pointer transition-colors"
-              onClick={() => { const a = matchLive(r.name); if (a) onRowClick(a); }}
-            >
-              <Td><span style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[17px]">{r.name}</span></Td>
-              <Td><span className="text-foreground/80">{r.plan}</span></Td>
-              <Td>
-                <span className="inline-flex items-center gap-2">
-                  <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60" />
-                  <span className="text-foreground/85">{r.owner}</span>
-                </span>
-              </Td>
-              <Td align="right"><span className="font-mono tabular-nums">{fmtUSD(r.arr)}</span></Td>
-              <Td><span className="text-foreground/80">{r.renewal}</span></Td>
-              <Td align="right"><span className="font-mono tabular-nums">{r.nrr}%</span></Td>
-              <Td align="right"><span className="font-mono tabular-nums">{r.health}</span></Td>
-              <Td><Sparkline data={r.trend} color={TREND_COLOR[r.risk]} /></Td>
-              <Td><span className={cn("font-mono uppercase tracking-widest text-[11px] font-medium", RISK_COLOR[r.risk])}>{r.risk}</span></Td>
-              <Td align="right">
-                <span className={cn("font-mono tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/85")}>
+    <div className="mt-4" data-testid="accounts-ledger">
+      <div className="md:hidden space-y-3">
+        {rows.map((r) => (
+          <button
+            key={r.name}
+            type="button"
+            onClick={() => openAccount(r.name)}
+            className="w-full border border-border bg-card p-4 text-left transition-colors hover:border-accent/45 hover:bg-accent/[0.035]"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[23px] leading-[1.05] truncate">{r.name}</div>
+                <div className="mt-1 text-[13px] text-foreground/62">{r.plan} · {r.renewal}</div>
+              </div>
+              <span className={cn("font-mono uppercase tracking-widest text-[10px] shrink-0", RISK_COLOR[r.risk])}>{r.risk}</span>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-3 font-mono text-[10px] uppercase tracking-widest">
+              <div>
+                <span className="block text-foreground/45">ARR</span>
+                <span className="mt-1 block text-foreground/86 tabular-nums">{fmtUSD(r.arr)}</span>
+              </div>
+              <div>
+                <span className="block text-foreground/45">Health</span>
+                <span className="mt-1 block text-foreground/86 tabular-nums">{r.health}</span>
+              </div>
+              <div>
+                <span className="block text-foreground/45">Days</span>
+                <span className={cn("mt-1 block tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/86")}>
                   {r.daysToRenewal}
                 </span>
-              </Td>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 min-w-0">
+                <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60 shrink-0" />
+                <span className="text-[13px] text-foreground/78 truncate">{r.owner}</span>
+              </span>
+              <Sparkline data={r.trend} color={TREND_COLOR[r.risk]} />
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="hidden md:block overflow-x-auto border border-border">
+        <table className="w-full min-w-[1080px] text-sm">
+          <thead>
+            <tr className="text-left font-mono text-[10px] uppercase tracking-widest text-accent/85 border-b border-border bg-card/55">
+              <Th>Account</Th><Th>Plan</Th><Th>Owner</Th>
+              <Th align="right">ARR (USD)</Th>
+              <Th>Renewal Date</Th>
+              <Th align="right">NRR %</Th>
+              <Th align="right">Health</Th>
+              <Th>Trend (30d)</Th>
+              <Th>Risk</Th>
+              <Th align="right">Days</Th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                key={r.name}
+                className="border-b border-border last:border-b-0 hover:bg-accent/[0.04] cursor-pointer transition-colors"
+                onClick={() => openAccount(r.name)}
+              >
+                <Td><span style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[18px] leading-none whitespace-nowrap">{r.name}</span></Td>
+                <Td><span className="text-foreground/80 whitespace-nowrap">{r.plan}</span></Td>
+                <Td>
+                  <span className="inline-flex items-center gap-2 min-w-[150px]">
+                    <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60 shrink-0" />
+                    <span className="text-foreground/85 whitespace-nowrap">{r.owner}</span>
+                  </span>
+                </Td>
+                <Td align="right"><span className="font-mono tabular-nums whitespace-nowrap">{fmtUSD(r.arr)}</span></Td>
+                <Td><span className="text-foreground/80 whitespace-nowrap">{r.renewal}</span></Td>
+                <Td align="right"><span className="font-mono tabular-nums">{r.nrr}%</span></Td>
+                <Td align="right"><span className="font-mono tabular-nums">{r.health}</span></Td>
+                <Td><Sparkline data={r.trend} color={TREND_COLOR[r.risk]} /></Td>
+                <Td><span className={cn("font-mono uppercase tracking-widest text-[11px] font-semibold", RISK_COLOR[r.risk])}>{r.risk}</span></Td>
+                <Td align="right">
+                  <span className={cn("font-mono tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/85")}>
+                    {r.daysToRenewal}
+                  </span>
+                </Td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
