@@ -145,6 +145,55 @@ const ACCENT_RAIL: Record<string, string> = {
 };
 
 type ViewKey = "pulse" | "accounts" | "renewals" | "360";
+type TrendRange = "30D" | "90D" | "180D";
+type TrendMetric = "nrr" | "health" | "adoption" | "risk";
+type TrendPoint = { label: string; nrr: number; health: number; adoption: number; risk: number };
+
+const RANGE_OPTIONS: { id: TrendRange; label: string }[] = [
+  { id: "30D", label: "30D" },
+  { id: "90D", label: "90D" },
+  { id: "180D", label: "180D" },
+];
+
+const TREND_SERIES: Record<TrendRange, TrendPoint[]> = {
+  "30D": [
+    { label: "May 01", nrr: 108, health: 72, adoption: 66, risk: 18 },
+    { label: "May 05", nrr: 109, health: 73, adoption: 68, risk: 17 },
+    { label: "May 09", nrr: 111, health: 75, adoption: 70, risk: 15 },
+    { label: "May 13", nrr: 110, health: 74, adoption: 69, risk: 16 },
+    { label: "May 17", nrr: 112, health: 76, adoption: 72, risk: 14 },
+    { label: "May 21", nrr: 114, health: 78, adoption: 74, risk: 12 },
+    { label: "May 25", nrr: 113, health: 77, adoption: 75, risk: 13 },
+    { label: "May 30", nrr: 115, health: 79, adoption: 77, risk: 11 },
+  ],
+  "90D": [
+    { label: "Mar W1", nrr: 103, health: 68, adoption: 61, risk: 25 },
+    { label: "Mar W2", nrr: 104, health: 69, adoption: 62, risk: 24 },
+    { label: "Mar W3", nrr: 106, health: 70, adoption: 64, risk: 22 },
+    { label: "Apr W1", nrr: 105, health: 69, adoption: 65, risk: 23 },
+    { label: "Apr W2", nrr: 108, health: 72, adoption: 67, risk: 20 },
+    { label: "Apr W3", nrr: 110, health: 74, adoption: 70, risk: 18 },
+    { label: "May W1", nrr: 111, health: 75, adoption: 71, risk: 16 },
+    { label: "May W2", nrr: 112, health: 77, adoption: 73, risk: 15 },
+    { label: "May W3", nrr: 114, health: 78, adoption: 75, risk: 13 },
+    { label: "May W4", nrr: 115, health: 79, adoption: 77, risk: 11 },
+  ],
+  "180D": [
+    { label: "Dec", nrr: 98, health: 63, adoption: 56, risk: 34 },
+    { label: "Jan", nrr: 100, health: 65, adoption: 58, risk: 31 },
+    { label: "Feb", nrr: 102, health: 66, adoption: 60, risk: 28 },
+    { label: "Mar", nrr: 105, health: 69, adoption: 64, risk: 24 },
+    { label: "Apr", nrr: 110, health: 74, adoption: 70, risk: 18 },
+    { label: "May", nrr: 115, health: 79, adoption: 77, risk: 11 },
+  ],
+};
+
+const TREND_METRICS: { key: TrendMetric; label: string; color: string; suffix: string }[] = [
+  { key: "nrr", label: "NRR", color: ACCENT_RAIL.gold, suffix: "%" },
+  { key: "health", label: "Health", color: ACCENT_RAIL.teal, suffix: "" },
+  { key: "adoption", label: "Adoption", color: ACCENT_RAIL.emerald, suffix: "%" },
+  { key: "risk", label: "Risk", color: ACCENT_RAIL.crimson, suffix: "" },
+];
 
 /* ================== Component ================== */
 
@@ -369,99 +418,8 @@ function PulseView({
 
       {/* ============== HEATMAP + LEDGER ============== */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 py-8">
-        {/* Heatmap */}
-        <div>
-          <Eyebrow>Accounts at Risk</Eyebrow>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-foreground/55">
-            Impact × Likelihood
-          </div>
-
-          <div className="mt-5 grid grid-cols-[auto_1fr] gap-x-3">
-            {/* Y-axis labels */}
-            <div className="flex flex-col gap-[6px]">
-              {IMPACT_ROWS.map((r) => (
-                <div
-                  key={r.n}
-                  className="h-[40px] sm:h-[44px] flex items-center justify-end gap-2 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-foreground/65 whitespace-nowrap"
-                >
-                  <span className="tabular-nums opacity-60">{r.n}</span>
-                  <span>{r.label}</span>
-                </div>
-              ))}
-            </div>
-            {/* Grid + X-axis */}
-            <div className="min-w-0">
-              <div className="grid grid-cols-5 gap-[6px]">
-                {HEATMAP.flatMap((row, ri) =>
-                  row.map((v, ci) => {
-                    const { bg, fg } = heatColor(v);
-                    return (
-                      <div
-                        key={`${ri}-${ci}`}
-                        className="h-[40px] sm:h-[44px] flex items-center justify-center font-mono text-sm sm:text-base tabular-nums font-semibold"
-                        style={{ background: bg, color: fg }}
-                      >
-                        {v}
-                      </div>
-                    );
-                  }),
-                )}
-              </div>
-              <div className="mt-2 grid grid-cols-5 gap-[6px]">
-                {LIKELIHOOD_COLS.map((c) => (
-                  <div
-                    key={c.n}
-                    className="text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-foreground/65 leading-tight"
-                  >
-                    <div className="tabular-nums opacity-60">{c.n}</div>
-                    <div className="truncate">{c.label}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-2 text-center font-mono text-[10px] uppercase tracking-widest text-foreground/55">
-                Likelihood
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Ledger — dotted vertical rail aligned through dot centers */}
-        <div>
-          <Eyebrow>Reckoning Ledger</Eyebrow>
-          <ol className="mt-5 relative">
-            {/* Dotted vertical rail */}
-            <span
-              aria-hidden
-              className="absolute top-[20px] bottom-[20px] w-0 border-l border-dotted border-accent/45"
-              style={{ left: "70px" }}
-            />
-            {LEDGER.map((e) => (
-              <li
-                key={e.time}
-                className="grid grid-cols-[56px_14px_1fr_minmax(0,140px)] items-center gap-3 py-2 min-h-[40px]"
-              >
-                <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/65 tabular-nums leading-none">
-                  {e.time}
-                </div>
-                {/* Dot cell */}
-                <div className="flex items-center justify-center h-full">
-                  <span
-                    aria-hidden
-                    className="block h-2.5 w-2.5 rounded-full border border-accent/70 bg-background"
-                  />
-                </div>
-                <div className="text-[12px] sm:text-[13px] leading-tight text-foreground/85 min-w-0 truncate">
-                  <span className="font-medium">{e.headline}</span>
-                  <span className="text-foreground/45"> · </span>
-                  <span className="text-accent/90">{e.account}</span>
-                </div>
-                <div className="text-[11px] sm:text-[12px] text-foreground/65 text-right leading-tight truncate">
-                  {e.detail}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <AccountRiskMatrix />
+        <ReckoningLedger />
       </section>
 
       <Hairline />
@@ -472,6 +430,106 @@ function PulseView({
         <AccountsTable rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
       </section>
     </>
+  );
+}
+
+function AccountRiskMatrix() {
+  return (
+    <div>
+      <Eyebrow>Accounts at Risk</Eyebrow>
+      <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-foreground/55">
+        Impact × Likelihood
+      </div>
+
+      <div className="mt-5 overflow-x-auto pb-1">
+        <div className="min-w-[520px] grid grid-cols-[88px_repeat(5,minmax(0,1fr))] gap-[6px]">
+          <div className="flex items-end justify-end pr-1 pb-1 font-mono text-[9px] uppercase tracking-widest text-foreground/45">
+            Impact
+          </div>
+          {LIKELIHOOD_COLS.map((c) => (
+            <div key={c.n} className="text-center font-mono text-[9px] uppercase tracking-wider text-foreground/62 leading-tight pb-1">
+              <span className="tabular-nums text-foreground/45">{c.n}</span>
+              <span className="block truncate">{c.label}</span>
+            </div>
+          ))}
+
+          {HEATMAP.map((row, ri) => (
+            <FragmentRow key={IMPACT_ROWS[ri].n} row={row} rowMeta={IMPACT_ROWS[ri]} />
+          ))}
+        </div>
+        <div className="mt-3 min-w-[520px] pl-[94px] text-center font-mono text-[10px] uppercase tracking-widest text-foreground/55">
+          Likelihood
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FragmentRow({ row, rowMeta }: { row: number[]; rowMeta: { n: number; label: string } }) {
+  return (
+    <>
+      <div className="h-[46px] flex items-center justify-end gap-2 pr-1 font-mono text-[10px] uppercase tracking-widest text-foreground/65 whitespace-nowrap">
+        <span className="tabular-nums text-foreground/45">{rowMeta.n}</span>
+        <span>{rowMeta.label}</span>
+      </div>
+      {row.map((v, ci) => {
+        const { bg, fg } = heatColor(v);
+        return (
+          <div
+            key={`${rowMeta.n}-${ci}`}
+            className="h-[46px] flex items-center justify-center border border-background/20 font-mono text-[15px] tabular-nums font-semibold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
+            style={{ background: bg, color: fg }}
+            title={`${v} accounts · ${rowMeta.label} impact · ${LIKELIHOOD_COLS[ci].label} likelihood`}
+          >
+            {v}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function ReckoningLedger() {
+  return (
+    <div>
+      <Eyebrow>Reckoning Ledger</Eyebrow>
+      <ol className="mt-5 relative">
+        <span
+          aria-hidden
+          className="absolute top-[18px] bottom-[18px] w-[3px] -translate-x-1/2"
+          style={{
+            left: "75px",
+            backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--accent) 72%, transparent) 1.35px, transparent 1.55px)",
+            backgroundSize: "3px 8px",
+            backgroundRepeat: "repeat-y",
+          }}
+        />
+        {LEDGER.map((e) => (
+          <li
+            key={e.time}
+            className="relative grid grid-cols-[56px_14px_minmax(0,1fr)] sm:grid-cols-[56px_14px_minmax(0,1fr)_minmax(96px,140px)] items-center gap-3 py-2.5 min-h-[42px]"
+          >
+            <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/65 tabular-nums leading-none">
+              {e.time}
+            </div>
+            <div className="relative z-10 flex items-center justify-center h-full">
+              <span
+                aria-hidden
+                className="block h-3 w-3 rounded-full border border-accent/80 bg-background shadow-[0_0_0_3px_var(--background)]"
+              />
+            </div>
+            <div className="text-[13px] leading-tight text-foreground/86 min-w-0 truncate">
+              <span className="font-medium">{e.headline}</span>
+              <span className="text-foreground/45"> · </span>
+              <span className="text-accent/95">{e.account}</span>
+            </div>
+            <div className="hidden sm:block text-[12px] text-foreground/65 text-right leading-tight truncate">
+              {e.detail}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
@@ -507,51 +565,99 @@ function AccountsTable({
   matchLive: (n: string) => CSAccount | undefined;
   onRowClick: (a: CSAccount) => void;
 }) {
+  const openAccount = (name: string) => {
+    const account = matchLive(name);
+    if (account) onRowClick(account);
+  };
   return (
-    <div className="mt-4 overflow-x-auto border border-border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left font-mono text-[10px] uppercase tracking-widest text-accent/80 border-b border-border bg-card/40">
-            <Th>Account</Th><Th>Plan</Th><Th>Owner</Th>
-            <Th align="right">ARR (USD)</Th>
-            <Th>Renewal Date</Th>
-            <Th align="right">NRR %</Th>
-            <Th align="right">Health</Th>
-            <Th>Trend (30d)</Th>
-            <Th>Risk</Th>
-            <Th align="right">Days</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr
-              key={r.name}
-              className="border-b border-border last:border-b-0 hover:bg-accent/[0.04] cursor-pointer transition-colors"
-              onClick={() => { const a = matchLive(r.name); if (a) onRowClick(a); }}
-            >
-              <Td><span style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[17px]">{r.name}</span></Td>
-              <Td><span className="text-foreground/80">{r.plan}</span></Td>
-              <Td>
-                <span className="inline-flex items-center gap-2">
-                  <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60" />
-                  <span className="text-foreground/85">{r.owner}</span>
-                </span>
-              </Td>
-              <Td align="right"><span className="font-mono tabular-nums">{fmtUSD(r.arr)}</span></Td>
-              <Td><span className="text-foreground/80">{r.renewal}</span></Td>
-              <Td align="right"><span className="font-mono tabular-nums">{r.nrr}%</span></Td>
-              <Td align="right"><span className="font-mono tabular-nums">{r.health}</span></Td>
-              <Td><Sparkline data={r.trend} color={TREND_COLOR[r.risk]} /></Td>
-              <Td><span className={cn("font-mono uppercase tracking-widest text-[11px] font-medium", RISK_COLOR[r.risk])}>{r.risk}</span></Td>
-              <Td align="right">
-                <span className={cn("font-mono tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/85")}>
+    <div className="mt-4" data-testid="accounts-ledger">
+      <div className="md:hidden space-y-3">
+        {rows.map((r) => (
+          <button
+            key={r.name}
+            type="button"
+            onClick={() => openAccount(r.name)}
+            className="w-full border border-border bg-card p-4 text-left transition-colors hover:border-accent/45 hover:bg-accent/[0.035]"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[23px] leading-[1.05] truncate">{r.name}</div>
+                <div className="mt-1 text-[13px] text-foreground/62">{r.plan} · {r.renewal}</div>
+              </div>
+              <span className={cn("font-mono uppercase tracking-widest text-[10px] shrink-0", RISK_COLOR[r.risk])}>{r.risk}</span>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-3 font-mono text-[10px] uppercase tracking-widest">
+              <div>
+                <span className="block text-foreground/45">ARR</span>
+                <span className="mt-1 block text-foreground/86 tabular-nums">{fmtUSD(r.arr)}</span>
+              </div>
+              <div>
+                <span className="block text-foreground/45">Health</span>
+                <span className="mt-1 block text-foreground/86 tabular-nums">{r.health}</span>
+              </div>
+              <div>
+                <span className="block text-foreground/45">Days</span>
+                <span className={cn("mt-1 block tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/86")}>
                   {r.daysToRenewal}
                 </span>
-              </Td>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 min-w-0">
+                <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60 shrink-0" />
+                <span className="text-[13px] text-foreground/78 truncate">{r.owner}</span>
+              </span>
+              <Sparkline data={r.trend} color={TREND_COLOR[r.risk]} />
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="hidden md:block overflow-x-auto border border-border">
+        <table className="w-full min-w-[1080px] text-sm">
+          <thead>
+            <tr className="text-left font-mono text-[10px] uppercase tracking-widest text-accent/85 border-b border-border bg-card/55">
+              <Th>Account</Th><Th>Plan</Th><Th>Owner</Th>
+              <Th align="right">ARR (USD)</Th>
+              <Th>Renewal Date</Th>
+              <Th align="right">NRR %</Th>
+              <Th align="right">Health</Th>
+              <Th>Trend (30d)</Th>
+              <Th>Risk</Th>
+              <Th align="right">Days</Th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                key={r.name}
+                className="border-b border-border last:border-b-0 hover:bg-accent/[0.04] cursor-pointer transition-colors"
+                onClick={() => openAccount(r.name)}
+              >
+                <Td><span style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[18px] leading-none whitespace-nowrap">{r.name}</span></Td>
+                <Td><span className="text-foreground/80 whitespace-nowrap">{r.plan}</span></Td>
+                <Td>
+                  <span className="inline-flex items-center gap-2 min-w-[150px]">
+                    <img src={r.avatar} alt="" className="h-6 w-6 rounded-full ring-1 ring-accent/30 bg-card/60 shrink-0" />
+                    <span className="text-foreground/85 whitespace-nowrap">{r.owner}</span>
+                  </span>
+                </Td>
+                <Td align="right"><span className="font-mono tabular-nums whitespace-nowrap">{fmtUSD(r.arr)}</span></Td>
+                <Td><span className="text-foreground/80 whitespace-nowrap">{r.renewal}</span></Td>
+                <Td align="right"><span className="font-mono tabular-nums">{r.nrr}%</span></Td>
+                <Td align="right"><span className="font-mono tabular-nums">{r.health}</span></Td>
+                <Td><Sparkline data={r.trend} color={TREND_COLOR[r.risk]} /></Td>
+                <Td><span className={cn("font-mono uppercase tracking-widest text-[11px] font-semibold", RISK_COLOR[r.risk])}>{r.risk}</span></Td>
+                <Td align="right">
+                  <span className={cn("font-mono tabular-nums", r.daysToRenewal < 0 ? "text-red-400" : r.daysToRenewal < 14 ? "text-orange-400" : "text-foreground/85")}>
+                    {r.daysToRenewal}
+                  </span>
+                </Td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -570,26 +676,76 @@ function RenewalsView({ rows }: { rows: DemoAccount[] }) {
         <Kpi rail={ACCENT_RAIL.crimson} label="At-Risk Renewals"    value={String(sorted.filter(r => r.risk === "Critical" || r.risk === "High").length)} trend="Critical + High risk contracts" />
       </div>
 
-      <Eyebrow>Contract Lifecycle Timeline</Eyebrow>
-      <ol className="mt-5 relative border-l border-border ml-3">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <div>
+          <Eyebrow>Contract Lifecycle Timeline</Eyebrow>
+          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-foreground/55">
+            Renewal motion · uplift estimates · risk milestones
+          </div>
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-widest text-accent/85 tabular-nums">
+          Next 180 days
+        </div>
+      </div>
+
+      <ol className="mt-6 relative space-y-0">
+        <span
+          aria-hidden
+          className="absolute top-7 bottom-7 left-[11px] sm:left-[132px] w-[3px] -translate-x-1/2"
+          style={{
+            backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--accent) 72%, transparent) 1.35px, transparent 1.55px)",
+            backgroundSize: "3px 8px",
+            backgroundRepeat: "repeat-y",
+          }}
+        />
         {sorted.map((r) => {
-          const tone = r.daysToRenewal < 0 ? "text-red-400 border-red-400" : r.daysToRenewal < 30 ? "text-amber-300 border-amber-300" : "text-emerald-400 border-emerald-400";
+          const overdue = r.daysToRenewal < 0;
+          const urgent = !overdue && r.daysToRenewal < 30;
+          const tone = overdue ? "text-red-400 border-red-400" : urgent ? "text-amber-300 border-amber-300" : "text-emerald-400 border-emerald-400";
+          const stage = overdue ? "Escalate" : urgent ? "Mutual plan" : r.daysToRenewal < 75 ? "Commercial align" : "Monitor";
+          const uplift = Math.round(r.arr * (r.risk === "Low" ? 0.18 : r.risk === "Medium" ? 0.1 : 0.04));
           return (
-            <li key={r.name} className="relative pl-6 py-4 border-b border-border last:border-b-0">
-              <span className={cn("absolute -left-[7px] top-6 h-3 w-3 rounded-full bg-background border-2", tone)} />
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/55">{r.renewal}</div>
-                  <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[22px] leading-tight mt-1">{r.name}</div>
-                  <div className="text-sm text-foreground/65 mt-1">{r.plan} · {r.owner}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-mono tabular-nums text-lg">{fmtUSD(r.arr)}</div>
-                  <div className={cn("font-mono text-[11px] uppercase tracking-widest mt-1", tone.split(" ")[0])}>
-                    {r.daysToRenewal < 0 ? `${Math.abs(r.daysToRenewal)} days overdue` : `${r.daysToRenewal} days out`}
+            <li key={r.name} className="relative grid grid-cols-[22px_minmax(0,1fr)] sm:grid-cols-[108px_28px_minmax(0,1fr)] gap-3 sm:gap-4 py-3">
+              <div className="hidden sm:block pt-5 text-right font-mono text-[10px] uppercase tracking-widest text-foreground/58 leading-tight tabular-nums">
+                <span className="block">{r.renewal}</span>
+                <span className={cn("block mt-1", tone.split(" ")[0])}>{overdue ? `${Math.abs(r.daysToRenewal)} overdue` : `${r.daysToRenewal} days`}</span>
+              </div>
+              <div className="relative z-10 flex justify-center pt-5">
+                <span className={cn("h-4 w-4 rounded-full bg-background border-2 shadow-[0_0_0_5px_var(--background)]", tone)} />
+              </div>
+              <article className="bg-card border border-border p-4 sm:p-5 hover:bg-accent/[0.035] transition-colors">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="sm:hidden font-mono text-[10px] uppercase tracking-widest text-foreground/55 mb-1">{r.renewal}</div>
+                    <div style={{ fontFamily: '"Cormorant Garamond", serif' }} className="text-[23px] sm:text-[26px] leading-[1.05] truncate">{r.name}</div>
+                    <div className="mt-1 text-[13px] text-foreground/65">{r.plan} · {r.owner}</div>
+                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-[10px] uppercase tracking-widest">
+                      <div>
+                        <span className="block text-foreground/45">Stage</span>
+                        <span className="mt-1 block text-foreground/82">{stage}</span>
+                      </div>
+                      <div>
+                        <span className="block text-foreground/45">Risk</span>
+                        <span className={cn("mt-1 block", RISK_COLOR[r.risk])}>{r.risk}</span>
+                      </div>
+                      <div>
+                        <span className="block text-foreground/45">Health</span>
+                        <span className="mt-1 block text-foreground/82 tabular-nums">{r.health}</span>
+                      </div>
+                      <div>
+                        <span className="block text-foreground/45">Uplift</span>
+                        <span className="mt-1 block text-accent/90 tabular-nums">{fmtUSD(uplift)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lg:text-right shrink-0">
+                    <div className="font-mono tabular-nums text-[20px] leading-none">{fmtUSD(r.arr)}</div>
+                    <div className={cn("font-mono text-[10px] uppercase tracking-widest mt-2", tone.split(" ")[0])}>
+                      {overdue ? `${Math.abs(r.daysToRenewal)} days overdue` : `${r.daysToRenewal} days out`}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </article>
             </li>
           );
         })}
@@ -601,6 +757,10 @@ function RenewalsView({ rows }: { rows: DemoAccount[] }) {
 /* ================== 360 view ================== */
 
 function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
+  const [range, setRange] = useState<TrendRange>("90D");
+  const [metric, setMetric] = useState<TrendMetric>("health");
+  const activeSeries = TREND_SERIES[range];
+  const activeMetric = TREND_METRICS.find((m) => m.key === metric) ?? TREND_METRICS[1];
   const cohorts = [
     { label: "Enterprise", filter: (r: DemoAccount) => r.plan === "Enterprise" },
     { label: "Growth",     filter: (r: DemoAccount) => r.plan === "Growth" },
@@ -608,6 +768,77 @@ function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
   ];
   return (
     <section className="pt-7 pb-12 space-y-10">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.55fr)] gap-4">
+        <div className="bg-card border border-border p-4 sm:p-5">
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-5">
+            <div>
+              <Eyebrow>Interactive Trend Graph</Eyebrow>
+              <div className="mt-1 text-[13px] text-foreground/62 leading-snug">
+                Customer success signal velocity across retention, health, adoption, and risk.
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {RANGE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={range === option.id}
+                  onClick={() => setRange(option.id)}
+                  className={cn(
+                    "h-8 px-3 border font-mono text-[10px] uppercase tracking-widest transition-colors",
+                    range === option.id
+                      ? "border-accent bg-accent text-accent-foreground"
+                      : "border-border text-foreground/65 hover:text-foreground hover:border-accent/50",
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <TrendGraph points={activeSeries} metric={activeMetric} />
+
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {TREND_METRICS.map((m) => {
+              const latest = activeSeries[activeSeries.length - 1][m.key];
+              const first = activeSeries[0][m.key];
+              const delta = latest - first;
+              return (
+                <button
+                  key={m.key}
+                  type="button"
+                  aria-pressed={metric === m.key}
+                  onClick={() => setMetric(m.key)}
+                  className={cn(
+                    "border p-3 text-left transition-colors",
+                    metric === m.key ? "border-accent bg-accent/[0.08]" : "border-border hover:border-accent/45 hover:bg-accent/[0.035]",
+                  )}
+                >
+                  <span className="block font-mono text-[10px] uppercase tracking-widest text-foreground/58">{m.label}</span>
+                  <span className="mt-2 flex items-baseline justify-between gap-2">
+                    <span className="font-mono text-[24px] leading-none tabular-nums" style={{ color: m.color }}>
+                      {latest}{m.suffix}
+                    </span>
+                    <span className={cn("font-mono text-[10px] uppercase tracking-widest tabular-nums", delta >= 0 ? "text-emerald-400" : "text-red-400")}>
+                      {delta >= 0 ? "+" : ""}{delta}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-4">
+          <Kpi rail={ACCENT_RAIL.gold} label="Expansion Momentum" value="+$1.4M" trend="Qualified expansion surfaced from healthy cohorts" />
+          <Kpi rail={ACCENT_RAIL.teal} label="Signal Coverage" value="92%" trend="Accounts with current product + support signals" />
+          <Kpi rail={ACCENT_RAIL.crimson} label="Risk Compression" value="-14" trend="High-severity accounts reduced in 90 days" />
+        </div>
+      </div>
+
+      <Hairline />
+
       <div>
         <Eyebrow>Cohort Trend Arrays</Eyebrow>
         <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -657,6 +888,94 @@ function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function TrendGraph({ points, metric }: { points: TrendPoint[]; metric: { key: TrendMetric; label: string; color: string; suffix: string } }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const w = 720;
+  const h = 280;
+  const padX = 44;
+  const padY = 30;
+  const values = points.map((p) => p[metric.key]);
+  const min = Math.floor(Math.min(...values) / 5) * 5;
+  const max = Math.ceil(Math.max(...values) / 5) * 5;
+  const span = Math.max(1, max - min);
+  const coords = points.map((p, i) => {
+    const x = padX + (i * (w - padX * 2)) / Math.max(1, points.length - 1);
+    const y = h - padY - ((p[metric.key] - min) / span) * (h - padY * 2);
+    return { x, y, point: p };
+  });
+  const path = coords.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+  const area = `${path} L ${coords[coords.length - 1].x.toFixed(1)} ${h - padY} L ${coords[0].x.toFixed(1)} ${h - padY} Z`;
+  const active = hovered === null ? null : coords[hovered];
+
+  return (
+    <div className="relative" data-testid="trend-graph">
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[260px] sm:h-[320px] overflow-hidden" role="img" aria-label={`${metric.label} trend graph`} onMouseLeave={() => setHovered(null)}>
+        <defs>
+          <linearGradient id={`trend-fill-${metric.key}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={metric.color} stopOpacity="0.28" />
+            <stop offset="100%" stopColor={metric.color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[0, 1, 2, 3].map((line) => {
+          const y = padY + (line * (h - padY * 2)) / 3;
+          const label = Math.round(max - (line * span) / 3);
+          return (
+            <g key={line}>
+              <line x1={padX} x2={w - padX} y1={y} y2={y} stroke="var(--border)" strokeWidth="1" />
+              <text x={12} y={y + 4} fill="var(--muted-foreground)" fontSize="10" fontFamily="var(--font-mono)">{label}</text>
+            </g>
+          );
+        })}
+        <path d={area} fill={`url(#trend-fill-${metric.key})`} />
+        <path d={path} fill="none" stroke={metric.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        {coords.map((p, i) => (
+          <g key={p.point.label} onMouseEnter={() => setHovered(i)} onFocus={() => setHovered(i)} tabIndex={0} className="outline-none">
+            <rect
+              x={i === 0 ? padX - 18 : p.x - ((w - padX * 2) / Math.max(1, points.length - 1)) / 2}
+              y={padY - 8}
+              width={(w - padX * 2) / Math.max(1, points.length - 1)}
+              height={h - padY * 2 + 16}
+              fill="transparent"
+            />
+            <circle cx={p.x} cy={p.y} r={hovered === i ? 5 : 3.5} fill="var(--background)" stroke={metric.color} strokeWidth="2" />
+          </g>
+        ))}
+        {active && (
+          <g pointerEvents="none">
+            <line x1={active.x} x2={active.x} y1={padY} y2={h - padY} stroke={metric.color} strokeOpacity="0.45" strokeDasharray="3 6" />
+            <circle cx={active.x} cy={active.y} r="6" fill={metric.color} />
+          </g>
+        )}
+        {coords.map((p, i) => (
+          <text key={`${p.point.label}-axis`} x={p.x} y={h - 7} textAnchor="middle" fill="var(--muted-foreground)" fontSize="9" fontFamily="var(--font-mono)" opacity={i % 2 === 0 || points.length <= 6 ? 1 : 0.45}>
+            {p.point.label}
+          </text>
+        ))}
+      </svg>
+      {active && (
+        <div
+          className="pointer-events-none absolute min-w-[150px] border border-accent/45 bg-card px-3 py-2 shadow-2xl"
+          style={{ left: `${Math.min(82, Math.max(14, (active.x / w) * 100))}%`, top: `${Math.min(72, Math.max(12, (active.y / h) * 100))}%`, transform: "translate(-50%, -115%)" }}
+        >
+          <div className="font-mono text-[10px] uppercase tracking-widest text-accent/85">{active.point.label}</div>
+          <div className="mt-1 flex items-baseline justify-between gap-4">
+            <span className="text-[13px] text-foreground/62">{metric.label}</span>
+            <span className="font-mono text-[20px] tabular-nums leading-none" style={{ color: metric.color }}>
+              {active.point[metric.key]}{metric.suffix}
+            </span>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 font-mono text-[9px] uppercase tracking-widest text-foreground/58">
+            <span>NRR {active.point.nrr}%</span>
+            <span>Health {active.point.health}</span>
+            <span>Adoption {active.point.adoption}%</span>
+            <span>Risk {active.point.risk}</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
