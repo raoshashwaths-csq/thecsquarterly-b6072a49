@@ -27,8 +27,9 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
   }
 
   const isActiveTop = (to: string, h?: string) => {
-    if (h) return pathname === to && (`#${hash}` === h || hash === h.slice(1));
-    return pathname === to || pathname.startsWith(to + "/");
+    const normalizedHash = hash ? (hash.startsWith("#") ? hash : `#${hash}`) : "";
+    if (h) return pathname === to && normalizedHash === h;
+    return (pathname === to && !normalizedHash) || pathname.startsWith(to + "/");
   };
   const isActive = (to: string) => pathname === to || pathname.startsWith(to + "/");
 
