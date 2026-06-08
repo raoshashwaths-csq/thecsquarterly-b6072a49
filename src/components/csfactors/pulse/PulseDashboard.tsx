@@ -368,7 +368,7 @@ function PulseView({
       <Hairline />
 
       {/* ============== HEATMAP + LEDGER ============== */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 lg:gap-10 py-8">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 py-8">
         {/* Heatmap */}
         <div>
           <Eyebrow>Accounts at Risk</Eyebrow>
@@ -376,16 +376,21 @@ function PulseView({
             Impact × Likelihood
           </div>
 
-          <div className="mt-5 flex">
-            <div className="flex flex-col gap-[6px] pr-3">
+          <div className="mt-5 grid grid-cols-[auto_1fr] gap-x-3">
+            {/* Y-axis labels */}
+            <div className="flex flex-col gap-[6px]">
               {IMPACT_ROWS.map((r) => (
-                <div key={r.n} className="h-[44px] flex items-center justify-end gap-2 font-mono text-[10px] uppercase tracking-widest text-foreground/65">
-                  <span className="tabular-nums">{r.n}</span>
+                <div
+                  key={r.n}
+                  className="h-[40px] sm:h-[44px] flex items-center justify-end gap-2 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-foreground/65 whitespace-nowrap"
+                >
+                  <span className="tabular-nums opacity-60">{r.n}</span>
                   <span>{r.label}</span>
                 </div>
               ))}
             </div>
-            <div className="flex-1">
+            {/* Grid + X-axis */}
+            <div className="min-w-0">
               <div className="grid grid-cols-5 gap-[6px]">
                 {HEATMAP.flatMap((row, ri) =>
                   row.map((v, ci) => {
@@ -393,7 +398,7 @@ function PulseView({
                     return (
                       <div
                         key={`${ri}-${ci}`}
-                        className="h-[44px] flex items-center justify-center font-mono text-base tabular-nums"
+                        className="h-[40px] sm:h-[44px] flex items-center justify-center font-mono text-sm sm:text-base tabular-nums font-semibold"
                         style={{ background: bg, color: fg }}
                       >
                         {v}
@@ -404,9 +409,12 @@ function PulseView({
               </div>
               <div className="mt-2 grid grid-cols-5 gap-[6px]">
                 {LIKELIHOOD_COLS.map((c) => (
-                  <div key={c.n} className="text-center font-mono text-[9px] uppercase tracking-widest text-foreground/65 leading-tight">
-                    <div className="tabular-nums">{c.n}</div>
-                    <div className="whitespace-nowrap">{c.label}</div>
+                  <div
+                    key={c.n}
+                    className="text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-foreground/65 leading-tight"
+                  >
+                    <div className="tabular-nums opacity-60">{c.n}</div>
+                    <div className="truncate">{c.label}</div>
                   </div>
                 ))}
               </div>
@@ -417,37 +425,37 @@ function PulseView({
           </div>
         </div>
 
-        {/* Ledger — vertical rail aligned through dot centers */}
-        <div className="mt-10 lg:mt-0">
+        {/* Ledger — dotted vertical rail aligned through dot centers */}
+        <div>
           <Eyebrow>Reckoning Ledger</Eyebrow>
           <ol className="mt-5 relative">
-            {/* Vertical rail: anchored to the dot column (left=78px), spans dot centers */}
+            {/* Dotted vertical rail */}
             <span
               aria-hidden
-              className="absolute w-px bg-accent/30"
-              style={{ left: "78px", top: "20px", bottom: "20px" }}
+              className="absolute top-[20px] bottom-[20px] w-0 border-l border-dotted border-accent/45"
+              style={{ left: "70px" }}
             />
             {LEDGER.map((e) => (
               <li
                 key={e.time}
-                className="grid grid-cols-[64px_14px_1fr_140px] items-center gap-3 py-2 min-h-[40px]"
+                className="grid grid-cols-[56px_14px_1fr_minmax(0,140px)] items-center gap-3 py-2 min-h-[40px]"
               >
                 <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/65 tabular-nums leading-none">
                   {e.time}
                 </div>
-                {/* Dot cell — exactly 14px wide, centered, dot is 10px → keeps perfect alignment */}
+                {/* Dot cell */}
                 <div className="flex items-center justify-center h-full">
                   <span
                     aria-hidden
                     className="block h-2.5 w-2.5 rounded-full border border-accent/70 bg-background"
                   />
                 </div>
-                <div className="text-[13px] leading-tight text-foreground/85 truncate">
+                <div className="text-[12px] sm:text-[13px] leading-tight text-foreground/85 min-w-0 truncate">
                   <span className="font-medium">{e.headline}</span>
                   <span className="text-foreground/45"> · </span>
                   <span className="text-accent/90">{e.account}</span>
                 </div>
-                <div className="text-[12px] text-foreground/65 text-right leading-tight truncate">
+                <div className="text-[11px] sm:text-[12px] text-foreground/65 text-right leading-tight truncate">
                   {e.detail}
                 </div>
               </li>
