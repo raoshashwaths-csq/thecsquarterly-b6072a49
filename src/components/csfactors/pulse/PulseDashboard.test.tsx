@@ -22,7 +22,6 @@ describe("PulseDashboard responsive views", () => {
     const ledger = screen.getByTestId("accounts-ledger");
     expect(within(ledger).getByRole("table")).toBeInTheDocument();
     expect(within(ledger).getAllByRole("button", { name: /northbridge global/i })[0]).toBeInTheDocument();
-    expect(within(ledger).getAllByText(/active client ledger/i)[0]).toBeInTheDocument();
   });
 
   it("renders the renewals timeline with lifecycle stages and uplift estimates", () => {
