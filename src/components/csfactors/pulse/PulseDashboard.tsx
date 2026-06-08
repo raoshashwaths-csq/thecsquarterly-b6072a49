@@ -908,11 +908,11 @@ function TrendGraph({ points, metric }: { points: TrendPoint[]; metric: { key: T
   });
   const path = coords.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
   const area = `${path} L ${coords[coords.length - 1].x.toFixed(1)} ${h - padY} L ${coords[0].x.toFixed(1)} ${h - padY} Z`;
-  const active = coords[hovered ?? coords.length - 1];
+  const active = hovered === null ? null : coords[hovered];
 
   return (
     <div className="relative" data-testid="trend-graph">
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[260px] sm:h-[320px] overflow-visible" role="img" aria-label={`${metric.label} trend graph`}>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[260px] sm:h-[320px] overflow-hidden" role="img" aria-label={`${metric.label} trend graph`} onMouseLeave={() => setHovered(null)}>
         <defs>
           <linearGradient id={`trend-fill-${metric.key}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor={metric.color} stopOpacity="0.28" />
