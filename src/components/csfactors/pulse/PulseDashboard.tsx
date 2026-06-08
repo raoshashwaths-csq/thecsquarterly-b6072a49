@@ -145,6 +145,55 @@ const ACCENT_RAIL: Record<string, string> = {
 };
 
 type ViewKey = "pulse" | "accounts" | "renewals" | "360";
+type TrendRange = "30D" | "90D" | "180D";
+type TrendMetric = "nrr" | "health" | "adoption" | "risk";
+type TrendPoint = { label: string; nrr: number; health: number; adoption: number; risk: number };
+
+const RANGE_OPTIONS: { id: TrendRange; label: string }[] = [
+  { id: "30D", label: "30D" },
+  { id: "90D", label: "90D" },
+  { id: "180D", label: "180D" },
+];
+
+const TREND_SERIES: Record<TrendRange, TrendPoint[]> = {
+  "30D": [
+    { label: "May 01", nrr: 108, health: 72, adoption: 66, risk: 18 },
+    { label: "May 05", nrr: 109, health: 73, adoption: 68, risk: 17 },
+    { label: "May 09", nrr: 111, health: 75, adoption: 70, risk: 15 },
+    { label: "May 13", nrr: 110, health: 74, adoption: 69, risk: 16 },
+    { label: "May 17", nrr: 112, health: 76, adoption: 72, risk: 14 },
+    { label: "May 21", nrr: 114, health: 78, adoption: 74, risk: 12 },
+    { label: "May 25", nrr: 113, health: 77, adoption: 75, risk: 13 },
+    { label: "May 30", nrr: 115, health: 79, adoption: 77, risk: 11 },
+  ],
+  "90D": [
+    { label: "Mar W1", nrr: 103, health: 68, adoption: 61, risk: 25 },
+    { label: "Mar W2", nrr: 104, health: 69, adoption: 62, risk: 24 },
+    { label: "Mar W3", nrr: 106, health: 70, adoption: 64, risk: 22 },
+    { label: "Apr W1", nrr: 105, health: 69, adoption: 65, risk: 23 },
+    { label: "Apr W2", nrr: 108, health: 72, adoption: 67, risk: 20 },
+    { label: "Apr W3", nrr: 110, health: 74, adoption: 70, risk: 18 },
+    { label: "May W1", nrr: 111, health: 75, adoption: 71, risk: 16 },
+    { label: "May W2", nrr: 112, health: 77, adoption: 73, risk: 15 },
+    { label: "May W3", nrr: 114, health: 78, adoption: 75, risk: 13 },
+    { label: "May W4", nrr: 115, health: 79, adoption: 77, risk: 11 },
+  ],
+  "180D": [
+    { label: "Dec", nrr: 98, health: 63, adoption: 56, risk: 34 },
+    { label: "Jan", nrr: 100, health: 65, adoption: 58, risk: 31 },
+    { label: "Feb", nrr: 102, health: 66, adoption: 60, risk: 28 },
+    { label: "Mar", nrr: 105, health: 69, adoption: 64, risk: 24 },
+    { label: "Apr", nrr: 110, health: 74, adoption: 70, risk: 18 },
+    { label: "May", nrr: 115, health: 79, adoption: 77, risk: 11 },
+  ],
+};
+
+const TREND_METRICS: { key: TrendMetric; label: string; color: string; suffix: string }[] = [
+  { key: "nrr", label: "NRR", color: ACCENT_RAIL.gold, suffix: "%" },
+  { key: "health", label: "Health", color: ACCENT_RAIL.teal, suffix: "" },
+  { key: "adoption", label: "Adoption", color: ACCENT_RAIL.emerald, suffix: "%" },
+  { key: "risk", label: "Risk", color: ACCENT_RAIL.crimson, suffix: "" },
+];
 
 /* ================== Component ================== */
 
@@ -369,99 +418,8 @@ function PulseView({
 
       {/* ============== HEATMAP + LEDGER ============== */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 py-8">
-        {/* Heatmap */}
-        <div>
-          <Eyebrow>Accounts at Risk</Eyebrow>
-          <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-foreground/55">
-            Impact × Likelihood
-          </div>
-
-          <div className="mt-5 grid grid-cols-[auto_1fr] gap-x-3">
-            {/* Y-axis labels */}
-            <div className="flex flex-col gap-[6px]">
-              {IMPACT_ROWS.map((r) => (
-                <div
-                  key={r.n}
-                  className="h-[40px] sm:h-[44px] flex items-center justify-end gap-2 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-foreground/65 whitespace-nowrap"
-                >
-                  <span className="tabular-nums opacity-60">{r.n}</span>
-                  <span>{r.label}</span>
-                </div>
-              ))}
-            </div>
-            {/* Grid + X-axis */}
-            <div className="min-w-0">
-              <div className="grid grid-cols-5 gap-[6px]">
-                {HEATMAP.flatMap((row, ri) =>
-                  row.map((v, ci) => {
-                    const { bg, fg } = heatColor(v);
-                    return (
-                      <div
-                        key={`${ri}-${ci}`}
-                        className="h-[40px] sm:h-[44px] flex items-center justify-center font-mono text-sm sm:text-base tabular-nums font-semibold"
-                        style={{ background: bg, color: fg }}
-                      >
-                        {v}
-                      </div>
-                    );
-                  }),
-                )}
-              </div>
-              <div className="mt-2 grid grid-cols-5 gap-[6px]">
-                {LIKELIHOOD_COLS.map((c) => (
-                  <div
-                    key={c.n}
-                    className="text-center font-mono text-[8px] sm:text-[9px] uppercase tracking-wider text-foreground/65 leading-tight"
-                  >
-                    <div className="tabular-nums opacity-60">{c.n}</div>
-                    <div className="truncate">{c.label}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-2 text-center font-mono text-[10px] uppercase tracking-widest text-foreground/55">
-                Likelihood
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Ledger — dotted vertical rail aligned through dot centers */}
-        <div>
-          <Eyebrow>Reckoning Ledger</Eyebrow>
-          <ol className="mt-5 relative">
-            {/* Dotted vertical rail */}
-            <span
-              aria-hidden
-              className="absolute top-[20px] bottom-[20px] w-0 border-l border-dotted border-accent/45"
-              style={{ left: "70px" }}
-            />
-            {LEDGER.map((e) => (
-              <li
-                key={e.time}
-                className="grid grid-cols-[56px_14px_1fr_minmax(0,140px)] items-center gap-3 py-2 min-h-[40px]"
-              >
-                <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/65 tabular-nums leading-none">
-                  {e.time}
-                </div>
-                {/* Dot cell */}
-                <div className="flex items-center justify-center h-full">
-                  <span
-                    aria-hidden
-                    className="block h-2.5 w-2.5 rounded-full border border-accent/70 bg-background"
-                  />
-                </div>
-                <div className="text-[12px] sm:text-[13px] leading-tight text-foreground/85 min-w-0 truncate">
-                  <span className="font-medium">{e.headline}</span>
-                  <span className="text-foreground/45"> · </span>
-                  <span className="text-accent/90">{e.account}</span>
-                </div>
-                <div className="text-[11px] sm:text-[12px] text-foreground/65 text-right leading-tight truncate">
-                  {e.detail}
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <AccountRiskMatrix />
+        <ReckoningLedger />
       </section>
 
       <Hairline />
@@ -472,6 +430,106 @@ function PulseView({
         <AccountsTable rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
       </section>
     </>
+  );
+}
+
+function AccountRiskMatrix() {
+  return (
+    <div>
+      <Eyebrow>Accounts at Risk</Eyebrow>
+      <div className="mt-1 font-mono text-[10px] uppercase tracking-widest text-foreground/55">
+        Impact × Likelihood
+      </div>
+
+      <div className="mt-5 overflow-x-auto pb-1">
+        <div className="min-w-[520px] grid grid-cols-[88px_repeat(5,minmax(0,1fr))] gap-[6px]">
+          <div className="flex items-end justify-end pr-1 pb-1 font-mono text-[9px] uppercase tracking-widest text-foreground/45">
+            Impact
+          </div>
+          {LIKELIHOOD_COLS.map((c) => (
+            <div key={c.n} className="text-center font-mono text-[9px] uppercase tracking-wider text-foreground/62 leading-tight pb-1">
+              <span className="tabular-nums text-foreground/45">{c.n}</span>
+              <span className="block truncate">{c.label}</span>
+            </div>
+          ))}
+
+          {HEATMAP.map((row, ri) => (
+            <FragmentRow key={IMPACT_ROWS[ri].n} row={row} rowMeta={IMPACT_ROWS[ri]} />
+          ))}
+        </div>
+        <div className="mt-3 min-w-[520px] pl-[94px] text-center font-mono text-[10px] uppercase tracking-widest text-foreground/55">
+          Likelihood
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FragmentRow({ row, rowMeta }: { row: number[]; rowMeta: { n: number; label: string } }) {
+  return (
+    <>
+      <div className="h-[46px] flex items-center justify-end gap-2 pr-1 font-mono text-[10px] uppercase tracking-widest text-foreground/65 whitespace-nowrap">
+        <span className="tabular-nums text-foreground/45">{rowMeta.n}</span>
+        <span>{rowMeta.label}</span>
+      </div>
+      {row.map((v, ci) => {
+        const { bg, fg } = heatColor(v);
+        return (
+          <div
+            key={`${rowMeta.n}-${ci}`}
+            className="h-[46px] flex items-center justify-center border border-background/20 font-mono text-[15px] tabular-nums font-semibold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
+            style={{ background: bg, color: fg }}
+            title={`${v} accounts · ${rowMeta.label} impact · ${LIKELIHOOD_COLS[ci].label} likelihood`}
+          >
+            {v}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function ReckoningLedger() {
+  return (
+    <div>
+      <Eyebrow>Reckoning Ledger</Eyebrow>
+      <ol className="mt-5 relative">
+        <span
+          aria-hidden
+          className="absolute top-[18px] bottom-[18px] w-[3px] -translate-x-1/2"
+          style={{
+            left: "75px",
+            backgroundImage: "radial-gradient(circle, color-mix(in oklab, var(--accent) 72%, transparent) 1.35px, transparent 1.55px)",
+            backgroundSize: "3px 8px",
+            backgroundRepeat: "repeat-y",
+          }}
+        />
+        {LEDGER.map((e) => (
+          <li
+            key={e.time}
+            className="relative grid grid-cols-[56px_14px_minmax(0,1fr)] sm:grid-cols-[56px_14px_minmax(0,1fr)_minmax(96px,140px)] items-center gap-3 py-2.5 min-h-[42px]"
+          >
+            <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/65 tabular-nums leading-none">
+              {e.time}
+            </div>
+            <div className="relative z-10 flex items-center justify-center h-full">
+              <span
+                aria-hidden
+                className="block h-3 w-3 rounded-full border border-accent/80 bg-background shadow-[0_0_0_3px_var(--background)]"
+              />
+            </div>
+            <div className="text-[13px] leading-tight text-foreground/86 min-w-0 truncate">
+              <span className="font-medium">{e.headline}</span>
+              <span className="text-foreground/45"> · </span>
+              <span className="text-accent/95">{e.account}</span>
+            </div>
+            <div className="hidden sm:block text-[12px] text-foreground/65 text-right leading-tight truncate">
+              {e.detail}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }
 
