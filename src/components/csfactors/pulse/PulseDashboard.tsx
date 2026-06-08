@@ -224,7 +224,7 @@ export function PulseDashboard({
           </div>
         </div>
         <h1
-          className="mt-6 font-serif text-[48px] md:text-[80px] leading-[0.98] tracking-[-0.015em] text-foreground"
+          className="mt-5 font-serif text-[40px] sm:text-[56px] md:text-[80px] leading-[0.98] tracking-[-0.015em] text-foreground"
           style={{ fontFamily: '"Cormorant Garamond", "Newsreader", Georgia, serif' }}
           suppressHydrationWarning
         >
