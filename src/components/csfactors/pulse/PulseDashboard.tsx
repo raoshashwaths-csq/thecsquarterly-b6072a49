@@ -245,8 +245,8 @@ export function PulseDashboard({
       </header>
 
       {/* ============== TAB STRIP ============== */}
-      <div className="border-t border-border">
-        <div className="flex gap-1 -mb-px">
+      <div className="border-t border-border overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+        <div className="flex gap-1 -mb-px min-w-max">
           {tabs.map((t) => {
             const active = activeView === t.id;
             return (
@@ -255,7 +255,7 @@ export function PulseDashboard({
                 type="button"
                 onClick={() => setActiveView(t.id)}
                 className={cn(
-                  "px-4 py-3 font-mono text-[11px] font-medium uppercase tracking-widest transition-colors border-t-2",
+                  "px-3 md:px-4 py-3 font-mono text-[10px] md:text-[11px] font-semibold uppercase tracking-widest transition-colors border-t-2 whitespace-nowrap",
                   active
                     ? "border-accent text-accent bg-card/60"
                     : "border-transparent text-foreground/55 hover:text-foreground/80",
