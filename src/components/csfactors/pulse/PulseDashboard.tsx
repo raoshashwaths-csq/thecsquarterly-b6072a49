@@ -317,43 +317,43 @@ function PulseView({
           {BURNERS.map((b) => (
             <article key={b.name} className="bg-card border border-border p-5 flex flex-col gap-4 min-h-[220px]">
               <div className="flex items-start justify-between gap-3">
-                <span className="inline-block px-2 py-0.5 bg-red-500/15 text-red-400 font-mono text-[10px] uppercase tracking-widest border border-red-500/40">
+                <span className="inline-block px-2 py-0.5 bg-red-500/15 text-red-400 font-mono text-[10px] font-semibold uppercase tracking-widest border border-red-500/40 whitespace-nowrap">
                   {b.tag}
-                </span>
-                <span className="font-mono text-[10px] uppercase tracking-widest text-foreground/45">
-                  {b.context}
                 </span>
               </div>
               <div>
                 <div
-                  className="text-[24px] leading-[1.1] tracking-tight"
+                  className="text-[22px] sm:text-[24px] leading-[1.1] tracking-tight"
                   style={{ fontFamily: '"Cormorant Garamond", "Newsreader", Georgia, serif' }}
                 >
                   {b.name}
                 </div>
-                <div className="mt-1 text-sm text-foreground/60">{b.plan}</div>
+                <div className="mt-1 text-[13px] text-foreground/60">{b.plan}</div>
+                <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-foreground/55 leading-snug">
+                  {b.context}
+                </div>
               </div>
               <div className="mt-auto flex items-end justify-between gap-4">
-                <div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-accent/80 mb-1.5">Owner</div>
+                <div className="min-w-0">
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent/85 mb-1.5">Owner</div>
                   <div className="flex items-center gap-2">
-                    <img src={b.avatar} alt="" className="h-7 w-7 rounded-full bg-card/60 ring-1 ring-accent/30" />
-                    <div className="leading-tight">
-                      <div className="text-sm">{b.owner}</div>
-                      <div className="text-xs text-foreground/55">{b.ownerType}</div>
+                    <img src={b.avatar} alt="" className="h-7 w-7 rounded-full bg-card/60 ring-1 ring-accent/30 shrink-0" />
+                    <div className="leading-tight min-w-0">
+                      <div className="text-[13px] truncate">{b.owner}</div>
+                      <div className="text-[11px] text-foreground/55">{b.ownerType}</div>
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-accent/80 mb-1">Days to Renewal</div>
+                <div className="text-right shrink-0">
+                  <div className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent/85 mb-1">Days to Renewal</div>
                   <div className={cn(
-                    "font-mono text-[32px] leading-none tabular-nums",
+                    "font-mono text-[28px] sm:text-[32px] leading-none tabular-nums font-medium",
                     b.state === "Overdue" ? "text-red-400" : b.days < 14 ? "text-amber-300" : "text-orange-300",
                   )}>
                     {b.days}
                   </div>
                   <div className={cn(
-                    "text-[11px] mt-1 font-mono uppercase tracking-widest",
+                    "text-[10px] mt-1 font-mono font-semibold uppercase tracking-widest",
                     b.state === "Overdue" ? "text-red-400" : "text-amber-300",
                   )}>
                     {b.state}
