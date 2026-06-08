@@ -353,7 +353,7 @@ function PulseView({
                     {b.days}
                   </div>
                   <div className={cn(
-                    "text-[10px] mt-1 font-mono font-semibold uppercase tracking-widest",
+                    "text-[10px] mt-1 font-mono font-semibold uppercase tracking-widest leading-tight max-w-[110px] ml-auto",
                     b.state === "Overdue" ? "text-red-400" : "text-amber-300",
                   )}>
                     {b.state}
