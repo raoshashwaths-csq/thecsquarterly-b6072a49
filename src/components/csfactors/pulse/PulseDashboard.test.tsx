@@ -42,7 +42,7 @@ describe("PulseDashboard responsive views", () => {
     expect(screen.getByText(/interactive trend graph/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "180D" }));
-    fireEvent.click(screen.getByRole("button", { name: /^NRR$/i }));
+    fireEvent.click(screen.getByRole("button", { name: /NRR115%/i }));
 
     expect(screen.getByLabelText(/nrr trend graph/i)).toBeInTheDocument();
     expect(screen.getAllByText(/115%/)[0]).toBeInTheDocument();
