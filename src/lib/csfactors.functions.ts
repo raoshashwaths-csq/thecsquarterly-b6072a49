@@ -272,6 +272,99 @@ export const logAccountEvent = createServerFn({ method: "POST" })
     return row as unknown as CSAccountEvent;
   });
 
+// =================== Portfolio trend (360 dashboard) ===================
+
+export type TrendPoint = {
+  label: string;
+  nrr: number;
+  health: number;
+  adoption: number;
+  risk: number;
+};
+export type TrendRange = "30D" | "90D" | "180D";
+
+const RANGE_CONFIG: Record<TrendRange, { days: number; buckets: number; fmt: (d: Date) => string }> = {
+  "30D": { days: 30, buckets: 8, fmt: (d) => d.toLocaleDateString("en-US", { month: "short", day: "2-digit" }) },
+  "90D": { days: 90, buckets: 8, fmt: (d) => `${d.toLocaleDateString("en-US", { month: "short" })} W${Math.ceil(d.getDate() / 7)}` },
+  "180D": { days: 180, buckets: 6, fmt: (d) => d.toLocaleDateString("en-US", { month: "short" }) },
+};
+
+function deriveSnapshot(accounts: Array<{ health: number; implementation_progress: number | null }>) {
+  if (!accounts.length) return { nrr: 100, health: 0, adoption: 0, risk: 0 };
+  const avgHealth = Math.round(accounts.reduce((s, a) => s + (a.health ?? 0), 0) / accounts.length);
+  const adoption = Math.round(
+    accounts.reduce((s, a) => s + (a.implementation_progress ?? a.health ?? 0), 0) / accounts.length,
+  );
+  return {
+    nrr: Math.round(80 + avgHealth * 0.4),
+    health: avgHealth,
+    adoption,
+    risk: accounts.filter((a) => (a.health ?? 0) < 50).length,
+  };
+}
+
+export const getPortfolioTrend = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ range: z.enum(["30D", "90D", "180D"]).default("90D") }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const cfg = RANGE_CONFIG[data.range];
+    const now = new Date();
+    const start = new Date(now.getTime() - cfg.days * 24 * 60 * 60 * 1000);
+
+    const { data: accountRows, error: accErr } = await supabase
+      .from("cs_accounts" as never)
+      .select("id, health, implementation_progress");
+    if (accErr) throw new Error(accErr.message);
+    const accounts = (accountRows ?? []) as Array<{ id: string; health: number; implementation_progress: number | null }>;
+
+    const { data: eventRows } = await supabase
+      .from("cs_account_events" as never)
+      .select("kind, payload, occurred_at, account_id")
+      .gte("occurred_at", start.toISOString())
+      .order("occurred_at", { ascending: true });
+    const events = (eventRows ?? []) as Array<{ kind: string; payload: Record<string, unknown> | null; occurred_at: string; account_id: string }>;
+
+    const current = deriveSnapshot(accounts);
+    const bucketMs = (cfg.days * 24 * 60 * 60 * 1000) / cfg.buckets;
+    const points: TrendPoint[] = [];
+
+    const healthById = new Map(accounts.map((a) => [a.id, a.health ?? 0]));
+    const adoptById = new Map(accounts.map((a) => [a.id, a.implementation_progress ?? a.health ?? 0]));
+
+    // Reverse-chronological so we can roll the snapshot backward.
+    const changes = events
+      .filter((e) => e.kind === "health_change" || e.kind === "snapshot")
+      .sort((a, b) => b.occurred_at.localeCompare(a.occurred_at));
+
+    function snapshotAt(boundary: Date) {
+      const h = new Map(healthById);
+      const a = new Map(adoptById);
+      for (const ev of changes) {
+        if (new Date(ev.occurred_at) <= boundary) break;
+        const p = (ev.payload ?? {}) as { account_id?: string; previous_health?: number; previous_adoption?: number };
+        const id = p.account_id ?? ev.account_id;
+        if (p.previous_health != null) h.set(id, Number(p.previous_health));
+        if (p.previous_adoption != null) a.set(id, Number(p.previous_adoption));
+      }
+      const reconstructed = accounts.map((acc) => ({
+        health: h.get(acc.id) ?? acc.health,
+        implementation_progress: a.get(acc.id) ?? acc.implementation_progress,
+      }));
+      return deriveSnapshot(reconstructed);
+    }
+
+    for (let i = 0; i < cfg.buckets; i++) {
+      const boundary = new Date(start.getTime() + (i + 1) * bucketMs);
+      const snap = i === cfg.buckets - 1 ? current : snapshotAt(boundary);
+      points.push({ label: cfg.fmt(boundary), ...snap });
+    }
+
+    return { range: data.range, points, accountCount: accounts.length };
+  });
+
 // =================== Stakeholders ===================
 
 const StakeholderInput = z.object({
