@@ -18,7 +18,7 @@ type DocWithVT = Document & {
 };
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [mounted, setMounted] = useState(false);
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const animatingRef = useRef(false);
