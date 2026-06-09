@@ -136,8 +136,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
     };
   }, []);
   return (
-    <html lang={lang}>
+    <html lang={lang} className="dark">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var s=localStorage.getItem('csq-theme');var d=s?s==='dark':true;document.documentElement.classList.toggle('dark',d);}catch(e){document.documentElement.classList.add('dark');}})();`,
+          }}
+        />
         <HeadContent />
       </head>
       {/* paper-grain: subtle paper texture overlay on cream sections. Remove this class to disable globally. */}

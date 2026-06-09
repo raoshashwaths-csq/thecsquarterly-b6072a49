@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react";
 const STORAGE_KEY = "csq-theme";
 
 function getInitialTheme(): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  // Default to the CS Factors midnight-slate aesthetic for the whole site.
+  return "dark";
 }
 
 type DocWithVT = Document & {
@@ -17,7 +18,7 @@ type DocWithVT = Document & {
 };
 
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [mounted, setMounted] = useState(false);
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const animatingRef = useRef(false);
