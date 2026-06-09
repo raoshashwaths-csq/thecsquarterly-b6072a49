@@ -213,19 +213,27 @@ export function PulseDashboard({
   const liveOrSeed = usingSeed ? pulseSeedAccounts : liveAccounts;
   const rows: DemoAccount[] = usingSeed
     ? DEMO
-    : liveOrSeed.slice(0, 12).map((a, i) => ({
-        name: a.name,
-        plan: (a.tier ?? "Core") as DemoAccount["plan"],
-        owner: a.csm_name ?? "—",
-        avatar: AVA(a.csm_name ?? a.name + i),
-        arr: Number(a.arr),
-        renewal: a.contract_renewal_date ?? "—",
-        nrr: Math.round(80 + a.health * 0.4),
-        health: a.health,
-        trend: Array.from({ length: 10 }, (_, k) => Math.max(20, Math.min(100, a.health + (k - 5) * 1.4))),
-        risk: a.health < 45 ? "Critical" : a.health < 60 ? "High" : a.health < 75 ? "Medium" : "Low",
-        daysToRenewal: 30,
-      }));
+    : liveOrSeed.slice(0, 12).map((a, i) => {
+        const renewalDate = a.contract_renewal_date ? new Date(a.contract_renewal_date) : null;
+        const days = renewalDate
+          ? Math.round((renewalDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
+          : 30;
+        return {
+          name: a.name,
+          plan: (a.tier ?? "Core") as DemoAccount["plan"],
+          owner: a.csm_name ?? "—",
+          avatar: AVA(a.csm_name ?? a.name + i),
+          arr: Number(a.arr),
+          renewal: renewalDate
+            ? renewalDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+            : "—",
+          nrr: Math.round(80 + a.health * 0.4),
+          health: a.health,
+          trend: Array.from({ length: 10 }, (_, k) => Math.max(20, Math.min(100, a.health + (k - 5) * 1.4))),
+          risk: a.health < 45 ? "Critical" : a.health < 60 ? "High" : a.health < 75 ? "Medium" : "Low",
+          daysToRenewal: days,
+        };
+      });
 
   const nrr   = usingSeed ? 112  : Math.round(rows.reduce((s, r) => s + r.nrr, 0) / Math.max(1, rows.length));
   const grr   = usingSeed ?  94  : 92;
