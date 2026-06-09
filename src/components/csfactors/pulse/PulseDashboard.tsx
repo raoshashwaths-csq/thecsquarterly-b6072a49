@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import type { CSAccount } from "@/lib/csfactors.functions";
+import { getPortfolioTrend, type TrendPoint as ApiTrendPoint, type TrendRange as ApiTrendRange } from "@/lib/csfactors.functions";
 import { pulseSeedAccounts } from "@/lib/mocks/pulseSeed";
 
 /* ------------------------------------------------------------------ *
