@@ -767,10 +767,17 @@ function RenewalsView({ rows }: { rows: DemoAccount[] }) {
 
 /* ================== 360 view ================== */
 
-function ThreeSixtyView({ rows }: { rows: DemoAccount[] }) {
+function ThreeSixtyView({ rows, live }: { rows: DemoAccount[]; live: boolean }) {
   const [range, setRange] = useState<TrendRange>("90D");
   const [metric, setMetric] = useState<TrendMetric>("health");
-  const activeSeries = TREND_SERIES[range];
+  const trendFn = useServerFn(getPortfolioTrend);
+  const { data: liveTrend } = useQuery({
+    queryKey: ["portfolio-trend", range],
+    queryFn: () => trendFn({ data: { range: range as ApiTrendRange } }),
+    enabled: live,
+    staleTime: 60_000,
+  });
+  const activeSeries: TrendPoint[] = (liveTrend?.points as ApiTrendPoint[] | undefined) ?? TREND_SERIES[range];
   const activeMetric = TREND_METRICS.find((m) => m.key === metric) ?? TREND_METRICS[1];
   const cohorts = [
     { label: "Enterprise", filter: (r: DemoAccount) => r.plan === "Enterprise" },
