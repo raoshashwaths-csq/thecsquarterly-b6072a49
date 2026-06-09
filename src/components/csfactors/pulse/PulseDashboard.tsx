@@ -343,7 +343,7 @@ export function PulseDashboard({
         <AccountsView rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
       )}
       {activeView === "renewals" && <RenewalsView rows={rows} />}
-      {activeView === "360" && <ThreeSixtyView rows={rows} />}
+      {activeView === "360" && <ThreeSixtyView rows={rows} live={!usingSeed} />}
     </div>
   );
 }
