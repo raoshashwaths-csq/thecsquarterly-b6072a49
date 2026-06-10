@@ -569,3 +569,61 @@
   }
 }
 
+/* ---------------------------------------------------------------
+   LumiBadgeButton — unified 3D lift/tilt/shadow across themes.
+   Both light and dark variants use identical motion curves; the
+   shadow palette swaps so each theme reads correctly without
+   feeling heavier or lighter than the other.
+   --------------------------------------------------------------- */
+.lumi-badge {
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+.lumi-badge .lumi-badge-img {
+  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+  transition:
+    transform 380ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter    380ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, filter;
+}
+.lumi-badge .lumi-badge-img--light {
+  filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.22))
+          drop-shadow(0 2px 4px rgba(15, 23, 42, 0.18));
+}
+.lumi-badge .lumi-badge-img--dark {
+  filter: drop-shadow(0 8px 22px rgba(201, 168, 76, 0.22))
+          drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55));
+}
+.lumi-badge:hover .lumi-badge-img,
+.lumi-badge:focus-visible .lumi-badge-img,
+.lumi-badge[data-state="active"] .lumi-badge-img {
+  transform: translate3d(0, -4px, 0) rotateX(8deg) rotateY(-6deg) scale(1.04);
+}
+.lumi-badge:hover .lumi-badge-img--light,
+.lumi-badge:focus-visible .lumi-badge-img--light,
+.lumi-badge[data-state="active"] .lumi-badge-img--light {
+  filter: drop-shadow(0 18px 32px rgba(15, 23, 42, 0.32))
+          drop-shadow(0 6px 10px rgba(15, 23, 42, 0.22));
+}
+.lumi-badge:hover .lumi-badge-img--dark,
+.lumi-badge:focus-visible .lumi-badge-img--dark,
+.lumi-badge[data-state="active"] .lumi-badge-img--dark {
+  filter: drop-shadow(0 20px 40px rgba(201, 168, 76, 0.45))
+          drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+}
+.lumi-badge:active .lumi-badge-img {
+  transform: translate3d(0, -1px, 0) rotateX(2deg) rotateY(-1deg) scale(0.99);
+  transition-duration: 120ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lumi-badge .lumi-badge-img,
+  .lumi-badge:hover .lumi-badge-img,
+  .lumi-badge:focus-visible .lumi-badge-img,
+  .lumi-badge[data-state="active"] .lumi-badge-img,
+  .lumi-badge:active .lumi-badge-img {
+    transform: none;
+    transition: none;
+  }
+}
+
+
