@@ -207,7 +207,7 @@ export function QAgentButton() {
                 </h2>
               </SheetTitle>
               <SheetDescription className="sr-only">
-                Ask Q, take a guided tour of this page, browse quick tips, or open the feature glossary.
+                Ask Lumi, take a guided tour of this page, browse quick tips, or open the feature glossary.
               </SheetDescription>
             </SheetHeader>
 
