@@ -261,7 +261,7 @@ export function QAgentButton() {
                   onChange={(e) => setQuery(e.target.value)}
                   disabled={loading}
                   maxLength={1000}
-                  placeholder={needsSignIn ? "Sign in to ask Q." : gated ? "Subscribe to Vanguard to keep asking Q." : currentPlaceholder}
+                  placeholder={needsSignIn ? "Sign in to ask Lumi." : gated ? "Subscribe to Vanguard to keep asking Lumi." : currentPlaceholder}
                   className="min-w-0 flex-1 bg-transparent px-4 py-3.5 font-body text-base focus:outline-none disabled:opacity-50"
                 />
                 {speech.supported ? (
