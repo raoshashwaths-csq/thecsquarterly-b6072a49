@@ -16,6 +16,7 @@ import {
   useLumiDrawer,
 } from "@/components/csfactors/AskLumiDrawer";
 import { LumiMark } from "@/components/site/LumiMark";
+import { LumiBadgeButton } from "@/components/site/LumiBadgeButton";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
 import { PulseDashboard } from "@/components/csfactors/pulse/PulseDashboard";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
