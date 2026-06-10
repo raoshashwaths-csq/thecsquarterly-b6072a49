@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { QMark } from "@/components/site/QMark";
+import { LumiBadgeButton } from "@/components/site/LumiBadgeButton";
 import { BookOpen, Compass, FileText, Highlighter, Bookmark, Lightbulb, Mic, Sparkles, Square } from "lucide-react";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { FeatureGlossary } from "@/components/enablement/FeatureGlossary";
