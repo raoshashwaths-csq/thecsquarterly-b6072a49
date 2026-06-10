@@ -204,7 +204,7 @@ function RootComponent() {
       <AuthInvalidator />
       <PageTransition />
       {!hideGlobalQ ? (
-        <QErrorBoundary label="Q">
+        <QErrorBoundary label="Lumi">
           <QAgentButton />
         </QErrorBoundary>
       ) : null}
