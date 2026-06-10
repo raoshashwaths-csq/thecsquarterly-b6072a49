@@ -1,9 +1,10 @@
 /**
- * Q. — the operator agent's brand mark.
+ * Lumi — the operator agent's brand mark for the marketing site.
  *
- * Q is the name of our agent and must ALWAYS appear with its trailing period
- * rendered in the contrast color (accent). Treat this like a logo: never type
- * a bare "Q" in user-facing copy — always render <QMark />.
+ * Historically this rendered "Q." — the project has since adopted Lumi as the
+ * single agent across both csquarterly.com and the CSFactors canvas. The
+ * component name is kept (QMark) to avoid churning every import site, but it
+ * now renders "Lumi" with the trailing period in the accent (Quicksand gold).
  *
  * Inherits typography from the parent (font, size, weight, tracking) and only
  * adds the colored period.
@@ -13,15 +14,14 @@ type Props = {
   className?: string;
   /** Override class for the period (defaults to `text-accent`). */
   periodClassName?: string;
-  /** Skip the trailing space-collapsing behavior — emit nothing after the dot. */
+  /** Reserved for backwards compat — no longer affects rendering. */
   tight?: boolean;
 };
 
-export function QMark({ className, periodClassName = "text-accent", tight }: Props) {
+export function QMark({ className, periodClassName = "text-accent" }: Props) {
   return (
-    <span className={className} aria-label="Q">
-      Q<span aria-hidden className={periodClassName}>.</span>
-      {tight ? null : null}
+    <span className={className} aria-label="Lumi">
+      Lumi<span aria-hidden className={periodClassName}>.</span>
     </span>
   );
 }
