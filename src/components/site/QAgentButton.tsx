@@ -183,7 +183,7 @@ export function QAgentButton() {
       <button
         type="button"
         onClick={handleOpen}
-        aria-label="Meet Q, the CS operator agent"
+        aria-label="Meet Lumi, the CS operator agent"
         className="group fixed bottom-20 right-5 md:bottom-28 md:right-8 z-40 flex items-end gap-0 pl-4 pr-3 py-2.5 md:pl-5 md:pr-4 md:py-3 bg-foreground text-background border border-foreground shadow-[0_12px_40px_-12px_rgba(0,0,0,0.55)] hover:shadow-[0_18px_50px_-12px_rgba(0,0,0,0.7)] transition-all duration-300"
       >
         <QMark className="font-display leading-none text-3xl md:text-4xl tracking-tight" periodClassName="text-accent ml-0.5 q-period" />
