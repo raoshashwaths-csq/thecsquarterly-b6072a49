@@ -5,29 +5,47 @@ import darkAsset from "@/assets/lumi-badge-dark.jpg.asset.json";
 
 /**
  * LumiBadgeButton — the canonical Lumi trigger across CS Quarterly and
- * CS Factors. Renders the hexagonal Lumi badge (light variant for cream
- * themes, dark variant for midnight) as a tactile, premium button.
+ * CS Factors. Renders the hexagonal Lumi badge with a tactile, theme-aware
+ * lift + tilt + shadow on hover so it feels identical in cream and midnight.
+ *
+ * Use the `tone` preset to keep sizing/padding consistent across surfaces:
+ *   - "hero"   96px — landing & section hero CTAs
+ *   - "card"   72px — feature cards / inline CTAs
+ *   - "header" 44px — nav / page-header chips
+ *   - "cta"    56px — floating CTA & inline action buttons
+ * Pass `size` only for one-off overrides.
  */
+export type LumiBadgeTone = "hero" | "card" | "header" | "cta";
+
+const TONE_SIZE: Record<LumiBadgeTone, number> = {
+  hero: 96,
+  card: 72,
+  header: 44,
+  cta: 56,
+};
+
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: number;
+  tone?: LumiBadgeTone;
   label?: string;
 };
 
 export const LumiBadgeButton = forwardRef<HTMLButtonElement, Props>(
-  ({ size = 64, label = "Ask Lumi", className, ...rest }, ref) => {
+  ({ tone = "cta", size, label = "Ask Lumi", className, style, ...rest }, ref) => {
+    const px = size ?? TONE_SIZE[tone];
     return (
       <button
         ref={ref}
         type="button"
         aria-label={label}
         title={label}
+        data-tone={tone}
         className={cn(
-          "group relative inline-flex items-center justify-center bg-transparent p-0 border-0 outline-none",
-          "transition-transform duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.04] active:scale-[0.98]",
+          "lumi-badge group relative inline-flex items-center justify-center bg-transparent p-0 border-0 outline-none align-middle shrink-0",
           "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent rounded-[14%]",
           className,
         )}
-        style={{ width: size, height: size }}
+        style={{ width: px, height: px, ...style }}
         {...rest}
       >
         {/* Light theme badge */}
@@ -36,7 +54,7 @@ export const LumiBadgeButton = forwardRef<HTMLButtonElement, Props>(
           alt=""
           aria-hidden
           draggable={false}
-          className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none dark:hidden drop-shadow-[0_10px_24px_rgba(15,23,42,0.25)] group-hover:drop-shadow-[0_14px_30px_rgba(15,23,42,0.35)] transition-[filter] duration-300"
+          className="lumi-badge-img lumi-badge-img--light absolute inset-0 w-full h-full object-contain select-none pointer-events-none dark:hidden"
         />
         {/* Dark theme badge */}
         <img
@@ -44,7 +62,7 @@ export const LumiBadgeButton = forwardRef<HTMLButtonElement, Props>(
           alt=""
           aria-hidden
           draggable={false}
-          className="absolute inset-0 w-full h-full object-contain select-none pointer-events-none hidden dark:block drop-shadow-[0_10px_28px_rgba(201,168,76,0.25)] group-hover:drop-shadow-[0_16px_36px_rgba(201,168,76,0.45)] transition-[filter] duration-300"
+          className="lumi-badge-img lumi-badge-img--dark absolute inset-0 w-full h-full object-contain select-none pointer-events-none hidden dark:block"
         />
         <span className="sr-only">{label}</span>
       </button>

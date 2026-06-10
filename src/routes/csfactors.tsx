@@ -56,7 +56,7 @@ function AskLumiTrigger() {
     <LumiBadgeButton
       onClick={() => lumi.open()}
       data-state={lumi.isOpen ? "active" : "idle"}
-      size={56}
+      tone="cta"
     />
   );
 }

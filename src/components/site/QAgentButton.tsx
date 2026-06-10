@@ -183,8 +183,8 @@ export function QAgentButton() {
       {/* Floating Lumi badge. */}
       <LumiBadgeButton
         onClick={handleOpen}
-        size={84}
-        className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-40 md:!w-[96px] md:!h-[96px]"
+        tone="hero"
+        className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-40"
         label="Meet Lumi, the CS operator agent"
       />
 
