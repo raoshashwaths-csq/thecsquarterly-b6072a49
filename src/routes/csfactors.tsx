@@ -16,6 +16,7 @@ import {
   useLumiDrawer,
 } from "@/components/csfactors/AskLumiDrawer";
 import { LumiMark } from "@/components/site/LumiMark";
+import { LumiBadgeButton } from "@/components/site/LumiBadgeButton";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
 import { PulseDashboard } from "@/components/csfactors/pulse/PulseDashboard";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
@@ -52,18 +53,11 @@ function CSFactorsPage() {
 function AskLumiTrigger() {
   const lumi = useLumiDrawer();
   return (
-    <button
-      type="button"
+    <LumiBadgeButton
       onClick={() => lumi.open()}
       data-state={lumi.isOpen ? "active" : "idle"}
-      aria-label="Ask Lumi"
-      className="lumi-cta"
-    >
-      <LumiMark variant="gold" size={22} animated className="shrink-0" />
-      <span className="font-display tracking-[0.16em] uppercase text-[12px] md:text-[13px]">
-        Ask Lumi
-      </span>
-    </button>
+      size={56}
+    />
   );
 }
 
