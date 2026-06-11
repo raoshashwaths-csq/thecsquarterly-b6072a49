@@ -586,15 +586,17 @@
     filter    380ms cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, filter;
 }
-/* Soft halo for legibility on busy backgrounds (esp. midnight canvas). */
+/* Soft halo for legibility on busy backgrounds.
+   Light theme uses a deeper navy halo so the warm-gold rim reads as a
+   distinct boundary against cream (#F5F0E9) — WCAG 1.4.11 non-text 3:1. */
 .lumi-badge::before {
   content: "";
   position: absolute;
   inset: -14%;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(closest-side, rgba(15, 23, 42, 0.12), transparent 70%);
-  opacity: 0.9;
+  background: radial-gradient(closest-side, rgba(15, 23, 42, 0.22), transparent 70%);
+  opacity: 0.95;
   transition: opacity 380ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .dark .lumi-badge::before {
@@ -605,9 +607,13 @@
   opacity: 1;
 }
 .lumi-badge .lumi-badge-img--light {
-  filter: drop-shadow(0 10px 22px rgba(15, 23, 42, 0.28))
-          drop-shadow(0 3px 6px rgba(15, 23, 42, 0.22))
-          contrast(1.05) saturate(1.05);
+  /* Tight 1px rim shadow forces a perceivable boundary against cream,
+     then two soft drops add depth without losing edge contrast. */
+  filter: drop-shadow(0 0 1px rgba(15, 23, 42, 0.6))
+          drop-shadow(0 1px 1px rgba(15, 23, 42, 0.45))
+          drop-shadow(0 10px 22px rgba(15, 23, 42, 0.32))
+          drop-shadow(0 3px 6px rgba(15, 23, 42, 0.24))
+          contrast(1.08) saturate(1.12);
 }
 .lumi-badge .lumi-badge-img--dark {
   filter: drop-shadow(0 10px 26px rgba(232, 199, 124, 0.35))
