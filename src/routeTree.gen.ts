@@ -38,6 +38,7 @@ import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.inde
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DesignSystemLumiBadgeRouteImport } from './routes/design-system.lumi-badge'
 import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
 import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
@@ -208,6 +209,11 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesignSystemLumiBadgeRoute = DesignSystemLumiBadgeRouteImport.update({
+  id: '/design-system/lumi-badge',
+  path: '/design-system/lumi-badge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Csfactors360Route = Csfactors360RouteImport.update({
@@ -384,6 +390,7 @@ export interface FileRoutesByFullPath {
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
+  '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -438,6 +445,7 @@ export interface FileRoutesByTo {
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
+  '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account': typeof AccountIndexRoute
@@ -496,6 +504,7 @@ export interface FileRoutesById {
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
+  '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -555,6 +564,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/csfactors/360'
+    | '/design-system/lumi-badge'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -609,6 +619,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/csfactors/360'
+    | '/design-system/lumi-badge'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account'
@@ -666,6 +677,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/csfactors/360'
+    | '/design-system/lumi-badge'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -719,6 +731,7 @@ export interface RootRouteChildren {
   AccountWorkspaceRoute: typeof AccountWorkspaceRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  DesignSystemLumiBadgeRoute: typeof DesignSystemLumiBadgeRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
@@ -943,6 +956,13 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/design-system/lumi-badge': {
+      id: '/design-system/lumi-badge'
+      path: '/design-system/lumi-badge'
+      fullPath: '/design-system/lumi-badge'
+      preLoaderRoute: typeof DesignSystemLumiBadgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/csfactors/360': {
@@ -1222,6 +1242,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountWorkspaceRoute: AccountWorkspaceRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  DesignSystemLumiBadgeRoute: DesignSystemLumiBadgeRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AccountIndexRoute: AccountIndexRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
