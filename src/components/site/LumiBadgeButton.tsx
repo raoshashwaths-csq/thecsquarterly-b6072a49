@@ -6,22 +6,24 @@ import darkAsset from "@/assets/lumi-badge-dark.jpg.asset.json";
 /**
  * LumiBadgeButton — the canonical Lumi trigger across CS Quarterly and
  * CS Factors. Renders the hexagonal Lumi badge with a tactile, theme-aware
- * lift + tilt + shadow on hover so it feels identical in cream and midnight.
+ * lift + tilt + shadow on hover.
  *
- * Use the `tone` preset to keep sizing/padding consistent across surfaces:
- *   - "hero"   96px — landing & section hero CTAs
- *   - "card"   72px — feature cards / inline CTAs
- *   - "header" 44px — nav / page-header chips
- *   - "cta"    56px — floating CTA & inline action buttons
- * Pass `size` only for one-off overrides.
+ * Tone presets — responsive sizes (mobile → tablet → desktop):
+ *   - "hero"   88 → 112 → 128 px  · landing & section hero CTAs
+ *   - "card"   64 → 80  → 88  px  · feature cards / inline CTAs
+ *   - "header" 40 → 44  → 48  px  · nav / page-header chips
+ *   - "cta"    56 → 64  → 72  px  · floating CTA & inline action buttons
+ *
+ * Pass `size` only for one-off overrides (disables the responsive ramp).
+ * See /design-system/lumi-badge for the full token reference.
  */
 export type LumiBadgeTone = "hero" | "card" | "header" | "cta";
 
-const TONE_SIZE: Record<LumiBadgeTone, number> = {
-  hero: 96,
-  card: 72,
-  header: 44,
-  cta: 56,
+const TONE_CLASSES: Record<LumiBadgeTone, string> = {
+  hero: "w-[88px] h-[88px] sm:w-28 sm:h-28 lg:w-32 lg:h-32",
+  card: "w-16 h-16 sm:w-20 sm:h-20 lg:w-[88px] lg:h-[88px]",
+  header: "w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12",
+  cta: "w-14 h-14 sm:w-16 sm:h-16 lg:w-[72px] lg:h-[72px]",
 };
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -32,7 +34,7 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export const LumiBadgeButton = forwardRef<HTMLButtonElement, Props>(
   ({ tone = "cta", size, label = "Ask Lumi", className, style, ...rest }, ref) => {
-    const px = size ?? TONE_SIZE[tone];
+    const sizeStyle = size ? { width: size, height: size, ...style } : style;
     return (
       <button
         ref={ref}
@@ -43,9 +45,10 @@ export const LumiBadgeButton = forwardRef<HTMLButtonElement, Props>(
         className={cn(
           "lumi-badge group relative inline-flex items-center justify-center bg-transparent p-0 border-0 outline-none align-middle shrink-0",
           "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent rounded-[14%]",
+          !size && TONE_CLASSES[tone],
           className,
         )}
-        style={{ width: px, height: px, ...style }}
+        style={sizeStyle}
         {...rest}
       >
         {/* Light theme badge */}
