@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LayoutGrid } from "lucide-react";
+import { LayoutGrid, Compass } from "lucide-react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -178,6 +178,30 @@ function HomePage() {
                 {t("home.workspace.title")}
               </span>
 
+            </span>
+          </Link>
+        </div>
+        {/* Canvas link — placed directly below the workspace card */}
+        <div className="mt-4 flex justify-center">
+          <Link
+            to="/agent/framework"
+            data-tour="canvas-icon"
+            className="group w-full max-w-2xl inline-flex items-center gap-4 bg-card border border-border hover:border-accent transition-colors p-4 md:p-5 text-left"
+            aria-label="Open Decision Canvas"
+          >
+            <span
+              aria-hidden
+              className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm group-hover:scale-105 transition-transform"
+            >
+              <Compass size={18} strokeWidth={2.5} />
+            </span>
+            <span className="flex-1 min-w-0">
+              <span className="block font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground leading-tight mb-1">
+                {t("home.canvas.eyebrow")}
+              </span>
+              <span className="block font-display text-base md:text-lg leading-tight">
+                {t("home.canvas.title")}
+              </span>
             </span>
           </Link>
         </div>

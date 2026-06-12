@@ -101,6 +101,10 @@
       "eyebrow": "Your Workspace",
       "title": "Notes · Highlights · Links →"
     },
+    "canvas": {
+      "eyebrow": "Decision Canvas",
+      "title": "Ask Lumi · Frameworks · Runs →"
+    },
     "sections": {
       "eyebrow": "The Sections",
       "count": "{{count}} disciplines",
