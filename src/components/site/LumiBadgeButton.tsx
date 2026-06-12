@@ -51,17 +51,17 @@ export const LumiBadgeButton = forwardRef<HTMLButtonElement, Props>(
         style={sizeStyle}
         {...rest}
       >
-        {/* Light theme badge */}
+        {/* Light mode: render the DARK badge for max contrast on cream */}
         <img
-          src={lightAsset.url}
+          src={darkAsset.url}
           alt=""
           aria-hidden
           draggable={false}
           className="lumi-badge-img lumi-badge-img--light absolute inset-0 w-full h-full object-contain select-none pointer-events-none dark:hidden"
         />
-        {/* Dark theme badge */}
+        {/* Dark mode: render the LIGHT badge for max contrast on midnight */}
         <img
-          src={darkAsset.url}
+          src={lightAsset.url}
           alt=""
           aria-hidden
           draggable={false}
