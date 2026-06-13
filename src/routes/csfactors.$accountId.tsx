@@ -129,24 +129,8 @@ function AccountPage() {
           </SectionCard>
         </div>
 
-        <SectionCard title="Activity log" eyebrow="History" className="mt-6">
-          {events.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No activity yet. Overrides and edits are logged automatically.</p>
-          ) : (
-            <ul className="divide-y divide-border">
-              {events.map((e) => (
-                <li key={e.id} className="py-3 flex items-baseline justify-between gap-4">
-                  <div>
-                    <div className="font-mono text-xs uppercase tracking-widest text-accent">{e.kind}</div>
-                    <div className="text-xs text-muted-foreground">{JSON.stringify(e.payload)}</div>
-                  </div>
-                  <time className="font-mono text-xs text-muted-foreground tabular-nums">
-                    {new Date(e.occurred_at).toLocaleString()}
-                  </time>
-                </li>
-              ))}
-            </ul>
-          )}
+        <SectionCard title="Timeline & milestones" eyebrow="History" className="mt-6">
+          <AccountTimeline accountId={accountId} />
         </SectionCard>
 
         {account.notes ? (
