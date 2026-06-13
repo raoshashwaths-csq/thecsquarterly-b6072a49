@@ -1,27 +1,37 @@
 /**
  * Lumi — the operator agent's brand mark for the marketing site.
  *
- * Historically this rendered "Q." — the project has since adopted Lumi as the
- * single agent across both csquarterly.com and the CSFactors canvas. The
- * component name is kept (QMark) to avoid churning every import site, but it
- * now renders "Lumi" with the trailing period in the accent (Quicksand gold).
- *
- * Inherits typography from the parent (font, size, weight, tracking) and only
- * adds the colored period.
+ * Renders "Lumi" where the dot on the "i" is replaced with an accent-colored
+ * dot that bounces (re-using the q-period-bounce animation). We use a dotless
+ * "ı" (U+0131) and stack our own colored dot above it so the tittle becomes
+ * the brand accent — same treatment the trailing period used to carry.
  */
 type Props = {
-  /** Override class for the wrapping span (rarely needed). */
   className?: string;
-  /** Override class for the period (defaults to `text-accent`). */
+  /** Override class for the accent dot (defaults to `bg-accent`). */
   periodClassName?: string;
   /** Reserved for backwards compat — no longer affects rendering. */
   tight?: boolean;
 };
 
-export function QMark({ className, periodClassName = "text-accent" }: Props) {
+export function QMark({ className, periodClassName = "bg-accent" }: Props) {
   return (
     <span className={className} aria-label="Lumi">
-      Lumi<span aria-hidden className={periodClassName}>.</span>
+      Lum
+      <span className="relative inline-block">
+        {/* dotless i — keeps the stem, drops the tittle */}
+        <span aria-hidden>ı</span>
+        {/* accent tittle: bouncing colored dot positioned over the stem */}
+        <span
+          aria-hidden
+          className={`q-period absolute left-1/2 -translate-x-1/2 rounded-full ${periodClassName}`}
+          style={{
+            width: "0.22em",
+            height: "0.22em",
+            top: "-0.05em",
+          }}
+        />
+      </span>
     </span>
   );
 }
