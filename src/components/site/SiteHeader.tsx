@@ -63,7 +63,7 @@ export function SiteHeader() {
     >
       <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3 md:gap-8">
         <Link to="/" className="group leading-none shrink-0 min-w-0">
-          <span className="font-display tracking-tight leading-none text-lg md:text-2xl whitespace-nowrap block">
+          <span className="font-display font-semibold tracking-tight leading-none text-xl md:text-[1.75rem] whitespace-nowrap block text-foreground drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
             The CS Quarterly<span
               aria-hidden
               className="text-secondary-accent group-hover:text-accent transition-colors font-bold"
