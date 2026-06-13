@@ -210,10 +210,11 @@ function HomePage() {
             </span>
           </Link>
         </div>
-
+      </header>
 
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
+
 
 
       {/* Sections strip */}
