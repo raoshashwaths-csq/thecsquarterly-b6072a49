@@ -19,6 +19,7 @@ import {
 import { HealthChip } from "@/components/dashboard/HealthChip";
 import { StakeholderMap } from "@/components/csfactors/StakeholderMap";
 import { ContractVault } from "@/components/csfactors/ContractVault";
+import { AccountTimeline } from "@/components/csfactors/AccountTimeline";
 import {
   updateAccount, deleteAccount, logAccountEvent, noticeWindow,
   type CSAccount,
@@ -104,7 +105,12 @@ export function AccountDrawer({
         </SheetHeader>
 
         <div className="px-4 md:px-6 py-4">
-          <Accordion type="multiple" defaultValue={["identity", "commercial", "stakeholders"]} className="space-y-1">
+          <Accordion type="multiple" defaultValue={["timeline", "identity", "commercial", "stakeholders"]} className="space-y-1">
+            <Section value="timeline" title="Timeline & milestones">
+              <AccountTimeline accountId={account.id} />
+            </Section>
+
+
             <Section value="identity" title="Identity">
               <Grid>
                 <Field label="Name" value={draft.name} onSave={(v) => save({ name: v })} />

@@ -253,23 +253,56 @@ export const logAccountEvent = createServerFn({ method: "POST" })
         account_id: z.string().uuid(),
         kind: z.string().min(1).max(60),
         payload: z.any().optional(),
+        occurred_at: z.string().datetime().optional(),
       })
       .parse(d),
   )
   .handler(async ({ context, data }) => {
     const { supabase, userId } = context;
+    const insert: Record<string, unknown> = {
+      account_id: data.account_id,
+      user_id: userId,
+      kind: data.kind,
+      payload: data.payload,
+    };
+    if (data.occurred_at) insert.occurred_at = data.occurred_at;
     const { data: row, error } = await supabase
       .from("cs_account_events" as never)
-      .insert({
-        account_id: data.account_id,
-        user_id: userId,
-        kind: data.kind,
-        payload: data.payload,
-      } as never)
+      .insert(insert as never)
       .select("*")
       .single();
     if (error) throw new Error(error.message);
     return row as unknown as CSAccountEvent;
+  });
+
+export const listAccountEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ account_id: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("cs_account_events" as never)
+      .select("*")
+      .eq("account_id", data.account_id)
+      .order("occurred_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as unknown as CSAccountEvent[];
+  });
+
+export const deleteAccountEvent = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("cs_account_events" as never)
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 // =================== Portfolio trend (360 dashboard) ===================
