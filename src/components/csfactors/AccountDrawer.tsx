@@ -19,6 +19,7 @@ import {
 import { HealthChip } from "@/components/dashboard/HealthChip";
 import { StakeholderMap } from "@/components/csfactors/StakeholderMap";
 import { ContractVault } from "@/components/csfactors/ContractVault";
+import { AccountTimeline } from "@/components/csfactors/AccountTimeline";
 import {
   updateAccount, deleteAccount, logAccountEvent, noticeWindow,
   type CSAccount,
