@@ -90,118 +90,123 @@ function HomePage() {
         )}
 
 
-        {/* AI Readiness Audit — primary value-prop card for first-time visitors */}
-        <div className="mt-12 flex justify-center">
+        {/* Primary destination grid — four equal cards, each with a clear primary CTA */}
+        <div className="mt-12 grid gap-4 md:grid-cols-2 text-left">
+          {/* AI Readiness */}
           <Link
             to="/ai-readiness"
             data-tour="ai-readiness-box"
-            className="group relative w-full max-w-2xl bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7 text-left flex flex-col md:flex-row md:items-center gap-5"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7"
             aria-label="Take the AI Readiness Audit"
           >
-            <span
-              aria-hidden
-              className="flex h-14 w-14 shrink-0 items-center justify-center bg-secondary-accent text-background rounded-sm font-mono text-base font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
-            >
-              AR
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                aria-hidden
+                className="flex h-10 w-10 shrink-0 items-center justify-center bg-secondary-accent text-background rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
+              >
+                AR
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary-accent font-semibold">
                 {t("home.aiCard.eyebrow")}
-              </div>
-              <div className="font-display text-xl md:text-2xl leading-tight mb-1">
-                {t("home.aiCard.title")}
-              </div>
-              <p className="text-sm text-foreground/70 leading-snug mb-2">
-                {t("home.aiCard.body")}
-              </p>
-              <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
-                {t("home.aiCard.cta")}
-              </div>
-              <QHint>{t("home.aiCard.hint")}</QHint>
+              </span>
             </div>
+            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
+              {t("home.aiCard.title")}
+            </h3>
+            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
+              {t("home.aiCard.body")}
+            </p>
+            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent border-b border-secondary-accent/40 group-hover:border-secondary-accent pb-1 self-start">
+              {t("home.aiCard.cta")}
+            </span>
+            <QHint>{t("home.aiCard.hint")}</QHint>
           </Link>
 
-        </div>
-
-        {/* Elevated CSF Command Centre card */}
-        <div className="mt-4 flex justify-center">
+          {/* CSFactors Command Centre */}
           <Link
             to="/csfactors"
             data-tour="csf-box"
-            className="group relative w-full max-w-2xl bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 text-left flex flex-col md:flex-row md:items-center gap-5"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7"
             aria-label="Open CSFactors Command Centre"
           >
-            <span
-              aria-hidden
-              className="flex h-14 w-14 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm font-mono text-base font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
-            >
-              CSF
-            </span>
-            <div className="flex-1 min-w-0">
-              <div className="font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent font-semibold mb-1">
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                aria-hidden
+                className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
+              >
+                CSF
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent font-semibold">
                 {t("home.csfCard.eyebrow")}
-              </div>
-              <div className="font-display text-xl md:text-2xl leading-tight mb-1">
-                {t("home.csfCard.title")}
-              </div>
-              <p className="text-sm text-foreground/70 leading-snug mb-2">
-                {t("home.csfCard.body")}
-              </p>
-              <div className="font-mono text-xs uppercase tracking-[0.22em] text-accent">
-                {t("home.csfCard.cta")}
-              </div>
-              <QHint>{t("home.csfCard.hint")}</QHint>
+              </span>
             </div>
+            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
+              {t("home.csfCard.title")}
+            </h3>
+            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
+              {t("home.csfCard.body")}
+            </p>
+            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-1 self-start">
+              {t("home.csfCard.cta")}
+            </span>
+            <QHint>{t("home.csfCard.hint")}</QHint>
           </Link>
 
-        </div>
-
-        {/* Workspace anchor — placed directly below the CSF card */}
-        <div className="mt-4 flex justify-center">
+          {/* Workspace */}
           <Link
             to="/account/workspace"
             data-tour="workspace-icon"
-            className="group w-full max-w-2xl inline-flex items-center gap-4 bg-card border border-border hover:border-accent transition-colors p-4 md:p-5 text-left"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-foreground border-l-4 border-l-foreground/70 transition-colors p-6 md:p-7"
             aria-label="Open your Workspace"
           >
-            <span
-              aria-hidden
-              className="flex h-10 w-10 shrink-0 items-center justify-center bg-foreground text-background rounded-sm group-hover:scale-105 transition-transform"
-            >
-              <LayoutGrid size={18} strokeWidth={2.5} />
-            </span>
-            <span className="flex-1 min-w-0">
-              <span className="block font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground leading-tight mb-1">
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                aria-hidden
+                className="flex h-10 w-10 shrink-0 items-center justify-center bg-foreground text-background rounded-sm group-hover:scale-105 transition-transform"
+              >
+                <LayoutGrid size={18} strokeWidth={2.5} />
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-foreground/70 font-semibold">
                 {t("home.workspace.eyebrow")}
               </span>
-              <span className="block font-display text-base md:text-lg leading-tight">
-                {t("home.workspace.title")}
-              </span>
-
+            </div>
+            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
+              {t("home.workspace.title")}
+            </h3>
+            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
+              {t("home.workspace.body")}
+            </p>
+            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-foreground border-b border-foreground/40 group-hover:border-foreground pb-1 self-start">
+              {t("home.workspace.cta")}
             </span>
           </Link>
-        </div>
-        {/* Canvas link — placed directly below the workspace card */}
-        <div className="mt-4 flex justify-center">
+
+          {/* Decision Canvas */}
           <Link
             to="/agent/framework"
             data-tour="canvas-icon"
-            className="group w-full max-w-2xl inline-flex items-center gap-4 bg-card border border-border hover:border-accent transition-colors p-4 md:p-5 text-left"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7"
             aria-label="Open Decision Canvas"
           >
-            <span
-              aria-hidden
-              className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm group-hover:scale-105 transition-transform"
-            >
-              <Compass size={18} strokeWidth={2.5} />
-            </span>
-            <span className="flex-1 min-w-0">
-              <span className="block font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground leading-tight mb-1">
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                aria-hidden
+                className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm group-hover:scale-105 transition-transform"
+              >
+                <Compass size={18} strokeWidth={2.5} />
+              </span>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent font-semibold">
                 {t("home.canvas.eyebrow")}
               </span>
-              <span className="block font-display text-base md:text-lg leading-tight">
-                {t("home.canvas.title")}
-              </span>
+            </div>
+            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
+              {t("home.canvas.title")}
+            </h3>
+            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
+              {t("home.canvas.body")}
+            </p>
+            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-1 self-start">
+              {t("home.canvas.cta")}
             </span>
           </Link>
         </div>
@@ -209,6 +214,7 @@ function HomePage() {
 
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
+
 
 
       {/* Sections strip */}

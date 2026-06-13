@@ -99,11 +99,15 @@
     },
     "workspace": {
       "eyebrow": "Your Workspace",
-      "title": "Notes · Highlights · Links →"
+      "title": "Your saved notes, in one place",
+      "body": "Pin essays, capture highlights, and revisit the links you've flagged across every dispatch.",
+      "cta": "Open your workspace →"
     },
     "canvas": {
       "eyebrow": "Decision Canvas",
-      "title": "Ask Lumi · Frameworks · Runs →"
+      "title": "Run a framework with Lumi",
+      "body": "Ask Lumi a renewal, expansion or escalation question and get a structured, sourced run in seconds.",
+      "cta": "Launch the canvas →"
     },
     "sections": {
       "eyebrow": "The Sections",
