@@ -6,6 +6,7 @@ import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { HealthChip, QBRText } from "@/components/dashboard/HealthChip";
 import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
+import { AccountTimeline } from "@/components/csfactors/AccountTimeline";
 import { Button } from "@/components/ui/button";
 import { BackToCommand } from "@/components/csfactors/BackToCommand";
 import {
