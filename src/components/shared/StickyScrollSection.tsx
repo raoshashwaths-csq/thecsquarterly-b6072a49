@@ -51,15 +51,15 @@ export function StickyScrollSection({ stages }: Props) {
         {stages.map((stage, i) => (
           <div
             key={i}
-            className="reveal-up flex flex-col gap-8 px-6 py-16 border-b border-border last:border-b-0"
+            className="flex flex-col gap-6 px-5 py-12 border-b border-border last:border-b-0"
           >
             {stage.label && (
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
                 {stage.label}
               </div>
             )}
-            <div>{stage.left}</div>
-            <div>{stage.right}</div>
+            <div className="min-w-0">{stage.left}</div>
+            <div className="w-full min-w-0 overflow-hidden">{stage.right}</div>
           </div>
         ))}
       </div>
