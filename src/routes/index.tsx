@@ -7,6 +7,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
+import { StickyScrollSection } from "@/components/shared/StickyScrollSection";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 
