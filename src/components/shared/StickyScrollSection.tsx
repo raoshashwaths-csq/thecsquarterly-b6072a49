@@ -78,7 +78,7 @@ export function StickyScrollSection({ stages }: Props) {
           height: "100vh",
           width: "100%",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
           overflow: "hidden",
         }}
         className="bg-background"
