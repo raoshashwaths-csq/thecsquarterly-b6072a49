@@ -91,7 +91,7 @@ export function StickyScrollSection({ stages }: Props) {
               style={{
                 position: "absolute",
                 inset: 0,
-                padding: "80px 48px",
+                padding: "80px 64px 80px 96px",
                 opacity: activeStage === i ? 1 : 0,
                 transform:
                   activeStage === i
