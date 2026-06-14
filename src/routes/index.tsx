@@ -213,6 +213,79 @@ function HomePage() {
         </div>
       </header>
 
+      <StickyScrollSection
+        stages={[
+          {
+            label: "The CSM",
+            left: (
+              <div className="max-w-lg">
+                <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
+                  Stage 01 / Practitioner
+                </div>
+                <h2 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight mb-6 text-balance">
+                  For the practitioner managing thirty accounts.
+                </h2>
+                <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
+                  A personal command centre for the CSM in the trenches. Triage the burning three before standup, surface the renewals that need a real conversation, and keep every account note in one operator-grade canvas.
+                </p>
+                <Link
+                  to="/csfactors"
+                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+                >
+                  Start free →
+                </Link>
+              </div>
+            ),
+            right: <StageMock variant="pulse" />,
+          },
+          {
+            label: "The Leader",
+            left: (
+              <div className="max-w-lg">
+                <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
+                  Stage 02 / Operator · Team
+                </div>
+                <h2 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight mb-6 text-balance">
+                  For the VP carrying the NRR number.
+                </h2>
+                <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
+                  Roll every CSM's book into a single 360° portfolio. Watch NRR move in real time, see which segments are bleeding gross retention, and act before the QBR turns into a post-mortem.
+                </p>
+                <Link
+                  to="/csfactors/360"
+                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+                >
+                  See the platform →
+                </Link>
+              </div>
+            ),
+            right: <StageMock variant="threeSixty" />,
+          },
+          {
+            label: "The Enterprise",
+            left: (
+              <div className="max-w-lg">
+                <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
+                  Stage 03 / Scale · Enterprise
+                </div>
+                <h2 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight mb-6 text-balance">
+                  For the CCO presenting to the board on Monday.
+                </h2>
+                <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
+                  A risk register, capacity model and renewal waterfall the board will actually read. Export the slide, defend the number, and walk out with the next quarter already mapped.
+                </p>
+                <Link
+                  to="/pricing"
+                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+                >
+                  View enterprise →
+                </Link>
+              </div>
+            ),
+            right: <StageMock variant="risk" />,
+          },
+        ]}
+      />
 
       <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
 
