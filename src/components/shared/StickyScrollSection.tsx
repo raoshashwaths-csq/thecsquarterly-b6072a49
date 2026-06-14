@@ -51,15 +51,15 @@ export function StickyScrollSection({ stages }: Props) {
         {stages.map((stage, i) => (
           <div
             key={i}
-            className="reveal-up flex flex-col gap-8 px-6 py-16 border-b border-border last:border-b-0"
+            className="flex flex-col gap-6 px-5 py-12 border-b border-border last:border-b-0"
           >
             {stage.label && (
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
                 {stage.label}
               </div>
             )}
-            <div>{stage.left}</div>
-            <div>{stage.right}</div>
+            <div className="min-w-0">{stage.left}</div>
+            <div className="w-full min-w-0 overflow-hidden">{stage.right}</div>
           </div>
         ))}
       </div>
@@ -78,7 +78,7 @@ export function StickyScrollSection({ stages }: Props) {
           height: "100vh",
           width: "100%",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
           overflow: "hidden",
         }}
         className="bg-background"
@@ -91,7 +91,7 @@ export function StickyScrollSection({ stages }: Props) {
               style={{
                 position: "absolute",
                 inset: 0,
-                padding: "80px 48px",
+                padding: "80px 64px 80px 96px",
                 opacity: activeStage === i ? 1 : 0,
                 transform:
                   activeStage === i
@@ -119,7 +119,7 @@ export function StickyScrollSection({ stages }: Props) {
               style={{
                 position: "absolute",
                 inset: 0,
-                padding: "80px 96px 80px 24px",
+                padding: "60px 80px 60px 32px",
                 opacity: activeStage === i ? 1 : 0,
                 transform:
                   activeStage === i

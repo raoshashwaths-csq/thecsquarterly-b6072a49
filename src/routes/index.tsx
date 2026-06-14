@@ -218,11 +218,11 @@ function HomePage() {
           {
             label: "The CSM",
             left: (
-              <div className="max-w-lg">
+              <div className="max-w-xl">
                 <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
                   Stage 01 / Practitioner
                 </div>
-                <h2 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight mb-6 text-balance">
+                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
                   For the practitioner managing thirty accounts.
                 </h2>
                 <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
@@ -241,11 +241,11 @@ function HomePage() {
           {
             label: "The Leader",
             left: (
-              <div className="max-w-lg">
+              <div className="max-w-xl">
                 <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
                   Stage 02 / Operator · Team
                 </div>
-                <h2 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight mb-6 text-balance">
+                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
                   For the VP carrying the NRR number.
                 </h2>
                 <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
@@ -264,11 +264,11 @@ function HomePage() {
           {
             label: "The Enterprise",
             left: (
-              <div className="max-w-lg">
+              <div className="max-w-xl">
                 <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
                   Stage 03 / Scale · Enterprise
                 </div>
-                <h2 className="font-display text-4xl md:text-5xl leading-[1.05] tracking-tight mb-6 text-balance">
+                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
                   For the CCO presenting to the board on Monday.
                 </h2>
                 <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
@@ -430,7 +430,7 @@ function HomePage() {
 
 function StageMock({ variant }: { variant: "pulse" | "threeSixty" | "risk" }) {
   return (
-    <div className="w-full max-w-xl mx-auto bg-card border border-border shadow-2xl overflow-hidden">
+    <div className="w-full max-w-full md:max-w-3xl mx-auto bg-card border border-border shadow-2xl overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-background/50">
         <div className="flex gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
