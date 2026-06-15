@@ -304,6 +304,17 @@ function ThreeSixtyPage() {
         </div>
       </main>
 
+      <AccountDrawer
+        account={drawerAccount}
+        open={!!drawerId}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDrawerId(null);
+            qc.invalidateQueries({ queryKey: ["exec-analytics-accounts"] });
+          }
+        }}
+      />
+
       <WorkspacePane open={workspaceOpen} onOpenChange={setWorkspaceOpen} />
     </div>
   );
