@@ -145,30 +145,18 @@ function AccountPage() {
             </SectionCard>
 
             <SectionCard
-              eyebrow="Executive analytics"
-              title="Portfolio command center"
-              description="Stakeholder risk matrices, real-time NPS, and renewal pressure across your book."
+              eyebrow="Analytics"
+              title="Portfolio dashboards have moved"
+              description="The executive command center and the four analytics lenses now live inside the CSFactors 360 Dashboard — one consolidated surface."
               actions={
-                <Link to="/account/executive/analytics" className="px-5 py-2.5 border border-foreground font-mono text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
-                  Open analytics
+                <Link to="/csfactors/360" className="px-5 py-2.5 border border-foreground font-mono text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
+                  Open 360 Dashboard
                 </Link>
               }
             >
-              <div className="text-xs text-muted-foreground">Available to Operator and above.</div>
+              <div className="text-xs text-muted-foreground">Operator+ unlock. Portfolio matrix, NRR waterfall, retention funnel, stakeholder radar, and team leaderboard — all on one page.</div>
             </SectionCard>
 
-            <SectionCard
-              eyebrow="Dashboards"
-              title="Four lenses on the portfolio"
-              description="Retention funnel, NRR waterfall, stakeholder radar, and team leaderboard — all built from your CSFactors data."
-              actions={
-                <Link to="/account/analytics" className="px-5 py-2.5 border border-foreground font-mono text-xs uppercase tracking-widest hover:bg-foreground hover:text-background transition-colors">
-                  Open dashboards
-                </Link>
-              }
-            >
-              <div className="text-xs text-muted-foreground">Operator+ unlock. Click through to any of the four dashboard views.</div>
-            </SectionCard>
 
 
             <SectionCard
