@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
 import { MobileNavDrawer } from "@/components/csfactors/MobileNavDrawer";
@@ -7,6 +9,12 @@ import { CSFLogo } from "@/components/csfactors/CSFLogo";
 import { WorkspacePane } from "@/components/csfactors/WorkspacePane";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { SectionCard } from "@/components/dashboard/SectionCard";
+import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
+import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
+import { BurningThree } from "@/components/csfactors/BurningThree";
+import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
+import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
+import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { TierGateOverlay } from "@/components/site/TierGateOverlay";
@@ -14,6 +22,7 @@ import { NrrWaterfallView } from "@/components/csfactors/threeSixty/NrrWaterfall
 import { RetentionFunnelView } from "@/components/csfactors/threeSixty/RetentionFunnelView";
 import { StakeholderRadarView } from "@/components/csfactors/threeSixty/StakeholderRadarView";
 import { TeamLeaderboardView } from "@/components/csfactors/threeSixty/TeamLeaderboardView";
+import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 
 export const Route = createFileRoute("/csfactors/360")({
   head: () => ({
@@ -27,6 +36,7 @@ export const Route = createFileRoute("/csfactors/360")({
 });
 
 const LENSES = [
+  { id: "portfolio",    label: "Portfolio Command",  to: "/account/executive/analytics" as const },
   { id: "nrr",          label: "NRR Waterfall",      to: "/account/analytics/nrr-waterfall" as const },
   { id: "retention",    label: "Retention Funnel",   to: "/account/analytics/retention-funnel" as const },
   { id: "stakeholders", label: "Stakeholder Radar",  to: "/account/analytics/stakeholder-radar" as const },
@@ -45,10 +55,43 @@ function StandaloneLink({ to }: { to: typeof LENSES[number]["to"] }) {
   );
 }
 
+function compact(n: number) {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (n >= 1_000) return `$${Math.round(n / 1_000)}K`;
+  return `$${n}`;
+}
+
 function ThreeSixtyPage() {
   const { user, loading: authLoading } = useAuth();
-  const { designation, loading: entLoading } = useEntitlements();
+  const ent = useEntitlements();
+  const { designation, loading: entLoading } = ent;
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const qc = useQueryClient();
+  const list = useServerFn(listAccounts);
+
+  const { data: accounts = [], isLoading } = useQuery({
+    queryKey: ["exec-analytics-accounts"],
+    queryFn: () => list(),
+    enabled: !!user && ent.canExecAnalytics,
+  });
+
+  const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [teamScope, setTeamScope] = useState<"me" | "team">("me");
+  const drawerAccount = useMemo(
+    () => accounts.find((a) => a.id === drawerId) ?? null,
+    [accounts, drawerId],
+  );
+
+  const totalARR = useMemo(() => accounts.reduce((s, a) => s + Number(a.arr), 0), [accounts]);
+  const atRisk = useMemo(
+    () => accounts.filter((a) => a.health < 50).reduce((s, a) => s + Number(a.arr), 0),
+    [accounts],
+  );
+  const compliance = useMemo(() => {
+    if (!accounts.length) return 0;
+    const done = accounts.filter((a) => a.qbr_status === "Completed").length;
+    return Math.round((done / accounts.length) * 100);
+  }, [accounts]);
 
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
@@ -127,6 +170,92 @@ function ThreeSixtyPage() {
             </div>
           ) : (
             <div className="space-y-10">
+              <section id="portfolio" className="scroll-mt-24 space-y-8">
+                <SectionCard
+                  eyebrow="Lens 00 / Portfolio Command"
+                  title="Burning Three"
+                  description="The three accounts most likely to detonate this quarter — by ARR weight × risk."
+                >
+                  <BurningThree accounts={accounts} />
+                </SectionCard>
+
+                <SectionCard eyebrow="Portfolio" title="Analytics overview">
+                  <AnalyticsHeader accounts={accounts} />
+                </SectionCard>
+
+                {ent.canTeamScope ? (
+                  <div className="inline-flex items-stretch border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setTeamScope("me")}
+                      className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
+                        teamScope === "me" ? "bg-foreground text-background" : "hover:bg-muted"
+                      }`}
+                    >
+                      My accounts
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTeamScope("team")}
+                      className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
+                        teamScope === "team" ? "bg-foreground text-background" : "hover:bg-muted"
+                      }`}
+                    >
+                      Whole team
+                    </button>
+                  </div>
+                ) : null}
+
+                <MetricGrid cols={3}>
+                  <MetricCard
+                    eyebrow="Total Portfolio ARR"
+                    value={compact(totalARR)}
+                    accent="accent"
+                    trend={accounts.length ? `${accounts.length} accounts` : "Add your first account"}
+                    trendDirection="flat"
+                  />
+                  <MetricCard
+                    eyebrow="ARR At Immediate Risk"
+                    value={compact(atRisk)}
+                    accent="danger"
+                    trend="Health below 50"
+                    trendDirection="down"
+                  />
+                  <MetricCard
+                    eyebrow="QBR Compliance"
+                    value={compliance}
+                    unit="%"
+                    accent="secondary"
+                    footer={
+                      <ProgressGauge value={compliance} accent={compliance >= 75 ? "success" : compliance >= 50 ? "secondary" : "danger"} />
+                    }
+                  />
+                </MetricGrid>
+
+                <SectionCard
+                  title="Master Account Matrix"
+                  eyebrow="Accounts"
+                  description={
+                    ent.canTeamScope && teamScope === "team"
+                      ? "Aggregate portfolio scoped to your whole team."
+                      : "Your isolated book of business — 32 fields per account."
+                  }
+                >
+                  {isLoading ? (
+                    <p className="text-sm text-muted-foreground py-6">Loading…</p>
+                  ) : accounts.length === 0 ? (
+                    <div className="py-12 text-center">
+                      <p className="text-sm text-foreground/70 mb-4">No accounts yet.</p>
+                      <Link to="/csfactors" className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+                        Open CSFactors to add →
+                      </Link>
+                    </div>
+                  ) : (
+                    <AccountsGrid accounts={accounts} onRowClick={(a: CSAccount) => setDrawerId(a.id)} />
+                  )}
+                </SectionCard>
+              </section>
+
               <section id="nrr" className="scroll-mt-24">
                 <SectionCard
                   eyebrow="Lens 01 / Revenue Movement"
@@ -174,6 +303,17 @@ function ThreeSixtyPage() {
           )}
         </div>
       </main>
+
+      <AccountDrawer
+        account={drawerAccount}
+        open={!!drawerId}
+        onOpenChange={(o) => {
+          if (!o) {
+            setDrawerId(null);
+            qc.invalidateQueries({ queryKey: ["exec-analytics-accounts"] });
+          }
+        }}
+      />
 
       <WorkspacePane open={workspaceOpen} onOpenChange={setWorkspaceOpen} />
     </div>
