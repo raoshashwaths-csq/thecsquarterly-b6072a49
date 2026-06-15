@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
 import { MobileNavDrawer } from "@/components/csfactors/MobileNavDrawer";
@@ -7,6 +9,12 @@ import { CSFLogo } from "@/components/csfactors/CSFLogo";
 import { WorkspacePane } from "@/components/csfactors/WorkspacePane";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { SectionCard } from "@/components/dashboard/SectionCard";
+import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
+import { ProgressGauge } from "@/components/dashboard/ProgressGauge";
+import { BurningThree } from "@/components/csfactors/BurningThree";
+import { AnalyticsHeader } from "@/components/csfactors/AnalyticsHeader";
+import { AccountsGrid } from "@/components/csfactors/AccountsGrid";
+import { AccountDrawer } from "@/components/csfactors/AccountDrawer";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { TierGateOverlay } from "@/components/site/TierGateOverlay";
@@ -14,6 +22,7 @@ import { NrrWaterfallView } from "@/components/csfactors/threeSixty/NrrWaterfall
 import { RetentionFunnelView } from "@/components/csfactors/threeSixty/RetentionFunnelView";
 import { StakeholderRadarView } from "@/components/csfactors/threeSixty/StakeholderRadarView";
 import { TeamLeaderboardView } from "@/components/csfactors/threeSixty/TeamLeaderboardView";
+import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 
 export const Route = createFileRoute("/csfactors/360")({
   head: () => ({
