@@ -301,28 +301,7 @@ function HomePage() {
             {t("home.sections.count", { count: SECTIONS.length })}
           </div>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-          {SECTIONS.map((s, i) => (
-            <Link
-              key={s.to}
-              to={s.to}
-              className="group relative block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-6 pt-7"
-            >
-              <span aria-hidden className="absolute top-0 left-6 right-6 h-px bg-foreground/80" />
-              <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">0{i + 1} / 0{SECTIONS.length}</div>
-              <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">
-                {t(`home.sections.items.${s.key}.name`, { defaultValue: s.name })}
-              </h2>
-              <p className="text-sm text-foreground/65 text-pretty mb-4">
-                {t(`home.sections.items.${s.key}.blurb`)}
-              </p>
-              <div className="font-mono uppercase tracking-widest text-xs text-foreground/60 group-hover:text-accent transition-colors mb-3">
-                {t("home.sections.enter")}
-              </div>
-              <QHint>{t(`home.sections.items.${s.key}.hint`)}</QHint>
-            </Link>
-          ))}
-        </div>
+        <SectionsFillGrid />
       </section>
 
 
