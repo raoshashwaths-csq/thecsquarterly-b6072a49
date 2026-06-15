@@ -36,6 +36,7 @@ export const Route = createFileRoute("/csfactors/360")({
 });
 
 const LENSES = [
+  { id: "portfolio",    label: "Portfolio Command",  to: "/account/executive/analytics" as const },
   { id: "nrr",          label: "NRR Waterfall",      to: "/account/analytics/nrr-waterfall" as const },
   { id: "retention",    label: "Retention Funnel",   to: "/account/analytics/retention-funnel" as const },
   { id: "stakeholders", label: "Stakeholder Radar",  to: "/account/analytics/stakeholder-radar" as const },
