@@ -170,6 +170,92 @@ function ThreeSixtyPage() {
             </div>
           ) : (
             <div className="space-y-10">
+              <section id="portfolio" className="scroll-mt-24 space-y-8">
+                <SectionCard
+                  eyebrow="Lens 00 / Portfolio Command"
+                  title="Burning Three"
+                  description="The three accounts most likely to detonate this quarter — by ARR weight × risk."
+                >
+                  <BurningThree accounts={accounts} />
+                </SectionCard>
+
+                <SectionCard eyebrow="Portfolio" title="Analytics overview">
+                  <AnalyticsHeader accounts={accounts} />
+                </SectionCard>
+
+                {ent.canTeamScope ? (
+                  <div className="inline-flex items-stretch border border-border">
+                    <button
+                      type="button"
+                      onClick={() => setTeamScope("me")}
+                      className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
+                        teamScope === "me" ? "bg-foreground text-background" : "hover:bg-muted"
+                      }`}
+                    >
+                      My accounts
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTeamScope("team")}
+                      className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
+                        teamScope === "team" ? "bg-foreground text-background" : "hover:bg-muted"
+                      }`}
+                    >
+                      Whole team
+                    </button>
+                  </div>
+                ) : null}
+
+                <MetricGrid cols={3}>
+                  <MetricCard
+                    eyebrow="Total Portfolio ARR"
+                    value={compact(totalARR)}
+                    accent="accent"
+                    trend={accounts.length ? `${accounts.length} accounts` : "Add your first account"}
+                    trendDirection="flat"
+                  />
+                  <MetricCard
+                    eyebrow="ARR At Immediate Risk"
+                    value={compact(atRisk)}
+                    accent="danger"
+                    trend="Health below 50"
+                    trendDirection="down"
+                  />
+                  <MetricCard
+                    eyebrow="QBR Compliance"
+                    value={compliance}
+                    unit="%"
+                    accent="secondary"
+                    footer={
+                      <ProgressGauge value={compliance} accent={compliance >= 75 ? "success" : compliance >= 50 ? "secondary" : "danger"} />
+                    }
+                  />
+                </MetricGrid>
+
+                <SectionCard
+                  title="Master Account Matrix"
+                  eyebrow="Accounts"
+                  description={
+                    ent.canTeamScope && teamScope === "team"
+                      ? "Aggregate portfolio scoped to your whole team."
+                      : "Your isolated book of business — 32 fields per account."
+                  }
+                >
+                  {isLoading ? (
+                    <p className="text-sm text-muted-foreground py-6">Loading…</p>
+                  ) : accounts.length === 0 ? (
+                    <div className="py-12 text-center">
+                      <p className="text-sm text-foreground/70 mb-4">No accounts yet.</p>
+                      <Link to="/csfactors" className="font-mono text-xs uppercase tracking-widest border-b border-foreground/40 hover:text-accent hover:border-accent pb-1">
+                        Open CSFactors to add →
+                      </Link>
+                    </div>
+                  ) : (
+                    <AccountsGrid accounts={accounts} onRowClick={(a: CSAccount) => setDrawerId(a.id)} />
+                  )}
+                </SectionCard>
+              </section>
+
               <section id="nrr" className="scroll-mt-24">
                 <SectionCard
                   eyebrow="Lens 01 / Revenue Movement"
