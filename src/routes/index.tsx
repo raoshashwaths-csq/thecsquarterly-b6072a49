@@ -8,6 +8,7 @@ import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
 import { StickyScrollSection } from "@/components/shared/StickyScrollSection";
+import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 
