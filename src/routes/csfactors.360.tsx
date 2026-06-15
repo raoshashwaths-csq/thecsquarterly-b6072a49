@@ -54,10 +54,43 @@ function StandaloneLink({ to }: { to: typeof LENSES[number]["to"] }) {
   );
 }
 
+function compact(n: number) {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (n >= 1_000) return `$${Math.round(n / 1_000)}K`;
+  return `$${n}`;
+}
+
 function ThreeSixtyPage() {
   const { user, loading: authLoading } = useAuth();
-  const { designation, loading: entLoading } = useEntitlements();
+  const ent = useEntitlements();
+  const { designation, loading: entLoading } = ent;
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const qc = useQueryClient();
+  const list = useServerFn(listAccounts);
+
+  const { data: accounts = [], isLoading } = useQuery({
+    queryKey: ["exec-analytics-accounts"],
+    queryFn: () => list(),
+    enabled: !!user && ent.canExecAnalytics,
+  });
+
+  const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [teamScope, setTeamScope] = useState<"me" | "team">("me");
+  const drawerAccount = useMemo(
+    () => accounts.find((a) => a.id === drawerId) ?? null,
+    [accounts, drawerId],
+  );
+
+  const totalARR = useMemo(() => accounts.reduce((s, a) => s + Number(a.arr), 0), [accounts]);
+  const atRisk = useMemo(
+    () => accounts.filter((a) => a.health < 50).reduce((s, a) => s + Number(a.arr), 0),
+    [accounts],
+  );
+  const compliance = useMemo(() => {
+    if (!accounts.length) return 0;
+    const done = accounts.filter((a) => a.qbr_status === "Completed").length;
+    return Math.round((done / accounts.length) * 100);
+  }, [accounts]);
 
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
