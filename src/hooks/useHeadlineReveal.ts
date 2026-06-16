@@ -1,39 +1,13 @@
-import { useEffect } from "react";
-
 /**
- * useHeadlineReveal — on each route mount, finds every h1/h2 in the
- * document and wraps its text in `.headline-wrapper > .headline-line`
- * so the CSS reveal animation can play. Idempotent: nodes already
- * processed (data-headline-reveal) are skipped.
+ * useHeadlineReveal — kept as a no-op for backwards compatibility.
  *
- * This runs at runtime so no existing component JSX has to change.
+ * The headline reveal is now a pure CSS animation scoped to `.page-enter h1`
+ * / `.page-enter h2` in styles.css. We no longer mutate the DOM at runtime
+ * because React's reconciliation (triggered by i18n resolution, auth state
+ * resolving, suspense boundaries, etc.) would fight with the injected
+ * wrapper and cause the reveal animation to flash 2–3 times after landing,
+ * which read as the page "hanging".
  */
-export function useHeadlineReveal(pathname: string) {
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-
-    const nodes = document.querySelectorAll<HTMLElement>("h1, h2");
-    nodes.forEach((el) => {
-      if (el.dataset.headlineReveal === "true") return;
-      // Skip headlines that already contain block-level / interactive markup
-      // we don't want to flatten (links, buttons, custom components).
-      if (el.querySelector("a, button, svg, img, [data-no-reveal]")) {
-        el.dataset.headlineReveal = "skipped";
-        return;
-      }
-      const text = el.textContent;
-      if (!text || !text.trim()) return;
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "headline-wrapper";
-      const line = document.createElement("span");
-      line.className = "headline-line";
-      // Preserve original children (including <em>, <span>, <br>) by moving
-      // them into the line span rather than replacing with textContent.
-      while (el.firstChild) line.appendChild(el.firstChild);
-      wrapper.appendChild(line);
-      el.appendChild(wrapper);
-      el.dataset.headlineReveal = "true";
-    });
-  }, [pathname]);
+export function useHeadlineReveal(_pathname: string) {
+  // intentionally empty — see file header.
 }
