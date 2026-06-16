@@ -62,7 +62,7 @@ function PricingPage() {
               {
                 eyebrow: "For CS teams",
                 title: "The platform without the implementation.",
-                body: "No multi-week rollout, no per-seat lock-in, no separate research budget. Dashboard, benchmarks, and Q advisor in one place from day one.",
+                body: "No multi-week rollout, no per-seat lock-in, no separate research budget. Dashboard, benchmarks, and Lumi in one place from day one.",
               },
               {
                 eyebrow: "For enterprise",
@@ -122,7 +122,7 @@ function PricingPage() {
             {[
               { k: "Data", v: "The Retention Ledger is proprietary and compounds with every operator who contributes." },
               { k: "Intelligence", v: "Editorial library, Codex playbooks, and decision trees built on four decades of CS practice." },
-              { k: "Platform", v: "Once health scores are calibrated and Q is in daily use, switching cost is real." },
+              { k: "Platform", v: "Once health scores are calibrated and Lumi is in daily use, switching cost is real." },
               { k: "Community", v: "Network effects compound as the profession grows. Senior operators read here." },
               { k: "Brand", v: "The only entity that is simultaneously the platform, the publication, and the source cited to boards." },
             ].map((m) => (
@@ -347,9 +347,9 @@ const COMPARE_GROUPS: Group[] = [
     ],
   },
   {
-    group: "Q advisor",
+    group: "Lumi",
     rows: [
-      { label: "Monthly Q sessions", values: ["0", "30", "100", "400", "1,000", "Unlimited", "Unlimited"] },
+      { label: "Monthly Lumi sessions", values: ["0", "30", "100", "400", "1,000", "Unlimited", "Unlimited"] },
       { label: "Seat scope", values: ["—", "Personal", "Personal", "Pooled", "Pooled", "Pooled", "Pooled"] },
     ],
   },

@@ -42,10 +42,15 @@ export function SectionsFillGrid() {
     const compute = () => {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight;
-      // progress 0 → section just entered from bottom; 1 → top about to exit
-      const total = rect.height; // distance the section traverses while overlapping the viewport top edge after entering
-      const scrolled = vh - rect.top; // 0 when top hits bottom of viewport
-      const raw = scrolled / (total + vh);
+      // We want fills to COMPLETE while the section is still on screen — by the
+      // time the section's last card reaches the top of the viewport, it should
+      // be fully filled. Drive progress from when the section's top crosses
+      // ~70% of the viewport (cards visible) to when its bottom reaches ~30%.
+      const startOffset = vh * 0.7;  // start filling once cards are well in view
+      const endOffset = vh * 0.3;    // complete before section scrolls out
+      const travel = rect.height - (vh - startOffset) - endOffset;
+      const scrolled = startOffset - rect.top;
+      const raw = travel > 0 ? scrolled / travel : 0;
       const progress = Math.max(0, Math.min(1, raw));
 
       const totalFillProgress = progress * (numCards - OVERLAP * (numCards - 1));
@@ -83,14 +88,19 @@ export function SectionsFillGrid() {
           const fillStyle = isMobile
             ? { transform: `scaleY(${pct / 100})`, transformOrigin: "bottom center" as const }
             : { transform: `scaleX(${pct / 100})`, transformOrigin: "left center" as const };
+          const fg = isFilled ? "var(--accent-foreground)" : "var(--foreground)";
+          const fgMuted = isFilled
+            ? "color-mix(in oklab, var(--accent-foreground) 85%, transparent)"
+            : "color-mix(in oklab, var(--foreground) 65%, transparent)";
           return (
             <Link
               key={s.to}
               to={s.to}
-              className="fill-card group relative block border bg-card/60 hover:bg-card transition-colors p-6 pt-7 overflow-hidden"
+              className="fill-card group relative block border bg-card/60 hover:bg-card p-6 pt-7 overflow-hidden"
               style={{
                 borderColor: isFilled ? "transparent" : undefined,
-                transition: "border-color 0.3s ease, background-color 0.2s ease, transform 0.2s ease",
+                color: fg,
+                transition: "border-color 0.25s ease, background-color 0.2s ease, color 0.25s ease, transform 0.2s ease",
               }}
             >
               {/* Fill layer */}
@@ -109,54 +119,34 @@ export function SectionsFillGrid() {
                 }}
               />
               {/* Content */}
-              <div
-                className="relative"
-                style={{
-                  zIndex: 1,
-                  color: isFilled ? "var(--accent-foreground)" : undefined,
-                  transition: "color 0.3s ease",
-                }}
-              >
+              <div className="relative" style={{ zIndex: 1, color: fg }}>
                 <span
                   aria-hidden
                   className="absolute -top-1 left-0 right-0 h-px"
                   style={{
-                    background: isFilled ? "var(--accent-foreground)" : "var(--foreground)",
+                    background: fg,
                     opacity: isFilled ? 0.4 : 0.8,
-                    transition: "background 0.3s ease, opacity 0.3s ease",
+                    transition: "background 0.25s ease, opacity 0.25s ease",
                   }}
                 />
                 <div
                   className="font-mono text-xs font-semibold mb-3"
                   style={{
                     color: isFilled ? "var(--accent-foreground)" : "var(--secondary-accent)",
-                    transition: "color 0.3s ease",
+                    transition: "color 0.25s ease",
                   }}
                 >
                   0{i + 1} / 0{SECTIONS.length}
                 </div>
-                <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight">
+                <h2 className="font-display text-xl md:text-2xl mb-2 leading-tight" style={{ color: fg }}>
                   {t(`home.sections.items.${s.key}.name`, { defaultValue: s.name })}
                 </h2>
-                <p
-                  className="text-sm text-pretty mb-4"
-                  style={{
-                    color: isFilled
-                      ? "color-mix(in oklab, var(--accent-foreground) 88%, transparent)"
-                      : "color-mix(in oklab, var(--foreground) 65%, transparent)",
-                    transition: "color 0.3s ease",
-                  }}
-                >
+                <p className="text-sm text-pretty mb-4" style={{ color: fgMuted, transition: "color 0.25s ease" }}>
                   {t(`home.sections.items.${s.key}.blurb`)}
                 </p>
                 <div
                   className="font-mono uppercase tracking-widest text-xs mb-3"
-                  style={{
-                    color: isFilled
-                      ? "var(--accent-foreground)"
-                      : "color-mix(in oklab, var(--foreground) 60%, transparent)",
-                    transition: "color 0.3s ease",
-                  }}
+                  style={{ color: fgMuted, transition: "color 0.25s ease" }}
                 >
                   {t("home.sections.enter")}
                 </div>
