@@ -88,14 +88,14 @@
       "title": "Đo độ sẵn sàng đội CS trong 5 phút",
       "body": "8 chiều, 32 chỉ số. Xem bạn đang ở Reactive, Operational hay Predictive — và phải sửa gì trước.",
       "cta": "Bắt đầu chẩn đoán miễn phí →",
-      "hint": "Q: bài đánh giá 5 phút chỉ ra chiều yếu nhất và nêu một việc sửa duy nhất sẽ nâng tầng của bạn."
+      "hint": "Lumi — bài đánh giá 5 phút chỉ ra chiều yếu nhất và nêu một việc sửa duy nhất sẽ nâng tầng của bạn."
     },
     "csfCard": {
       "eyebrow": "CSF · Command Centre",
       "title": "Dashboard CS cá nhân của bạn",
       "body": "Phân tích danh mục, sức khỏe, gia hạn và cơ hội — trong một console cấp operator.",
       "cta": "Mở khóa ở tầng Operator →",
-      "hint": "Q: console hàng ngày — bắt đầu ở đây mỗi sáng để phân loại ba việc cấp bách."
+      "hint": "Lumi — console hàng ngày — bắt đầu ở đây mỗi sáng để phân loại ba việc cấp bách."
     },
     "workspace": {
       "eyebrow": "Workspace của bạn",
@@ -108,24 +108,24 @@
       "items": {
         "vanguard": {
           "blurb": "Chiến thuật chủ động cho cam kết hiệu quả.",
-          "hint": "Q: mở khi bạn cần tín hiệu tuần về việc các tổ chức CS khác đang làm gì."
+          "hint": "Lumi — mở khi bạn cần tín hiệu tuần về việc các tổ chức CS khác đang làm gì."
         },
         "retention": {
           "blurb": "Phát hiện churn sớm. Đảo ngược một cách hệ thống.",
-          "hint": "Q: chọn một playbook mỗi quý và chạy hết toàn bộ danh mục."
+          "hint": "Lumi — chọn một playbook mỗi quý và chạy hết toàn bộ danh mục."
         },
         "outcome": {
           "blurb": "Case study đã được xác thực, kèm bằng chứng.",
-          "hint": "Q: quay lại đây khi bạn cần con số để thuyết phục board hay stakeholder."
+          "hint": "Lumi — quay lại đây khi bạn cần con số để thuyết phục board hay stakeholder."
         },
         "codex": {
           "blurb": "Thư viện tham khảo cho operator chuyên nghiệp.",
-          "hint": "Q: dùng như từ điển — vào, lấy khung mẫu, ra."
+          "hint": "Lumi — dùng như từ điển — vào, lấy khung mẫu, ra."
         },
         "diagnostic": {
           "name": "Chẩn đoán",
           "blurb": "Đo đội bạn. 8 chiều, 32 chỉ số.",
-          "hint": "Q: bước chuyển duy nhất mở khóa tầng kế tiếp là thứ đáng đầu tư trước."
+          "hint": "Lumi — bước chuyển duy nhất mở khóa tầng kế tiếp là thứ đáng đầu tư trước."
         }
       }
     },

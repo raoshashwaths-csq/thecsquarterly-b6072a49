@@ -104,7 +104,7 @@ function AccountPage() {
               description={
                 isPaid
                   ? "Manage your billing, update your card, or cancel from the secure billing portal. Access continues until the end of your current period."
-                  : "Pick a tier to unlock the Vanguard archive, the CSFactors dashboard, and the Q advisor."
+                  : "Pick a tier to unlock the Vanguard archive, the CSFactors dashboard, and Lumi."
               }
               actions={
                 isPaid ? (

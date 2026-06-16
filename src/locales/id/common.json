@@ -88,14 +88,14 @@
       "title": "Ukur kesiapan tim CS Anda dalam 5 menit",
       "body": "8 dimensi, 32 metrik. Lihat posisi Anda antara Reactive, Operational, dan Predictive — dan apa yang harus diperbaiki lebih dulu.",
       "cta": "Mulai diagnostik gratis →",
-      "hint": "Q: audit 5 menit menunjukkan dimensi terlemah Anda dan menamai satu perbaikan yang menggerakkan tier Anda."
+      "hint": "Lumi — audit 5 menit menunjukkan dimensi terlemah Anda dan menamai satu perbaikan yang menggerakkan tier Anda."
     },
     "csfCard": {
       "eyebrow": "CSF · Command Centre",
       "title": "Dasbor CS pribadi Anda",
       "body": "Analitik portofolio, kesehatan, renewal, dan peluang — dalam satu konsol kelas operator.",
       "cta": "Buka di tier Operator →",
-      "hint": "Q: konsol harian Anda — mulai di sini setiap pagi untuk menangani tiga prioritas mendesak."
+      "hint": "Lumi — konsol harian Anda — mulai di sini setiap pagi untuk menangani tiga prioritas mendesak."
     },
     "workspace": {
       "eyebrow": "Workspace Anda",
@@ -108,24 +108,24 @@
       "items": {
         "vanguard": {
           "blurb": "Strategi proaktif untuk engagement yang produktif.",
-          "hint": "Q: buka saat Anda ingin sinyal mingguan tentang apa yang dilakukan organisasi CS lain."
+          "hint": "Lumi — buka saat Anda ingin sinyal mingguan tentang apa yang dilakukan organisasi CS lain."
         },
         "retention": {
           "blurb": "Deteksi churn lebih awal. Balikkan secara sistematis.",
-          "hint": "Q: pilih satu playbook per kuartal dan jalankan dari awal hingga akhir di seluruh book."
+          "hint": "Lumi — pilih satu playbook per kuartal dan jalankan dari awal hingga akhir di seluruh book."
         },
         "outcome": {
           "blurb": "Studi kasus tervalidasi, dengan bukti angkanya.",
-          "hint": "Q: kembali ke sini ketika Anda butuh angka untuk argumen ke board atau stakeholder."
+          "hint": "Lumi — kembali ke sini ketika Anda butuh angka untuk argumen ke board atau stakeholder."
         },
         "codex": {
           "blurb": "Perpustakaan referensi untuk operator serius.",
-          "hint": "Q: pakai seperti kamus — masuk, ambil kerangkanya, keluar."
+          "hint": "Lumi — pakai seperti kamus — masuk, ambil kerangkanya, keluar."
         },
         "diagnostic": {
           "name": "Diagnostik",
           "blurb": "Ukur tim Anda. 8 dimensi, 32 metrik.",
-          "hint": "Q: satu transisi yang membuka tier berikutnya adalah yang pertama harus didanai."
+          "hint": "Lumi — satu transisi yang membuka tier berikutnya adalah yang pertama harus didanai."
         }
       }
     },

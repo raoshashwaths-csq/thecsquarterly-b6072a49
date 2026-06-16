@@ -88,14 +88,14 @@
       "title": "Sukatin ang CS org mo sa 5 minuto",
       "body": "8 dimensyon, 32 metrics. Tingnan kung nasaan ka sa pagitan ng Reactive, Operational at Predictive — at ano ang dapat ayusin muna.",
       "cta": "Kunin ang libreng diagnostic →",
-      "hint": "Q: ang 5-minute audit ang magsasabi ng pinakamahinang dimensyon mo at ng isang ayos na magpapabago ng iyong tier."
+      "hint": "Lumi — ang 5-minute audit ang magsasabi ng pinakamahinang dimensyon mo at ng isang ayos na magpapabago ng iyong tier."
     },
     "csfCard": {
       "eyebrow": "CSF · Command Centre",
       "title": "Iyong personal na CS dashboard",
       "body": "Portfolio analytics, health, renewals at opportunities — sa isang operator-grade console.",
       "cta": "I-unlock sa Operator tier →",
-      "hint": "Q: ang araw-araw mong operator console — magsimula dito tuwing umaga para i-triage ang tatlong pinakamadalian."
+      "hint": "Lumi — ang araw-araw mong operator console — magsimula dito tuwing umaga para i-triage ang tatlong pinakamadalian."
     },
     "workspace": {
       "eyebrow": "Iyong Workspace",
@@ -108,24 +108,24 @@
       "items": {
         "vanguard": {
           "blurb": "Proactive plays para sa mabungang engagement.",
-          "hint": "Q: buksan kapag gusto mo ng lingguhang signal kung ano ang ginagawa ng ibang CS orgs."
+          "hint": "Lumi — buksan kapag gusto mo ng lingguhang signal kung ano ang ginagawa ng ibang CS orgs."
         },
         "retention": {
           "blurb": "Matukoy ang churn agad. Baliktarin ito nang sistematiko.",
-          "hint": "Q: pumili ng isang playbook kada quarter at patakbuhin ito buo sa buong book."
+          "hint": "Lumi — pumili ng isang playbook kada quarter at patakbuhin ito buo sa buong book."
         },
         "outcome": {
           "blurb": "Validated case studies, may resibo.",
-          "hint": "Q: balikan ito kung kailangan mo ng numero para sa board o stakeholder argument."
+          "hint": "Lumi — balikan ito kung kailangan mo ng numero para sa board o stakeholder argument."
         },
         "codex": {
           "blurb": "Reference library para sa seryosong operator.",
-          "hint": "Q: gamitin parang diksyunaryo — pumasok, kunin ang framework, umalis."
+          "hint": "Lumi — gamitin parang diksyunaryo — pumasok, kunin ang framework, umalis."
         },
         "diagnostic": {
           "name": "Mga Diagnostic",
           "blurb": "Sukatin ang iyong team. 8 dimensyon, 32 metrics.",
-          "hint": "Q: ang iisang transisyon na magbubukas sa susunod mong tier ay ang unang pondohan."
+          "hint": "Lumi — ang iisang transisyon na magbubukas sa susunod mong tier ay ang unang pondohan."
         }
       }
     },
