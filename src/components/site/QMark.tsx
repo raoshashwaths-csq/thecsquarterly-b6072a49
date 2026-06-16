@@ -16,19 +16,22 @@ type Props = {
 
 export function QMark({ className, periodClassName = "bg-accent" }: Props) {
   return (
-    <span className={className} aria-label="Lumi">
+    <span className={className} aria-label="Lumi" style={{ display: "inline-block", lineHeight: 1.2 }}>
       Lum
-      <span className="relative inline-block">
+      <span className="relative inline-block" style={{ verticalAlign: "baseline" }}>
         {/* dotless i — keeps the stem, drops the tittle */}
         <span aria-hidden>ı</span>
-        {/* accent tittle: bouncing colored dot positioned over the stem */}
+        {/* accent tittle: bouncing colored dot positioned over the stem.
+            Sized + offset in em so it tracks any font-size, and the bounce
+            travel stays inside the line-box so it never crashes into the
+            line above. */}
         <span
           aria-hidden
           className={`q-period absolute left-1/2 -translate-x-1/2 rounded-full ${periodClassName}`}
           style={{
-            width: "0.22em",
-            height: "0.22em",
-            top: "-0.05em",
+            width: "0.2em",
+            height: "0.2em",
+            top: "-0.18em",
           }}
         />
       </span>
