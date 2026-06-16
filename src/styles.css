@@ -344,28 +344,36 @@
 }
 
 /* ---------------------------------------------------------------
-   Headline typeface reveal (h1/h2): each line rises from behind
-   a hidden overflow mask on mount. Wrappers are injected at
-   runtime by useHeadlineReveal so existing components are not
-   modified.
+   Headline reveal (h1/h2): each headline rises + fades in once on
+   route mount. Scoped to `.page-enter` (the per-route keyed wrapper
+   in __root.tsx) so the animation runs exactly once per navigation
+   and is not re-triggered by React re-renders from i18n, auth, or
+   suspense resolution. No DOM mutation, no observers — CSS only.
    --------------------------------------------------------------- */
+.page-enter h1,
+.page-enter h2 {
+  animation: revealUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.page-enter h2 {
+  animation-delay: 80ms;
+}
+
+/* Legacy wrappers (kept in case any code still injects them). */
 .headline-wrapper {
   overflow: hidden;
 }
 
 .headline-line {
   display: block;
-  transform: translateY(100%);
-  opacity: 0;
-  animation: revealUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: revealUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.headline-line:nth-child(1) { animation-delay: 0ms; }
-.headline-line:nth-child(2) { animation-delay: 80ms; }
-.headline-line:nth-child(3) { animation-delay: 160ms; }
-.headline-line:nth-child(4) { animation-delay: 240ms; }
-
 @keyframes revealUp {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
   to {
     transform: translateY(0);
     opacity: 1;
