@@ -622,6 +622,3 @@ function Section({ eyebrow, title, children }: { eyebrow: string; title: string;
     </div>
   );
 }
-
-// Avoid unused-import warnings in strict builds
-void useState;
