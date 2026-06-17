@@ -23,7 +23,7 @@ export const TOP_LINKS: NavLink[] = [
   { to: "/csfactors", label: "Pulse", icon: Activity },
   { to: "/csfactors", hash: "#accounts", label: "Accounts", icon: LayoutGrid },
   { to: "/csfactors", hash: "#renewals", label: "Renewals", icon: UsersIcon },
-  { to: "/csfactors", hash: "#360", label: "360 Dashboard", icon: LayoutDashboard },
+  { to: "/csfactors/360", label: "360 Dashboard", icon: LayoutDashboard },
 ];
 
 // Workspace handled separately (opens a Sheet)
