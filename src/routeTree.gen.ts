@@ -38,6 +38,7 @@ import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.inde
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DiagnosticsChampionDependencyRouteImport } from './routes/diagnostics.champion-dependency'
 import { Route as DesignSystemLumiBadgeRouteImport } from './routes/design-system.lumi-badge'
 import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
 import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
@@ -211,6 +212,12 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiagnosticsChampionDependencyRoute =
+  DiagnosticsChampionDependencyRouteImport.update({
+    id: '/diagnostics/champion-dependency',
+    path: '/diagnostics/champion-dependency',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DesignSystemLumiBadgeRoute = DesignSystemLumiBadgeRouteImport.update({
   id: '/design-system/lumi-badge',
   path: '/design-system/lumi-badge',
@@ -391,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
+  '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -446,6 +454,7 @@ export interface FileRoutesByTo {
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
+  '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account': typeof AccountIndexRoute
@@ -505,6 +514,7 @@ export interface FileRoutesById {
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
+  '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/account/': typeof AccountIndexRoute
@@ -565,6 +575,7 @@ export interface FileRouteTypes {
     | '/csfactors/$accountId'
     | '/csfactors/360'
     | '/design-system/lumi-badge'
+    | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -620,6 +631,7 @@ export interface FileRouteTypes {
     | '/csfactors/$accountId'
     | '/csfactors/360'
     | '/design-system/lumi-badge'
+    | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account'
@@ -678,6 +690,7 @@ export interface FileRouteTypes {
     | '/csfactors/$accountId'
     | '/csfactors/360'
     | '/design-system/lumi-badge'
+    | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/account/'
@@ -732,6 +745,7 @@ export interface RootRouteChildren {
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   DesignSystemLumiBadgeRoute: typeof DesignSystemLumiBadgeRoute
+  DiagnosticsChampionDependencyRoute: typeof DiagnosticsChampionDependencyRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
@@ -956,6 +970,13 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diagnostics/champion-dependency': {
+      id: '/diagnostics/champion-dependency'
+      path: '/diagnostics/champion-dependency'
+      fullPath: '/diagnostics/champion-dependency'
+      preLoaderRoute: typeof DiagnosticsChampionDependencyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design-system/lumi-badge': {
@@ -1243,6 +1264,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentFrameworkRoute: AgentFrameworkRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   DesignSystemLumiBadgeRoute: DesignSystemLumiBadgeRoute,
+  DiagnosticsChampionDependencyRoute: DiagnosticsChampionDependencyRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   AccountIndexRoute: AccountIndexRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
