@@ -52,6 +52,7 @@ import { Route as AccountApiRouteImport } from './routes/account.api'
 import { Route as AccountAnalyticsIndexRouteImport } from './routes/account.analytics.index'
 import { Route as QResponseRunIdRouteImport } from './routes/q.response.$runId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as CsfactorsPlaybookSlugRouteImport } from './routes/csfactors.playbook.$slug'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
 import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
@@ -283,6 +284,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CsfactorsPlaybookSlugRoute = CsfactorsPlaybookSlugRouteImport.update({
+  id: '/playbook/$slug',
+  path: '/playbook/$slug',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
 const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
   id: '/api/v1/$',
   path: '/api/v1/$',
@@ -413,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
@@ -469,6 +476,7 @@ export interface FileRoutesByTo {
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics': typeof AccountAnalyticsIndexRoute
@@ -529,6 +537,7 @@ export interface FileRoutesById {
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
@@ -590,6 +599,7 @@ export interface FileRouteTypes {
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
+    | '/csfactors/playbook/$slug'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics/'
@@ -646,6 +656,7 @@ export interface FileRouteTypes {
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
+    | '/csfactors/playbook/$slug'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics'
@@ -705,6 +716,7 @@ export interface FileRouteTypes {
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
+    | '/csfactors/playbook/$slug'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics/'
@@ -1070,6 +1082,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/csfactors/playbook/$slug': {
+      id: '/csfactors/playbook/$slug'
+      path: '/playbook/$slug'
+      fullPath: '/csfactors/playbook/$slug'
+      preLoaderRoute: typeof CsfactorsPlaybookSlugRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
     '/api/v1/$': {
       id: '/api/v1/$'
       path: '/api/v1/$'
@@ -1210,11 +1229,13 @@ const CodexRouteWithChildren = CodexRoute._addFileChildren(CodexRouteChildren)
 interface CsfactorsRouteChildren {
   CsfactorsAccountIdRoute: typeof CsfactorsAccountIdRoute
   Csfactors360Route: typeof Csfactors360Route
+  CsfactorsPlaybookSlugRoute: typeof CsfactorsPlaybookSlugRoute
 }
 
 const CsfactorsRouteChildren: CsfactorsRouteChildren = {
   CsfactorsAccountIdRoute: CsfactorsAccountIdRoute,
   Csfactors360Route: Csfactors360Route,
+  CsfactorsPlaybookSlugRoute: CsfactorsPlaybookSlugRoute,
 }
 
 const CsfactorsRouteWithChildren = CsfactorsRoute._addFileChildren(
