@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { HealthChip } from "@/components/dashboard/HealthChip";
+// HealthChip not used; severity rendered inline
 import { listAccounts } from "@/lib/csfactors.functions";
 import { listPlaybooks } from "@/lib/playbooks.functions";
 import { runPlaybookOnPortfolio, hasPlaybookRunner } from "@/lib/playbook-runner";
