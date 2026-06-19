@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { HealthChip } from "@/components/dashboard/HealthChip";
+// HealthChip not used; severity rendered inline
 import { listAccounts } from "@/lib/csfactors.functions";
 import { listPlaybooks } from "@/lib/playbooks.functions";
 import { runPlaybookOnPortfolio, hasPlaybookRunner } from "@/lib/playbook-runner";
@@ -83,16 +83,18 @@ function PlaybookRunnerPage() {
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MetricCard label="Accounts matched" value={String(result.insights.length)} />
+              <MetricCard eyebrow="Accounts matched" value={String(result.insights.length)} topAccent="gold" />
               <MetricCard
-                label="High-severity"
+                eyebrow="High-severity"
                 value={String(result.insights.filter((i) => i.severity === "high").length)}
+                topAccent="danger"
               />
               <MetricCard
-                label="Combined ARR"
+                eyebrow="Combined ARR"
                 value={`$${Math.round(
                   result.insights.reduce((s, i) => s + (i.arr ?? 0), 0) / 1000,
                 )}K`}
+                topAccent="secondary"
               />
             </div>
 
@@ -119,10 +121,17 @@ function PlaybookRunnerPage() {
                           >
                             {i.accountName}
                           </Link>
-                          <HealthChip
-                            label={i.severity === "high" ? "High" : i.severity === "medium" ? "Watch" : "Healthy"}
-                            tone={i.severity === "high" ? "critical" : i.severity === "medium" ? "warning" : "ok"}
-                          />
+                          <span
+                            className={`inline-flex items-center px-2.5 py-1 border font-mono text-[10px] uppercase tracking-widest ${
+                              i.severity === "high"
+                                ? "bg-destructive/15 text-destructive border-destructive/40"
+                                : i.severity === "medium"
+                                  ? "bg-secondary-accent/15 text-secondary-accent border-secondary-accent/40"
+                                  : "bg-emerald-600/15 text-emerald-700 dark:text-emerald-300 border-emerald-600/40"
+                            }`}
+                          >
+                            {i.severity === "high" ? "High" : i.severity === "medium" ? "Watch" : "Healthy"}
+                          </span>
                         </div>
                         <p className="text-xs text-foreground/65 mb-1">{i.reason}</p>
                         <p className="text-sm text-foreground/85 flex items-start gap-2">
