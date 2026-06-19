@@ -53,6 +53,54 @@ export type Database = {
         }
         Relationships: []
       }
+      article_translations: {
+        Row: {
+          article_id: string | null
+          created_at: string
+          id: string
+          language_code: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source_content_hash: string | null
+          status: string
+          translated_at: string | null
+          translated_content: string | null
+          translated_subtitle: string | null
+          translated_title: string | null
+          updated_at: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          language_code: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_content_hash?: string | null
+          status?: string
+          translated_at?: string | null
+          translated_content?: string | null
+          translated_subtitle?: string | null
+          translated_title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string
+          id?: string
+          language_code?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source_content_hash?: string | null
+          status?: string
+          translated_at?: string | null
+          translated_content?: string | null
+          translated_subtitle?: string | null
+          translated_title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       benchmark_drops: {
         Row: {
           created_at: string
@@ -1241,6 +1289,42 @@ export type Database = {
           id?: string
           name?: string
           owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      translation_glossary: {
+        Row: {
+          category: string | null
+          created_at: string
+          fixed_translations: Json
+          id: string
+          notes: string | null
+          pending_review: boolean
+          protection_type: string
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          fixed_translations?: Json
+          id?: string
+          notes?: string | null
+          pending_review?: boolean
+          protection_type: string
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          fixed_translations?: Json
+          id?: string
+          notes?: string | null
+          pending_review?: boolean
+          protection_type?: string
+          term?: string
           updated_at?: string
         }
         Relationships: []
