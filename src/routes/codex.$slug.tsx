@@ -114,6 +114,22 @@ function PlaybookPage() {
                 return <p key={i} className="text-lg leading-relaxed my-5 text-foreground/85">{para}</p>;
               });
             })()}
+            <div className="mt-12 pt-8 border-t border-border">
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
+                Take it live
+              </div>
+              <h3 className="font-display text-2xl mb-3">Run this playbook on your portfolio</h3>
+              <p className="text-foreground/70 mb-5 max-w-xl">
+                Scan your CSFactors accounts for the exact signals this playbook describes. We&rsquo;ll surface the matches and the next move for each.
+              </p>
+              <Link
+                to="/csfactors/playbook/$slug"
+                params={{ slug }}
+                className="inline-flex items-center gap-2 font-mono uppercase tracking-widest text-xs px-5 py-3 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors"
+              >
+                Run this playbook on your portfolio →
+              </Link>
+            </div>
           </div>
         ) : (
           <>
