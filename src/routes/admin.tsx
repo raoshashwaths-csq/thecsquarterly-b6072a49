@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, FileText, MessageSquare, BookOpen, Users, CreditCard,
   ShoppingBag, BarChart3, Sparkles, Search as SearchIcon, UsersRound, Mail, Link as LinkIcon,
-  Download, Upload, ScrollText,
+  Download, Upload, ScrollText, Languages,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";

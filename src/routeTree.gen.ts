@@ -56,6 +56,7 @@ import { Route as CsfactorsPlaybookSlugRouteImport } from './routes/csfactors.pl
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
 import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
+import { Route as AdminContentTranslationRouteImport } from './routes/admin.content.translation'
 import { Route as AccountExecutiveAnalyticsRouteImport } from './routes/account.executive.analytics'
 import { Route as AccountAnalyticsTeamLeaderboardRouteImport } from './routes/account.analytics.team-leaderboard'
 import { Route as AccountAnalyticsStakeholderRadarRouteImport } from './routes/account.analytics.stakeholder-radar'
@@ -304,6 +305,11 @@ const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
   path: '/agent/response/$runId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminContentTranslationRoute = AdminContentTranslationRouteImport.update({
+  id: '/content/translation',
+  path: '/content/translation',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AccountExecutiveAnalyticsRoute =
   AccountExecutiveAnalyticsRouteImport.update({
     id: '/account/executive/analytics',
@@ -416,6 +422,7 @@ export interface FileRoutesByFullPath {
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
   '/account/analytics/team-leaderboard': typeof AccountAnalyticsTeamLeaderboardRoute
   '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
+  '/admin/content/translation': typeof AdminContentTranslationRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -473,6 +480,7 @@ export interface FileRoutesByTo {
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
   '/account/analytics/team-leaderboard': typeof AccountAnalyticsTeamLeaderboardRoute
   '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
+  '/admin/content/translation': typeof AdminContentTranslationRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -534,6 +542,7 @@ export interface FileRoutesById {
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
   '/account/analytics/team-leaderboard': typeof AccountAnalyticsTeamLeaderboardRoute
   '/account/executive/analytics': typeof AccountExecutiveAnalyticsRoute
+  '/admin/content/translation': typeof AdminContentTranslationRoute
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
@@ -596,6 +605,7 @@ export interface FileRouteTypes {
     | '/account/analytics/stakeholder-radar'
     | '/account/analytics/team-leaderboard'
     | '/account/executive/analytics'
+    | '/admin/content/translation'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
@@ -653,6 +663,7 @@ export interface FileRouteTypes {
     | '/account/analytics/stakeholder-radar'
     | '/account/analytics/team-leaderboard'
     | '/account/executive/analytics'
+    | '/admin/content/translation'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
@@ -713,6 +724,7 @@ export interface FileRouteTypes {
     | '/account/analytics/stakeholder-radar'
     | '/account/analytics/team-leaderboard'
     | '/account/executive/analytics'
+    | '/admin/content/translation'
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
@@ -1110,6 +1122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentResponseRunIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/content/translation': {
+      id: '/admin/content/translation'
+      path: '/content/translation'
+      fullPath: '/admin/content/translation'
+      preLoaderRoute: typeof AdminContentTranslationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/account/executive/analytics': {
       id: '/account/executive/analytics'
       path: '/account/executive/analytics'
@@ -1192,10 +1211,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminControlPanelRoute: typeof AdminControlPanelRoute
+  AdminContentTranslationRoute: typeof AdminContentTranslationRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminControlPanelRoute: AdminControlPanelRoute,
+  AdminContentTranslationRoute: AdminContentTranslationRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
