@@ -83,16 +83,18 @@ function PlaybookRunnerPage() {
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MetricCard label="Accounts matched" value={String(result.insights.length)} />
+              <MetricCard eyebrow="Accounts matched" value={String(result.insights.length)} topAccent="gold" />
               <MetricCard
-                label="High-severity"
+                eyebrow="High-severity"
                 value={String(result.insights.filter((i) => i.severity === "high").length)}
+                topAccent="danger"
               />
               <MetricCard
-                label="Combined ARR"
+                eyebrow="Combined ARR"
                 value={`$${Math.round(
                   result.insights.reduce((s, i) => s + (i.arr ?? 0), 0) / 1000,
                 )}K`}
+                topAccent="secondary"
               />
             </div>
 
