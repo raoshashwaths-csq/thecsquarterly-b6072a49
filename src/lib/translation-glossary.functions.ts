@@ -51,7 +51,7 @@ export const upsertGlossaryTerm = createServerFn({ method: "POST" })
     if (data.id) row.id = data.id;
     const { data: out, error } = await context.supabase
       .from("translation_glossary")
-      .upsert(row, { onConflict: "id" })
+      .upsert([row] as any, { onConflict: "id" })
       .select()
       .single();
     if (error) throw new Error(error.message);
