@@ -132,6 +132,9 @@ function PlaybookRunnerPage() {
                           >
                             {i.severity === "high" ? "High" : i.severity === "medium" ? "Watch" : "Healthy"}
                           </span>
+                        </div>
+                        <p className="text-xs text-foreground/65 mb-1">{i.reason}</p>
+                        <p className="text-sm text-foreground/85 flex items-start gap-2">
                           <AlertTriangle size={14} className="text-accent mt-1 shrink-0" />
                           <span>{i.nextStep}</span>
                         </p>
