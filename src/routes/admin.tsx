@@ -145,6 +145,16 @@ function AdminPage() {
                     </ul>
                   </div>
                 ))}
+                <div>
+                  <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2 px-2">Content</div>
+                  <Link
+                    to="/admin/content/translation"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-sm border-l-2 border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                  >
+                    <Languages className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 truncate">Translation</span>
+                  </Link>
+                </div>
               </nav>
             </aside>
 
