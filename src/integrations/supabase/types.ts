@@ -605,6 +605,238 @@ export type Database = {
         }
         Relationships: []
       }
+      map_comments: {
+        Row: {
+          author_name: string | null
+          author_type: string
+          content: string
+          created_at: string
+          id: string
+          map_id: string
+          milestone_id: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          author_type: string
+          content: string
+          created_at?: string
+          id?: string
+          map_id: string
+          milestone_id?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          author_type?: string
+          content?: string
+          created_at?: string
+          id?: string
+          map_id?: string
+          milestone_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_comments_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_comments_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "map_milestones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_milestones: {
+        Row: {
+          assigned_to: string | null
+          blocked_reason: string | null
+          completed_at: string | null
+          completion_note: string | null
+          created_at: string
+          description: string | null
+          due_days_from_start: number | null
+          health_score_impact: number
+          id: string
+          map_id: string
+          milestone_order: number
+          owner: string
+          phase_id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          blocked_reason?: string | null
+          completed_at?: string | null
+          completion_note?: string | null
+          created_at?: string
+          description?: string | null
+          due_days_from_start?: number | null
+          health_score_impact?: number
+          id?: string
+          map_id: string
+          milestone_order: number
+          owner?: string
+          phase_id: string
+          status?: string
+          title: string
+        }
+        Update: {
+          assigned_to?: string | null
+          blocked_reason?: string | null
+          completed_at?: string | null
+          completion_note?: string | null
+          created_at?: string
+          description?: string | null
+          due_days_from_start?: number | null
+          health_score_impact?: number
+          id?: string
+          map_id?: string
+          milestone_order?: number
+          owner?: string
+          phase_id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_milestones_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_milestones_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "map_phases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_phases: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          is_value_milestone: boolean
+          map_id: string
+          phase_order: number
+          title: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          is_value_milestone?: boolean
+          map_id: string
+          phase_order: number
+          title: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          is_value_milestone?: boolean
+          map_id?: string
+          phase_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_phases_map_id_fkey"
+            columns: ["map_id"]
+            isOneToOne: false
+            referencedRelation: "maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maps: {
+        Row: {
+          account_id: string | null
+          account_industry: string | null
+          account_name: string | null
+          account_tier: string | null
+          actual_ttv_days: number | null
+          benchmark_ttv_days: number | null
+          completed_at: string | null
+          contract_start_date: string | null
+          created_at: string
+          csm_id: string
+          csm_name: string | null
+          customer_email: string | null
+          id: string
+          last_customer_view: string | null
+          lumi_generated: boolean
+          share_enabled: boolean
+          share_token: string
+          status: string
+          target_value_date: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          account_industry?: string | null
+          account_name?: string | null
+          account_tier?: string | null
+          actual_ttv_days?: number | null
+          benchmark_ttv_days?: number | null
+          completed_at?: string | null
+          contract_start_date?: string | null
+          created_at?: string
+          csm_id: string
+          csm_name?: string | null
+          customer_email?: string | null
+          id?: string
+          last_customer_view?: string | null
+          lumi_generated?: boolean
+          share_enabled?: boolean
+          share_token?: string
+          status?: string
+          target_value_date?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          account_industry?: string | null
+          account_name?: string | null
+          account_tier?: string | null
+          actual_ttv_days?: number | null
+          benchmark_ttv_days?: number | null
+          completed_at?: string | null
+          contract_start_date?: string | null
+          created_at?: string
+          csm_id?: string
+          csm_name?: string | null
+          customer_email?: string | null
+          id?: string
+          last_customer_view?: string | null
+          lumi_generated?: boolean
+          share_enabled?: boolean
+          share_token?: string
+          status?: string
+          target_value_date?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maps_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "cs_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playbooks: {
         Row: {
           body: string
