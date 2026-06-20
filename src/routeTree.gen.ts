@@ -36,6 +36,7 @@ import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as CodexIndexRouteImport } from './routes/codex.index'
 import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
+import { Route as MTokenRouteImport } from './routes/m.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DiagnosticsChampionDependencyRouteImport } from './routes/diagnostics.champion-dependency'
@@ -49,10 +50,13 @@ import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
 import { Route as AccountApiRouteImport } from './routes/account.api'
+import { Route as CsfactorsMapsIndexRouteImport } from './routes/csfactors.maps.index'
 import { Route as AccountAnalyticsIndexRouteImport } from './routes/account.analytics.index'
 import { Route as QResponseRunIdRouteImport } from './routes/q.response.$runId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CsfactorsPlaybookSlugRouteImport } from './routes/csfactors.playbook.$slug'
+import { Route as CsfactorsMapsNewRouteImport } from './routes/csfactors.maps.new'
+import { Route as CsfactorsMapsIdRouteImport } from './routes/csfactors.maps.$id'
 import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
 import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
 import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
@@ -204,6 +208,11 @@ const AccountIndexRoute = AccountIndexRouteImport.update({
   path: '/account/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MTokenRoute = MTokenRouteImport.update({
+  id: '/m/$token',
+  path: '/m/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -270,6 +279,11 @@ const AccountApiRoute = AccountApiRouteImport.update({
   path: '/account/api',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CsfactorsMapsIndexRoute = CsfactorsMapsIndexRouteImport.update({
+  id: '/maps/',
+  path: '/maps/',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
 const AccountAnalyticsIndexRoute = AccountAnalyticsIndexRouteImport.update({
   id: '/account/analytics/',
   path: '/account/analytics/',
@@ -288,6 +302,16 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
 const CsfactorsPlaybookSlugRoute = CsfactorsPlaybookSlugRouteImport.update({
   id: '/playbook/$slug',
   path: '/playbook/$slug',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const CsfactorsMapsNewRoute = CsfactorsMapsNewRouteImport.update({
+  id: '/maps/new',
+  path: '/maps/new',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const CsfactorsMapsIdRoute = CsfactorsMapsIdRouteImport.update({
+  id: '/maps/$id',
+  path: '/maps/$id',
   getParentRoute: () => CsfactorsRoute,
 } as any)
 const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
@@ -413,6 +437,7 @@ export interface FileRoutesByFullPath {
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/m/$token': typeof MTokenRoute
   '/account/': typeof AccountIndexRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
@@ -426,10 +451,13 @@ export interface FileRoutesByFullPath {
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/csfactors/maps/$id': typeof CsfactorsMapsIdRoute
+  '/csfactors/maps/new': typeof CsfactorsMapsNewRoute
   '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
+  '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -471,6 +499,7 @@ export interface FileRoutesByTo {
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/m/$token': typeof MTokenRoute
   '/account': typeof AccountIndexRoute
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
@@ -484,10 +513,13 @@ export interface FileRoutesByTo {
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/csfactors/maps/$id': typeof CsfactorsMapsIdRoute
+  '/csfactors/maps/new': typeof CsfactorsMapsNewRoute
   '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics': typeof AccountAnalyticsIndexRoute
+  '/csfactors/maps': typeof CsfactorsMapsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -533,6 +565,7 @@ export interface FileRoutesById {
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/m/$token': typeof MTokenRoute
   '/account/': typeof AccountIndexRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
@@ -546,10 +579,13 @@ export interface FileRoutesById {
   '/agent/response/$runId': typeof AgentResponseRunIdRoute
   '/api/elevenlabs/stt': typeof ApiElevenlabsSttRoute
   '/api/v1/$': typeof ApiV1SplatRoute
+  '/csfactors/maps/$id': typeof CsfactorsMapsIdRoute
+  '/csfactors/maps/new': typeof CsfactorsMapsNewRoute
   '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
+  '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -596,6 +632,7 @@ export interface FileRouteTypes {
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/m/$token'
     | '/account/'
     | '/ai-readiness/'
     | '/codex/'
@@ -609,10 +646,13 @@ export interface FileRouteTypes {
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
+    | '/csfactors/maps/$id'
+    | '/csfactors/maps/new'
     | '/csfactors/playbook/$slug'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics/'
+    | '/csfactors/maps/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -654,6 +694,7 @@ export interface FileRouteTypes {
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/m/$token'
     | '/account'
     | '/ai-readiness'
     | '/codex'
@@ -667,10 +708,13 @@ export interface FileRouteTypes {
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
+    | '/csfactors/maps/$id'
+    | '/csfactors/maps/new'
     | '/csfactors/playbook/$slug'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics'
+    | '/csfactors/maps'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -715,6 +759,7 @@ export interface FileRouteTypes {
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
+    | '/m/$token'
     | '/account/'
     | '/ai-readiness/'
     | '/codex/'
@@ -728,10 +773,13 @@ export interface FileRouteTypes {
     | '/agent/response/$runId'
     | '/api/elevenlabs/stt'
     | '/api/v1/$'
+    | '/csfactors/maps/$id'
+    | '/csfactors/maps/new'
     | '/csfactors/playbook/$slug'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics/'
+    | '/csfactors/maps/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -771,6 +819,7 @@ export interface RootRouteChildren {
   DesignSystemLumiBadgeRoute: typeof DesignSystemLumiBadgeRoute
   DiagnosticsChampionDependencyRoute: typeof DiagnosticsChampionDependencyRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  MTokenRoute: typeof MTokenRoute
   AccountIndexRoute: typeof AccountIndexRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
   AccountAnalyticsRetentionFunnelRoute: typeof AccountAnalyticsRetentionFunnelRoute
@@ -982,6 +1031,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/m/$token': {
+      id: '/m/$token'
+      path: '/m/$token'
+      fullPath: '/m/$token'
+      preLoaderRoute: typeof MTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/insights/$slug': {
       id: '/insights/$slug'
       path: '/$slug'
@@ -1073,6 +1129,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountApiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/csfactors/maps/': {
+      id: '/csfactors/maps/'
+      path: '/maps'
+      fullPath: '/csfactors/maps/'
+      preLoaderRoute: typeof CsfactorsMapsIndexRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
     '/account/analytics/': {
       id: '/account/analytics/'
       path: '/account/analytics'
@@ -1099,6 +1162,20 @@ declare module '@tanstack/react-router' {
       path: '/playbook/$slug'
       fullPath: '/csfactors/playbook/$slug'
       preLoaderRoute: typeof CsfactorsPlaybookSlugRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/csfactors/maps/new': {
+      id: '/csfactors/maps/new'
+      path: '/maps/new'
+      fullPath: '/csfactors/maps/new'
+      preLoaderRoute: typeof CsfactorsMapsNewRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/csfactors/maps/$id': {
+      id: '/csfactors/maps/$id'
+      path: '/maps/$id'
+      fullPath: '/csfactors/maps/$id'
+      preLoaderRoute: typeof CsfactorsMapsIdRouteImport
       parentRoute: typeof CsfactorsRoute
     }
     '/api/v1/$': {
@@ -1250,13 +1327,19 @@ const CodexRouteWithChildren = CodexRoute._addFileChildren(CodexRouteChildren)
 interface CsfactorsRouteChildren {
   CsfactorsAccountIdRoute: typeof CsfactorsAccountIdRoute
   Csfactors360Route: typeof Csfactors360Route
+  CsfactorsMapsIdRoute: typeof CsfactorsMapsIdRoute
+  CsfactorsMapsNewRoute: typeof CsfactorsMapsNewRoute
   CsfactorsPlaybookSlugRoute: typeof CsfactorsPlaybookSlugRoute
+  CsfactorsMapsIndexRoute: typeof CsfactorsMapsIndexRoute
 }
 
 const CsfactorsRouteChildren: CsfactorsRouteChildren = {
   CsfactorsAccountIdRoute: CsfactorsAccountIdRoute,
   Csfactors360Route: Csfactors360Route,
+  CsfactorsMapsIdRoute: CsfactorsMapsIdRoute,
+  CsfactorsMapsNewRoute: CsfactorsMapsNewRoute,
   CsfactorsPlaybookSlugRoute: CsfactorsPlaybookSlugRoute,
+  CsfactorsMapsIndexRoute: CsfactorsMapsIndexRoute,
 }
 
 const CsfactorsRouteWithChildren = CsfactorsRoute._addFileChildren(
@@ -1308,6 +1391,7 @@ const rootRouteChildren: RootRouteChildren = {
   DesignSystemLumiBadgeRoute: DesignSystemLumiBadgeRoute,
   DiagnosticsChampionDependencyRoute: DiagnosticsChampionDependencyRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  MTokenRoute: MTokenRoute,
   AccountIndexRoute: AccountIndexRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
   AccountAnalyticsRetentionFunnelRoute: AccountAnalyticsRetentionFunnelRoute,
