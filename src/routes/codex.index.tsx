@@ -85,6 +85,34 @@ function CodexPage() {
         )}
       </main>
 
+      <section className="border-t border-border">
+        <div className="max-w-7xl w-full mx-auto px-6 py-16">
+          <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">Diagnostics</div>
+          <h2 className="font-display text-3xl md:text-4xl leading-tight tracking-tight mb-10 max-w-3xl">
+            Short, structured diagnostics. <span className="italic text-accent">Run in minutes.</span>
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <article className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors">
+              <div className="p-6 flex flex-col flex-1">
+                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-3">Stakeholder Management</div>
+                <h3 className="font-display text-2xl mb-3 leading-tight">Champion Dependency Diagnostic</h3>
+                <p className="text-sm text-foreground/70 text-pretty mb-6 flex-1">
+                  Score how exposed an account is to losing its primary champion, and surface the next move before the wheels come off.
+                </p>
+                <Link
+                  to="/diagnostics/champion-dependency"
+                  className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
+                >
+                  Start diagnostic →
+                </Link>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+
+
       <section className="bg-foreground text-background py-20">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <div className="font-mono text-xs uppercase tracking-[0.3em] opacity-60 mb-6">The economics</div>
