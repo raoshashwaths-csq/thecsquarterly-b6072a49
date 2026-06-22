@@ -13,6 +13,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { QMark } from "@/components/site/QMark";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import {
   TREES, NODES, nodesForTree, getNode, breadcrumbFor, type TreeId, type TreeNode,
 } from "@/lib/q-trees";
@@ -37,6 +38,7 @@ function cleanEyebrow(eyebrow: string): string {
 
 function AgentFrameworkPage() {
   const { user, loading } = useAuth();
+  const sub = useSubscriptionTier();
   const [hasVanguard, setHasVanguard] = useState<boolean | null>(null);
   const [activeTree, setActiveTree] = useState<TreeId>("T1");
   const [runTerminal, setRunTerminal] = useState<TreeNode | null>(null);
@@ -91,6 +93,9 @@ function AgentFrameworkPage() {
           <Switch checked={witty} onCheckedChange={setWitty} aria-label="Toggle witty voice" />
         </div>
       </header>
+
+      <LumiSessionBanner sub={sub} />
+
 
       {/* Tree picker rail */}
       <RevealBlock>
