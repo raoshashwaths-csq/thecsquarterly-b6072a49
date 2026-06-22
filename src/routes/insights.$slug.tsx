@@ -10,7 +10,9 @@ import { AnnotationBar } from "@/components/site/AnnotationBar";
 import { AudioBar } from "@/components/site/AudioBar";
 import { HighlightedBody } from "@/components/site/HighlightedBody";
 import { Paywall, BlurredTeaser } from "@/components/site/Paywall";
+import { PaywallOverlay, PaywallBlur } from "@/components/site/PaywallOverlay";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import { getPost } from "@/lib/posts.functions";
 
 const postQuery = (slug: string) =>
@@ -162,16 +164,25 @@ function PostPage() {
   const { data: post } = useSuspenseQuery(postQuery(slug));
   const [tone, setTone] = useState<Tone>("mckinsey");
   const { user, loading: authLoading } = useAuth();
+  const sub = useSubscriptionTier();
   const navigate = useNavigate();
   const [showToneHint, setShowToneHint] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  // Visitor 4th-article soft gate (replaces previous hard redirect).
+  const [visitorGate, setVisitorGate] = useState(false);
+  // Free-user 52%-scroll gate.
+  const [scrollGate, setScrollGate] = useState(false);
+  // When the free user clicks "Continue reading for free" we let them through
+  // but keep a slim persistent nudge at the top of the article.
+  const [freeContinued, setFreeContinued] = useState(false);
 
   const hasMck = !!(post?.title_mckinsey && post?.body_mckinsey);
   const hasWod = !!(post?.title_wodehouse && post?.body_wodehouse);
   const hasBothTones = hasMck && hasWod;
 
-  // Track distinct articles viewed. Allow 3 free, then paywall on a 4th new article.
-  // CRITICAL: wait for auth to resolve so a logged-in Vanguard is never bounced.
+  // Track distinct articles viewed. Visitors get 3 free; the 4th shows the
+  // PaywallOverlay in-context instead of redirecting to /pricing.
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (authLoading) return;
@@ -181,7 +192,7 @@ function PostPage() {
     const isNew = !seen.includes(slug);
     if (isNew) {
       if (!user && seen.length >= 3) {
-        navigate({ to: "/pricing" });
+        setVisitorGate(true);
         return;
       }
       seen.push(slug);
@@ -191,7 +202,15 @@ function PostPage() {
       const t = window.setTimeout(() => setShowToneHint(true), 600);
       return () => window.clearTimeout(t);
     }
-  }, [slug, user, authLoading, hasBothTones, navigate]);
+  }, [slug, user, authLoading, hasBothTones]);
+
+  // Free-tier scroll gate at 52% on premium content.
+  useEffect(() => {
+    if (sub.tier !== "free") return;
+    if (!post?.locked) return;
+    if (freeContinued) return;
+    if (progress >= 0.52) setScrollGate(true);
+  }, [progress, sub.tier, post?.locked, freeContinued]);
 
   const { title, body } = useMemo(() => {
     if (!post) return { title: "", body: "" };
@@ -275,7 +294,26 @@ function PostPage() {
         )}
       </div>
 
-      {post.locked ? (
+      {visitorGate ? (
+        <div className="relative mt-12">
+          <PaywallBlur full>
+            <HighlightedBody body={body} progress={0} className="prose-content" key={`body-${tone}`} />
+          </PaywallBlur>
+          <PaywallOverlay gate="article" tier="visitor" />
+        </div>
+      ) : post.locked && sub.tier === "free" && scrollGate ? (
+        <div className="relative mt-12">
+          <PaywallBlur>
+            <HighlightedBody body={body} progress={progress} className="prose-content" key={`body-${tone}`} />
+          </PaywallBlur>
+          <PaywallOverlay
+            gate="article"
+            tier="free"
+            continueAvailable
+            onContinueFree={() => { setScrollGate(false); setFreeContinued(true); }}
+          />
+        </div>
+      ) : post.locked && sub.tier === "visitor" ? (
         <>
           <BlurredTeaser>
             <HighlightedBody body={body} progress={progress} className="prose-content mt-12" key={`body-${tone}`} />
@@ -285,11 +323,24 @@ function PostPage() {
             oneOffLabel={`Unlock "${post.title}"`}
             oneOffPriceCents={900}
             onBuyOneOff={() => navigate({ to: "/pricing" })}
-            subtitle="One essay. Or unlock the full archive with Practitioner from $29/mo."
+            subtitle="One essay. Or unlock the full archive with Practitioner from $39/mo."
           />
         </>
       ) : (
         <>
+          {freeContinued && (
+            <div className="mt-10 mb-6 border border-border bg-card px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-foreground/70">
+                Reading on Free · upgrade for unlimited access and 50 Lumi sessions
+              </span>
+              <Link
+                to="/pricing"
+                className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent border-b border-accent/40 hover:border-accent pb-0.5"
+              >
+                See Practitioner →
+              </Link>
+            </div>
+          )}
           <HighlightedBody body={body} progress={progress} className="prose-content mt-12 animate-tone-swap" key={`body-${tone}`} />
 
           <AnnotationBar slug={slug} />
