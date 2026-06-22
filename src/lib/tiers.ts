@@ -1,6 +1,12 @@
 // Canonical pricing matrix for The CS Quarterly.
-// See mem://product/positioning-v4 for the strategy; this file is the single
-// source of truth that /pricing and /subscribe both render from.
+// Single source of truth that /pricing, /subscribe, the homepage, and the
+// PaywallOverlay all render from. See mem://product/positioning-v4 for the
+// surrounding strategy.
+//
+// Pricing override (this revision):
+//   Practitioner $39 — unlocks Codex + CSFactors dashboard + 50 Lumi/month.
+//   Operator $89 — adds Operator analytics + 100 Lumi/month.
+// CSFactors is gated at Practitioner+ in this spec (was Operator+).
 
 export type Designation =
   | "reader"
@@ -17,15 +23,15 @@ export type Tier = {
   designation: Designation;
   label: string;
   tagline: string;
-  priceMonthly: string;        // display string e.g. "$79"
-  priceMonthlyValue: number;   // numeric for math; 0 for free, 0 for contact-only display
-  priceAnnual?: string;        // e.g. "$790 / year"
-  contactOnly?: boolean;       // skip monthly/annual ladder, route to mailto
-  seatCap: string;             // "1 seat" | "Up to 8 seats" | "Unlimited"
-  qCap: string;                // "0 sessions" | "30 / month" | "Unlimited"
+  priceMonthly: string;
+  priceMonthlyValue: number;
+  priceAnnual?: string;
+  contactOnly?: boolean;
+  seatCap: string;
+  qCap: string;
   band: "individual" | "team" | "partner";
-  highlight?: boolean;         // visually emphasized card
-  highlightLabel?: string;     // chip text when highlighted
+  highlight?: boolean;
+  highlightLabel?: string;
   features: string[];
   cta: string;
   ctaKind: TierCtaKind;
@@ -40,13 +46,14 @@ export const TIERS: Tier[] = [
     priceMonthlyValue: 0,
     priceAnnual: "Free forever",
     seatCap: "1 seat",
-    qCap: "0 sessions",
+    qCap: "1 session / week",
     band: "individual",
     features: [
       "Weekly Tuesday dispatch",
       "Retention Ledger benchmark ticker",
       "AI Diagnostic — score only",
       "Public archive access",
+      "Lumi — 1 session per week",
       "__jobboard__:Job board as a candidate",
     ],
     cta: "Start free",
@@ -55,20 +62,23 @@ export const TIERS: Tier[] = [
   {
     designation: "practitioner",
     label: "Practitioner",
-    tagline: "Full library, every Codex playbook, and the Q advisor.",
-    priceMonthly: "$29",
-    priceMonthlyValue: 29,
-    priceAnnual: "$290 / year",
+    tagline: "Full library, every Codex playbook, CSFactors dashboard, and Lumi.",
+    priceMonthly: "$39",
+    priceMonthlyValue: 39,
+    priceAnnual: "$390 / year",
     seatCap: "1 seat",
-    qCap: "30 / month",
+    qCap: "50 / month",
     band: "individual",
+    highlight: true,
+    highlightLabel: "Most popular for individuals",
     features: [
       "Everything in Reader",
       "Full premium archive, two-voice toggle",
       "All six Codex playbooks",
       "AI Diagnostic full blueprint",
-      "Q advisor, 30 sessions a month",
-      "Access to the Whiteboard to hold your article notes and pasted URLs",
+      "CSFactors personal dashboard",
+      "Lumi — 50 sessions a month",
+      "Whiteboard for article notes and pasted URLs",
     ],
     cta: "Become a Practitioner",
     ctaKind: "checkout",
@@ -76,20 +86,18 @@ export const TIERS: Tier[] = [
   {
     designation: "operator",
     label: "Operator",
-    tagline: "The personal CS dashboard and a benchmark comparison tool.",
-    priceMonthly: "$79",
-    priceMonthlyValue: 79,
-    priceAnnual: "$790 / year",
+    tagline: "Advanced operator analytics, benchmarks, and more Lumi headroom.",
+    priceMonthly: "$89",
+    priceMonthlyValue: 89,
+    priceAnnual: "$890 / year",
     seatCap: "1 seat",
     qCap: "100 / month",
     band: "individual",
-    highlight: true,
-    highlightLabel: "Most popular for senior ICs",
     features: [
       "Everything in Practitioner",
-      "Personal CS dashboard — your portfolio, health, renewals",
+      "Operator analytics — risk register, renewal waterfall",
       "Benchmark comparison vs Retention Ledger quartiles",
-      "Q advisor, 100 sessions a month",
+      "Lumi — 100 sessions a month",
       "VP+ community access",
       "Priority content notifications",
     ],
@@ -99,18 +107,19 @@ export const TIERS: Tier[] = [
   {
     designation: "team",
     label: "Team",
-    tagline: "Shared team dashboard, admin analytics, and learning paths.",
+    tagline: "Shared team dashboard, admin analytics, and a 500-session Lumi pool.",
     priceMonthly: "$599",
     priceMonthlyValue: 599,
     priceAnnual: "$5,990 / year",
     seatCap: "Up to 8 seats",
-    qCap: "400 pooled / month",
+    qCap: "500 pooled / month",
     band: "team",
     features: [
       "Everything in Operator, per seat",
       "Shared team CS dashboard — portfolio + renewal pipeline",
       "Admin analytics — usage, reads, agent activity",
       "Assignable learning paths",
+      "Lumi pool — 500 sessions a month",
       "__jobboard__:2 job board posting credits per quarter",
       "SSO preparation",
     ],
@@ -120,12 +129,12 @@ export const TIERS: Tier[] = [
   {
     designation: "scale",
     label: "Scale",
-    tagline: "Advanced dashboard, branded benchmark PDF, and a quarterly briefing call.",
+    tagline: "Advanced dashboard, branded benchmark PDF, and a 2,000-session pool.",
     priceMonthly: "$1,499",
     priceMonthlyValue: 1499,
     priceAnnual: "$14,990 / year",
     seatCap: "Up to 20 seats",
-    qCap: "1,000 pooled / month",
+    qCap: "2,000 pooled / month",
     band: "team",
     highlight: true,
     highlightLabel: "Most popular for mid-market CS",
@@ -134,6 +143,7 @@ export const TIERS: Tier[] = [
       "Advanced dashboard — cohort analysis, churn signal heatmap",
       "Quarterly branded benchmark PDF, board-ready",
       "Quarterly briefing call with the editorial team",
+      "Lumi pool — 2,000 sessions a month",
       "SSO / SAML integration",
       "__jobboard__:4 job board posting credits per quarter",
     ],
@@ -143,12 +153,12 @@ export const TIERS: Tier[] = [
   {
     designation: "enterprise",
     label: "Enterprise",
-    tagline: "White-label benchmark reports, Ledger API, and certified learning paths.",
+    tagline: "White-label benchmarks, Ledger API, and a 5,000-session pool.",
     priceMonthly: "$3,500",
     priceMonthlyValue: 3500,
     priceAnnual: "Custom annual contract",
     seatCap: "Up to 50 seats",
-    qCap: "Unlimited",
+    qCap: "5,000 pooled / month",
     band: "team",
     features: [
       "Everything in Scale",
@@ -156,6 +166,7 @@ export const TIERS: Tier[] = [
       "Retention Ledger API access",
       "Custom learning paths with completion certificates",
       "Dedicated community space for your team",
+      "Lumi pool — 5,000 sessions a month",
       "SSO / SAML mandatory, priority onboarding",
     ],
     cta: "Talk to editorial",

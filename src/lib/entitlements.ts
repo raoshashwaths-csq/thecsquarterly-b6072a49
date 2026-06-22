@@ -30,16 +30,23 @@ export const DESIGNATION_LABEL: Record<Designation, string> = {
   strategic_partner: "Strategic Partner",
 };
 
-/** Monthly Q-agent interaction cap. Infinity = no cap. */
+/**
+ * Monthly Lumi (Q) interaction cap. Infinity = no cap.
+ * Reader is the logged-in free state — 1 session per week ≈ 4 per month.
+ * Visitors (no session) get 0 server-side.
+ */
 export const Q_MONTHLY_CAP: Record<Designation, number> = {
-  reader: 0,
-  practitioner: 30,
+  reader: 4,
+  practitioner: 50,
   operator: 100,
-  team: 400,
-  scale: 1000,
-  enterprise: Number.POSITIVE_INFINITY,
+  team: 500,
+  scale: 2000,
+  enterprise: 5000,
   strategic_partner: Number.POSITIVE_INFINITY,
 };
+
+/** Free (Reader) tier is 1 session per week, tracked client-side by ISO week. */
+export const READER_WEEKLY_CAP = 1;
 
 /** Map legacy `subscriptions.tier` strings to the new designation vocabulary. */
 export function tierToDesignation(tier: string | null | undefined): Designation {

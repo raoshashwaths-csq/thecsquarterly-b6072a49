@@ -13,6 +13,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { QMark } from "@/components/site/QMark";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import {
   TREES, NODES, nodesForTree, getNode, breadcrumbFor, type TreeId, type TreeNode,
 } from "@/lib/q-trees";
@@ -37,6 +38,7 @@ function cleanEyebrow(eyebrow: string): string {
 
 function AgentFrameworkPage() {
   const { user, loading } = useAuth();
+  const sub = useSubscriptionTier();
   const [hasVanguard, setHasVanguard] = useState<boolean | null>(null);
   const [activeTree, setActiveTree] = useState<TreeId>("T1");
   const [runTerminal, setRunTerminal] = useState<TreeNode | null>(null);
@@ -91,6 +93,9 @@ function AgentFrameworkPage() {
           <Switch checked={witty} onCheckedChange={setWitty} aria-label="Toggle witty voice" />
         </div>
       </header>
+
+      <LumiSessionBanner sub={sub} />
+
 
       {/* Tree picker rail */}
       <RevealBlock>
@@ -569,3 +574,51 @@ function RunDrawer({ node, witty, setWitty, onClose }: {
 }
 
 void NODES;
+
+// Lumi tier-aware banner. Pure presentation — server still enforces caps via assertQUnderCap.
+function LumiSessionBanner({ sub }: { sub: ReturnType<typeof useSubscriptionTier> }) {
+  if (sub.loading) return null;
+  if (sub.tier === "visitor") return null; // gate card already shown upstream
+
+  const used = sub.lumiSessionsUsed;
+  const allowed = sub.lumiSessionsAllowed;
+  const remaining = Math.max(0, allowed - used);
+
+  if (sub.tier === "free") {
+    const exhausted = used >= allowed;
+    return (
+      <div className={`mb-8 border ${exhausted ? "border-destructive/40" : "border-border"} bg-card px-5 py-3 flex items-center justify-between gap-4 flex-wrap`}>
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-1">Free plan · 1 session / week</div>
+          <div className="text-sm text-foreground/80">
+            {exhausted
+              ? "Session used. Resets on Monday. Practitioner gets 50 sessions per month."
+              : "1 free session available this week — make it count."}
+          </div>
+        </div>
+        {exhausted && (
+          <Link to="/pricing" className="font-mono text-[11px] uppercase tracking-[0.22em] bg-accent text-accent-foreground px-4 py-2 hover:opacity-90">
+            Upgrade ($39/mo)
+          </Link>
+        )}
+      </div>
+    );
+  }
+
+  // Paid tiers
+  const lowHeadroom = remaining > 0 && remaining <= Math.max(1, Math.floor(allowed * 0.1));
+  const pool = sub.tier === "team" || sub.tier === "scale" || sub.tier === "enterprise";
+  return (
+    <div className="mb-8 border border-border bg-card px-5 py-3 flex items-center justify-between gap-4 flex-wrap">
+      <div className={`font-mono text-[11px] uppercase tracking-[0.22em] ${lowHeadroom ? "text-secondary-accent" : "text-foreground/70"}`}>
+        {pool ? `${used} / ${allowed} team sessions used this month` : `${used} of ${allowed} sessions used this month`}
+      </div>
+      {lowHeadroom && sub.tier !== "enterprise" && (
+        <Link to="/pricing" className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent border-b border-accent/40 hover:border-accent pb-0.5">
+          {remaining} left · upgrade →
+        </Link>
+      )}
+    </div>
+  );
+}
+

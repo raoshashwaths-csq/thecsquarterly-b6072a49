@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LayoutGrid, Compass } from "lucide-react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
@@ -11,6 +12,7 @@ import { StickyScrollSection } from "@/components/shared/StickyScrollSection";
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 
 import { listPosts } from "@/lib/posts.functions";
 
@@ -213,6 +215,8 @@ function HomePage() {
           </Link>
         </div>
       </header>
+
+      <TierStrip />
 
       <StickyScrollSection
         stages={[
@@ -504,6 +508,167 @@ function StageMock({ variant }: { variant: "pulse" | "threeSixty" | "risk" }) {
         )}
       </div>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tier-aware strip — rendered immediately below the hero. Switches content
+// (NOT visual design) based on the visitor's tier. Tokens only — no hex.
+// ─────────────────────────────────────────────────────────────────────────────
+function TierStrip() {
+  const sub = useSubscriptionTier();
+  const [readerNudgeDismissed, setReaderNudgeDismissed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return window.sessionStorage.getItem("cs_reader_nudge_seen") === "1";
+  });
+
+  if (sub.loading) return null;
+
+  // VISITOR — three what-you-get cards
+  if (sub.tier === "visitor") {
+    const cards: Array<{ eyebrow: string; title: string; body: string; cta: string; to: string }> = [
+      { eyebrow: "Free", title: "Reader", body: "Weekly dispatch, diagnostic score, and one Lumi session a week.", cta: "Start free", to: "/login" },
+      { eyebrow: "$39 / mo", title: "Practitioner unlocks", body: "Full archive, all six Codex playbooks, CSFactors dashboard, 50 Lumi/mo.", cta: "Learn more", to: "/pricing" },
+      { eyebrow: "$89 / mo", title: "Operator unlocks", body: "Risk register, renewal waterfall, benchmark comparisons, 100 Lumi/mo.", cta: "Learn more", to: "/pricing" },
+    ];
+    return (
+      <section className="max-w-7xl w-full mx-auto px-6 pt-4 pb-12">
+        <div className="grid md:grid-cols-3 gap-4">
+          {cards.map((c) => (
+            <Link
+              key={c.title}
+              to={c.to}
+              className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col"
+            >
+              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-3">{c.eyebrow}</div>
+              <h3 className="font-display text-xl leading-tight mb-2">{c.title}</h3>
+              <p className="text-sm text-foreground/70 leading-snug mb-4 flex-1">{c.body}</p>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-0.5 self-start">
+                {c.cta} →
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  // FREE — personalised greeting + slim upgrade nudge
+  if (sub.tier === "free") {
+    return (
+      <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-10">
+        <div className="border border-border bg-card px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex flex-col">
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-1">
+              Good to see you, {sub.displayName}
+            </span>
+            <span className="text-sm text-foreground/80">
+              Unlock the full Codex library, 50 Lumi sessions, and your CSFactors dashboard. From $39/month.
+            </span>
+          </div>
+          <Link
+            to="/pricing"
+            className="font-mono text-[11px] uppercase tracking-[0.22em] bg-accent text-accent-foreground px-4 py-2 hover:opacity-90"
+          >
+            See plans →
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  // PRACTITIONER — "Your week" 3-tile (Lumi remaining is real; latest article + open MAPs are placeholders)
+  if (sub.tier === "practitioner") {
+    const remaining = Math.max(0, sub.lumiSessionsAllowed - sub.lumiSessionsUsed);
+    const showReaderNudge = !readerNudgeDismissed;
+    return (
+      <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-10 space-y-4">
+        <div className="grid md:grid-cols-3 gap-4">
+          <Tile eyebrow="This week" title="Latest dispatch" body="See the newest essay below." to="/insights" cta="Read →" />
+          <Tile eyebrow="Lumi" title={`${remaining} of ${sub.lumiSessionsAllowed} remaining`} body="Sessions reset on the 1st of the month." to="/agent/framework" cta="Open Lumi →" />
+          <Tile eyebrow="CSFactors" title="Open MAPs" body="Live mutual action plans for your accounts." to="/csfactors/maps" cta="Open →" />
+        </div>
+        {showReaderNudge && (
+          <div className="border border-border bg-card px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-1">What you're missing</div>
+              <p className="text-sm text-foreground/80 max-w-2xl">
+                Operator adds the risk register, renewal waterfall, and benchmark comparisons on top of everything you have today. $89/month.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Link to="/pricing" className="font-mono text-[11px] uppercase tracking-[0.22em] bg-accent text-accent-foreground px-4 py-2 hover:opacity-90">
+                Explore Operator
+              </Link>
+              <button
+                type="button"
+                onClick={() => { window.sessionStorage.setItem("cs_reader_nudge_seen", "1"); setReaderNudgeDismissed(true); }}
+                className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground"
+              >
+                Remind me later
+              </button>
+            </div>
+          </div>
+        )}
+        {remaining <= Math.max(1, Math.floor(sub.lumiSessionsAllowed * 0.2)) && remaining > 0 && (
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary-accent">
+            You have {remaining} Lumi sessions left this month. Operator members get 100.
+          </p>
+        )}
+      </section>
+    );
+  }
+
+  // OPERATOR — same tiles plus a renewal/risk line (real data wired separately)
+  if (sub.tier === "operator") {
+    const remaining = Math.max(0, sub.lumiSessionsAllowed - sub.lumiSessionsUsed);
+    return (
+      <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-10">
+        <div className="grid md:grid-cols-3 gap-4">
+          <Tile eyebrow="Operator" title="Risk register" body="Open risks across your portfolio." to="/csfactors" cta="Open →" />
+          <Tile eyebrow="Lumi" title={`${remaining} of ${sub.lumiSessionsAllowed} remaining`} body="Sessions reset on the 1st of the month." to="/agent/framework" cta="Open Lumi →" />
+          <Tile eyebrow="Renewals" title="Next renewal window" body="The accounts inside your 90-day horizon." to="/csfactors/360" cta="Open 360 →" />
+        </div>
+      </section>
+    );
+  }
+
+  // TEAM / SCALE / ENTERPRISE — team summary
+  return (
+    <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-10">
+      <div className="border border-border bg-card px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-1">Your team</div>
+          <p className="text-sm text-foreground/80">
+            Lumi pool: {sub.lumiSessionsUsed} / {sub.lumiSessionsAllowed} sessions used this month.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Link to="/csfactors/360" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground">
+            Team Pulse
+          </Link>
+          <Link to="/csfactors/maps" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground">
+            MAP engine
+          </Link>
+          <Link to="/account/workspace" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground">
+            Workspace
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Tile({ eyebrow, title, body, to, cta }: { eyebrow: string; title: string; body: string; to: string; cta: string }) {
+  return (
+    <Link to={to} className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col">
+      <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-2">{eyebrow}</div>
+      <h3 className="font-display text-lg leading-tight mb-2">{title}</h3>
+      <p className="text-sm text-foreground/70 leading-snug mb-4 flex-1">{body}</p>
+      <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-0.5 self-start">
+        {cta}
+      </span>
+    </Link>
   );
 }
 
