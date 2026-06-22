@@ -70,7 +70,7 @@ function CodexPage() {
             <article key={p.id} className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors">
               <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
                 <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
-                  <Lock size={12} /> Premium
+                  <Lock size={12} /> {hasFullAccess ? "Included" : "Premium"}
                 </div>
                 <div className="absolute top-4 right-4 font-mono text-xs opacity-50">{p.pages}pp</div>
                 <FileText size={48} className="opacity-30" />
@@ -87,11 +87,11 @@ function CodexPage() {
                     params={{ slug: p.slug }}
                     className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
                   >
-                    ${(p.price_cents / 100).toFixed(0)} · View playbook
+                    {hasFullAccess ? "Open playbook" : `$${(p.price_cents / 100).toFixed(0)} · View playbook`}
                   </Link>
-                  {p.included_in_vanguard && (
+                  {!hasFullAccess && p.included_in_vanguard && (
                     <Link to="/pricing" className="block text-center uppercase tracking-widest text-xs font-mono text-secondary-accent hover:text-accent">
-                      Or unlock instantly with Vanguard →
+                      Or unlock all 6 from $39/mo →
                     </Link>
                   )}
                 </div>
