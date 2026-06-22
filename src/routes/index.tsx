@@ -11,6 +11,7 @@ import { StickyScrollSection } from "@/components/shared/StickyScrollSection";
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 
 import { listPosts } from "@/lib/posts.functions";
 
