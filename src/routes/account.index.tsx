@@ -139,7 +139,27 @@ function AccountPage() {
                 )
               }
             >
-              <div className="text-sm text-muted-foreground capitalize">Status: {me.data.subscriptionStatus}</div>
+              <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">Status</dt>
+                  <dd className="capitalize">{sub?.status ?? me.data.subscriptionStatus ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">Plan</dt>
+                  <dd>{sub?.priceId ?? (isPaid ? designationLabel : "Free")}</dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">
+                    {sub?.cancelAtPeriodEnd ? "Access ends" : "Renews"}
+                  </dt>
+                  <dd>{periodEndLabel ?? "—"}</dd>
+                </div>
+              </dl>
+              {sub?.cancelAtPeriodEnd && periodEndLabel && (
+                <p className="mt-3 text-xs text-secondary-accent font-mono uppercase tracking-widest">
+                  Cancellation scheduled · access continues until {periodEndLabel}
+                </p>
+              )}
             </SectionCard>
 
             <SectionCard eyebrow="Purchases" title="Playbook orders">
