@@ -22,7 +22,10 @@ export const logLumiEvent = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => EventSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await supabase.from("lumi_events").insert({
+    // Cast: lumi_events was just added; generated types refresh on next build.
+    await (supabase.from("lumi_events" as never) as unknown as {
+      insert: (row: Record<string, unknown>) => Promise<unknown>;
+    }).insert({
       user_id: userId,
       event: data.event,
       tree_id: data.treeId ?? null,
