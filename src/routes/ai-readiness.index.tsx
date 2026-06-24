@@ -4,6 +4,13 @@ import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
+import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
+
+const onStartAiReadiness = () =>
+  trackDiagnosticEvent("diagnostic.cta_click", {
+    slug: "ai-readiness",
+    surface: "ai-readiness.landing",
+  });
 
 
 export const Route = createFileRoute("/ai-readiness/")({
