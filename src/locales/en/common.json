@@ -79,7 +79,44 @@
     "hero": {
       "line1": "Stop managing accounts.",
       "line2": "Start engineering trajectory.",
-      "sub": "Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships."
+      "sub": "Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships.",
+      "rotations": [
+        {
+          "line1": "Stop managing accounts.",
+          "line2": "Start engineering trajectory.",
+          "sub": "Passives service contracts; leaders architect growth. This weekly playbook brings the elite tier the exact psychology, strategy, and frameworks needed to build legendary enterprise partnerships."
+        },
+        {
+          "line1": "The gap between 94% NRR and 120% NRR",
+          "line2": "is not headcount. It is system design.",
+          "sub": "Every Tuesday: the exact frameworks, diagnostics, and decision models the top quartile runs on."
+        },
+        {
+          "line1": "High-touch CS is a scaling liability.",
+          "line2": "Here is what replaces it.",
+          "sub": "One dispatch every Tuesday. The frameworks, benchmarks, and decision architecture the 120% NRR operators actually use."
+        },
+        {
+          "line1": "Stop managing accounts.",
+          "line2": "Start engineering revenue.",
+          "sub": "The CS industry optimised for empathy. The top quartile optimised for outcomes. This is the playbook for the latter."
+        },
+        {
+          "line1": "Your peers are managing relationships.",
+          "line2": "The top quartile is engineering expansion.",
+          "sub": "The difference is not effort. It is architecture. One dispatch a week for operators who have figured that out."
+        },
+        {
+          "line1": "CS done right does not feel like CS.",
+          "line2": "It feels like revenue leadership.",
+          "sub": "For the operators who already know the difference — and the ones who are about to."
+        },
+        {
+          "line1": "Why do your best accounts still churn?",
+          "line2": "The answer is structural. So is the fix.",
+          "sub": "Every Tuesday, the frameworks that separate CS teams that retain from CS teams that compound."
+        }
+      ]
     },
     "welcomeBack": "Welcome back —",
     "openAccount": "open your account →",
