@@ -221,13 +221,17 @@ function TierConfirm({ designation }: { designation: Designation }) {
 
         <button
           onClick={onCheckout}
-          className="block w-full py-3.5 text-center font-mono text-xs uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all"
+          disabled={opening}
+          className="flex items-center justify-center gap-2 w-full py-3.5 font-mono text-xs uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all disabled:opacity-60"
         >
+          {opening && <Loader2 size={14} className="animate-spin" />}
           {tier.ctaKind === "contact"
             ? tier.cta
             : !user
               ? "Sign in to continue"
-              : "Continue to checkout"}
+              : opening
+                ? "Opening checkout…"
+                : "Continue to checkout"}
         </button>
 
         {tier.ctaKind !== "contact" && (
