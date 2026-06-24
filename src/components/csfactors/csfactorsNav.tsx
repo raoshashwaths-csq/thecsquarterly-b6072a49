@@ -10,6 +10,7 @@ import {
   Users2,
   BookUser,
   Map as MapIcon,
+  Inbox,
 } from "lucide-react";
 
 export type NavLink = {
