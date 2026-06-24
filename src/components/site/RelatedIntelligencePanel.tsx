@@ -29,7 +29,7 @@ export function RelatedIntelligencePanel({ slug }: Props) {
       <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">
         Related intelligence
       </div>
-      <ul className="divide-y divide-border border border-border bg-card">
+      <ul className="divide-y divide-border border border-border bg-card widget-lift">
         {playbook && (
           <li>
             <Link
