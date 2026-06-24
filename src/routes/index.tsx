@@ -409,6 +409,7 @@ function HomePage() {
       {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
       <SiteFooter />
+      {user && <ResumeRunPrompt />}
     </div>
   );
 }
