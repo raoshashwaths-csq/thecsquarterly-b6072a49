@@ -5,6 +5,7 @@ import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useDiagnosticFlow, useCountUp } from "@/hooks/useDiagnosticFlow";
 import { useEntitlements } from "@/hooks/useEntitlements";
+import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 
 export const Route = createFileRoute("/diagnostics/champion-dependency")({
   head: () => ({
@@ -154,6 +155,21 @@ function ChampionDependencyDiagnostic() {
     calculateScore: exposureScore,
     calculateSubScores: subScores,
   });
+
+  useEffect(() => {
+    if (flow.stage === "survey") {
+      trackDiagnosticEvent("diagnostic.survey_start", {
+        slug: "champion-dependency",
+        surface: "diagnostics.champion-dependency",
+      });
+    } else if (flow.stage === "results") {
+      trackDiagnosticEvent("diagnostic.submit", {
+        slug: "champion-dependency",
+        surface: "diagnostics.champion-dependency",
+        meta: { exposure: flow.score },
+      });
+    }
+  }, [flow.stage, flow.score]);
 
   return (
     <div className="min-h-screen flex flex-col page-enter">

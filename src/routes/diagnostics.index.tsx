@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 
 export const Route = createFileRoute("/diagnostics/")({
   head: () => ({
@@ -116,6 +117,12 @@ function DiagnosticsIndex() {
 
                 <Link
                   to={d.to}
+                  onClick={() =>
+                    trackDiagnosticEvent("diagnostic.cta_click", {
+                      slug: d.slug,
+                      surface: "diagnostics.hub",
+                    })
+                  }
                   className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
                 >
                   View diagnostic →

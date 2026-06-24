@@ -4,6 +4,13 @@ import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
+import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
+
+const onStartAiReadiness = () =>
+  trackDiagnosticEvent("diagnostic.cta_click", {
+    slug: "ai-readiness",
+    surface: "ai-readiness.landing",
+  });
 
 
 export const Route = createFileRoute("/ai-readiness/")({
@@ -56,6 +63,7 @@ function AiReadinessLanding() {
         </p>
         <Link
           to="/ai-readiness/survey"
+          onClick={onStartAiReadiness}
           className="inline-block px-10 py-5 bg-foreground text-background font-mono text-xs uppercase tracking-widest font-bold hover:bg-accent transition-colors"
         >
           Start the diagnostic
@@ -103,6 +111,7 @@ function AiReadinessLanding() {
           <p className="font-mono uppercase tracking-widest text-xs opacity-60 mb-12">, SaaS Capital Retention Benchmarks, 2024</p>
           <Link
             to="/ai-readiness/survey"
+            onClick={onStartAiReadiness}
             className="inline-block px-10 py-5 bg-background text-foreground font-mono text-xs uppercase tracking-widest font-bold hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             Begin →

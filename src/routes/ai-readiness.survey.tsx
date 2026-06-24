@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { QUESTIONS, SCORE_OPTIONS, GAP_FIXES, AGENT_INFO } from "@/lib/survey";
 import type { ScoreResult } from "@/lib/survey";
 import { submitSurvey } from "@/lib/survey.functions";
+import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -53,6 +54,13 @@ function SurveyPage() {
     ? currentQuestion.metrics.every((m) => typeof answers[m.id] === "number")
     : true;
 
+  useEffect(() => {
+    trackDiagnosticEvent("diagnostic.survey_start", {
+      slug: "ai-readiness",
+      surface: "ai-readiness.survey",
+    });
+  }, []);
+
   async function handleSubmit() {
     setError(null);
     setSubmitting(true);
@@ -61,6 +69,11 @@ function SurveyPage() {
         data: { name, email, company, title, segment, hcm_status: hcm, answers },
       });
       setResult(res);
+      trackDiagnosticEvent("diagnostic.submit", {
+        slug: "ai-readiness",
+        surface: "ai-readiness.survey",
+        meta: { tier: res?.tier, score: res?.finalScore },
+      });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not submit.");
