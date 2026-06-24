@@ -20,12 +20,15 @@ import {
 } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/agent/framework")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    tree: typeof search.tree === "string" ? (search.tree as TreeId) : undefined,
+  }),
   head: () => ({
     meta: [
-      { title: "Q · Operator Canvas — The CS Quarterly" },
-      { name: "description", content: "Navigate Q's decision graph to a benchmark-grounded, immediately executable response. Vanguard only." },
+      { title: "Lumi · Operator Canvas — The CS Quarterly" },
+      { name: "description", content: "Navigate Lumi's 21-tree decision graph to a benchmark-grounded, immediately executable response. Vanguard only." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Q · Operator Canvas" },
+      { property: "og:title", content: "Lumi · Operator Canvas" },
       { property: "og:description", content: "The institutional memory of a 40-year CS operator. Available at 11pm." },
     ],
   }),
