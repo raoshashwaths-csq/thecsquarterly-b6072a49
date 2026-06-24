@@ -13,7 +13,7 @@ export function SiteFooter() {
   ] as const;
 
   const RESOURCES = [
-    { labelKey: "footer.resourceLinks.diagnostic", path: "/ai-readiness" },
+    { labelKey: "footer.resourceLinks.diagnostic", path: "/diagnostics" },
     { labelKey: "footer.resourceLinks.calculator", path: "/calculator" },
     { labelKey: "footer.resourceLinks.benchmarks", path: "/benchmarks" },
     { labelKey: "footer.resourceLinks.directory", path: "/directory" },

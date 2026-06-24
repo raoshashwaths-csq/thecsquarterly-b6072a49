@@ -37,7 +37,7 @@ export function ForYou() {
           </div>
           {!user && (
             <Link
-              to="/ai-readiness"
+              to="/diagnostics"
               className="hidden md:inline-block font-mono text-xs uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
             >
               Take the diagnostic →

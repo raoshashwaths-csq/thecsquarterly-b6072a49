@@ -47,7 +47,7 @@ export const Route = createFileRoute("/vanguard")({
               </div>
             </Link>
             <Link
-              to="/ai-readiness"
+              to="/diagnostics"
               className="group block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-8"
             >
               <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">The Diagnostic</div>

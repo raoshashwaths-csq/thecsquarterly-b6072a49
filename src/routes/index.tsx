@@ -31,7 +31,7 @@ const SECTIONS = [
   { to: "/retention-protocol", name: "The Retention Protocol", key: "retention" },
   { to: "/outcome-forum", name: "The Outcome Forum", key: "outcome" },
   { to: "/codex", name: "The CS Codex", key: "codex" },
-  { to: "/ai-readiness", name: "The Diagnostics", key: "diagnostic" },
+  { to: "/diagnostics", name: "The Diagnostics", key: "diagnostic" },
 ] as const;
 
 
@@ -99,7 +99,7 @@ function HomePage() {
         <div className="mt-12 grid gap-4 md:grid-cols-2 text-left">
           {/* AI Readiness */}
           <Link
-            to="/ai-readiness"
+            to="/diagnostics"
             data-tour="ai-readiness-box"
             className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7"
             aria-label="Take the AI Readiness Audit"

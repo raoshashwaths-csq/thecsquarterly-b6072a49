@@ -69,7 +69,7 @@ export const NAV_GROUPS: NavGroup[] = [
 export const TOP_LINKS: NavLink[] = NAV_GROUPS.flatMap((g) => g.links);
 
 export const STANDALONE_LINKS: NavLink[] = [
-  { to: "/ai-readiness", label: "AI Readiness Diagnostic", icon: Gauge },
+  { to: "/diagnostics/ai-readiness", label: "AI Readiness Diagnostic", icon: Gauge },
   { to: "/calculator", label: "ROI Calculator", icon: Calculator },
   { to: "/benchmarks", label: "NRR Benchmarks", icon: BarChart3 },
   { to: "/directory", label: "Operator Directory", icon: BookUser },

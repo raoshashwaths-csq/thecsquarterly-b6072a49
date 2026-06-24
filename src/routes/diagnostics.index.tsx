@@ -26,7 +26,7 @@ export const Route = createFileRoute("/diagnostics/")({
 
 type Diagnostic = {
   slug: string;
-  to: "/ai-readiness" | "/diagnostics/champion-dependency";
+  to: "/diagnostics/ai-readiness" | "/diagnostics/champion-dependency";
   category: string;
   title: string;
   blurb: string;
@@ -36,7 +36,7 @@ type Diagnostic = {
 const DIAGNOSTICS: Diagnostic[] = [
   {
     slug: "ai-readiness",
-    to: "/ai-readiness",
+    to: "/diagnostics/ai-readiness",
     category: "Operating Maturity",
     title: "CS Operating Maturity Diagnostic",
     blurb:

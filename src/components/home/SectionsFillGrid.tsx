@@ -8,7 +8,7 @@ const SECTIONS = [
   { to: "/retention-protocol", name: "The Retention Protocol", key: "retention" },
   { to: "/outcome-forum", name: "The Outcome Forum", key: "outcome" },
   { to: "/codex", name: "The CS Codex", key: "codex" },
-  { to: "/ai-readiness", name: "The Diagnostics", key: "diagnostic" },
+  { to: "/diagnostics", name: "The Diagnostics", key: "diagnostic" },
 ] as const;
 
 const OVERLAP = 0.15;
