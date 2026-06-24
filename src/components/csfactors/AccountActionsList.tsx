@@ -80,9 +80,11 @@ export function AccountActionsList({
       />
       {detailId && (
         <CtaDetailDrawer
-          ctaId={detailId}
+          id={detailId}
           open={!!detailId}
-          onOpenChange={(o) => !o && setDetailId(null)}
+          onOpenChange={(o) => {
+            if (!o) setDetailId(null);
+          }}
         />
       )}
     </div>
