@@ -76,7 +76,7 @@ export function AccountDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-2xl overflow-y-auto p-0 max-w-full"
+        className="w-full sm:max-w-none sm:w-[88vw] lg:w-[60vw] xl:w-[55vw] 2xl:w-[50vw] overflow-y-auto p-0"
       >
         <SheetHeader className="px-4 md:px-6 pt-4 md:pt-6 pb-4 border-b border-border bg-card sticky top-0 z-20 text-left">
           <div className="flex items-start justify-between gap-3">

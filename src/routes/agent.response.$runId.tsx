@@ -6,6 +6,7 @@ import { getQRun, setQRunShared, type RunZones } from "@/lib/q-agent.functions";
 import { getNode, breadcrumbFor } from "@/lib/q-trees";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { RunAccountTagger } from "@/components/agent/RunAccountTagger";
 import { QMark } from "@/components/site/QMark";
 import { Switch } from "@/components/ui/switch";
 
@@ -23,6 +24,7 @@ type Run = {
   id: string; node_id: string; context: Record<string, string>;
   witty: boolean; zones: RunZones; shared: boolean;
   isOwner: boolean; created_at: string;
+  account_id: string | null; tagged_stakeholder: string | null; tagged_at: string | null;
 };
 
 function ResponsePage() {
@@ -130,6 +132,17 @@ function ResponsePage() {
               <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
               <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
               <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+
+              {run.isOwner && node && (
+                <RunAccountTagger
+                  runId={run.id}
+                  treeId={node.treeId}
+                  initialAccountId={run.account_id}
+                  initialStakeholder={run.tagged_stakeholder}
+                  isOwner={run.isOwner}
+                />
+              )}
+
 
               <div className="flex flex-wrap gap-3 pt-10 border-t border-border mt-12">
                 <button

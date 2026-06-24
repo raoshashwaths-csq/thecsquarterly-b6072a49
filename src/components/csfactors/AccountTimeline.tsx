@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Calendar, Phone, PresentationIcon, Crown, AlertTriangle, TrendingUp,
   Handshake, FileText, Users, Sparkles, Trash2, Plus, ListChecks, CheckCircle2,
-  Pencil, RefreshCw, Search, X,
+  Pencil, RefreshCw, Search, X, Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,7 @@ export const VECTORS: Vector[] = [
   { kind: "cta.raised",         label: "CTA raised",         icon: ListChecks,       tint: "accent" },
   { kind: "cta.completed",      label: "CTA completed",      icon: CheckCircle2,     tint: "emerald" },
   { kind: "note",               label: "Note",               icon: FileText,         tint: "neutral" },
+  { kind: "lumi.run.tagged",    label: "Lumi run tagged",    icon: Compass,          tint: "secondary" },
   // System-emitted kinds (not user-selectable from the picker)
   { kind: "field.edit",         label: "Field edit",         icon: Pencil,           tint: "neutral", hidden: true },
   { kind: "qbr.override",       label: "QBR override",       icon: RefreshCw,        tint: "neutral", hidden: true },

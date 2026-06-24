@@ -5,6 +5,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { ResumeRunPrompt } from "@/components/agent/ResumeRunPrompt";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
@@ -408,6 +409,7 @@ function HomePage() {
       {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
       <SiteFooter />
+      {user && <ResumeRunPrompt />}
     </div>
   );
 }

@@ -279,7 +279,7 @@ export const getQRun = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("q_runs")
-      .select("id, node_id, context, witty, zones, shared, user_id, created_at")
+      .select("id, node_id, context, witty, zones, shared, user_id, created_at, account_id, tagged_stakeholder, tagged_at")
       .eq("id", data.runId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -291,6 +291,7 @@ export const getQRun = createServerFn({ method: "GET" })
       id: string; node_id: string; context: Record<string, string>;
       witty: boolean; zones: RunZones; shared: boolean;
       user_id: string; isOwner: boolean; created_at: string;
+      account_id: string | null; tagged_stakeholder: string | null; tagged_at: string | null;
     };
   });
 
@@ -324,4 +325,92 @@ export const setQRunShared = createServerFn({ method: "POST" })
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true, shared: data.shared };
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Account tagging — only the run's owner can tag a run to one of their accounts.
+// ─────────────────────────────────────────────────────────────────────────────
+export const listMyAccountsForTagging = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("cs_accounts" as never)
+      .select("id, name, health, arr")
+      .eq("user_id", userId)
+      .order("name", { ascending: true })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    return {
+      accounts: (data ?? []) as unknown as Array<{
+        id: string; name: string; health: number | null; arr: number | null;
+      }>,
+    };
+  });
+
+export const tagQRunToAccount = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => {
+    const o = input as { runId?: string; accountId?: string | null; stakeholder?: string | null };
+    if (!o.runId || typeof o.runId !== "string") throw new Error("runId required");
+    return {
+      runId: o.runId,
+      accountId: o.accountId ?? null,
+      stakeholder: (o.stakeholder ?? null) as string | null,
+    };
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // If clearing the tag
+    if (!data.accountId) {
+      const { error } = await supabase
+        .from("q_runs")
+        .update({ account_id: null, tagged_stakeholder: null, tagged_at: null } as never)
+        .eq("id", data.runId)
+        .eq("user_id", userId);
+      if (error) throw new Error(error.message);
+      return { ok: true, accountId: null as string | null };
+    }
+
+    // Confirm the account belongs to this user before tagging
+    const { data: acct, error: acctErr } = await supabase
+      .from("cs_accounts" as never)
+      .select("id, name")
+      .eq("id", data.accountId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (acctErr) throw new Error(acctErr.message);
+    if (!acct) throw new Error("Account not found or not yours");
+    const acctRow = acct as unknown as { id: string; name: string };
+
+    // Confirm the run is owned by this user, then update
+    const { data: runRow, error: runErr } = await supabase
+      .from("q_runs")
+      .update({
+        account_id: data.accountId,
+        tagged_stakeholder: data.stakeholder,
+        tagged_at: new Date().toISOString(),
+      } as never)
+      .eq("id", data.runId)
+      .eq("user_id", userId)
+      .select("id, node_id")
+      .maybeSingle();
+    if (runErr) throw new Error(runErr.message);
+    if (!runRow) throw new Error("Run not found or not yours");
+    const runFields = runRow as unknown as { id: string; node_id: string };
+
+    // Write a timeline event so the account card shows the tagged Lumi run.
+    await supabase.from("cs_account_events" as never).insert({
+      account_id: data.accountId,
+      user_id: userId,
+      kind: "lumi.run.tagged",
+      payload: {
+        run_id: data.runId,
+        node_id: runFields.node_id,
+        stakeholder: data.stakeholder,
+      },
+    } as never);
+
+    return { ok: true, accountId: data.accountId, accountName: acctRow.name };
   });
