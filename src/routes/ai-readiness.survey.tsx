@@ -54,6 +54,13 @@ function SurveyPage() {
     ? currentQuestion.metrics.every((m) => typeof answers[m.id] === "number")
     : true;
 
+  useEffect(() => {
+    trackDiagnosticEvent("diagnostic.survey_start", {
+      slug: "ai-readiness",
+      surface: "ai-readiness.survey",
+    });
+  }, []);
+
   async function handleSubmit() {
     setError(null);
     setSubmitting(true);
@@ -62,6 +69,11 @@ function SurveyPage() {
         data: { name, email, company, title, segment, hcm_status: hcm, answers },
       });
       setResult(res);
+      trackDiagnosticEvent("diagnostic.submit", {
+        slug: "ai-readiness",
+        surface: "ai-readiness.survey",
+        meta: { tier: res?.tier, score: res?.totalScore },
+      });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not submit.");
