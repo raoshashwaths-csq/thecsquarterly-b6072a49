@@ -724,7 +724,7 @@ function TierStrip({ compact = false }: { compact?: boolean } = {}) {
 
 function Tile({ eyebrow, title, body, to, cta }: { eyebrow: string; title: string; body: string; to: string; cta: string }) {
   return (
-    <Link to={to} className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col">
+    <Link to={to} className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col card-lift">
       <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-2">{eyebrow}</div>
       <h3 className="font-display text-lg leading-tight mb-2">{title}</h3>
       <p className="text-sm text-foreground/70 leading-snug mb-4 flex-1">{body}</p>
