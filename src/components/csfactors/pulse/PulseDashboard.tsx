@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import type { CSAccount } from "@/lib/csfactors.functions";
 import { getPortfolioTrend, type TrendPoint as ApiTrendPoint, type TrendRange as ApiTrendRange } from "@/lib/csfactors.functions";
 import { pulseSeedAccounts } from "@/lib/mocks/pulseSeed";
+import { ActionCentrePanel } from "@/components/csfactors/ctas/ActionCentrePanel";
 
 /* ------------------------------------------------------------------ *
  * Pulse — editorial midnight dashboard.
