@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from "@/components/ui/sheet";
@@ -14,6 +15,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { QMark } from "@/components/site/QMark";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { trackLumiEvent, rememberLastTree, recallLastTree } from "@/lib/lumi-analytics";
 import {
   TREES, NODES, nodesForTree, getNode, breadcrumbFor, CATEGORY_COLOR,
   type TreeId, type TreeNode, type TreeCategory,
@@ -44,19 +46,54 @@ function AgentFrameworkPage() {
   const { user, loading } = useAuth();
   const sub = useSubscriptionTier();
   const search = Route.useSearch();
+  const navigate = useNavigate();
   const [hasVanguard, setHasVanguard] = useState<boolean | null>(null);
-  const [activeTree, setActiveTree] = useState<TreeId>(
-    (search.tree && TREES.some((t) => t.id === search.tree)) ? search.tree : "T1",
-  );
+  // Initial tree resolution priority: ?tree= → localStorage last → T1.
+  const [activeTree, setActiveTree] = useState<TreeId>(() => {
+    if (search.tree && TREES.some((t) => t.id === search.tree)) return search.tree;
+    const remembered = recallLastTree();
+    if (remembered && TREES.some((t) => t.id === remembered)) return remembered as TreeId;
+    return "T1";
+  });
+  // focusMode = picker collapsed, wheel surfaced after a user selection.
+  const [focusMode, setFocusMode] = useState<boolean>(!!search.tree);
   const [runTerminal, setRunTerminal] = useState<TreeNode | null>(null);
   const [witty, setWitty] = useState(false);
+  const wheelRef = useRef<HTMLDivElement>(null);
 
+  // Mirror URL → state when ?tree changes (deep links, back/forward).
   useEffect(() => {
     if (search.tree && TREES.some((t) => t.id === search.tree) && search.tree !== activeTree) {
       setActiveTree(search.tree);
+      setFocusMode(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.tree]);
+
+  // Mirror state → URL + localStorage on every active-tree change.
+  useEffect(() => {
+    rememberLastTree(activeTree);
+    if (search.tree !== activeTree) {
+      navigate({ to: "/agent/framework", search: { tree: activeTree }, replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTree]);
+
+  function handlePickTree(id: TreeId) {
+    const fromTree = activeTree;
+    setActiveTree(id);
+    setFocusMode(true);
+    trackLumiEvent("tree.select", { treeId: id, surface: "canvas", meta: { from: fromTree } });
+    trackLumiEvent("tree.focus", { treeId: id, surface: "canvas" });
+    // Smooth-scroll the wheel into view after the animation kicks off.
+    setTimeout(() => wheelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  }
+
+  function handleBackToPicker() {
+    trackLumiEvent("tree.unfocus", { treeId: activeTree, surface: "canvas" });
+    setFocusMode(false);
+  }
+
 
   useEffect(() => {
     if (loading || !user) { setHasVanguard(user ? false : null); return; }
@@ -111,66 +148,90 @@ function AgentFrameworkPage() {
       <LumiSessionBanner sub={sub} />
 
 
-      {/* Tree picker rail — grouped by category */}
+      {/* Tree picker rail — collapses into a "Back to all decision trees" pill once a tree is focused. */}
       <RevealBlock>
-        <div className="space-y-6 mb-10">
-          {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
-            const group = TREES.filter((t) => t.category === cat);
-            if (group.length === 0) return null;
-            const c = CATEGORY_COLOR[cat];
-            return (
-              <div key={cat}>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/60">{c.label}</span>
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
+            focusMode ? "max-h-0 opacity-0 pointer-events-none -translate-y-2" : "max-h-[3000px] opacity-100 translate-y-0"
+          }`}
+          aria-hidden={focusMode}
+        >
+          <div className="space-y-6 mb-10">
+            {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
+              const group = TREES.filter((t) => t.category === cat);
+              if (group.length === 0) return null;
+              const c = CATEGORY_COLOR[cat];
+              return (
+                <div key={cat}>
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/60">{c.label}</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {group.map((t) => {
+                      const active = t.id === activeTree;
+                      return (
+                        <button
+                          key={t.id}
+                          onClick={() => handlePickTree(t.id)}
+                          className={`relative text-left p-4 border transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:-translate-y-0.5 ${
+                            active
+                              ? "border-foreground bg-foreground text-background shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]"
+                              : "border-border hover:border-foreground"
+                          }`}
+                          style={!active ? { boxShadow: `inset 3px 0 0 0 ${c.hex}` } : undefined}
+                        >
+                          <div className={`font-mono text-xs uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
+                            {cleanEyebrow(t.eyebrow)}
+                          </div>
+                          <div className="font-display text-base leading-tight break-words">{t.title}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {group.map((t) => {
-                    const active = t.id === activeTree;
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => setActiveTree(t.id)}
-                        className={`relative text-left p-4 border transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:-translate-y-0.5 ${
-                          active
-                            ? "border-foreground bg-foreground text-background shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]"
-                            : "border-border hover:border-foreground"
-                        }`}
-                        style={!active ? { boxShadow: `inset 3px 0 0 0 ${c.hex}` } : undefined}
-                      >
-                        <div className={`font-mono text-xs uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
-                          {cleanEyebrow(t.eyebrow)}
-                        </div>
-                        <div className="font-display text-base leading-tight break-words">{t.title}</div>
-                      </button>
-                    );
-                  })}
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className="border border-border bg-card/40 p-4 mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
+              const c = CATEGORY_COLOR[cat];
+              return (
+                <div key={cat} className="flex items-start gap-2.5">
+                  <span aria-hidden className="mt-1.5 inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.hex }} />
+                  <div className="min-w-0">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/80">{c.label}</div>
+                    <div className="text-xs text-foreground/60 leading-snug">{c.blurb}</div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        {/* Legend */}
-        <div className="border border-border bg-card/40 p-4 mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
-            const c = CATEGORY_COLOR[cat];
-            return (
-              <div key={cat} className="flex items-start gap-2.5">
-                <span aria-hidden className="mt-1.5 inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.hex }} />
-                <div className="min-w-0">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/80">{c.label}</div>
-                  <div className="text-xs text-foreground/60 leading-snug">{c.blurb}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Back-to-picker pill — shown only in focus mode */}
+        {focusMode && (
+          <div className="mb-8 animate-fade-up">
+            <button
+              type="button"
+              onClick={handleBackToPicker}
+              className="inline-flex items-center gap-2 border border-border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.25em] text-foreground/70 hover:border-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              All decision trees
+            </button>
+          </div>
+        )}
       </RevealBlock>
 
       {/* Selected tree header */}
       <RevealBlock>
-        <div className="border-t border-border pt-6 mb-10">
+        <div
+          key={`hdr-${activeTree}`}
+          className="border-t border-border pt-6 mb-10 animate-fade-up"
+        >
           <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
             {cleanEyebrow(tree.eyebrow)}
           </div>
@@ -181,22 +242,24 @@ function AgentFrameworkPage() {
 
       {/* Desktop (lg+): circular wheel. Tablet & mobile: stacked cards. */}
       <RevealBlock>
-        <div className="hidden lg:block">
-          <TreeWheel
-            key={activeTree}
-            tree={tree}
-            terminals={terminals}
-            onTerminal={setRunTerminal}
-          />
-        </div>
-        <div className="lg:hidden">
-          <TreeStack
-            tree={tree}
-            terminals={terminals}
-            onTerminal={setRunTerminal}
-          />
+        <div ref={wheelRef} key={`wheel-${activeTree}`} className="animate-fade-up">
+          <div className="hidden lg:block">
+            <TreeWheel
+              tree={tree}
+              terminals={terminals}
+              onTerminal={setRunTerminal}
+            />
+          </div>
+          <div className="lg:hidden">
+            <TreeStack
+              tree={tree}
+              terminals={terminals}
+              onTerminal={setRunTerminal}
+            />
+          </div>
         </div>
       </RevealBlock>
+
 
       <RunHistory />
 
@@ -210,7 +273,7 @@ function CanvasShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 pt-28 md:pt-32 pb-24">
-        <div className="container max-w-6xl mx-auto px-5 sm:px-6 md:px-10">{children}</div>
+        <div className="container max-w-6xl 2xl:max-w-[88rem] 3xl:max-w-[104rem] mx-auto px-5 sm:px-6 md:px-10 2xl:px-14">{children}</div>
       </main>
       <SiteFooter />
     </div>

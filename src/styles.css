@@ -41,6 +41,9 @@
   --font-ui: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Custom widescreen breakpoint — enables `3xl:` utilities on 1800px+ monitors. */
+  --breakpoint-3xl: 112rem;
 }
 
 :root {
@@ -183,11 +186,19 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Prevent rogue horizontal scroll on mobile across CS Quarterly + CSFactors.
-       Any wide content (charts, tables, tab strips) must opt-in via its own
-       overflow-x-auto container instead of bleeding into page width. */
     overflow-x: clip;
     max-width: 100%;
+  }
+  /* Widescreen legibility — bump base font-size on large monitors so body
+     copy and UI typography don't shrink into illegibility at 1600px+. */
+  @media (min-width: 1600px) {
+    html, body { font-size: 18px; }
+  }
+  @media (min-width: 1920px) {
+    html, body { font-size: 19px; }
+  }
+  @media (min-width: 2400px) {
+    html, body { font-size: 20px; }
   }
   /* Belt + braces: anything that tries to be wider than the viewport gets
      clipped at the root rather than introducing a horizontal scrollbar. */

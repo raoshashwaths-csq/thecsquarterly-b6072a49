@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { TREES, CATEGORY_COLOR } from "@/lib/q-trees";
+import { trackLumiEvent, rememberLastTree } from "@/lib/lumi-analytics";
 
 /**
  * Vertical list of all Lumi decision-tree headings.
@@ -31,7 +32,11 @@ export function TreeVectorList({
               key={t.id}
               to="/agent/framework"
               search={{ tree: t.id }}
-              onClick={onPick}
+              onClick={() => {
+                rememberLastTree(t.id);
+                trackLumiEvent("tree.select", { treeId: t.id, surface: "drawer", meta: { from: heading } });
+                onPick?.();
+              }}
               className="group flex items-center gap-3 px-3 py-2.5 hover:bg-accent/5 transition-colors"
             >
               <span
@@ -55,3 +60,4 @@ export function TreeVectorList({
     </div>
   );
 }
+

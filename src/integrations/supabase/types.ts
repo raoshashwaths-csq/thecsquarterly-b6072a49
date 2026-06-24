@@ -695,6 +695,39 @@ export type Database = {
         }
         Relationships: []
       }
+      lumi_events: {
+        Row: {
+          briefing_shown: boolean
+          created_at: string
+          event: string
+          id: string
+          message_count: number
+          meta: Json | null
+          tree_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          briefing_shown?: boolean
+          created_at?: string
+          event: string
+          id?: string
+          message_count?: number
+          meta?: Json | null
+          tree_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          briefing_shown?: boolean
+          created_at?: string
+          event?: string
+          id?: string
+          message_count?: number
+          meta?: Json | null
+          tree_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       map_comments: {
         Row: {
           author_name: string | null

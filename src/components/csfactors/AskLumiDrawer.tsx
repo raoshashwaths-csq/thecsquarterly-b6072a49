@@ -17,6 +17,7 @@ import { TreeVectorList } from "@/components/site/TreeVectorList";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
 import type { LumiBriefing } from "@/lib/lumi-briefings";
+import { trackLumiEvent } from "@/lib/lumi-analytics";
 import { cn } from "@/lib/utils";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -84,7 +85,18 @@ function AskLumiDrawer({
   });
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 80);
+    if (open) {
+      setTimeout(() => inputRef.current?.focus(), 80);
+      trackLumiEvent("drawer.open", {
+        surface: "csfactors",
+        briefingShown: !!briefing,
+        messageCount: messages.length,
+        meta: briefing ? { briefingEyebrow: briefing.eyebrow, accountId: briefing.accountId ?? null } : undefined,
+      });
+    } else {
+      trackLumiEvent("drawer.close", { surface: "csfactors", messageCount: messages.length });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, briefing]);
 
   useEffect(() => {
