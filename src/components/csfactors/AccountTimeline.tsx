@@ -379,7 +379,7 @@ function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (i
               month: "short", day: "2-digit", year: "2-digit",
             })}
           </time>
-          {isManual && (
+          {canDelete && (
             <button
               type="button"
               onClick={() => onDelete(event.id)}
