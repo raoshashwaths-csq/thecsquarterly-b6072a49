@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -20,7 +19,7 @@ export function RelatedIntelligencePanel({ slug }: Props) {
   if (!playbook && !tree && !foundational) return null;
 
   const onClick = (kind: "playbook" | "tree" | "foundational", targetSlug: string) =>
-    trackLumiEvent("article.related.click" as never, {
+    trackLumiEvent("article.related.click", {
       surface: "insights",
       meta: { slug, kind, targetSlug },
     });
@@ -32,72 +31,67 @@ export function RelatedIntelligencePanel({ slug }: Props) {
       </div>
       <ul className="divide-y divide-border border border-border bg-card">
         {playbook && (
-          <RelatedRow
-            eyebrow="PLAYBOOK"
-            title={playbook.title}
-            to="/codex/$slug"
-            params={{ slug: playbook.slug }}
-            onClick={() => onClick("playbook", playbook.slug)}
-          />
+          <li>
+            <Link
+              to="/codex/$slug"
+              params={{ slug: playbook.slug }}
+              onClick={() => onClick("playbook", playbook.slug)}
+              className="group flex items-start justify-between gap-6 px-5 py-4 transition-transform hover:-translate-y-px"
+            >
+              <RowBody eyebrow="PLAYBOOK" title={playbook.title} />
+              <Arrow />
+            </Link>
+          </li>
         )}
         {tree && (
-          <RelatedRow
-            eyebrow={`LUMI TREE · ${tree.id}`}
-            title={tree.title}
-            to="/csfactors"
-            search={{ tree: tree.id }}
-            onClick={() => onClick("tree", tree.id)}
-          />
+          <li>
+            <Link
+              to="/csfactors"
+              search={{ tree: tree.id } as never}
+              onClick={() => onClick("tree", tree.id)}
+              className="group flex items-start justify-between gap-6 px-5 py-4 transition-transform hover:-translate-y-px"
+            >
+              <RowBody eyebrow={`LUMI TREE · ${tree.id}`} title={tree.title} />
+              <Arrow />
+            </Link>
+          </li>
         )}
         {foundational && (
-          <RelatedRow
-            eyebrow="FOUNDATIONAL"
-            title={foundational.title}
-            to="/insights/$slug"
-            params={{ slug: foundational.slug }}
-            onClick={() => onClick("foundational", foundational.slug)}
-          />
+          <li>
+            <Link
+              to="/insights/$slug"
+              params={{ slug: foundational.slug }}
+              onClick={() => onClick("foundational", foundational.slug)}
+              className="group flex items-start justify-between gap-6 px-5 py-4 transition-transform hover:-translate-y-px"
+            >
+              <RowBody eyebrow="FOUNDATIONAL" title={foundational.title} />
+              <Arrow />
+            </Link>
+          </li>
         )}
       </ul>
     </section>
   );
 }
 
-type RowProps = {
-  eyebrow: string;
-  title: string;
-  to: string;
-  params?: Record<string, string>;
-  search?: Record<string, string>;
-  onClick: () => void;
-};
-
-function RelatedRow({ eyebrow, title, to, params, search, onClick }: RowProps) {
+function RowBody({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
-    <li>
-      <Link
-        // @ts-expect-error — dynamic route helper acceptable here
-        to={to}
-        params={params}
-        search={search}
-        onClick={onClick}
-        className="group flex items-start justify-between gap-6 px-5 py-4 transition-transform hover:-translate-y-px"
-      >
-        <div className="min-w-0">
-          <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-1">
-            {eyebrow}
-          </div>
-          <div className="font-display text-lg leading-snug text-foreground group-hover:underline underline-offset-4 decoration-accent/60">
-            {title}
-          </div>
-        </div>
-        <span aria-hidden className="font-mono text-xs text-muted-foreground mt-2 shrink-0">
-          →
-        </span>
-      </Link>
-    </li>
+    <div className="min-w-0">
+      <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-1">
+        {eyebrow}
+      </div>
+      <div className="font-display text-lg leading-snug text-foreground group-hover:underline underline-offset-4 decoration-accent/60">
+        {title}
+      </div>
+    </div>
   );
 }
 
-// silence unused import in non-React contexts
-void useEffect;
+function Arrow() {
+  return (
+    <span aria-hidden className="font-mono text-xs text-muted-foreground mt-2 shrink-0">
+      →
+    </span>
+  );
+}
+
