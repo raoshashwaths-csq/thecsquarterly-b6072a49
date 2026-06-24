@@ -164,6 +164,18 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
     }
   }
 
+  const fieldEditCount = presentKinds.get("field.edit") ?? 0;
+  async function clearFieldEdits() {
+    if (!confirm(`Remove all ${fieldEditCount} auto-logged field edits on this account?`)) return;
+    try {
+      const res = await delByKind({ data: { account_id: accountId, kind: "field.edit" } });
+      await qc.invalidateQueries({ queryKey: ["cs-events", accountId] });
+      toast.success(`Cleared ${res.deleted} field edit${res.deleted === 1 ? "" : "s"}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Clear failed");
+    }
+  }
+
   const activeFilters = filterKinds.size > 0 || query.length > 0;
 
   return (
