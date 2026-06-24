@@ -28,6 +28,7 @@ import { Route as CsfactorsRouteImport } from './routes/csfactors'
 import { Route as CodexRouteImport } from './routes/codex'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
+import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -46,6 +47,7 @@ import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
 import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
@@ -171,6 +173,11 @@ const BenchmarksRoute = BenchmarksRouteImport.update({
   path: '/benchmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiReadinessRoute = AiReadinessRouteImport.update({
+  id: '/ai-readiness',
+  path: '/ai-readiness',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -261,6 +268,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   id: '/checkout/return',
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AiReadinessSurveyRoute = AiReadinessSurveyRouteImport.update({
+  id: '/survey',
+  path: '/survey',
+  getParentRoute: () => AiReadinessRoute,
 } as any)
 const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
   id: '/agent/framework',
@@ -424,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
@@ -448,6 +461,7 @@ export interface FileRoutesByFullPath {
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/agent/framework': typeof AgentFrameworkRoute
+  '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
@@ -492,6 +506,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/csfactors': typeof CsfactorsRouteWithChildren
@@ -514,6 +529,7 @@ export interface FileRoutesByTo {
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/agent/framework': typeof AgentFrameworkRoute
+  '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
@@ -558,6 +574,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
@@ -582,6 +599,7 @@ export interface FileRoutesById {
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/agent/framework': typeof AgentFrameworkRoute
+  '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
@@ -628,6 +646,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-readiness'
     | '/benchmarks'
     | '/calculator'
     | '/codex'
@@ -652,6 +671,7 @@ export interface FileRouteTypes {
     | '/admin/control-panel'
     | '/admin/payments'
     | '/agent/framework'
+    | '/ai-readiness/survey'
     | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
@@ -696,6 +716,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-readiness'
     | '/benchmarks'
     | '/calculator'
     | '/csfactors'
@@ -718,6 +739,7 @@ export interface FileRouteTypes {
     | '/admin/control-panel'
     | '/admin/payments'
     | '/agent/framework'
+    | '/ai-readiness/survey'
     | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
@@ -761,6 +783,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-readiness'
     | '/benchmarks'
     | '/calculator'
     | '/codex'
@@ -785,6 +808,7 @@ export interface FileRouteTypes {
     | '/admin/control-panel'
     | '/admin/payments'
     | '/agent/framework'
+    | '/ai-readiness/survey'
     | '/checkout/return'
     | '/codex/$slug'
     | '/csfactors/$accountId'
@@ -830,6 +854,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AiReadinessRoute: typeof AiReadinessRouteWithChildren
   BenchmarksRoute: typeof BenchmarksRoute
   CalculatorRoute: typeof CalculatorRoute
   CodexRoute: typeof CodexRouteWithChildren
@@ -1014,6 +1039,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BenchmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-readiness': {
+      id: '/ai-readiness'
+      path: '/ai-readiness'
+      fullPath: '/ai-readiness'
+      preLoaderRoute: typeof AiReadinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -1139,6 +1171,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/checkout/return'
       preLoaderRoute: typeof CheckoutReturnRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/ai-readiness/survey': {
+      id: '/ai-readiness/survey'
+      path: '/survey'
+      fullPath: '/ai-readiness/survey'
+      preLoaderRoute: typeof AiReadinessSurveyRouteImport
+      parentRoute: typeof AiReadinessRoute
     }
     '/agent/framework': {
       id: '/agent/framework'
@@ -1360,6 +1399,18 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface AiReadinessRouteChildren {
+  AiReadinessSurveyRoute: typeof AiReadinessSurveyRoute
+}
+
+const AiReadinessRouteChildren: AiReadinessRouteChildren = {
+  AiReadinessSurveyRoute: AiReadinessSurveyRoute,
+}
+
+const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
+  AiReadinessRouteChildren,
+)
+
 interface CodexRouteChildren {
   CodexSlugRoute: typeof CodexSlugRoute
   CodexIndexRoute: typeof CodexIndexRoute
@@ -1430,6 +1481,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
+  AiReadinessRoute: AiReadinessRouteWithChildren,
   BenchmarksRoute: BenchmarksRoute,
   CalculatorRoute: CalculatorRoute,
   CodexRoute: CodexRouteWithChildren,
