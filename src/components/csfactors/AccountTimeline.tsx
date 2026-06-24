@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
-  listAccountEvents, logAccountEvent, deleteAccountEvent,
+  listAccountEvents, logAccountEvent, deleteAccountEvent, deleteAccountEventsByKind,
   type CSAccountEvent,
 } from "@/lib/csfactors.functions";
 
