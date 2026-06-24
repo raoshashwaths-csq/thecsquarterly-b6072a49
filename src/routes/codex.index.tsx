@@ -71,7 +71,7 @@ function CodexPage() {
         )}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {playbooks.map((p) => (
-            <article key={p.id} className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors">
+            <article key={p.id} className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors card-lift">
               <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
                 <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
                   <Lock size={12} /> {hasFullAccess ? "Included" : "Premium"}
