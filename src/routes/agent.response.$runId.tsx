@@ -23,6 +23,7 @@ type Run = {
   id: string; node_id: string; context: Record<string, string>;
   witty: boolean; zones: RunZones; shared: boolean;
   isOwner: boolean; created_at: string;
+  account_id: string | null; tagged_stakeholder: string | null; tagged_at: string | null;
 };
 
 function ResponsePage() {
