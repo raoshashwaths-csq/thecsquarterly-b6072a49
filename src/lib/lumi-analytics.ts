@@ -5,7 +5,12 @@ export type LumiEventName =
   | "drawer.open"
   | "drawer.close"
   | "tree.focus"
-  | "tree.unfocus";
+  | "tree.unfocus"
+  | "article.signal.shown"
+  | "article.resume.shown"
+  | "article.resume.click"
+  | "article.resume.dismiss"
+  | "article.related.click";
 
 export type LumiEventProps = {
   treeId?: string;
