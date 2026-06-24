@@ -16,7 +16,7 @@ export function ArticleSignalRow({ post }: Props) {
   const copy = complexityCopy(complexity, sub.tier);
 
   useEffect(() => {
-    trackLumiEvent("article.signal.shown" as never, {
+    trackLumiEvent("article.signal.shown", {
       surface: "insights",
       meta: { slug: post.slug, complexity, tier: sub.tier },
     });

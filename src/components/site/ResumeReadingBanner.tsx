@@ -29,7 +29,7 @@ export function ResumeReadingBanner({ slug, title }: { slug: string; title: stri
 
   useEffect(() => {
     if (!eligible || dismissed) return;
-    trackLumiEvent("article.resume.shown" as never, {
+    trackLumiEvent("article.resume.shown", {
       surface: "insights",
       meta: { slug, pct: savedEntry?.pct },
     });
@@ -48,7 +48,7 @@ export function ResumeReadingBanner({ slug, title }: { slug: string; title: stri
       <div className="flex items-center gap-4">
         <button
           onClick={() => {
-            trackLumiEvent("article.resume.click" as never, {
+            trackLumiEvent("article.resume.click", {
               surface: "insights",
               meta: { slug, pct: savedEntry.pct },
             });
@@ -61,7 +61,7 @@ export function ResumeReadingBanner({ slug, title }: { slug: string; title: stri
         </button>
         <button
           onClick={() => {
-            trackLumiEvent("article.resume.dismiss" as never, {
+            trackLumiEvent("article.resume.dismiss", {
               surface: "insights",
               meta: { slug },
             });
