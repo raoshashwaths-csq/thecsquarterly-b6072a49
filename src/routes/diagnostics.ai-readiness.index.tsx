@@ -23,9 +23,9 @@ export const Route = createFileRoute("/diagnostics/ai-readiness/")({
       },
       { property: "og:title", content: "CS Operating Maturity Diagnostic" },
       { property: "og:description", content: "8 dimensions · 32 metrics · Personalised 90-day plan." },
-      { property: "og:url", content: "/ai-readiness" },
+      { property: "og:url", content: "/diagnostics/ai-readiness" },
     ],
-    links: [{ rel: "canonical", href: "/ai-readiness" }],
+    links: [{ rel: "canonical", href: "/diagnostics/ai-readiness" }],
   }),
   component: AiReadinessLanding,
 });

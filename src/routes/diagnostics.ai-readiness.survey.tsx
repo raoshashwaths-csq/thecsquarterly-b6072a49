@@ -18,10 +18,10 @@ export const Route = createFileRoute("/diagnostics/ai-readiness/survey")({
         name: "description",
         content: "8 dimensions, 32 metrics. Benchmark your Customer Success operating model against the discipline of top-decile retention orgs.",
       },
-      { property: "og:url", content: "/ai-readiness/survey" },
+      { property: "og:url", content: "/diagnostics/ai-readiness/survey" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: "/ai-readiness/survey" }],
+    links: [{ rel: "canonical", href: "/diagnostics/ai-readiness/survey" }],
   }),
   component: SurveyPage,
 });
