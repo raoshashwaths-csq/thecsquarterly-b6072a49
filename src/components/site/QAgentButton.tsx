@@ -26,6 +26,7 @@ import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { FeatureGlossary } from "@/components/enablement/FeatureGlossary";
 import { RouteTipsList } from "@/components/enablement/RouteTipsList";
 import { PlaybookTour } from "@/components/enablement/PlaybookTour";
+import { trackLumiEvent } from "@/lib/lumi-analytics";
 
 const TRIAL_KEY = "q.trial.used";
 const DRAFT_KEY = "q.draft.global";
@@ -128,7 +129,10 @@ export function QAgentButton() {
     return () => clearTimeout(t);
   }, [query, runUniversal]);
 
-  const handleOpen = () => { setOpen(true); };
+  const handleOpen = () => {
+    setOpen(true);
+    trackLumiEvent("drawer.open", { surface: "site", briefingShown: false, messageCount: answer ? 1 : 0 });
+  };
 
 
   // Monthly Q interaction cap (designation-tier scoped).
