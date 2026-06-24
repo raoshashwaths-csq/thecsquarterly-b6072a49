@@ -132,6 +132,17 @@ function ResponsePage() {
               <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
               <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
 
+              {run.isOwner && node && (
+                <RunAccountTagger
+                  runId={run.id}
+                  treeId={node.treeId}
+                  initialAccountId={run.account_id}
+                  initialStakeholder={run.tagged_stakeholder}
+                  isOwner={run.isOwner}
+                />
+              )}
+
+
               <div className="flex flex-wrap gap-3 pt-10 border-t border-border mt-12">
                 <button
                   onClick={() => navigate({ to: "/agent/framework" })}
