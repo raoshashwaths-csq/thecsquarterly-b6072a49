@@ -435,6 +435,13 @@ function PulseView({
 
       <Hairline />
 
+      {/* ============== ACTION CENTRE ============== */}
+      <section className="pt-6 pb-8">
+        <ActionCentrePanel />
+      </section>
+
+      <Hairline />
+
       {/* ============== PORTFOLIO OVERVIEW ============== */}
       <section className="pt-6 pb-12">
         <Eyebrow>Portfolio Overview</Eyebrow>
