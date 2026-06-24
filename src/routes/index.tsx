@@ -87,14 +87,14 @@ function HomePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center md:animate-fade-up">
+      <header className="max-w-7xl w-full mx-auto px-6 pt-20 md:pt-24 pb-6 text-center md:animate-fade-up">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           {t("home.eyebrow")}
         </div>
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
           {hero.line1} <span className="not-italic text-accent">{hero.line2}</span>
         </h1>
-        <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-10">
+        <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-8">
           {hero.sub}
         </p>
         {!user ? (
@@ -107,6 +107,8 @@ function HomePage() {
             </Link>
           </p>
         )}
+
+        <TierStrip compact />
 
 
         {/* Primary destination grid — four equal cards, each with a clear primary CTA */}
