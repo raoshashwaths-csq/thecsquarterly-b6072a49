@@ -70,7 +70,7 @@ export function RunAccountTagger({
       return;
     }
     let cancelled = false;
-    listFn({ data: {} })
+    listFn({})
       .then((r) => {
         if (!cancelled) setAccounts(r.accounts);
       })
