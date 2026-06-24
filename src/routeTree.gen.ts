@@ -34,6 +34,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as DiagnosticsIndexRouteImport } from './routes/diagnostics.index'
 import { Route as CodexIndexRouteImport } from './routes/codex.index'
+import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as MTokenRouteImport } from './routes/m.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -201,6 +202,11 @@ const CodexIndexRoute = CodexIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => CodexRoute,
+} as any)
+const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
+  id: '/ai-readiness/',
+  path: '/ai-readiness/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AccountIndexRoute = AccountIndexRouteImport.update({
   id: '/account/',
@@ -467,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/insights/$slug': typeof InsightsSlugRoute
   '/m/$token': typeof MTokenRoute
   '/account/': typeof AccountIndexRoute
+  '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -533,6 +540,7 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/m/$token': typeof MTokenRoute
   '/account': typeof AccountIndexRoute
+  '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/diagnostics': typeof DiagnosticsIndexRoute
   '/insights': typeof InsightsIndexRoute
@@ -603,6 +611,7 @@ export interface FileRoutesById {
   '/insights/$slug': typeof InsightsSlugRoute
   '/m/$token': typeof MTokenRoute
   '/account/': typeof AccountIndexRoute
+  '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -674,6 +683,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/m/$token'
     | '/account/'
+    | '/ai-readiness/'
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
@@ -740,6 +750,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/m/$token'
     | '/account'
+    | '/ai-readiness'
     | '/codex'
     | '/diagnostics'
     | '/insights'
@@ -809,6 +820,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/m/$token'
     | '/account/'
+    | '/ai-readiness/'
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
@@ -872,6 +884,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   MTokenRoute: typeof MTokenRoute
   AccountIndexRoute: typeof AccountIndexRoute
+  AiReadinessIndexRoute: typeof AiReadinessIndexRoute
   DiagnosticsIndexRoute: typeof DiagnosticsIndexRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
   AccountAnalyticsRetentionFunnelRoute: typeof AccountAnalyticsRetentionFunnelRoute
@@ -1068,6 +1081,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/codex/'
       preLoaderRoute: typeof CodexIndexRouteImport
       parentRoute: typeof CodexRoute
+    }
+    '/ai-readiness/': {
+      id: '/ai-readiness/'
+      path: '/ai-readiness'
+      fullPath: '/ai-readiness/'
+      preLoaderRoute: typeof AiReadinessIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/account/': {
       id: '/account/'
@@ -1480,6 +1500,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   MTokenRoute: MTokenRoute,
   AccountIndexRoute: AccountIndexRoute,
+  AiReadinessIndexRoute: AiReadinessIndexRoute,
   DiagnosticsIndexRoute: DiagnosticsIndexRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
   AccountAnalyticsRetentionFunnelRoute: AccountAnalyticsRetentionFunnelRoute,
