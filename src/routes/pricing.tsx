@@ -364,7 +364,6 @@ const COMPARE_GROUPS: Group[] = [
   {
     group: "Benchmarks",
     rows: [
-      { label: "Retention Ledger ticker", values: [true, true, true, true, true, true, true] },
       { label: "Benchmark comparison tool", values: [false, false, true, true, true, true, true] },
       { label: "Quarterly branded PDF", values: [false, false, false, false, true, true, true] },
       { label: "White-label benchmark report", values: [false, false, false, false, false, true, true] },

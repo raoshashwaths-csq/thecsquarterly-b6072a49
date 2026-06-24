@@ -50,7 +50,6 @@ export const TIERS: Tier[] = [
     band: "individual",
     features: [
       "Weekly Tuesday dispatch",
-      "Retention Ledger benchmark ticker",
       "AI Diagnostic — score only",
       "Public archive access",
       "Lumi — 1 session per week",
