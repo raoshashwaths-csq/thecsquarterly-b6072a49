@@ -112,7 +112,7 @@ function HomePage() {
 
 
         {/* Primary destination grid — four equal cards, each with a clear primary CTA */}
-        <div className="mt-12 grid gap-4 md:grid-cols-2 text-left">
+        <div className="mt-10 grid gap-4 md:grid-cols-2 text-left">
           {/* AI Readiness */}
           <Link
             to="/diagnostics"
@@ -232,8 +232,6 @@ function HomePage() {
           </Link>
         </div>
       </header>
-
-      <TierStrip />
 
       <StickyScrollSection
         stages={[
