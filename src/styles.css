@@ -315,14 +315,16 @@
   transform: translate3d(0, -110%, 0);
 }
 
-.card-lift {
+.card-lift,
+.widget-lift {
   transition:
     transform 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
     box-shadow 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
     border-color 320ms cubic-bezier(0.22, 0.61, 0.36, 1);
   will-change: transform, box-shadow;
 }
-.card-lift:hover {
+.card-lift:hover,
+.widget-lift:hover {
   transform: translate3d(0, -4px, 0);
   box-shadow:
     0 1px 0 color-mix(in oklab, var(--color-foreground) 6%, transparent),
