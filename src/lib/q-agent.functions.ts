@@ -375,13 +375,14 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
 
     // Confirm the account belongs to this user before tagging
     const { data: acct, error: acctErr } = await supabase
-      .from("cs_accounts")
+      .from("cs_accounts" as never)
       .select("id, name")
       .eq("id", data.accountId)
       .eq("user_id", userId)
       .maybeSingle();
     if (acctErr) throw new Error(acctErr.message);
     if (!acct) throw new Error("Account not found or not yours");
+    const acctRow = acct as unknown as { id: string; name: string };
 
     // Confirm the run is owned by this user, then update
     const { data: runRow, error: runErr } = await supabase
