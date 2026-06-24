@@ -11,7 +11,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
-import { HealthChip } from "@/components/dashboard/HealthChip";
+
 import { getPaddleEnvironment } from "@/lib/paddle";
 import { getPaymentsAnalytics } from "@/lib/payments-analytics.functions";
 
@@ -234,7 +234,7 @@ function PaymentsAnalyticsPage() {
             >
               {d.recentCancels.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  No cancellations in the last 30 days. <HealthChip tone="success" label="Healthy" />
+                  No cancellations in the last 30 days.
                 </p>
               ) : (
                 <ul className="divide-y divide-border">
