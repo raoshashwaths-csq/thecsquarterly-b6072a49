@@ -93,6 +93,7 @@ function ThreeSixtyPage() {
     const done = accounts.filter((a) => a.qbr_status === "Completed").length;
     return Math.round((done / accounts.length) * 100);
   }, [accounts]);
+  const portfolioUpdatedAt = useMemo(() => latestUpdatedAt(accounts as Array<{ updated_at?: string | null }>), [accounts]);
 
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
