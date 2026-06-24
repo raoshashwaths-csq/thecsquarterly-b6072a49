@@ -15,7 +15,8 @@ import { QMark } from "@/components/site/QMark";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import {
-  TREES, NODES, nodesForTree, getNode, breadcrumbFor, type TreeId, type TreeNode,
+  TREES, NODES, nodesForTree, getNode, breadcrumbFor, CATEGORY_COLOR,
+  type TreeId, type TreeNode, type TreeCategory,
 } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/agent/framework")({
