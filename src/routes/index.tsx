@@ -307,15 +307,11 @@ function HomePage() {
         ]}
       />
 
-      <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
-
-
-
-      {/* Sections strip */}
-      <section className="max-w-7xl w-full mx-auto px-6 py-16 animate-fade-up [animation-delay:300ms]">
-        <div className="flex items-end justify-between mb-10">
+      {/* Editorial — sections rail + featured share one band */}
+      <section className="max-w-7xl w-full mx-auto px-6 py-14 md:py-16 animate-fade-up [animation-delay:300ms]">
+        <div className="flex items-end justify-between mb-8">
           <div className="font-mono text-xs uppercase tracking-widest text-foreground font-semibold">
-            {t("home.sections.eyebrow")}
+            {t("home.editorial.eyebrow")}
           </div>
           <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
             {t("home.sections.count", { count: SECTIONS.length })}
@@ -324,9 +320,6 @@ function HomePage() {
         <SectionsFillGrid />
       </section>
 
-
-
-      <div className="h-px bg-border max-w-7xl w-full mx-auto" />
 
       {/* Recruiter / leader: tools surface BEFORE the editorial */}
       {isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
