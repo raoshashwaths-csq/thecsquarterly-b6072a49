@@ -177,7 +177,7 @@ function HomePage() {
           <Link
             to="/account/workspace"
             data-tour="workspace-icon"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-foreground border-l-4 border-l-foreground/70 transition-colors p-6 md:p-7"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-foreground border-l-4 border-l-foreground/70 transition-colors p-6 md:p-7 card-lift"
             aria-label="Open your Workspace"
           >
             <div className="flex items-center gap-3 mb-4">
