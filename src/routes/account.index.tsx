@@ -21,6 +21,8 @@ import { getPaddleEnvironment } from "@/lib/paddle";
 
 
 
+type AccountSearch = { checkout?: "success" | "cancel"; tier?: string };
+
 export const Route = createFileRoute("/account/")({
   head: () => ({
     meta: [
@@ -28,6 +30,14 @@ export const Route = createFileRoute("/account/")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (input: Record<string, unknown>): AccountSearch => {
+    const c = input.checkout;
+    const t = input.tier;
+    return {
+      checkout: c === "success" || c === "cancel" ? c : undefined,
+      tier: typeof t === "string" ? t : undefined,
+    };
+  },
   component: AccountPage,
 });
 
