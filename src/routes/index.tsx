@@ -418,6 +418,52 @@ function HomePage() {
   );
 }
 
+function ClosingCTA() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const primary = user
+    ? { to: "/csfactors", label: t("home.closing.ctaAuthedPrimary") }
+    : { to: "/diagnostics", label: t("home.closing.ctaPrimary") };
+  const secondary = user
+    ? { to: "/account/workspace", label: t("home.closing.ctaAuthedSecondary") }
+    : { to: "/pricing", label: t("home.closing.ctaSecondary") };
+
+  return (
+    <section className="border-t border-border bg-card/40">
+      <div className="max-w-5xl w-full mx-auto px-6 py-16 md:py-20 text-center">
+        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-secondary-accent mb-5 font-semibold">
+          {t("home.closing.eyebrow")}
+        </div>
+        <h2 className="font-display text-3xl md:text-5xl leading-[1.05] tracking-tight text-balance mb-5">
+          {t("home.closing.title")}
+        </h2>
+        <p className="max-w-2xl mx-auto text-base md:text-lg text-foreground/75 text-pretty mb-8">
+          {t("home.closing.sub")}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to={primary.to}
+            className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+          >
+            {primary.label} →
+          </Link>
+          <Link
+            to={secondary.to}
+            className="inline-flex items-center gap-2 border border-border font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:border-foreground transition-colors"
+          >
+            {secondary.label} →
+          </Link>
+        </div>
+        {!user && (
+          <div className="mt-8 max-w-xl mx-auto">
+            <NewsletterInline source="home-closing" />
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function StageMock({ variant }: { variant: "pulse" | "threeSixty" | "risk" }) {
   return (
     <div className="w-full max-w-full md:max-w-3xl mx-auto bg-card border border-border shadow-2xl overflow-hidden">
@@ -521,7 +567,8 @@ function StageMock({ variant }: { variant: "pulse" | "threeSixty" | "risk" }) {
 // Tier-aware strip — rendered immediately below the hero. Switches content
 // (NOT visual design) based on the visitor's tier. Tokens only — no hex.
 // ─────────────────────────────────────────────────────────────────────────────
-function TierStrip() {
+function TierStrip({ compact = false }: { compact?: boolean } = {}) {
+  void compact;
   const sub = useSubscriptionTier();
   const [readerNudgeDismissed, setReaderNudgeDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
