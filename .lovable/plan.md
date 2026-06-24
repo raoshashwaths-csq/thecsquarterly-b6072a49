@@ -1,108 +1,117 @@
+# Build Plan — Next 3 Workstreams
 
-## Scope
+Confirmed scope from your answers:
+1. Build **2-E CTA Engine** next.
+2. Follow Bible pricing tiers as-is (adds a new **Reader $19** tier between Free and Practitioner).
+3. Migrate payments **Stripe → Paddle**.
+4. Hold 4-A.
+5. One-time housekeeping commit to mark the Bible's status indicators.
 
-Refine the existing CSFactors Pulse dashboard to match `csq-mockup-pulse-dark.png` pixel-for-pixel, complete the Q → Lumi rebrand using the uploaded lighthouse mark, and wire the Ask Lumi slide-out drawer with ledger-driven context. Data values stay frozen.
+To keep risk low, these will ship in **three separate sessions** in this order. Trying to do all three at once would tangle the CTA migration with the payment migration.
 
-## 1. Lumi brand asset
+---
 
-- Upload `IMG_20260531_020324-2.png` via `lovable-assets` → `src/assets/lumi-mark.png.asset.json`.
-- New `src/components/site/LumiMark.tsx`:
-  - Props: `variant: "emblem" | "lockup"`, `size`, `animated`, `className`.
-  - `emblem` = lighthouse only (cropped via CSS `object-position` or a pre-cropped emblem-only asset). `lockup` = emblem + serif "Lumi" wordmark (font-display, gold).
-  - Built-in beam/star/lantern animation hooks toggled by `animated` + parent `data-state="active"`.
-- Replace every `<QMark />` usage with `<LumiMark variant="emblem" />` (inline) or `<LumiMark variant="lockup" />` (hero spots). Keep `QMark.tsx` as a one-line re-export shim during this pass to avoid churn — delete in a follow-up.
-- Copy sweep: "Ask Q" → "Ask Lumi", "Powered by Q" → "Powered by Lumi", "Q Insight" → "Lumi Insight", tooltips, aria-labels, toasts, suggested vectors header.
+## Session 1 (this turn) — 2-E CTA Engine + tier matrix update + Bible status sync
 
-## 2. Lighthouse activation animation
+### A. Tier matrix update (small, prerequisite for CTA team-leader checks)
 
-In `src/styles.css` add keyframes + utilities (semantic only, no hex in components):
+`src/lib/tiers.ts` + `src/lib/entitlements.ts`:
+- Insert **Reader** tier between Free and Practitioner: $19/mo, 20 Lumi/mo, full Codex + premium archive, **no CSFactors**.
+- Keep Practitioner $39 / Operator $89 / pools 500-2000-5000 (already correct).
+- `useSubscriptionTier`: extend `tier` union to include `'reader'`, set its Lumi cap to 20/mo, `canAccessCSFactors=false`, `canAccessCommunity=true`.
+- Update `PaywallOverlay` Reader-on-CSFactors variant (Bible's State C copy).
+- Update Codex banner copy: Reader+ gets "All 6 playbooks included" (currently Practitioner+).
+- Add new DB column `profiles.is_team_leader boolean default false` in a migration; expose via `useSubscriptionTier`. (Bible says `users.is_team_leader`; this project's user-facing table is `profiles` — same effect, correct location.)
 
-```text
-@keyframes lumi-beam   { 0% { transform: rotate(-30deg) } 100% { transform: rotate(30deg) } }
-@keyframes lumi-twinkle{ 0%,100% { opacity:.4 } 50% { opacity:1 } }
-@keyframes lumi-lantern{ 0%,100% { opacity:.5 } 50% { opacity:1; filter: blur(6px) } }
-```
+Update memory `mem://index.md` to reflect Reader $19 + revised gating.
 
-- `.lumi-beam` — absolute conic-gradient overlay, masked to lantern origin, 2.4s ease-in-out infinite alternate, gated by `data-state="hover"|"active"`.
-- `.lumi-star` (×3) — staggered 1.8s/2.4s/3.0s delays.
-- `.lumi-lantern` — radial blur pulse on drawer open.
-- Reduced-motion: `@media (prefers-reduced-motion)` disables all three.
+### B. 2-E CTA Engine
 
-## 3. Top utility bar — Ask Lumi trigger
+**Migration** (`supabase/migrations/...`)
+- `public.ctas` table per Bible schema, with two adjustments to match this project:
+  - `account_id uuid REFERENCES public.cs_accounts(id)` (Bible says `accounts`; our table is `cs_accounts`).
+  - `created_by` / `assigned_to` reference `auth.users(id)`, not a public `users` table.
+- Add `profiles.is_team_leader` (from section A).
+- GRANTs for `authenticated` + `service_role`; RLS:
+  - SELECT: row creator OR assignee OR `team_wide=true` for same-team viewers (via `is_team_member`).
+  - INSERT: authenticated users; `created_by = auth.uid()` enforced.
+  - UPDATE: creator, assignee, or `has_role(auth.uid(),'admin')`.
+  - DELETE: creator only.
+- Indexes on `(status, due_date)`, `(account_id, status)`, `(assigned_to, status)`.
 
-In `src/routes/csfactors.tsx` header zone (next to Import CSV / + Add Account):
+**Server functions** — `src/lib/ctas.functions.ts`
+- `listCtas({ scope, status?, accountId?, assigneeId? })`
+- `getCta(id)`
+- `createCta(input)` (used by Create modal + Pulse "+" + Lumi push)
+- `updateCta({ id, patch })` (status, assignee, priority, due_date, description)
+- `completeCta({ id, outcome, note })`
+- `bulkUpdate({ ids, patch })` for list-view bulk actions
+- `pushLumiActions({ accountId?, runId, steps[3] })` — Lumi resolution drawer hook (3 inserts)
+All gated by `requireSupabaseAuth`.
 
-- New `AskLumiTrigger` button — flat (radius 0), 1px gold hairline (`border-accent`), 36px height, gold text. Embeds `<LumiMark variant="emblem" size={18} animated />` left of "Ask Lumi".
-- Click → opens the new Ask Lumi drawer with no preset context.
-- Hover → beam sweep + lantern pulse activate.
+**Components** — `src/components/csfactors/ctas/`
+- `CtaConfig.ts` — `CTA_CONFIG` and `PRIORITY_CONFIG`. **Colors mapped to existing semantic tokens** (`--accent`, `--secondary-accent`, emerald, destructive, muted). Bible's hex values are reference only; we do not introduce them per the locked design-system rule.
+- `ActionCentrePanel.tsx` — Surface A, embedded in Pulse below existing content. Uses `SectionCard` + `HealthChip` primitives.
+- `AccountCtaTab.tsx` — Surface B, embedded as a tab on `csfactors.$accountId.tsx`.
+- `CtaCreateDrawer.tsx`, `CtaDetailDrawer.tsx`, `QuickCompleteModal.tsx`, `TeamAssignmentModal.tsx`.
+- `CtaListView.tsx`, `CtaBoardView.tsx` (HTML5 drag).
 
-## 4. Ask Lumi drawer (slide-out copilot)
+**Routes**
+- `src/routes/csfactors.ctas.tsx` — Surface C (`/csfactors/ctas`). Metric strip + LIST/BOARD toggle.
+- Sidebar: insert "ACTION CENTRE" entry in `CSFactorsSidebar.tsx` **between Pulse and Accounts**, with badge for open count + red dot when overdue.
+- Path note: Bible says `/ctas`. This project namespaces CSFactors features under `/csfactors/*` (locked convention); we'll use `/csfactors/ctas`. Calling out so you can override if you'd rather break convention.
 
-New `src/components/csfactors/AskLumiDrawer.tsx`:
+**Integrations**
+- `PulseDashboard.tsx` — render `<ActionCentrePanel />` below existing content (additive, no rewrite).
+- `AccountsGrid` / `csfactors.$accountId.tsx` — "Next Best Action" chip pulls from `ctas` with the Bible's ordering; falls back to "+" trigger that opens Create drawer pre-filled with `account_id`.
+- `AskLumiDrawer` resolution footer — add "PUSH TO ACTION CENTRE" button next to existing actions; uses `pushLumiActions`.
+- Home "Open CTAs" tile (Practitioner state) — now reads live count.
 
-- 420px fixed right slide-out, `ease-out` 240ms; backdrop `bg-foreground/40 backdrop-blur-sm`.
-- Header: lockup logo left, "[ Close ]" mono text trigger right.
-- Body sections:
-  - Context briefing card (rendered when invoked from a ledger row) — dark card, gold hairline top, mono eyebrow "Lumi Insight · <event time>", serif headline, body summary, "Open account →" link.
-  - Composer (textarea + send) wired to the existing `askQ` server function (reused as-is; rename in copy only).
-- State managed by a new `LumiDrawerContext` (`src/components/csfactors/LumiDrawerContext.tsx`) exposing `open(briefing?)` / `close()`. Provider mounted in `csfactors.tsx`.
-- Replaces the legacy `QAgentDrawer` slot on CSFactors only; site-wide `QAgentButton` is untouched.
-- Reuses existing `useElevenLabsSpeechInput` hook for dictation.
+**Out of scope** (Bible mentions but we won't build here):
+- Email/push notifications — toasts only, per Bible §7.
+- Bridge to MAP Engine "linked CTAs" — separate work.
 
-## 5. Reckoning Ledger interactivity
+### C. Bible status housekeeping commit
 
-`src/components/csfactors/pulse/ReckoningLedger.tsx`:
+A single commit that updates the Bible markdown in-place:
+- 0-A, 0-B, 1-E, 2-A, 2-B, 2-C → ✅ BUILT
+- 2-E → ✅ BUILT (after this session)
+- Add a note at the top: "Tier matrix updated to include Reader $19 (Jun 2026)."
 
-- Convert each event row to a `<button>` with full-width hit target.
-- Fix timeline rail: move rail to `left: 11px` and center each `8px` dot via `translate-x-[-50%] left-[11px]`; rows use `pl-7` so text never crosses the rail.
-- onClick → `lumiDrawer.open({ kind: "ledger", event, account })` builds a briefing payload from the event (escalation/usage drop/health change → templated runbook copy).
-- Briefing renderer: a small `buildLedgerBriefing(event, account)` pure function in `src/lib/lumi-briefings.ts` returning `{ eyebrow, headline, body, accountId }`.
+Stored at `docs/CS-Quarterly-Build-Bible.md` so it lives with the repo. Tell me if you'd rather keep it outside the repo.
 
-## 6. Burning Three — populate third card
+---
 
-`deriveBurningThree` in `src/lib/csfactors.functions.ts` currently returns up to 3 but seeds only 2 entries with content; add a third `info`-accent slot ("Renewal upcoming") derived from the soonest `renewal_date` in the next 60 days. For demo (seed) data, ensure `pulseSeed.ts` has at least one account with a renewal in that window so the third card renders (TechCore Q2-2027 already qualifies — verify and adjust contract date if needed).
+## Session 2 (next) — Stripe → Paddle migration
 
-## 7. KPI metric card accent rails
+Large and risky; isolate from feature work. High-level outline only here.
 
-`src/components/dashboard/MetricCard.tsx`:
+1. **You disconnect Stripe** from the Payments dashboard (three-dots menu → Disconnect Stripe). I cannot do this step.
+2. Enable Lovable's seamless Paddle integration (`enable_paddle_payments`).
+3. Recreate products + prices in Paddle for: Free (no price), **Reader $19/mo**, Practitioner $39/mo, Operator $89/mo, Team, Scale, Enterprise — monthly + annual where applicable.
+4. Replace Stripe code in one pass:
+   - Delete `src/lib/stripe.server.ts`, `src/lib/payments.functions.ts` (Stripe variant), `src/components/StripeEmbeddedCheckout.tsx`, `PaymentTestModeBanner.tsx`.
+   - Rewrite checkout server fn for Paddle; rewrite `/subscribe` to use Paddle's checkout component.
+   - Replace webhook at `src/routes/api/public/payments/webhook.ts` with Paddle signature verification + Paddle event names (`subscription.created/updated/canceled`).
+   - Update `subscriptions` table writer to store Paddle's `customer_id` / `subscription_id` shape.
+5. Keep `subscriptions` table schema; add `provider text default 'paddle'` column for clarity. Existing Stripe rows stay readable but inactive.
+6. Remove Stripe env vars from references; leave secrets in place (managed by connector).
+7. Verify go-live readiness for Paddle, then publish.
 
-- Add a `topAccent?: "gold" | "success" | "danger" | "warn"` prop.
-- Render as a `2px` flat bar pinned to the card top (absolute, full width), color from semantic tokens (`--accent`, `--success` / emerald, `--destructive`, `--secondary-accent`).
-- Update `PulseDashboard.tsx` to pass `topAccent="gold" | "success" | "danger" | "success"` to NRR / GRR / Churn / Health respectively. Keep the existing accent prop for trend color only.
+**Trade-offs to acknowledge before starting:** existing Stripe subscribers don't migrate automatically — they remain on Stripe until they cancel/resubscribe. If you want them moved, that's a manual customer-by-customer process outside the codebase.
 
-## 8. Heatmap hover state
+---
 
-`RiskHeatmap.tsx`:
+## Session 3 (later) — your call
 
-- On hover, swap border to `outline outline-1 outline-accent` (already partly there) and reveal a floating mono tooltip via Radix `HoverCard` or a simple absolute-positioned `div` showing `Impact <i> · Likelihood <l>` and first 2 account names.
-- Keep current click → row-drawer behavior intact.
+Slots open for: 1-C completion (AI Readiness blueprint paywall), 2-D EBR Builder, 1-F/G/H homepage animations, 3-A Lumi trees 9–13, or 3-C WhatsApp (needs `ctas` table → unblocked by Session 1).
 
-## 9. Typography / spacing polish
+---
 
-- `PulseHeader.tsx`: tighten serif headline — wrap the italic emphasis in `<em class="italic font-display tracking-tight pr-[0.05em]">` so the trailing period doesn't crowd. Date stamp `MONDAY, 1 JUNE 2026` — force `font-mono uppercase tracking-[0.28em] text-[11px] text-muted-foreground`.
-- Unify all dashboard eyebrows on the shared `.eyebrow` utility (already in `styles.css`) — sweep `BurningThree`, `RiskHeatmap`, `PulseDashboard`, `ReckoningLedger`, `SectionCard` to remove ad-hoc tracking values.
+## Open questions before I start Session 1
 
-## 10. Sidebar rail tightening
+1. **Route path:** `/csfactors/ctas` (project convention) vs `/ctas` (Bible literal). OK with `/csfactors/ctas`?
+2. **Reader tier in Stripe:** while Stripe is still live, do you want me to also add a Reader $19 price in Stripe so it's purchasable during the interim before Paddle goes live — or skip the Stripe wiring entirely and only enable Reader once Paddle is live?
+3. **Bible file location:** OK to commit the status-synced Bible to `docs/CS-Quarterly-Build-Bible.md`?
 
-`CSFactorsSidebar.tsx`: reduce horizontal padding to `px-3`, icon row gap to `gap-1`, icon button to `h-9 w-9` so the rail reads as a flush shell. No nav items added or removed.
-
-## 11. Account drawer cross-fade
-
-Existing "Open account →" links already route to `/csfactors/$accountId`. Add a `view-transition-name` on the `<main>` container and the account drawer root + a small `.fade-cross` utility (200ms `opacity` + 2px translate) for browsers without view-transition support. No router changes.
-
-## Out of scope (deferred)
-
-- Renaming Q files (`QAgentDrawer`, `QFilterContext`, `q-agent.functions.ts`, etc.) — copy/visual rebrand only this turn; file/server-fn renames in a follow-up to keep this diff reviewable.
-- Stakeholder Canvas, 360 lens rework, drop-cap polish on `/insights`.
-
-## Technical notes
-
-- All new colors come from existing semantic tokens (`--accent`, `--secondary-accent`, `--destructive`, plus emerald via existing `--success` token if defined; otherwise add `--success: oklch(0.72 0.12 150)` once in `styles.css`).
-- No new dependencies.
-- No DB/schema changes; ledger briefings are derived client-side.
-- `askQ` server fn reused unchanged; rebrand is presentation-only.
-
-## Files touched
-
-- new: `src/assets/lumi-mark.png.asset.json`, `src/components/site/LumiMark.tsx`, `src/components/csfactors/AskLumiDrawer.tsx`, `src/components/csfactors/LumiDrawerContext.tsx`, `src/lib/lumi-briefings.ts`
-- edited: `src/styles.css`, `src/components/site/QMark.tsx` (shim → LumiMark), `src/components/dashboard/MetricCard.tsx`, `src/components/csfactors/pulse/{PulseDashboard,PulseHeader,RiskHeatmap,ReckoningLedger}.tsx`, `src/components/csfactors/{CSFactorsSidebar,BurningThree,QAgentDrawer (copy only)}.tsx`, `src/routes/csfactors.tsx`, `src/lib/csfactors.functions.ts` (third Burning Three slot), `src/lib/mocks/pulseSeed.ts` (verify renewal-window account), `src/components/site/QHint.tsx` (copy)
+Once you confirm 1–3 I'll execute Session 1 end-to-end.
