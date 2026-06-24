@@ -7,7 +7,7 @@ import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
 import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
-import { SUGGESTED_VECTORS } from "@/lib/q-vectors";
+import { TreeVectorList } from "@/components/site/TreeVectorList";
 import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
 import { useTour } from "@/hooks/useTour";
