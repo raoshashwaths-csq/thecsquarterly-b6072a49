@@ -111,26 +111,58 @@ function AgentFrameworkPage() {
       <LumiSessionBanner sub={sub} />
 
 
-      {/* Tree picker rail */}
+      {/* Tree picker rail — grouped by category */}
       <RevealBlock>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12">
-          {TREES.map((t) => {
-            const active = t.id === activeTree;
+        <div className="space-y-6 mb-10">
+          {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
+            const group = TREES.filter((t) => t.category === cat);
+            if (group.length === 0) return null;
+            const c = CATEGORY_COLOR[cat];
             return (
-              <button
-                key={t.id}
-                onClick={() => setActiveTree(t.id)}
-                className={`text-left p-4 border transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:-translate-y-0.5 ${
-                  active
-                    ? "border-foreground bg-foreground text-background shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]"
-                    : "border-border hover:border-foreground"
-                }`}
-              >
-                <div className={`font-mono text-xs uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
-                  {cleanEyebrow(t.eyebrow)}
+              <div key={cat}>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/60">{c.label}</span>
                 </div>
-                <div className="font-display text-base leading-tight break-words">{t.title}</div>
-              </button>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {group.map((t) => {
+                    const active = t.id === activeTree;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => setActiveTree(t.id)}
+                        className={`relative text-left p-4 border transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:-translate-y-0.5 ${
+                          active
+                            ? "border-foreground bg-foreground text-background shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]"
+                            : "border-border hover:border-foreground"
+                        }`}
+                        style={!active ? { boxShadow: `inset 3px 0 0 0 ${c.hex}` } : undefined}
+                      >
+                        <div className={`font-mono text-xs uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
+                          {cleanEyebrow(t.eyebrow)}
+                        </div>
+                        <div className="font-display text-base leading-tight break-words">{t.title}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div className="border border-border bg-card/40 p-4 mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
+            const c = CATEGORY_COLOR[cat];
+            return (
+              <div key={cat} className="flex items-start gap-2.5">
+                <span aria-hidden className="mt-1.5 inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.hex }} />
+                <div className="min-w-0">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/80">{c.label}</div>
+                  <div className="text-xs text-foreground/60 leading-snug">{c.blurb}</div>
+                </div>
+              </div>
             );
           })}
         </div>
