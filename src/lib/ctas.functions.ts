@@ -177,6 +177,23 @@ export const createCta = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+    // Mirror onto the account timeline so the client card shows it.
+    if (row?.account_id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from("cs_account_events").insert({
+        account_id: row.account_id,
+        user_id: userId,
+        kind: "cta.raised",
+        payload: {
+          label: "CTA raised",
+          title: row.title,
+          cta_id: row.id,
+          cta_type: row.cta_type,
+          priority: row.priority,
+          due_date: row.due_date,
+        },
+      });
+    }
     return { cta: row as Cta };
   });
 
@@ -218,8 +235,9 @@ export const completeCta = createServerFn({ method: "POST" })
     (data: { id: string; outcome: CtaOutcome; note?: string | null }) => data,
   )
   .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: row, error } = await (context.supabase as any)
+    const { data: row, error } = await (supabase as any)
       .from(CTA_TABLE)
       .update({
         status: "completed",
@@ -231,6 +249,21 @@ export const completeCta = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+    if (row?.account_id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from("cs_account_events").insert({
+        account_id: row.account_id,
+        user_id: userId,
+        kind: "cta.completed",
+        payload: {
+          label: "CTA completed",
+          title: row.title,
+          cta_id: row.id,
+          outcome: row.outcome,
+          note: row.completion_note,
+        },
+      });
+    }
     return { cta: row as Cta };
   });
 
@@ -310,7 +343,29 @@ export const pushLumiActions = createServerFn({ method: "POST" })
       .insert(rows)
       .select("*");
     if (error) throw new Error(error.message);
-    return { ctas: (inserted ?? []) as Cta[] };
+    const ctas = (inserted ?? []) as Cta[];
+    // Mirror Lumi-raised CTAs onto the account timeline.
+    const events = ctas
+      .filter((c) => !!c.account_id)
+      .map((c) => ({
+        account_id: c.account_id,
+        user_id: userId,
+        kind: "cta.raised",
+        payload: {
+          label: "CTA raised (Lumi)",
+          title: c.title,
+          cta_id: c.id,
+          cta_type: c.cta_type,
+          priority: c.priority,
+          due_date: c.due_date,
+          source: "lumi",
+        },
+      }));
+    if (events.length) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from("cs_account_events").insert(events);
+    }
+    return { ctas };
   });
 
 // METRICS for /csfactors/ctas metric strip ----------------------------------

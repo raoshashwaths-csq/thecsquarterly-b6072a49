@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
+    "check:wiring": "bun scripts/check-wiring.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
