@@ -10,7 +10,7 @@ import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const Route = createFileRoute("/ai-readiness/survey")({
+export const Route = createFileRoute("/diagnostics/ai-readiness/survey")({
   head: () => ({
     meta: [
       { title: "CS Operating Maturity Diagnostic, The CS Quarterly" },
