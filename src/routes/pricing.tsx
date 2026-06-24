@@ -70,7 +70,7 @@ function PricingPage() {
                 body: "Consolidates the legacy CS suite, the research subscription, and the L&D spend into a single platform with the editorial team on call.",
               },
             ].map((c) => (
-              <div key={c.eyebrow} className="p-6 border border-border bg-card/60">
+              <div key={c.eyebrow} className="p-6 border border-border bg-card/60 card-lift">
                 <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-3">
                   {c.eyebrow}
                 </div>
