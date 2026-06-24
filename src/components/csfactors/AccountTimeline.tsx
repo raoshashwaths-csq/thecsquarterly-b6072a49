@@ -71,6 +71,7 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
   const list = useServerFn(listAccountEvents);
   const log = useServerFn(logAccountEvent);
   const del = useServerFn(deleteAccountEvent);
+  const delByKind = useServerFn(deleteAccountEventsByKind);
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["cs-events", accountId],
