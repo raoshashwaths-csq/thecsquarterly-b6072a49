@@ -209,8 +209,9 @@ export const runQNode = createServerFn({ method: "POST" })
     }
 
     const breadcrumb = breadcrumbFor(node.id);
+    const category = getTree(node.treeId)?.category;
     const messages = [
-      { role: "system", content: buildSystem(data.witty) },
+      { role: "system", content: buildSystem(data.witty, category) },
       {
         role: "user",
         content: buildUser({
