@@ -19,6 +19,7 @@ import { LumiMark } from "@/components/site/LumiMark";
 import { LumiBadgeButton } from "@/components/site/LumiBadgeButton";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
 import { PulseDashboard } from "@/components/csfactors/pulse/PulseDashboard";
+import { TaggedLumiRunsWidget } from "@/components/csfactors/TaggedLumiRunsWidget";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -179,6 +180,12 @@ function CSFactorsPageInner() {
                   onRowClick={onRowClick}
                 />
               </QErrorBoundary>
+
+              <div className="mt-8">
+                <QErrorBoundary label="Tagged Lumi Runs">
+                  <TaggedLumiRunsWidget />
+                </QErrorBoundary>
+              </div>
             </>
           )}
         </div>
