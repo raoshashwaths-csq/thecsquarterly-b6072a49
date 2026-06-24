@@ -102,12 +102,20 @@ function AdminPage() {
             <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Editorial dashboard</div>
             <h1 className="font-display text-5xl">The Newsroom</h1>
           </div>
-          <Link
-            to="/admin/control-panel"
-            className="font-mono text-xs uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
-          >
-            Open Control Panel →
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              to="/admin/payments"
+              className="font-mono text-xs uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
+            >
+              Payments Analytics →
+            </Link>
+            <Link
+              to="/admin/control-panel"
+              className="font-mono text-xs uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 transition-colors"
+            >
+              Open Control Panel →
+            </Link>
+          </div>
         </div>
 
         {me.data?.isAdmin && (
