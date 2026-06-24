@@ -399,16 +399,16 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
     if (!runRow) throw new Error("Run not found or not yours");
 
     // Write a timeline event so the account card shows the tagged Lumi run.
-    await supabase.from("account_events").insert({
+    await supabase.from("cs_account_events" as never).insert({
       account_id: data.accountId,
       user_id: userId,
-      kind: "lumi_run_tagged",
+      kind: "lumi.run.tagged",
       payload: {
         run_id: data.runId,
         node_id: runRow.node_id,
         stakeholder: data.stakeholder,
       },
-    });
+    } as never);
 
     return { ok: true, accountId: data.accountId, accountName: acct.name };
   });
