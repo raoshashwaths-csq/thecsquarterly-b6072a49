@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   Calendar, Phone, PresentationIcon, Crown, AlertTriangle, TrendingUp,
   Handshake, FileText, Users, Sparkles, Trash2, Plus, ListChecks, CheckCircle2,
-  Pencil, RefreshCw, Search, X,
+  Pencil, RefreshCw, Search, X, Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
