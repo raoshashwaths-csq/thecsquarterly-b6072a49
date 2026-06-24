@@ -14,6 +14,9 @@ import { Paywall, BlurredTeaser } from "@/components/site/Paywall";
 import { PaywallOverlay, PaywallBlur } from "@/components/site/PaywallOverlay";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { ArticleSignalRow } from "@/components/site/ArticleSignalRow";
+import { ResumeReadingBanner } from "@/components/site/ResumeReadingBanner";
+import { RelatedIntelligencePanel } from "@/components/site/RelatedIntelligencePanel";
 import { getPost } from "@/lib/posts.functions";
 
 const postQuery = (slug: string) =>
@@ -236,9 +239,8 @@ function PostPage() {
           {post.series_title} · Part {post.series_part} of {post.series_total}
         </div>
       )}
-      <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-6">
-        {post.category} · {post.read_minutes} min read
-      </div>
+      <ArticleSignalRow post={post} />
+      <ResumeReadingBanner slug={slug} title={post.title} />
       <h1
         key={`title-${tone}`}
         className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10 animate-tone-swap"
