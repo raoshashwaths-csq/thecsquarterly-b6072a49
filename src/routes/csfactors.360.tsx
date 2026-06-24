@@ -23,6 +23,7 @@ import { RetentionFunnelView } from "@/components/csfactors/threeSixty/Retention
 import { StakeholderRadarView } from "@/components/csfactors/threeSixty/StakeholderRadarView";
 import { TeamLeaderboardView } from "@/components/csfactors/threeSixty/TeamLeaderboardView";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
+import { latestUpdatedAt } from "@/components/dashboard/useFreshness";
 
 export const Route = createFileRoute("/csfactors/360")({
   head: () => ({
