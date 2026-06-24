@@ -421,12 +421,22 @@ function HomePage() {
 function ClosingCTA() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const primary = user
-    ? { to: "/csfactors", label: t("home.closing.ctaAuthedPrimary") }
-    : { to: "/diagnostics", label: t("home.closing.ctaPrimary") };
-  const secondary = user
-    ? { to: "/account/workspace", label: t("home.closing.ctaAuthedSecondary") }
-    : { to: "/pricing", label: t("home.closing.ctaSecondary") };
+  const sub = useSubscriptionTier();
+
+  // Prevent flash of visitor CTA while auth/tier state is still resolving.
+  if (sub.loading) return null;
+
+  // Tier-aware routing:
+  //   visitor / free  → diagnostic (free value) + pricing (upgrade path)
+  //   practitioner+   → CSFactors (main dashboard) + workspace
+  const isPaid = sub.canAccessCSFactors;
+
+  const primary = isPaid
+    ? { to: "/csfactors" as const, label: t("home.closing.ctaAuthedPrimary") }
+    : { to: "/diagnostics" as const, label: t("home.closing.ctaPrimary") };
+  const secondary = isPaid
+    ? { to: "/account/workspace" as const, label: t("home.closing.ctaAuthedSecondary") }
+    : { to: "/pricing" as const, label: t("home.closing.ctaSecondary") };
 
   return (
     <section className="border-t border-border bg-card/40">
