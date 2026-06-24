@@ -39,7 +39,7 @@ export function trackDiagnosticEvent(
     // string namespace ("diagnostic.*") keeps it filterable.
     logLumiEvent({
       data: {
-        event: event as unknown as "tree.select",
+        event,
         surface: props.surface ?? "diagnostics",
         meta: { slug: props.slug, ...(props.meta ?? {}) },
       },
