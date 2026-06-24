@@ -7,7 +7,7 @@ import { askQ, getQEntitlement } from "@/lib/q-agent.functions";
 import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
-import { SUGGESTED_VECTORS } from "@/lib/q-vectors";
+import { TreeVectorList } from "@/components/site/TreeVectorList";
 import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
 import { useTour } from "@/hooks/useTour";
@@ -308,24 +308,10 @@ export function QAgentButton() {
               </div>
             ) : (
               <>
-                {/* Suggested Vectors — premium parchment pills */}
+                {/* Suggested Vectors — vertical tree heading list */}
                 {!answer && (
                   <div className="mb-5">
-                    <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
-                      Suggested Vectors
-                    </div>
-                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 snap-x">
-                      {SUGGESTED_VECTORS.map((v) => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => { setQuery(v); inputRef.current?.focus(); }}
-                          className="snap-start shrink-0 max-w-[280px] text-left text-xs font-body leading-snug border border-border bg-card/70 px-3 py-2.5 hover:border-accent hover:text-accent transition-colors"
-                        >
-                          {v}
-                        </button>
-                      ))}
-                    </div>
+                    <TreeVectorList onPick={() => setOpen(false)} maxHeight="max-h-[52vh]" />
                   </div>
                 )}
 

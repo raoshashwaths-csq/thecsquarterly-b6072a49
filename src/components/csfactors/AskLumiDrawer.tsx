@@ -13,6 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { Mic, Send, Sparkle, Square } from "lucide-react";
 import { LumiMark } from "@/components/site/LumiMark";
+import { TreeVectorList } from "@/components/site/TreeVectorList";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
 import type { LumiBriefing } from "@/lib/lumi-briefings";
@@ -184,10 +185,15 @@ function AskLumiDrawer({
               ) : null}
             </article>
           ) : (
-            <div className="text-sm text-foreground/70 leading-relaxed">
-              <LumiMark variant="emblem" size={18} className="mr-1" />
-              Lumi reads your live CSFactors data — accounts, stakeholders, QBR
-              status, sentiment, renewals, and logged events. Ask anything.
+            <div className="space-y-5">
+              <div className="text-sm text-foreground/70 leading-relaxed">
+                <LumiMark variant="emblem" size={18} className="mr-1" />
+                Lumi reads your live CSFactors data — accounts, stakeholders, QBR
+                status, sentiment, renewals, and logged events. Ask anything, or pick a vector below to open the operator canvas.
+              </div>
+              {messages.length === 0 ? (
+                <TreeVectorList onPick={onClose} maxHeight="max-h-[46vh]" />
+              ) : null}
             </div>
           )}
 
