@@ -407,7 +407,7 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
       kind: "lumi.run.tagged",
       payload: {
         run_id: data.runId,
-        node_id: runRow.node_id,
+        node_id: runFields.node_id,
         stakeholder: data.stakeholder,
       },
     } as never);
