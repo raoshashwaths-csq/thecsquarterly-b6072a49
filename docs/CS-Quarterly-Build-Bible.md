@@ -1,6 +1,8 @@
 # THE CS QUARTERLY — COMPLETE LOVABLE BUILD BIBLE
 ## Every Prompt, Every Phase, In Build Order
 ## Last updated: June 2026
+> **Status sync (Jun 2026):** 0-A, 0-B, 1-E, 2-A, 2-B, 2-C, 2-E are built. Reader $19 tier insertion is deferred to the Stripe → Paddle migration session.
+
 
 ---
 
@@ -60,7 +62,7 @@ Confirm you have read these constraints before writing any code.
 
 ---
 
-## PROMPT 0-A: WIRING AUDIT ⬜ NOT STARTED
+## PROMPT 0-A: WIRING AUDIT ✅ BUILT
 ### Find every broken link, orphan route, and dead CTA
 
 ```
@@ -235,7 +237,7 @@ line was added or modified.
 
 ---
 
-## PROMPT 0-B: TIER-AWARE EXPERIENCE ⬜ NOT STARTED
+## PROMPT 0-B: TIER-AWARE EXPERIENCE ✅ BUILT
 ### Homepage and paywall personalised by subscription level
 
 ```
@@ -517,7 +519,7 @@ Lovable session before attempting Phases 5–8.
 
 ---
 
-## PROMPT 1-E: RENAME Q → LUMI ⬜ NOT STARTED
+## PROMPT 1-E: RENAME Q → LUMI ✅ BUILT
 ### One-day brand-critical fix
 
 ```
@@ -898,7 +900,7 @@ Testing:
 
 ---
 
-## PROMPT 2-A: CHAMPION DEPENDENCY DIAGNOSTIC 📄 PROMPT READY
+## PROMPT 2-A: CHAMPION DEPENDENCY DIAGNOSTIC ✅ BUILT
 ### Second diagnostic — single-threading exposure score
 
 📄 **FILE:** `/mnt/user-data/outputs/PRD-Champion-Dependency-Diagnostic.md`
@@ -914,7 +916,7 @@ All future diagnostics reuse this hook.
 
 ---
 
-## PROMPT 2-B: TRANSLATION GLOSSARY TABLE 📄 PROMPT READY
+## PROMPT 2-B: TRANSLATION GLOSSARY TABLE ✅ BUILT
 ### Supabase setup + admin UI — unblocks all MENA/SEA translation
 
 📄 **FILE:** `/mnt/user-data/outputs/Translation-Glossary-Lovable-Prompt.md`
@@ -930,7 +932,7 @@ Cost: $15–30 per language on Upwork/Fiverr.
 
 ---
 
-## PROMPT 2-C: MAP ENGINE 📄 PROMPT READY
+## PROMPT 2-C: MAP ENGINE ✅ BUILT
 ### Mutual Action Plan — highest-ROI CSFactors PM feature
 
 ```
@@ -1509,7 +1511,7 @@ Testing:
 
 ---
 
-## PROMPT 2-E: CTA ENGINE ⬜ NOT STARTED
+## PROMPT 2-E: CTA ENGINE ✅ BUILT
 ### Native action management with team assignment and board view
 
 ```
@@ -2879,11 +2881,11 @@ Testing:
 | 1-F Sticky Scroll Animation | ⬜ NOT STARTED | This document |
 | 1-G Card Fill Animation | ⬜ NOT STARTED | This document |
 | 1-H Homepage Micro-Animations | ⬜ NOT STARTED | This document |
-| 2-A Champion Diagnostic | 📄 READY | PRD-Champion-Dependency-Diagnostic.md |
-| 2-B Translation Glossary | 📄 READY | Translation-Glossary-Lovable-Prompt.md |
-| 2-C MAP Engine | 📄 READY | This document |
+| 2-A Champion Diagnostic | ✅ BUILT | PRD-Champion-Dependency-Diagnostic.md |
+| 2-B Translation Glossary | ✅ BUILT | Translation-Glossary-Lovable-Prompt.md |
+| 2-C MAP Engine | ✅ BUILT | This document |
 | 2-D EBR Builder | ⬜ NOT STARTED | This document |
-| 2-E CTA Engine | ⬜ NOT STARTED | This document |
+| 2-E CTA Engine | ✅ BUILT | This document |
 | 3-A Lumi Trees 9–13 | ⬜ NOT STARTED | This document |
 | 3-B Lumi Trees 14–21 | ⬜ NOT STARTED | This document |
 | 3-C WhatsApp Integration | ⬜ NOT STARTED | This document |
