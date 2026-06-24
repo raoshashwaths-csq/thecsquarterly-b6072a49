@@ -13,8 +13,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { DESIGNATION_LABEL } from "@/lib/entitlements";
 import { getMe, listMyPurchases } from "@/lib/auth.functions";
-import { createPortalSession } from "@/lib/payments.functions";
-import { getStripeEnvironment } from "@/lib/stripe";
+import {
+  createPaddlePortalSession,
+  getMyPaddleSubscription,
+} from "@/lib/paddle.functions";
+import { getPaddleEnvironment } from "@/lib/paddle";
 
 
 
@@ -33,7 +36,8 @@ function AccountPage() {
   const navigate = useNavigate();
   const fetchMe = useServerFn(getMe);
   const fetchPurchases = useServerFn(listMyPurchases);
-  const openPortal = useServerFn(createPortalSession);
+  const fetchSubscription = useServerFn(getMyPaddleSubscription);
+  const openPortal = useServerFn(createPaddlePortalSession);
   const { group, isRecruiterOrLead } = usePersona();
   const { designation } = useEntitlements();
 
@@ -43,14 +47,16 @@ function AccountPage() {
 
   const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe(), enabled: !!user });
   const purchases = useQuery({ queryKey: ["my-purchases"], queryFn: () => fetchPurchases(), enabled: !!user });
+  const subscription = useQuery({
+    queryKey: ["my-paddle-subscription", getPaddleEnvironment()],
+    queryFn: () => fetchSubscription({ data: { environment: getPaddleEnvironment() } }),
+    enabled: !!user,
+  });
 
   const onManageBilling = async () => {
     try {
       const result = await openPortal({
-        data: {
-          environment: getStripeEnvironment(),
-          returnUrl: `${window.location.origin}/account`,
-        },
+        data: { environment: getPaddleEnvironment() },
       });
       if ("error" in result) throw new Error(result.error);
       window.open(result.url, "_blank", "noopener");
@@ -61,6 +67,14 @@ function AccountPage() {
 
   const designationLabel = DESIGNATION_LABEL[designation];
   const isPaid = designation !== "reader";
+  const sub = subscription.data;
+  const periodEndLabel = sub?.currentPeriodEnd
+    ? new Date(sub.currentPeriodEnd).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -125,7 +139,27 @@ function AccountPage() {
                 )
               }
             >
-              <div className="text-sm text-muted-foreground capitalize">Status: {me.data.subscriptionStatus}</div>
+              <dl className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">Status</dt>
+                  <dd className="capitalize">{sub?.status ?? me.data.subscriptionStatus ?? "—"}</dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">Plan</dt>
+                  <dd>{sub?.priceId ?? (isPaid ? designationLabel : "Free")}</dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">
+                    {sub?.cancelAtPeriodEnd ? "Access ends" : "Renews"}
+                  </dt>
+                  <dd>{periodEndLabel ?? "—"}</dd>
+                </div>
+              </dl>
+              {sub?.cancelAtPeriodEnd && periodEndLabel && (
+                <p className="mt-3 text-xs text-secondary-accent font-mono uppercase tracking-widest">
+                  Cancellation scheduled · access continues until {periodEndLabel}
+                </p>
+              )}
             </SectionCard>
 
             <SectionCard eyebrow="Purchases" title="Playbook orders">

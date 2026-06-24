@@ -1436,6 +1436,8 @@ export type Database = {
           designation: string | null
           environment: string
           id: string
+          paddle_customer_id: string | null
+          paddle_subscription_id: string | null
           price_id: string | null
           product_id: string | null
           status: string
@@ -1453,6 +1455,8 @@ export type Database = {
           designation?: string | null
           environment?: string
           id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           price_id?: string | null
           product_id?: string | null
           status?: string
@@ -1470,6 +1474,8 @@ export type Database = {
           designation?: string | null
           environment?: string
           id?: string
+          paddle_customer_id?: string | null
+          paddle_subscription_id?: string | null
           price_id?: string | null
           product_id?: string | null
           status?: string
