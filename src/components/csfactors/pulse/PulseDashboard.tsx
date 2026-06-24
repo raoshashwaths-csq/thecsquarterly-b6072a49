@@ -295,7 +295,7 @@ export function PulseDashboard({
             return (
               <>
                 {g},{" "}
-                <span className="italic tracking-[0.005em]" style={{ fontStyle: "italic" }}>
+                <span className="not-italic tracking-[0.005em]" style={{ fontStyle: "normal" }}>
                   {firstName}
                 </span>
                 <span className="text-accent">.</span>
