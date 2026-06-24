@@ -343,7 +343,29 @@ export const pushLumiActions = createServerFn({ method: "POST" })
       .insert(rows)
       .select("*");
     if (error) throw new Error(error.message);
-    return { ctas: (inserted ?? []) as Cta[] };
+    const ctas = (inserted ?? []) as Cta[];
+    // Mirror Lumi-raised CTAs onto the account timeline.
+    const events = ctas
+      .filter((c) => !!c.account_id)
+      .map((c) => ({
+        account_id: c.account_id,
+        user_id: userId,
+        kind: "cta.raised",
+        payload: {
+          label: "CTA raised (Lumi)",
+          title: c.title,
+          cta_id: c.id,
+          cta_type: c.cta_type,
+          priority: c.priority,
+          due_date: c.due_date,
+          source: "lumi",
+        },
+      }));
+    if (events.length) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase as any).from("cs_account_events").insert(events);
+    }
+    return { ctas };
   });
 
 // METRICS for /csfactors/ctas metric strip ----------------------------------
