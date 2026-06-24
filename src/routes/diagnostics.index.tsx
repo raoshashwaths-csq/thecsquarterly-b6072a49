@@ -89,7 +89,7 @@ function DiagnosticsIndex() {
           {DIAGNOSTICS.map((d) => (
             <article
               key={d.slug}
-              className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors"
+              className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors card-lift"
             >
               <div className="p-8 flex flex-col flex-1">
                 <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-4">

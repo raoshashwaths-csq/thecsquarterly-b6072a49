@@ -25,7 +25,7 @@ export function SectionCard({
     <section
       data-stale={stale ? "true" : undefined}
       className={cn(
-        "relative border border-border bg-card csf-widget",
+        "relative border border-border bg-card csf-widget widget-lift",
         stale && "stale-glow",
         className,
       )}

@@ -117,7 +117,7 @@ function HomePage() {
           <Link
             to="/diagnostics"
             data-tour="ai-readiness-box"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7 card-lift"
             aria-label="Take the AI Readiness Audit"
           >
             <div className="flex items-center gap-3 mb-4">
@@ -147,7 +147,7 @@ function HomePage() {
           <Link
             to="/csfactors"
             data-tour="csf-box"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 card-lift"
             aria-label="Open CSFactors Command Centre"
           >
             <div className="flex items-center gap-3 mb-4">
@@ -177,7 +177,7 @@ function HomePage() {
           <Link
             to="/account/workspace"
             data-tour="workspace-icon"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-foreground border-l-4 border-l-foreground/70 transition-colors p-6 md:p-7"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-foreground border-l-4 border-l-foreground/70 transition-colors p-6 md:p-7 card-lift"
             aria-label="Open your Workspace"
           >
             <div className="flex items-center gap-3 mb-4">
@@ -206,7 +206,7 @@ function HomePage() {
           <Link
             to="/agent/framework"
             data-tour="canvas-icon"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 card-lift"
             aria-label="Open Decision Canvas"
           >
             <div className="flex items-center gap-3 mb-4">
@@ -601,7 +601,7 @@ function TierStrip({ compact = false }: { compact?: boolean } = {}) {
             <Link
               key={c.title}
               to={c.to}
-              className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col"
+              className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col card-lift"
             >
               <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-3">{c.eyebrow}</div>
               <h3 className="font-display text-xl leading-tight mb-2">{c.title}</h3>
@@ -724,7 +724,7 @@ function TierStrip({ compact = false }: { compact?: boolean } = {}) {
 
 function Tile({ eyebrow, title, body, to, cta }: { eyebrow: string; title: string; body: string; to: string; cta: string }) {
   return (
-    <Link to={to} className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col">
+    <Link to={to} className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col card-lift">
       <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-2">{eyebrow}</div>
       <h3 className="font-display text-lg leading-tight mb-2">{title}</h3>
       <p className="text-sm text-foreground/70 leading-snug mb-4 flex-1">{body}</p>

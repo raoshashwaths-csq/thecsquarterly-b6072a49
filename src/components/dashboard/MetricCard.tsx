@@ -59,7 +59,7 @@ export function MetricCard({
     <div
       data-stale={stale ? "true" : undefined}
       className={cn(
-        "relative bg-card p-5 md:p-6 border border-border overflow-hidden group rounded-none csf-widget",
+        "relative bg-card p-5 md:p-6 border border-border overflow-hidden group rounded-none csf-widget widget-lift",
         "transition-colors hover:border-foreground/40",
         stale && "stale-glow",
         className,
