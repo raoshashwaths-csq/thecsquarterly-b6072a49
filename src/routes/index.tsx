@@ -410,6 +410,8 @@ function HomePage() {
       {/* Operator / unknown: tools surface AFTER the editorial */}
       {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
+      <ClosingCTA />
+
       <SiteFooter />
       {user && <ResumeRunPrompt />}
     </div>
