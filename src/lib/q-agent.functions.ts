@@ -279,7 +279,7 @@ export const getQRun = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("q_runs")
-      .select("id, node_id, context, witty, zones, shared, user_id, created_at")
+      .select("id, node_id, context, witty, zones, shared, user_id, created_at, account_id, tagged_stakeholder, tagged_at")
       .eq("id", data.runId)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -291,6 +291,7 @@ export const getQRun = createServerFn({ method: "GET" })
       id: string; node_id: string; context: Record<string, string>;
       witty: boolean; zones: RunZones; shared: boolean;
       user_id: string; isOwner: boolean; created_at: string;
+      account_id: string | null; tagged_stakeholder: string | null; tagged_at: string | null;
     };
   });
 
