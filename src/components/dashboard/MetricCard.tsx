@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+import { useFreshness, type FreshnessInput } from "./useFreshness";
 
 type Accent = "neutral" | "accent" | "secondary" | "danger" | "success";
 type TopAccent = "gold" | "success" | "danger" | "warn" | "secondary";
@@ -15,6 +16,8 @@ export type MetricCardProps = {
   topAccent?: TopAccent;
   footer?: ReactNode;
   className?: string;
+  /** When the underlying value last changed. Older than 7 days → soft gold glow. */
+  updatedAt?: FreshnessInput;
 };
 
 const ACCENT_BAR: Record<Accent, string> = {
@@ -49,12 +52,16 @@ export function MetricCard({
   topAccent,
   footer,
   className,
+  updatedAt,
 }: MetricCardProps) {
+  const { stale, label } = useFreshness(updatedAt);
   return (
     <div
+      data-stale={stale ? "true" : undefined}
       className={cn(
-        "relative bg-card p-5 md:p-6 border border-border overflow-hidden group rounded-none",
+        "relative bg-card p-5 md:p-6 border border-border overflow-hidden group rounded-none csf-widget",
         "transition-colors hover:border-foreground/40",
+        stale && "stale-glow",
         className,
       )}
     >
@@ -63,6 +70,14 @@ export function MetricCard({
       ) : (
         <div className={cn("absolute left-0 top-0 h-[2px] w-10", ACCENT_BAR[accent])} />
       )}
+      {stale && label ? (
+        <span
+          title="This metric hasn't refreshed in over a week."
+          className="absolute top-2 right-2 font-mono text-[9px] uppercase tracking-[0.22em] text-secondary-accent border border-secondary-accent/40 px-1.5 py-0.5"
+        >
+          {label}
+        </span>
+      ) : null}
       <div className="font-mono text-[11px] uppercase tracking-[0.28em] text-muted-foreground mb-4 font-semibold">
         {eyebrow}
       </div>
