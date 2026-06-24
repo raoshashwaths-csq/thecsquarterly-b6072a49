@@ -10,6 +10,7 @@ import {
   Users2,
   BookUser,
   Map as MapIcon,
+  Inbox,
 } from "lucide-react";
 
 export type NavLink = {
@@ -22,6 +23,7 @@ export type NavLink = {
 
 export const TOP_LINKS: NavLink[] = [
   { to: "/csfactors", label: "Pulse", icon: Activity },
+  { to: "/csfactors/ctas", label: "Action Centre", icon: Inbox },
   { to: "/csfactors", hash: "#accounts", label: "Accounts", icon: LayoutGrid },
   { to: "/csfactors/maps", label: "MAP Engine", icon: MapIcon },
   { to: "/csfactors", hash: "#renewals", label: "Renewals", icon: UsersIcon },

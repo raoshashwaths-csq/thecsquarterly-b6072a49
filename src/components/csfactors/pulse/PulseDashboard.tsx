@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import type { CSAccount } from "@/lib/csfactors.functions";
 import { getPortfolioTrend, type TrendPoint as ApiTrendPoint, type TrendRange as ApiTrendRange } from "@/lib/csfactors.functions";
 import { pulseSeedAccounts } from "@/lib/mocks/pulseSeed";
+import { ActionCentrePanel } from "@/components/csfactors/ctas/ActionCentrePanel";
 
 /* ------------------------------------------------------------------ *
  * Pulse — editorial midnight dashboard.
@@ -431,6 +432,13 @@ function PulseView({
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-10 py-8">
         <AccountRiskMatrix />
         <ReckoningLedger />
+      </section>
+
+      <Hairline />
+
+      {/* ============== ACTION CENTRE ============== */}
+      <section className="pt-6 pb-8">
+        <ActionCentrePanel />
       </section>
 
       <Hairline />

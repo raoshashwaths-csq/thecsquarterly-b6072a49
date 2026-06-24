@@ -422,6 +422,96 @@ export type Database = {
           },
         ]
       }
+      ctas: {
+        Row: {
+          account_id: string | null
+          account_name: string | null
+          assigned_to: string | null
+          assigned_to_name: string | null
+          completed_at: string | null
+          completion_note: string | null
+          created_at: string
+          created_by: string
+          created_by_name: string | null
+          cta_type: string
+          description: string | null
+          due_date: string | null
+          id: string
+          outcome: string | null
+          priority: string
+          source: string
+          source_ref: string | null
+          status: string
+          team_id: string | null
+          team_wide: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          account_id?: string | null
+          account_name?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          completed_at?: string | null
+          completion_note?: string | null
+          created_at?: string
+          created_by: string
+          created_by_name?: string | null
+          cta_type: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          outcome?: string | null
+          priority?: string
+          source?: string
+          source_ref?: string | null
+          status?: string
+          team_id?: string | null
+          team_wide?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string | null
+          account_name?: string | null
+          assigned_to?: string | null
+          assigned_to_name?: string | null
+          completed_at?: string | null
+          completion_note?: string | null
+          created_at?: string
+          created_by?: string
+          created_by_name?: string | null
+          cta_type?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          outcome?: string | null
+          priority?: string
+          source?: string
+          source_ref?: string | null
+          status?: string
+          team_id?: string | null
+          team_wide?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ctas_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "cs_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ctas_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       directory_profiles: {
         Row: {
           bio: string | null
@@ -978,6 +1068,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          is_team_leader: boolean
           persona: Database["public"]["Enums"]["user_persona"] | null
           seniority: string | null
           updated_at: string
@@ -987,6 +1078,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id: string
+          is_team_leader?: boolean
           persona?: Database["public"]["Enums"]["user_persona"] | null
           seniority?: string | null
           updated_at?: string
@@ -996,6 +1088,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          is_team_leader?: boolean
           persona?: Database["public"]["Enums"]["user_persona"] | null
           seniority?: string | null
           updated_at?: string
