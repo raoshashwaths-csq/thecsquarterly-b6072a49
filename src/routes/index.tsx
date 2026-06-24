@@ -67,7 +67,21 @@ function HomePage() {
   const { group, isRecruiterOrLead } = usePersona();
   const { user } = useAuth();
 
-
+  // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
+  // server render; swap to the viewer's local day-of-week after mount.
+  const [dayIndex, setDayIndex] = useState(0);
+  useEffect(() => {
+    setDayIndex(new Date().getDay());
+  }, []);
+  const rotations = t("home.hero.rotations", { returnObjects: true }) as
+    | Array<{ line1: string; line2: string; sub: string }>
+    | undefined;
+  const fallback = {
+    line1: t("home.hero.line1"),
+    line2: t("home.hero.line2"),
+    sub: t("home.hero.sub"),
+  };
+  const hero = rotations?.[dayIndex] ?? fallback;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -78,10 +92,10 @@ function HomePage() {
           {t("home.eyebrow")}
         </div>
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
-          {t("home.hero.line1")} <span className="not-italic text-accent">{t("home.hero.line2")}</span>
+          {hero.line1} <span className="not-italic text-accent">{hero.line2}</span>
         </h1>
         <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-10">
-          {t("home.hero.sub")}
+          {hero.sub}
         </p>
         {!user ? (
           <NewsletterInline source="home-hero" />
