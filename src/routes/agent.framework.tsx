@@ -43,10 +43,20 @@ function cleanEyebrow(eyebrow: string): string {
 function AgentFrameworkPage() {
   const { user, loading } = useAuth();
   const sub = useSubscriptionTier();
+  const search = Route.useSearch();
   const [hasVanguard, setHasVanguard] = useState<boolean | null>(null);
-  const [activeTree, setActiveTree] = useState<TreeId>("T1");
+  const [activeTree, setActiveTree] = useState<TreeId>(
+    (search.tree && TREES.some((t) => t.id === search.tree)) ? search.tree : "T1",
+  );
   const [runTerminal, setRunTerminal] = useState<TreeNode | null>(null);
   const [witty, setWitty] = useState(false);
+
+  useEffect(() => {
+    if (search.tree && TREES.some((t) => t.id === search.tree) && search.tree !== activeTree) {
+      setActiveTree(search.tree);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.tree]);
 
   useEffect(() => {
     if (loading || !user) { setHasVanguard(user ? false : null); return; }
