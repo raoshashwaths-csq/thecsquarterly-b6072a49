@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { getNode, breadcrumbFor } from "./q-trees";
+import { getNode, breadcrumbFor, getTree } from "./q-trees";
 import { assertQUnderCap } from "./q-usage.functions";
 import { computeCostMicros } from "./q-pricing";
 
