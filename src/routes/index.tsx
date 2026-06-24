@@ -601,7 +601,7 @@ function TierStrip({ compact = false }: { compact?: boolean } = {}) {
             <Link
               key={c.title}
               to={c.to}
-              className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col"
+              className="group border border-border bg-card p-5 hover:border-foreground transition-colors flex flex-col card-lift"
             >
               <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-3">{c.eyebrow}</div>
               <h3 className="font-display text-xl leading-tight mb-2">{c.title}</h3>
