@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 
 export const Route = createFileRoute("/diagnostics/")({
   head: () => ({
