@@ -38,7 +38,12 @@ function AiReadinessLanding() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <header className="max-w-5xl mx-auto px-6 pt-24 pb-16 text-center animate-fade-up">
+      <div className="max-w-5xl mx-auto px-6 pt-10 w-full">
+        <BackButton label="Back to Diagnostics" fallbackTo="/diagnostics" />
+      </div>
+
+      <header className="max-w-5xl mx-auto px-6 pt-8 pb-16 text-center animate-fade-up">
+
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-medium">
           6 Minutes · 8 Dimensions · 32 Metrics
         </div>

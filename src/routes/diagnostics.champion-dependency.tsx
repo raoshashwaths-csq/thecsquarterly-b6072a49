@@ -157,7 +157,11 @@ function ChampionDependencyDiagnostic() {
   return (
     <div className="min-h-screen flex flex-col page-enter">
       <SiteHeader />
+      <div className="max-w-3xl mx-auto px-6 pt-10 w-full">
+        <BackButton label="Back to Diagnostics" fallbackTo="/diagnostics" />
+      </div>
       <main className="flex-1">
+
         {flow.stage === "landing" && <LandingState onStart={flow.start} />}
         {flow.stage === "survey" && <SurveyState flow={flow} />}
         {flow.stage === "calculating" && <CalculatingState step={flow.calcStep} steps={flow.calcSteps} />}

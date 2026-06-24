@@ -73,7 +73,11 @@ function PlaybookPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <article className="max-w-3xl mx-auto px-6 pt-16 pb-12 w-full animate-fade-up">
+      <div className="max-w-3xl mx-auto px-6 pt-10 w-full">
+        <BackButton label="Back to Codex" fallbackTo="/codex" />
+      </div>
+      <article className="max-w-3xl mx-auto px-6 pt-6 pb-12 w-full animate-fade-up">
+
         <Link to="/codex" className="font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent">
           ← The Codex
         </Link>
