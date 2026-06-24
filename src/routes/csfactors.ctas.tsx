@@ -119,16 +119,18 @@ function CtasPage() {
         <div className="px-4 md:px-8 py-6 space-y-6">
           {/* Metric strip */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <MetricCard label="Open" value={metricsQ.data?.open ?? "—"} />
+            <MetricCard eyebrow="Open" value={metricsQ.data?.open ?? "—"} />
             <MetricCard
-              label="Overdue"
+              eyebrow="Overdue"
               value={metricsQ.data?.overdue ?? "—"}
-              tone={metricsQ.data?.overdue ? "danger" : undefined}
+              accent={metricsQ.data?.overdue ? "danger" : "neutral"}
+              topAccent={metricsQ.data?.overdue ? "danger" : undefined}
             />
-            <MetricCard label="Due today" value={metricsQ.data?.dueToday ?? "—"} />
+            <MetricCard eyebrow="Due today" value={metricsQ.data?.dueToday ?? "—"} />
             <MetricCard
-              label="Completed this week"
+              eyebrow="Completed this week"
               value={metricsQ.data?.completedThisWeek ?? "—"}
+              accent="success"
             />
           </div>
 
