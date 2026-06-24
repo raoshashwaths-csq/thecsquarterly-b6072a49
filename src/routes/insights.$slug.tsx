@@ -372,6 +372,8 @@ function PostPage() {
               </ol>
             </section>
           )}
+
+          <RelatedIntelligencePanel slug={slug} />
         </>
       )}
     </article>
