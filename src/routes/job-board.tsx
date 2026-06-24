@@ -129,7 +129,7 @@ function JobBoardPage() {
         <section className="max-w-7xl mx-auto px-6 pt-20 pb-12">
           <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4">The Job Board</div>
           <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-6 max-w-4xl">
-            Pre-qualified roles, <span className="italic">read by operators.</span>
+            Pre-qualified roles, <span className="not-italic">read by operators.</span>
           </h1>
           <p className="text-lg text-foreground/70 max-w-2xl text-pretty">
             Every listing is filtered for tech stack, region, and segment. Recruiters reach an audience of senior CS operators inside the Tuesday dispatch.
@@ -240,7 +240,7 @@ function JobBoardPage() {
             <div className="text-center mb-12">
               <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-4">For Recruiters</div>
               <h2 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-4">
-                Reach the operators <span className="italic">other boards can't.</span>
+                Reach the operators <span className="not-italic">other boards can't.</span>
               </h2>
               <p className="text-foreground/70 max-w-2xl mx-auto">
                 Five line items, no contracts. Every listing ships inside the Tuesday dispatch.

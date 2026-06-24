@@ -43,7 +43,7 @@ function PricingPage() {
             The Platform
           </div>
           <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-6">
-            An operating system for the <span className="italic">customer success</span> profession.
+            An operating system for the <span className="not-italic">customer success</span> profession.
           </h1>
           <p className="text-lg text-foreground/70 max-w-2xl mx-auto text-pretty">
             Not a newsletter with tools attached. A CS platform with the industry&apos;s intelligence layer, benchmark dataset, and <QMark /> advisor built into the foundation.

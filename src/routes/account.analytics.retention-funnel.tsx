@@ -81,7 +81,7 @@ function RetentionFunnelPage() {
   return (
     <AnalyticsShell
       eyebrow="Analytics / Retention Funnel"
-      title={<>Where they <span className="italic text-accent">leak.</span></>}
+      title={<>Where they <span className="not-italic text-accent">leak.</span></>}
       description="Stage-by-stage drop-off across the customer lifecycle. Built from journey stage, implementation progress, health, and QBR status."
     >
       {isLoading ? (

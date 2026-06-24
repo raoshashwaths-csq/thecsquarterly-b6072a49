@@ -30,7 +30,7 @@ function AboutPage() {
           About
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10">
-          For the operators who run <span className="italic">retention</span>.
+          For the operators who run <span className="not-italic">retention</span>.
         </h1>
         <div className="space-y-6 text-lg leading-relaxed text-foreground/85">
           <p>
@@ -42,7 +42,7 @@ function AboutPage() {
           <p>
             We also run the annual AI Readiness Survey for CS and HR leaders, a 12-question diagnostic that benchmarks where you are and tells you what to do next.
           </p>
-          <p className="font-display italic text-2xl pt-4">
+          <p className="font-display not-italic text-2xl pt-4">
             No noise. No vendor pitches. One essay every Tuesday.
           </p>
         </div>

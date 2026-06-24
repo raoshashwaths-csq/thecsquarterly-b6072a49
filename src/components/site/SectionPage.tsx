@@ -35,7 +35,7 @@ export function SectionPage({ eyebrow, title, italicWord, tagline, description, 
           {eyebrow}
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-8">
-          {title}{italicWord && <> <span className="italic text-accent">{italicWord}</span></>}
+          {title}{italicWord && <> <span className="not-italic text-accent">{italicWord}</span></>}
         </h1>
         <p className="text-xl text-foreground/80 max-w-3xl text-pretty mb-6">{tagline}</p>
         <p className="text-base text-foreground/65 max-w-3xl text-pretty">{description}</p>

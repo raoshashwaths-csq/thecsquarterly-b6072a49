@@ -103,7 +103,7 @@ function ExecutiveAnalyticsPage() {
           </div>
           <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight">
             Portfolio command{" "}
-            <span className="italic text-accent">center.</span>
+            <span className="not-italic text-accent">center.</span>
           </h1>
           <p className="text-foreground/70 mt-3 max-w-2xl">
             Stakeholder risk matrices, real-time NPS, and renewal pressure across your book of business.

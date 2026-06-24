@@ -55,7 +55,7 @@ function AnalyticsIndex() {
             Analytics / Dashboards
           </div>
           <h1 className="font-display text-3xl md:text-6xl leading-[0.95] tracking-tight">
-            Four lenses on the <span className="italic text-accent">portfolio.</span>
+            Four lenses on the <span className="not-italic text-accent">portfolio.</span>
           </h1>
           <p className="text-foreground/70 mt-3 max-w-2xl text-sm md:text-base">
             Built from your CSFactors data. No new entry required — switch lens, see the same accounts a different way.

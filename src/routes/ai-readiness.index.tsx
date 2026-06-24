@@ -43,7 +43,7 @@ function AiReadinessLanding() {
           6 Minutes · 8 Dimensions · 32 Metrics
         </div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-10">
-          Is your CS function <span className="italic text-accent">built to retain?</span>
+          Is your CS function <span className="not-italic text-accent">built to retain?</span>
         </h1>
         <p className="text-xl text-foreground/75 max-w-2xl mx-auto text-pretty mb-12">
           The CS Operating Maturity Diagnostic scores your Customer Success organisation across 8 operating dimensions, surfaces your top three gaps, and delivers a 90-day plan tailored to your tier, from foundation to AI-native.

@@ -77,7 +77,7 @@ function HomePage() {
           {t("home.eyebrow")}
         </div>
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
-          {t("home.hero.line1")} <span className="italic text-accent">{t("home.hero.line2")}</span>
+          {t("home.hero.line1")} <span className="not-italic text-accent">{t("home.hero.line2")}</span>
         </h1>
         <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-10">
           {t("home.hero.sub")}
@@ -338,7 +338,7 @@ function HomePage() {
               </p>
               {featured.subtitle && (
                 <div className="border-y border-border py-8 mb-12">
-                  <p className="font-display italic text-2xl md:text-3xl leading-snug text-pretty">
+                  <p className="font-display not-italic text-2xl md:text-3xl leading-snug text-pretty">
                     {featured.subtitle}
                   </p>
                 </div>

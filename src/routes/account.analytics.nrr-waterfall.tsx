@@ -107,7 +107,7 @@ function NrrWaterfallPage() {
   return (
     <AnalyticsShell
       eyebrow="Analytics / NRR Waterfall"
-      title={<>From start to <span className="italic text-accent">end of period.</span></>}
+      title={<>From start to <span className="not-italic text-accent">end of period.</span></>}
       description="Estimated expansion, contraction, and churn movement derived from health bands across your portfolio."
     >
       {isLoading ? (
