@@ -117,7 +117,7 @@ function HomePage() {
           <Link
             to="/diagnostics"
             data-tour="ai-readiness-box"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7 card-lift"
             aria-label="Take the AI Readiness Audit"
           >
             <div className="flex items-center gap-3 mb-4">
