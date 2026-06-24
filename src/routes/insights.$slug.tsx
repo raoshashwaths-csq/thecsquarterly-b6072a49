@@ -3,6 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Glasses, Smile, X } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { SeriesRail } from "@/components/site/SeriesRail";
@@ -377,6 +378,10 @@ function PostPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
+      <div className="max-w-3xl mx-auto px-6 pt-10 w-full">
+        <BackButton label="Back" fallbackTo="/insights" />
+      </div>
+
 
       {isSeries ? (
         <div className="max-w-7xl w-full mx-auto px-6 pt-20 pb-16 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-x-16 gap-y-10">

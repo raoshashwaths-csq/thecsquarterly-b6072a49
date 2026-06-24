@@ -33,6 +33,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as DiagnosticsIndexRouteImport } from './routes/diagnostics.index'
 import { Route as CodexIndexRouteImport } from './routes/codex.index'
 import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
@@ -194,6 +195,11 @@ const InsightsIndexRoute = InsightsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => InsightsRoute,
+} as any)
+const DiagnosticsIndexRoute = DiagnosticsIndexRouteImport.update({
+  id: '/diagnostics/',
+  path: '/diagnostics/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CodexIndexRoute = CodexIndexRouteImport.update({
   id: '/',
@@ -455,6 +461,7 @@ export interface FileRoutesByFullPath {
   '/account/': typeof AccountIndexRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
+  '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
@@ -519,6 +526,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountIndexRoute
   '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
+  '/diagnostics': typeof DiagnosticsIndexRoute
   '/insights': typeof InsightsIndexRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
@@ -587,6 +595,7 @@ export interface FileRoutesById {
   '/account/': typeof AccountIndexRoute
   '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
+  '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
@@ -656,6 +665,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/ai-readiness/'
     | '/codex/'
+    | '/diagnostics/'
     | '/insights/'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
@@ -720,6 +730,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/ai-readiness'
     | '/codex'
+    | '/diagnostics'
     | '/insights'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
@@ -787,6 +798,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/ai-readiness/'
     | '/codex/'
+    | '/diagnostics/'
     | '/insights/'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
@@ -845,6 +857,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   MTokenRoute: typeof MTokenRoute
   AccountIndexRoute: typeof AccountIndexRoute
+  DiagnosticsIndexRoute: typeof DiagnosticsIndexRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
   AccountAnalyticsRetentionFunnelRoute: typeof AccountAnalyticsRetentionFunnelRoute
   AccountAnalyticsStakeholderRadarRoute: typeof AccountAnalyticsStakeholderRadarRoute
@@ -1033,6 +1046,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/insights/'
       preLoaderRoute: typeof InsightsIndexRouteImport
       parentRoute: typeof InsightsRoute
+    }
+    '/diagnostics/': {
+      id: '/diagnostics/'
+      path: '/diagnostics'
+      fullPath: '/diagnostics/'
+      preLoaderRoute: typeof DiagnosticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/codex/': {
       id: '/codex/'
@@ -1435,6 +1455,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   MTokenRoute: MTokenRoute,
   AccountIndexRoute: AccountIndexRoute,
+  DiagnosticsIndexRoute: DiagnosticsIndexRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
   AccountAnalyticsRetentionFunnelRoute: AccountAnalyticsRetentionFunnelRoute,
   AccountAnalyticsStakeholderRadarRoute: AccountAnalyticsStakeholderRadarRoute,
@@ -1456,13 +1477,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

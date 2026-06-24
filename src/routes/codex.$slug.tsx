@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Paywall, BlurredTeaser } from "@/components/site/Paywall";
 import { AudioBar } from "@/components/site/AudioBar";
@@ -73,7 +74,11 @@ function PlaybookPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
-      <article className="max-w-3xl mx-auto px-6 pt-16 pb-12 w-full animate-fade-up">
+      <div className="max-w-3xl mx-auto px-6 pt-10 w-full">
+        <BackButton label="Back to Codex" fallbackTo="/codex" />
+      </div>
+      <article className="max-w-3xl mx-auto px-6 pt-6 pb-12 w-full animate-fade-up">
+
         <Link to="/codex" className="font-mono uppercase tracking-widest text-xs text-muted-foreground hover:text-accent">
           ← The Codex
         </Link>
