@@ -69,13 +69,13 @@ export function StickyScrollSection({ stages }: Props) {
   return (
     <div
       ref={outerRef}
-      style={{ position: "relative", height: `calc(100vh * ${stages.length + 0.5})` }}
+      style={{ position: "relative", height: `calc(85vh * ${stages.length + 0.5})` }}
     >
       <div
         style={{
           position: "sticky",
           top: 0,
-          height: "100vh",
+          height: "85vh",
           width: "100%",
           display: "grid",
           gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
