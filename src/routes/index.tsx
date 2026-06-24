@@ -206,7 +206,7 @@ function HomePage() {
           <Link
             to="/agent/framework"
             data-tour="canvas-icon"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7"
+            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 card-lift"
             aria-label="Open Decision Canvas"
           >
             <div className="flex items-center gap-3 mb-4">
