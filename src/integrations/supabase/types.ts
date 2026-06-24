@@ -1163,6 +1163,7 @@ export type Database = {
       }
       q_runs: {
         Row: {
+          account_id: string | null
           context: Json
           cost_micros: number | null
           created_at: string
@@ -1171,6 +1172,8 @@ export type Database = {
           model: string | null
           node_id: string
           shared: boolean
+          tagged_at: string | null
+          tagged_stakeholder: string | null
           tokens_in: number | null
           tokens_out: number | null
           user_id: string
@@ -1178,6 +1181,7 @@ export type Database = {
           zones: Json
         }
         Insert: {
+          account_id?: string | null
           context?: Json
           cost_micros?: number | null
           created_at?: string
@@ -1186,6 +1190,8 @@ export type Database = {
           model?: string | null
           node_id: string
           shared?: boolean
+          tagged_at?: string | null
+          tagged_stakeholder?: string | null
           tokens_in?: number | null
           tokens_out?: number | null
           user_id: string
@@ -1193,6 +1199,7 @@ export type Database = {
           zones: Json
         }
         Update: {
+          account_id?: string | null
           context?: Json
           cost_micros?: number | null
           created_at?: string
@@ -1201,13 +1208,23 @@ export type Database = {
           model?: string | null
           node_id?: string
           shared?: boolean
+          tagged_at?: string | null
+          tagged_stakeholder?: string | null
           tokens_in?: number | null
           tokens_out?: number | null
           user_id?: string
           witty?: boolean
           zones?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "q_runs_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "cs_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reading_sequences: {
         Row: {
