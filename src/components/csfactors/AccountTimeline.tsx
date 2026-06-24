@@ -349,7 +349,7 @@ function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (i
   const Icon = vector.icon;
   const payload = (event.payload ?? {}) as { title?: string; details?: string; label?: string };
   const title = payload.title || payload.label || label;
-  const isManual = !!KIND_INDEX[event.kind] && !KIND_INDEX[event.kind].hidden;
+  const canDelete = !!KIND_INDEX[event.kind];
 
   return (
     <li className="ml-4">
