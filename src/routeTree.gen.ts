@@ -35,12 +35,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as DiagnosticsIndexRouteImport } from './routes/diagnostics.index'
 import { Route as CodexIndexRouteImport } from './routes/codex.index'
-import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
 import { Route as MTokenRouteImport } from './routes/m.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DiagnosticsChampionDependencyRouteImport } from './routes/diagnostics.champion-dependency'
+import { Route as DiagnosticsAiReadinessRouteImport } from './routes/diagnostics.ai-readiness'
 import { Route as DesignSystemLumiBadgeRouteImport } from './routes/design-system.lumi-badge'
 import { Route as CsfactorsCtasRouteImport } from './routes/csfactors.ctas'
 import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
@@ -53,10 +53,12 @@ import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
 import { Route as AccountApiRouteImport } from './routes/account.api'
+import { Route as DiagnosticsAiReadinessIndexRouteImport } from './routes/diagnostics.ai-readiness.index'
 import { Route as CsfactorsMapsIndexRouteImport } from './routes/csfactors.maps.index'
 import { Route as AccountAnalyticsIndexRouteImport } from './routes/account.analytics.index'
 import { Route as QResponseRunIdRouteImport } from './routes/q.response.$runId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as DiagnosticsAiReadinessSurveyRouteImport } from './routes/diagnostics.ai-readiness.survey'
 import { Route as CsfactorsPlaybookSlugRouteImport } from './routes/csfactors.playbook.$slug'
 import { Route as CsfactorsMapsNewRouteImport } from './routes/csfactors.maps.new'
 import { Route as CsfactorsMapsIdRouteImport } from './routes/csfactors.maps.$id'
@@ -206,11 +208,6 @@ const CodexIndexRoute = CodexIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CodexRoute,
 } as any)
-const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AiReadinessRoute,
-} as any)
 const AccountIndexRoute = AccountIndexRouteImport.update({
   id: '/account/',
   path: '/account/',
@@ -237,6 +234,11 @@ const DiagnosticsChampionDependencyRoute =
     path: '/diagnostics/champion-dependency',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DiagnosticsAiReadinessRoute = DiagnosticsAiReadinessRouteImport.update({
+  id: '/diagnostics/ai-readiness',
+  path: '/diagnostics/ai-readiness',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DesignSystemLumiBadgeRoute = DesignSystemLumiBadgeRouteImport.update({
   id: '/design-system/lumi-badge',
   path: '/design-system/lumi-badge',
@@ -297,6 +299,12 @@ const AccountApiRoute = AccountApiRouteImport.update({
   path: '/account/api',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiagnosticsAiReadinessIndexRoute =
+  DiagnosticsAiReadinessIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DiagnosticsAiReadinessRoute,
+  } as any)
 const CsfactorsMapsIndexRoute = CsfactorsMapsIndexRouteImport.update({
   id: '/maps/',
   path: '/maps/',
@@ -317,6 +325,12 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiagnosticsAiReadinessSurveyRoute =
+  DiagnosticsAiReadinessSurveyRouteImport.update({
+    id: '/survey',
+    path: '/survey',
+    getParentRoute: () => DiagnosticsAiReadinessRoute,
+  } as any)
 const CsfactorsPlaybookSlugRoute = CsfactorsPlaybookSlugRouteImport.update({
   id: '/playbook/$slug',
   path: '/playbook/$slug',
@@ -454,12 +468,12 @@ export interface FileRoutesByFullPath {
   '/csfactors/360': typeof Csfactors360Route
   '/csfactors/ctas': typeof CsfactorsCtasRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
+  '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessRouteWithChildren
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/m/$token': typeof MTokenRoute
   '/account/': typeof AccountIndexRoute
-  '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -475,10 +489,12 @@ export interface FileRoutesByFullPath {
   '/csfactors/maps/$id': typeof CsfactorsMapsIdRoute
   '/csfactors/maps/new': typeof CsfactorsMapsNewRoute
   '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
+  '/diagnostics/ai-readiness/survey': typeof DiagnosticsAiReadinessSurveyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
+  '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -490,6 +506,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/csfactors': typeof CsfactorsRouteWithChildren
@@ -524,7 +541,6 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/m/$token': typeof MTokenRoute
   '/account': typeof AccountIndexRoute
-  '/ai-readiness': typeof AiReadinessIndexRoute
   '/codex': typeof CodexIndexRoute
   '/diagnostics': typeof DiagnosticsIndexRoute
   '/insights': typeof InsightsIndexRoute
@@ -540,10 +556,12 @@ export interface FileRoutesByTo {
   '/csfactors/maps/$id': typeof CsfactorsMapsIdRoute
   '/csfactors/maps/new': typeof CsfactorsMapsNewRoute
   '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
+  '/diagnostics/ai-readiness/survey': typeof DiagnosticsAiReadinessSurveyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps': typeof CsfactorsMapsIndexRoute
+  '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -588,12 +606,12 @@ export interface FileRoutesById {
   '/csfactors/360': typeof Csfactors360Route
   '/csfactors/ctas': typeof CsfactorsCtasRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
+  '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessRouteWithChildren
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/m/$token': typeof MTokenRoute
   '/account/': typeof AccountIndexRoute
-  '/ai-readiness/': typeof AiReadinessIndexRoute
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
@@ -609,10 +627,12 @@ export interface FileRoutesById {
   '/csfactors/maps/$id': typeof CsfactorsMapsIdRoute
   '/csfactors/maps/new': typeof CsfactorsMapsNewRoute
   '/csfactors/playbook/$slug': typeof CsfactorsPlaybookSlugRoute
+  '/diagnostics/ai-readiness/survey': typeof DiagnosticsAiReadinessSurveyRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/q/response/$runId': typeof QResponseRunIdRoute
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
+  '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -658,12 +678,12 @@ export interface FileRouteTypes {
     | '/csfactors/360'
     | '/csfactors/ctas'
     | '/design-system/lumi-badge'
+    | '/diagnostics/ai-readiness'
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/m/$token'
     | '/account/'
-    | '/ai-readiness/'
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
@@ -679,10 +699,12 @@ export interface FileRouteTypes {
     | '/csfactors/maps/$id'
     | '/csfactors/maps/new'
     | '/csfactors/playbook/$slug'
+    | '/diagnostics/ai-readiness/survey'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics/'
     | '/csfactors/maps/'
+    | '/diagnostics/ai-readiness/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -694,6 +716,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-readiness'
     | '/benchmarks'
     | '/calculator'
     | '/csfactors'
@@ -728,7 +751,6 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/m/$token'
     | '/account'
-    | '/ai-readiness'
     | '/codex'
     | '/diagnostics'
     | '/insights'
@@ -744,10 +766,12 @@ export interface FileRouteTypes {
     | '/csfactors/maps/$id'
     | '/csfactors/maps/new'
     | '/csfactors/playbook/$slug'
+    | '/diagnostics/ai-readiness/survey'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics'
     | '/csfactors/maps'
+    | '/diagnostics/ai-readiness'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -791,12 +815,12 @@ export interface FileRouteTypes {
     | '/csfactors/360'
     | '/csfactors/ctas'
     | '/design-system/lumi-badge'
+    | '/diagnostics/ai-readiness'
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/m/$token'
     | '/account/'
-    | '/ai-readiness/'
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
@@ -812,10 +836,12 @@ export interface FileRouteTypes {
     | '/csfactors/maps/$id'
     | '/csfactors/maps/new'
     | '/csfactors/playbook/$slug'
+    | '/diagnostics/ai-readiness/survey'
     | '/lovable/email/suppression'
     | '/q/response/$runId'
     | '/account/analytics/'
     | '/csfactors/maps/'
+    | '/diagnostics/ai-readiness/'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -853,6 +879,7 @@ export interface RootRouteChildren {
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   DesignSystemLumiBadgeRoute: typeof DesignSystemLumiBadgeRoute
+  DiagnosticsAiReadinessRoute: typeof DiagnosticsAiReadinessRouteWithChildren
   DiagnosticsChampionDependencyRoute: typeof DiagnosticsChampionDependencyRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   MTokenRoute: typeof MTokenRoute
@@ -1061,13 +1088,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CodexIndexRouteImport
       parentRoute: typeof CodexRoute
     }
-    '/ai-readiness/': {
-      id: '/ai-readiness/'
-      path: '/'
-      fullPath: '/ai-readiness/'
-      preLoaderRoute: typeof AiReadinessIndexRouteImport
-      parentRoute: typeof AiReadinessRoute
-    }
     '/account/': {
       id: '/account/'
       path: '/account'
@@ -1101,6 +1121,13 @@ declare module '@tanstack/react-router' {
       path: '/diagnostics/champion-dependency'
       fullPath: '/diagnostics/champion-dependency'
       preLoaderRoute: typeof DiagnosticsChampionDependencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diagnostics/ai-readiness': {
+      id: '/diagnostics/ai-readiness'
+      path: '/diagnostics/ai-readiness'
+      fullPath: '/diagnostics/ai-readiness'
+      preLoaderRoute: typeof DiagnosticsAiReadinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/design-system/lumi-badge': {
@@ -1187,6 +1214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountApiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/diagnostics/ai-readiness/': {
+      id: '/diagnostics/ai-readiness/'
+      path: '/'
+      fullPath: '/diagnostics/ai-readiness/'
+      preLoaderRoute: typeof DiagnosticsAiReadinessIndexRouteImport
+      parentRoute: typeof DiagnosticsAiReadinessRoute
+    }
     '/csfactors/maps/': {
       id: '/csfactors/maps/'
       path: '/maps'
@@ -1214,6 +1248,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/diagnostics/ai-readiness/survey': {
+      id: '/diagnostics/ai-readiness/survey'
+      path: '/survey'
+      fullPath: '/diagnostics/ai-readiness/survey'
+      preLoaderRoute: typeof DiagnosticsAiReadinessSurveyRouteImport
+      parentRoute: typeof DiagnosticsAiReadinessRoute
     }
     '/csfactors/playbook/$slug': {
       id: '/csfactors/playbook/$slug'
@@ -1360,12 +1401,10 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AiReadinessRouteChildren {
   AiReadinessSurveyRoute: typeof AiReadinessSurveyRoute
-  AiReadinessIndexRoute: typeof AiReadinessIndexRoute
 }
 
 const AiReadinessRouteChildren: AiReadinessRouteChildren = {
   AiReadinessSurveyRoute: AiReadinessSurveyRoute,
-  AiReadinessIndexRoute: AiReadinessIndexRoute,
 }
 
 const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
@@ -1422,6 +1461,22 @@ const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
   InsightsRouteChildren,
 )
 
+interface DiagnosticsAiReadinessRouteChildren {
+  DiagnosticsAiReadinessSurveyRoute: typeof DiagnosticsAiReadinessSurveyRoute
+  DiagnosticsAiReadinessIndexRoute: typeof DiagnosticsAiReadinessIndexRoute
+}
+
+const DiagnosticsAiReadinessRouteChildren: DiagnosticsAiReadinessRouteChildren =
+  {
+    DiagnosticsAiReadinessSurveyRoute: DiagnosticsAiReadinessSurveyRoute,
+    DiagnosticsAiReadinessIndexRoute: DiagnosticsAiReadinessIndexRoute,
+  }
+
+const DiagnosticsAiReadinessRouteWithChildren =
+  DiagnosticsAiReadinessRoute._addFileChildren(
+    DiagnosticsAiReadinessRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1451,6 +1506,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentFrameworkRoute: AgentFrameworkRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   DesignSystemLumiBadgeRoute: DesignSystemLumiBadgeRoute,
+  DiagnosticsAiReadinessRoute: DiagnosticsAiReadinessRouteWithChildren,
   DiagnosticsChampionDependencyRoute: DiagnosticsChampionDependencyRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   MTokenRoute: MTokenRoute,

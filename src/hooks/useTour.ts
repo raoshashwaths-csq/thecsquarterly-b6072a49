@@ -91,7 +91,7 @@ const TOUR_STEPS_BY_ROUTE: Record<string, TourStep[]> = {
       body: "Where you sit in the cohort tells you whether you have a retention problem or a positioning problem.",
     },
   ],
-  "/ai-readiness": [
+  "/diagnostics/ai-readiness": [
     {
       id: "ai-band",
       target: "ai-band",

@@ -570,7 +570,7 @@ function ResultsState({
           More free assessments
         </div>
         <Link
-          to="/ai-readiness"
+          to="/diagnostics/ai-readiness"
           className="block border border-border bg-card p-6 hover:border-accent transition-colors"
         >
           <div className="flex items-baseline justify-between gap-4">

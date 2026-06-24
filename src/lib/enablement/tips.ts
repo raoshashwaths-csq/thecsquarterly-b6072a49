@@ -80,7 +80,7 @@ export const TIP_GROUPS: TipGroup[] = [
     ],
   },
   {
-    match: "/ai-readiness",
+    match: "/diagnostics/ai-readiness",
     label: "AI Readiness",
     tips: [
       {
@@ -109,7 +109,7 @@ export const TIP_GROUPS: TipGroup[] = [
         id: "home-ai-readiness",
         title: "Start with the diagnostic",
         body: "The 5-minute AI Readiness Audit places you on a band (Reactive → Operational → Predictive), surfaces your weakest of 8 dimensions, and names the one fix that moves the band. Take it before anything else — it frames every other tool here.",
-        cta: { label: "Take the audit", to: "/ai-readiness" },
+        cta: { label: "Take the audit", to: "/diagnostics" },
       },
       {
         id: "home-csf-box",
@@ -151,7 +151,7 @@ export const TIP_GROUPS: TipGroup[] = [
         id: "home-section-diagnostic",
         title: "Diagnostic — benchmark your team",
         body: "8 dimensions, 32 metrics. Use the Diagnostic to compare your org against the cohort and identify the single transition that unlocks the next band.",
-        cta: { label: "Run Diagnostic", to: "/ai-readiness" },
+        cta: { label: "Run Diagnostic", to: "/diagnostics" },
       },
     ],
   },

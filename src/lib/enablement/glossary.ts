@@ -55,7 +55,7 @@ export const FEATURE_GLOSSARY: GlossaryItem[] = [
     whyItMatters:
       "Tools without readiness produce expensive theatre. The diagnostic tells you which lever to pull next, in order.",
     tags: ["ai", "diagnostic", "readiness", "maturity"],
-    link: { label: "Run the diagnostic", to: "/ai-readiness" },
+    link: { label: "Run the diagnostic", to: "/diagnostics/ai-readiness" },
   },
   {
     id: "ask-q",

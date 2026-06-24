@@ -13,7 +13,7 @@ const onStartAiReadiness = () =>
   });
 
 
-export const Route = createFileRoute("/ai-readiness/")({
+export const Route = createFileRoute("/diagnostics/ai-readiness/")({
   head: () => ({
     meta: [
       { title: "CS Operating Maturity Diagnostic, The CS Quarterly" },
@@ -23,9 +23,9 @@ export const Route = createFileRoute("/ai-readiness/")({
       },
       { property: "og:title", content: "CS Operating Maturity Diagnostic" },
       { property: "og:description", content: "8 dimensions · 32 metrics · Personalised 90-day plan." },
-      { property: "og:url", content: "/ai-readiness" },
+      { property: "og:url", content: "/diagnostics/ai-readiness" },
     ],
-    links: [{ rel: "canonical", href: "/ai-readiness" }],
+    links: [{ rel: "canonical", href: "/diagnostics/ai-readiness" }],
   }),
   component: AiReadinessLanding,
 });
@@ -62,7 +62,7 @@ function AiReadinessLanding() {
           The CS Operating Maturity Diagnostic scores your Customer Success organisation across 8 operating dimensions, surfaces your top three gaps, and delivers a 90-day plan tailored to your tier, from foundation to AI-native.
         </p>
         <Link
-          to="/ai-readiness/survey"
+          to="/diagnostics/ai-readiness/survey"
           onClick={onStartAiReadiness}
           className="inline-block px-10 py-5 bg-foreground text-background font-mono text-xs uppercase tracking-widest font-bold hover:bg-accent transition-colors"
         >
@@ -110,7 +110,7 @@ function AiReadinessLanding() {
           </p>
           <p className="font-mono uppercase tracking-widest text-xs opacity-60 mb-12">, SaaS Capital Retention Benchmarks, 2024</p>
           <Link
-            to="/ai-readiness/survey"
+            to="/diagnostics/ai-readiness/survey"
             onClick={onStartAiReadiness}
             className="inline-block px-10 py-5 bg-background text-foreground font-mono text-xs uppercase tracking-widest font-bold hover:bg-accent hover:text-accent-foreground transition-colors"
           >
