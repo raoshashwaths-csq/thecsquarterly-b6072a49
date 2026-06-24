@@ -32,7 +32,7 @@ export function SiteHeader() {
     { to: "/retention-protocol", label: t("nav.retention") },
     { to: "/outcome-forum", label: t("nav.outcome") },
     { to: "/codex", label: t("nav.codex") },
-    { to: "/ai-readiness", label: t("nav.diagnostic") },
+    { to: "/diagnostics", label: t("nav.diagnostic") },
   ] as const;
 
   const meta = (user?.user_metadata ?? {}) as {
