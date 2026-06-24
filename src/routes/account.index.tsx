@@ -13,8 +13,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { DESIGNATION_LABEL } from "@/lib/entitlements";
 import { getMe, listMyPurchases } from "@/lib/auth.functions";
-import { createPortalSession } from "@/lib/payments.functions";
-import { getStripeEnvironment } from "@/lib/stripe";
+import {
+  createPaddlePortalSession,
+  getMyPaddleSubscription,
+} from "@/lib/paddle.functions";
+import { getPaddleEnvironment } from "@/lib/paddle";
 
 
 
