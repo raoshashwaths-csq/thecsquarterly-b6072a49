@@ -72,7 +72,7 @@ function SurveyPage() {
       trackDiagnosticEvent("diagnostic.submit", {
         slug: "ai-readiness",
         surface: "ai-readiness.survey",
-        meta: { tier: res?.tier, score: res?.totalScore },
+        meta: { tier: res?.tier, score: res?.finalScore },
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (e) {
