@@ -101,6 +101,18 @@
   --destructive-foreground: oklch(0.98 0 0);
 }
 
+/* Subtle gold glow at the top of dark mode pages */
+html.dark,
+html.dark body {
+  background:
+    radial-gradient(
+      ellipse 80% 40% at 50% -10%,
+      rgba(196, 164, 90, 0.06) 0%,
+      transparent 70%
+    ),
+    #111111;
+}
+
 @keyframes reveal-line {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
