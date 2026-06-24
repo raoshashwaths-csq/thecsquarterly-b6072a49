@@ -182,6 +182,18 @@
       "viewAll": "View all"
     },
     "insightLabel": "Insight #{{n}}, {{min}} min read",
-    "readFull": "Read the full essay"
+    "readFull": "Read the full essay",
+    "editorial": {
+      "eyebrow": "Editorial"
+    },
+    "closing": {
+      "eyebrow": "Start where it matters",
+      "title": "Ship the next quarter with the operators who already are.",
+      "sub": "One dispatch a week, six playbooks in the Codex, a command centre for your portfolio. Pick the surface that fits today.",
+      "ctaPrimary": "Take the diagnostic",
+      "ctaSecondary": "See plans",
+      "ctaAuthedPrimary": "Open CSFactors",
+      "ctaAuthedSecondary": "Open Workspace"
+    }
   }
 }

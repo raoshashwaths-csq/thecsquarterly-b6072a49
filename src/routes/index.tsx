@@ -87,14 +87,14 @@ function HomePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <header className="max-w-7xl w-full mx-auto px-6 pt-24 pb-12 text-center md:animate-fade-up">
+      <header className="max-w-7xl w-full mx-auto px-6 pt-20 md:pt-24 pb-6 text-center md:animate-fade-up">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           {t("home.eyebrow")}
         </div>
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
           {hero.line1} <span className="not-italic text-accent">{hero.line2}</span>
         </h1>
-        <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-10">
+        <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-8">
           {hero.sub}
         </p>
         {!user ? (
@@ -108,9 +108,11 @@ function HomePage() {
           </p>
         )}
 
+        <TierStrip compact />
+
 
         {/* Primary destination grid — four equal cards, each with a clear primary CTA */}
-        <div className="mt-12 grid gap-4 md:grid-cols-2 text-left">
+        <div className="mt-10 grid gap-4 md:grid-cols-2 text-left">
           {/* AI Readiness */}
           <Link
             to="/diagnostics"
@@ -231,8 +233,6 @@ function HomePage() {
         </div>
       </header>
 
-      <TierStrip />
-
       <StickyScrollSection
         stages={[
           {
@@ -307,15 +307,11 @@ function HomePage() {
         ]}
       />
 
-      <div className="h-px bg-border max-w-7xl w-full mx-auto mt-16 animate-reveal-line" />
-
-
-
-      {/* Sections strip */}
-      <section className="max-w-7xl w-full mx-auto px-6 py-16 animate-fade-up [animation-delay:300ms]">
-        <div className="flex items-end justify-between mb-10">
+      {/* Editorial — sections rail + featured share one band */}
+      <section className="max-w-7xl w-full mx-auto px-6 py-14 md:py-16 animate-fade-up [animation-delay:300ms]">
+        <div className="flex items-end justify-between mb-8">
           <div className="font-mono text-xs uppercase tracking-widest text-foreground font-semibold">
-            {t("home.sections.eyebrow")}
+            {t("home.editorial.eyebrow")}
           </div>
           <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
             {t("home.sections.count", { count: SECTIONS.length })}
@@ -325,41 +321,35 @@ function HomePage() {
       </section>
 
 
-
-      <div className="h-px bg-border max-w-7xl w-full mx-auto" />
-
       {/* Recruiter / leader: tools surface BEFORE the editorial */}
       {isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
       {/* Featured + Sidebar */}
       {featured && (
-        <main className="max-w-7xl w-full mx-auto px-6 py-20 animate-fade-up [animation-delay:400ms]">
-
-          <div className="grid lg:grid-cols-12 gap-16">
+        <main className="max-w-7xl w-full mx-auto px-6 py-14 md:py-16 animate-fade-up [animation-delay:400ms]">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-7">
-              <div className="mb-8 font-mono text-xs text-accent font-medium">
+              <div className="mb-6 font-mono text-xs text-accent font-medium">
                 {t("home.insightLabel", {
                   n: posts.length.toString().padStart(3, "0"),
                   min: featured.read_minutes,
                 })}
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
-                <h2 className="font-display text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight transition-all">
+                <h2 className="font-display text-4xl md:text-6xl mb-6 leading-[1.1] tracking-tight transition-all">
                   {featured.title}
                 </h2>
               </Link>
-              <p className="text-xl leading-relaxed text-foreground/80 mb-10 text-pretty">
+              <p className="text-xl leading-relaxed text-foreground/80 mb-8 text-pretty">
                 {featured.excerpt}
               </p>
               {featured.subtitle && (
-                <div className="border-y border-border py-8 mb-12">
+                <div className="border-y border-border py-6 mb-8">
                   <p className="font-display not-italic text-2xl md:text-3xl leading-snug text-pretty">
                     {featured.subtitle}
                   </p>
                 </div>
               )}
-
-
               <Link
                 to="/insights/$slug"
                 params={{ slug: featured.slug }}
@@ -369,26 +359,24 @@ function HomePage() {
               </Link>
             </div>
 
-
-            <aside className="lg:col-span-5 flex flex-col gap-12 lg:border-l lg:border-border lg:pl-12">
+            <aside className="lg:col-span-5 flex flex-col gap-10 lg:border-l lg:border-border lg:pl-12">
               <div>
                 <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   {t("home.thesis.eyebrow")}
                 </div>
-                <p className="text-lg italic leading-snug">
+                <p className="text-lg leading-snug">
                   "CS is no longer a service department; it is a revenue engine that requires the same mechanical precision as an assembly line."
                 </p>
               </div>
             </aside>
-
           </div>
         </main>
       )}
 
       {/* Recent grid */}
       {rest.length > 0 && (
-        <section className="max-w-7xl w-full mx-auto px-6 pb-24">
-          <div className="flex justify-between items-end mb-12">
+        <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-14 md:pb-16">
+          <div className="flex justify-between items-end mb-10">
             <h2 className="font-display text-4xl">{t("home.recent.title")}</h2>
             <Link
               to="/insights"
@@ -422,9 +410,57 @@ function HomePage() {
       {/* Operator / unknown: tools surface AFTER the editorial */}
       {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
+      <ClosingCTA />
+
       <SiteFooter />
       {user && <ResumeRunPrompt />}
     </div>
+  );
+}
+
+function ClosingCTA() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const primary = user
+    ? { to: "/csfactors", label: t("home.closing.ctaAuthedPrimary") }
+    : { to: "/diagnostics", label: t("home.closing.ctaPrimary") };
+  const secondary = user
+    ? { to: "/account/workspace", label: t("home.closing.ctaAuthedSecondary") }
+    : { to: "/pricing", label: t("home.closing.ctaSecondary") };
+
+  return (
+    <section className="border-t border-border bg-card/40">
+      <div className="max-w-5xl w-full mx-auto px-6 py-16 md:py-20 text-center">
+        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-secondary-accent mb-5 font-semibold">
+          {t("home.closing.eyebrow")}
+        </div>
+        <h2 className="font-display text-3xl md:text-5xl leading-[1.05] tracking-tight text-balance mb-5">
+          {t("home.closing.title")}
+        </h2>
+        <p className="max-w-2xl mx-auto text-base md:text-lg text-foreground/75 text-pretty mb-8">
+          {t("home.closing.sub")}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link
+            to={primary.to}
+            className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+          >
+            {primary.label} →
+          </Link>
+          <Link
+            to={secondary.to}
+            className="inline-flex items-center gap-2 border border-border font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:border-foreground transition-colors"
+          >
+            {secondary.label} →
+          </Link>
+        </div>
+        {!user && (
+          <div className="mt-8 max-w-xl mx-auto">
+            <NewsletterInline source="home-closing" />
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -531,7 +567,8 @@ function StageMock({ variant }: { variant: "pulse" | "threeSixty" | "risk" }) {
 // Tier-aware strip — rendered immediately below the hero. Switches content
 // (NOT visual design) based on the visitor's tier. Tokens only — no hex.
 // ─────────────────────────────────────────────────────────────────────────────
-function TierStrip() {
+function TierStrip({ compact = false }: { compact?: boolean } = {}) {
+  void compact;
   const sub = useSubscriptionTier();
   const [readerNudgeDismissed, setReaderNudgeDismissed] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
