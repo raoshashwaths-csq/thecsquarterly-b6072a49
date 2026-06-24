@@ -28,6 +28,7 @@ import { Route as CsfactorsRouteImport } from './routes/csfactors'
 import { Route as CodexRouteImport } from './routes/codex'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as BenchmarksRouteImport } from './routes/benchmarks'
+import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -173,6 +174,11 @@ const BenchmarksRoute = BenchmarksRouteImport.update({
   path: '/benchmarks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiReadinessRoute = AiReadinessRouteImport.update({
+  id: '/ai-readiness',
+  path: '/ai-readiness',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -204,9 +210,9 @@ const CodexIndexRoute = CodexIndexRouteImport.update({
   getParentRoute: () => CodexRoute,
 } as any)
 const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
-  id: '/ai-readiness/',
-  path: '/ai-readiness/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AiReadinessRoute,
 } as any)
 const AccountIndexRoute = AccountIndexRouteImport.update({
   id: '/account/',
@@ -270,9 +276,9 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AiReadinessSurveyRoute = AiReadinessSurveyRouteImport.update({
-  id: '/ai-readiness/survey',
-  path: '/ai-readiness/survey',
-  getParentRoute: () => rootRouteImport,
+  id: '/survey',
+  path: '/survey',
+  getParentRoute: () => AiReadinessRoute,
 } as any)
 const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
   id: '/agent/framework',
@@ -436,6 +442,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
@@ -574,6 +581,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/ai-readiness': typeof AiReadinessRouteWithChildren
   '/benchmarks': typeof BenchmarksRoute
   '/calculator': typeof CalculatorRoute
   '/codex': typeof CodexRouteWithChildren
@@ -646,6 +654,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-readiness'
     | '/benchmarks'
     | '/calculator'
     | '/codex'
@@ -783,6 +792,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/ai-readiness'
     | '/benchmarks'
     | '/calculator'
     | '/codex'
@@ -854,6 +864,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AiReadinessRoute: typeof AiReadinessRouteWithChildren
   BenchmarksRoute: typeof BenchmarksRoute
   CalculatorRoute: typeof CalculatorRoute
   CodexRoute: typeof CodexRouteWithChildren
@@ -876,7 +887,6 @@ export interface RootRouteChildren {
   AccountApiRoute: typeof AccountApiRoute
   AccountWorkspaceRoute: typeof AccountWorkspaceRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
-  AiReadinessSurveyRoute: typeof AiReadinessSurveyRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   DesignSystemLumiBadgeRoute: typeof DesignSystemLumiBadgeRoute
   DiagnosticsAiReadinessRoute: typeof DiagnosticsAiReadinessRouteWithChildren
@@ -884,7 +894,6 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   MTokenRoute: typeof MTokenRoute
   AccountIndexRoute: typeof AccountIndexRoute
-  AiReadinessIndexRoute: typeof AiReadinessIndexRoute
   DiagnosticsIndexRoute: typeof DiagnosticsIndexRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
   AccountAnalyticsRetentionFunnelRoute: typeof AccountAnalyticsRetentionFunnelRoute
@@ -1040,6 +1049,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BenchmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-readiness': {
+      id: '/ai-readiness'
+      path: '/ai-readiness'
+      fullPath: '/ai-readiness'
+      preLoaderRoute: typeof AiReadinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -1084,10 +1100,10 @@ declare module '@tanstack/react-router' {
     }
     '/ai-readiness/': {
       id: '/ai-readiness/'
-      path: '/ai-readiness'
+      path: '/'
       fullPath: '/ai-readiness/'
       preLoaderRoute: typeof AiReadinessIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AiReadinessRoute
     }
     '/account/': {
       id: '/account/'
@@ -1175,10 +1191,10 @@ declare module '@tanstack/react-router' {
     }
     '/ai-readiness/survey': {
       id: '/ai-readiness/survey'
-      path: '/ai-readiness/survey'
+      path: '/survey'
       fullPath: '/ai-readiness/survey'
       preLoaderRoute: typeof AiReadinessSurveyRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AiReadinessRoute
     }
     '/agent/framework': {
       id: '/agent/framework'
@@ -1400,6 +1416,20 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface AiReadinessRouteChildren {
+  AiReadinessSurveyRoute: typeof AiReadinessSurveyRoute
+  AiReadinessIndexRoute: typeof AiReadinessIndexRoute
+}
+
+const AiReadinessRouteChildren: AiReadinessRouteChildren = {
+  AiReadinessSurveyRoute: AiReadinessSurveyRoute,
+  AiReadinessIndexRoute: AiReadinessIndexRoute,
+}
+
+const AiReadinessRouteWithChildren = AiReadinessRoute._addFileChildren(
+  AiReadinessRouteChildren,
+)
+
 interface CodexRouteChildren {
   CodexSlugRoute: typeof CodexSlugRoute
   CodexIndexRoute: typeof CodexIndexRoute
@@ -1470,6 +1500,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
+  AiReadinessRoute: AiReadinessRouteWithChildren,
   BenchmarksRoute: BenchmarksRoute,
   CalculatorRoute: CalculatorRoute,
   CodexRoute: CodexRouteWithChildren,
@@ -1492,7 +1523,6 @@ const rootRouteChildren: RootRouteChildren = {
   AccountApiRoute: AccountApiRoute,
   AccountWorkspaceRoute: AccountWorkspaceRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
-  AiReadinessSurveyRoute: AiReadinessSurveyRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   DesignSystemLumiBadgeRoute: DesignSystemLumiBadgeRoute,
   DiagnosticsAiReadinessRoute: DiagnosticsAiReadinessRouteWithChildren,
@@ -1500,7 +1530,6 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   MTokenRoute: MTokenRoute,
   AccountIndexRoute: AccountIndexRoute,
-  AiReadinessIndexRoute: AiReadinessIndexRoute,
   DiagnosticsIndexRoute: DiagnosticsIndexRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
   AccountAnalyticsRetentionFunnelRoute: AccountAnalyticsRetentionFunnelRoute,
