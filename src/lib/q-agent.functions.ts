@@ -335,15 +335,15 @@ export const listMyAccountsForTagging = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data, error } = await supabase
-      .from("cs_accounts")
-      .select("id, name, health, arr_usd")
+      .from("cs_accounts" as never)
+      .select("id, name, health, arr")
       .eq("user_id", userId)
       .order("name", { ascending: true })
       .limit(200);
     if (error) throw new Error(error.message);
     return {
-      accounts: (data ?? []) as Array<{
-        id: string; name: string; health: string | null; arr_usd: number | null;
+      accounts: (data ?? []) as unknown as Array<{
+        id: string; name: string; health: number | null; arr: number | null;
       }>,
     };
   });
