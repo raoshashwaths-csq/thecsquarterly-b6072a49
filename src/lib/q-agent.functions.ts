@@ -366,7 +366,7 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
     if (!data.accountId) {
       const { error } = await supabase
         .from("q_runs")
-        .update({ account_id: null, tagged_stakeholder: null, tagged_at: null })
+        .update({ account_id: null, tagged_stakeholder: null, tagged_at: null } as never)
         .eq("id", data.runId)
         .eq("user_id", userId);
       if (error) throw new Error(error.message);
@@ -391,13 +391,14 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
         account_id: data.accountId,
         tagged_stakeholder: data.stakeholder,
         tagged_at: new Date().toISOString(),
-      })
+      } as never)
       .eq("id", data.runId)
       .eq("user_id", userId)
       .select("id, node_id")
       .maybeSingle();
     if (runErr) throw new Error(runErr.message);
     if (!runRow) throw new Error("Run not found or not yours");
+    const runFields = runRow as unknown as { id: string; node_id: string };
 
     // Write a timeline event so the account card shows the tagged Lumi run.
     await supabase.from("cs_account_events" as never).insert({
