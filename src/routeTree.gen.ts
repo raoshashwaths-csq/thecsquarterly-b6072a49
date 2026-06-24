@@ -48,6 +48,7 @@ import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
 import { Route as AccountApiRouteImport } from './routes/account.api'
@@ -270,6 +271,11 @@ const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
   path: '/agent/framework',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminControlPanelRoute = AdminControlPanelRouteImport.update({
   id: '/control-panel',
   path: '/control-panel',
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/account/api': typeof AccountApiRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -496,6 +503,7 @@ export interface FileRoutesByTo {
   '/account/api': typeof AccountApiRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -563,6 +571,7 @@ export interface FileRoutesById {
   '/account/api': typeof AccountApiRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -631,6 +640,7 @@ export interface FileRouteTypes {
     | '/account/api'
     | '/account/workspace'
     | '/admin/control-panel'
+    | '/admin/payments'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/checkout/return'
@@ -694,6 +704,7 @@ export interface FileRouteTypes {
     | '/account/api'
     | '/account/workspace'
     | '/admin/control-panel'
+    | '/admin/payments'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/checkout/return'
@@ -760,6 +771,7 @@ export interface FileRouteTypes {
     | '/account/api'
     | '/account/workspace'
     | '/admin/control-panel'
+    | '/admin/payments'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/checkout/return'
@@ -1127,6 +1139,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentFrameworkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/control-panel': {
       id: '/admin/control-panel'
       path: '/control-panel'
@@ -1307,11 +1326,13 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminControlPanelRoute: typeof AdminControlPanelRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminContentTranslationRoute: typeof AdminContentTranslationRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminControlPanelRoute: AdminControlPanelRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
   AdminContentTranslationRoute: AdminContentTranslationRoute,
 }
 
