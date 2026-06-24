@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from "@/components/ui/sheet";
@@ -14,6 +15,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { QMark } from "@/components/site/QMark";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { trackLumiEvent, rememberLastTree, recallLastTree } from "@/lib/lumi-analytics";
 import {
   TREES, NODES, nodesForTree, getNode, breadcrumbFor, CATEGORY_COLOR,
   type TreeId, type TreeNode, type TreeCategory,
@@ -44,19 +46,54 @@ function AgentFrameworkPage() {
   const { user, loading } = useAuth();
   const sub = useSubscriptionTier();
   const search = Route.useSearch();
+  const navigate = useNavigate();
   const [hasVanguard, setHasVanguard] = useState<boolean | null>(null);
-  const [activeTree, setActiveTree] = useState<TreeId>(
-    (search.tree && TREES.some((t) => t.id === search.tree)) ? search.tree : "T1",
-  );
+  // Initial tree resolution priority: ?tree= → localStorage last → T1.
+  const [activeTree, setActiveTree] = useState<TreeId>(() => {
+    if (search.tree && TREES.some((t) => t.id === search.tree)) return search.tree;
+    const remembered = recallLastTree();
+    if (remembered && TREES.some((t) => t.id === remembered)) return remembered as TreeId;
+    return "T1";
+  });
+  // focusMode = picker collapsed, wheel surfaced after a user selection.
+  const [focusMode, setFocusMode] = useState<boolean>(!!search.tree);
   const [runTerminal, setRunTerminal] = useState<TreeNode | null>(null);
   const [witty, setWitty] = useState(false);
+  const wheelRef = useRef<HTMLDivElement>(null);
 
+  // Mirror URL → state when ?tree changes (deep links, back/forward).
   useEffect(() => {
     if (search.tree && TREES.some((t) => t.id === search.tree) && search.tree !== activeTree) {
       setActiveTree(search.tree);
+      setFocusMode(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search.tree]);
+
+  // Mirror state → URL + localStorage on every active-tree change.
+  useEffect(() => {
+    rememberLastTree(activeTree);
+    if (search.tree !== activeTree) {
+      navigate({ to: "/agent/framework", search: { tree: activeTree }, replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTree]);
+
+  function handlePickTree(id: TreeId) {
+    const fromTree = activeTree;
+    setActiveTree(id);
+    setFocusMode(true);
+    trackLumiEvent("tree.select", { treeId: id, surface: "canvas", meta: { from: fromTree } });
+    trackLumiEvent("tree.focus", { treeId: id, surface: "canvas" });
+    // Smooth-scroll the wheel into view after the animation kicks off.
+    setTimeout(() => wheelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  }
+
+  function handleBackToPicker() {
+    trackLumiEvent("tree.unfocus", { treeId: activeTree, surface: "canvas" });
+    setFocusMode(false);
+  }
+
 
   useEffect(() => {
     if (loading || !user) { setHasVanguard(user ? false : null); return; }
