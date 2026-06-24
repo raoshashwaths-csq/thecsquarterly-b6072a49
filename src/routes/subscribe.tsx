@@ -96,7 +96,8 @@ function TierConfirm({ designation }: { designation: Designation }) {
   const tier = getTier(designation)!;
   const { user } = useAuth();
   const [cadence, setCadence] = useState<Cadence>("monthly");
-  const [checkingOut, setCheckingOut] = useState(false);
+  const [opening, setOpening] = useState(false);
+  const resolvePrice = useServerFn(resolvePaddlePrice);
 
   const priceId = priceIdFor(designation, cadence);
   const annualSaving =
@@ -104,7 +105,7 @@ function TierConfirm({ designation }: { designation: Designation }) {
       ? `Save ~$${(tier.priceMonthlyValue * 12 - tier.priceMonthlyValue * 10).toLocaleString()} a year`
       : "";
 
-  const onCheckout = () => {
+  const onCheckout = async () => {
     if (tier.ctaKind === "contact" || !priceId) {
       window.location.href = tierMailto(tier.label);
       return;
@@ -113,32 +114,31 @@ function TierConfirm({ designation }: { designation: Designation }) {
       window.location.href = `/login?return=/subscribe?tier=${designation}`;
       return;
     }
-    setCheckingOut(true);
+    setOpening(true);
+    try {
+      const env = getPaddleEnvironment();
+      await initializePaddle();
+      const paddlePriceId = await resolvePrice({
+        data: { priceId, environment: env },
+      });
+      const successUrl = `${window.location.origin}/account?checkout=success&tier=${designation}`;
+      window.Paddle.Checkout.open({
+        items: [{ priceId: paddlePriceId, quantity: 1 }],
+        customer: user.email ? { email: user.email } : undefined,
+        customData: { userId: user.id },
+        settings: {
+          displayMode: "overlay",
+          successUrl,
+          allowLogout: false,
+          variant: "one-page",
+        },
+      });
+    } catch (e) {
+      toast.error((e as Error).message || "Could not open checkout");
+    } finally {
+      setOpening(false);
+    }
   };
-
-  if (checkingOut && priceId && user) {
-    return (
-      <section className="max-w-2xl mx-auto px-6 py-16 animate-fade-up">
-        <button
-          type="button"
-          onClick={() => setCheckingOut(false)}
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-foreground/60 hover:text-foreground mb-8"
-        >
-          <ArrowLeft size={12} />
-          Back
-        </button>
-        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
-          Secure checkout · {cadence === "monthly" ? "Monthly" : "Annual"}
-        </div>
-        <h1 className="font-display text-3xl tracking-tight mb-6">{tier.label}.</h1>
-        <StripeEmbeddedCheckout
-          priceId={priceId}
-          userId={user.id}
-          customerEmail={user.email ?? undefined}
-        />
-      </section>
-    );
-  }
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-20 animate-fade-up">
