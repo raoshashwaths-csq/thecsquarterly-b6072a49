@@ -414,3 +414,55 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
 
     return { ok: true, accountId: data.accountId, accountName: acctRow.name };
   });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tagged Lumi runs summary — powers the CSFactors widget that groups the
+// signed-in user's tagged runs by stakeholder + tree.
+// ─────────────────────────────────────────────────────────────────────────────
+export const listMyTaggedLumiRuns = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("q_runs")
+      .select("id, node_id, account_id, tagged_stakeholder, tagged_at, created_at")
+      .eq("user_id", userId)
+      .not("account_id", "is", null)
+      .order("tagged_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const rows = (data ?? []) as unknown as Array<{
+      id: string;
+      node_id: string;
+      account_id: string | null;
+      tagged_stakeholder: string | null;
+      tagged_at: string | null;
+      created_at: string;
+    }>;
+
+    // Join account names in one extra round-trip (RLS-scoped to this user).
+    const accountIds = Array.from(new Set(rows.map((r) => r.account_id).filter((x): x is string => Boolean(x))));
+    let nameById = new Map<string, string>();
+    if (accountIds.length) {
+      const { data: accts } = await supabase
+        .from("cs_accounts" as never)
+        .select("id, name")
+        .in("id", accountIds);
+      const acctList = (accts ?? []) as unknown as Array<{ id: string; name: string }>;
+      nameById = new Map(acctList.map((a) => [a.id, a.name]));
+    }
+
+    return {
+      runs: rows.map((r) => ({
+        id: r.id,
+        nodeId: r.node_id,
+        accountId: r.account_id,
+        accountName: r.account_id ? nameById.get(r.account_id) ?? null : null,
+        stakeholder: r.tagged_stakeholder,
+        taggedAt: r.tagged_at,
+        createdAt: r.created_at,
+      })),
+    };
+  });
+
