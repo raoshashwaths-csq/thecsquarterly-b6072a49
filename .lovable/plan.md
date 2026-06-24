@@ -1,117 +1,89 @@
-# Build Plan — Next 3 Workstreams
+## Goal
 
-Confirmed scope from your answers:
-1. Build **2-E CTA Engine** next.
-2. Follow Bible pricing tiers as-is (adds a new **Reader $19** tier between Free and Practitioner).
-3. Migrate payments **Stripe → Paddle**.
-4. Hold 4-A.
-5. One-time housekeeping commit to mark the Bible's status indicators.
+1. Extend the Lumi canvas from 8 → 21 decision trees per the Build Bible (Prompts 3-A and 3-B), fully functional like T1–T8.
+2. Replace the current horizontal "Suggested Vectors" scroll strip with a **vertical list of tree headings** inside the Lumi drawer surfaces (site `QAgentButton` sheet + CSFactors `AskLumiDrawer`).
+3. Keep all existing canvas / wheel / drawer / API behaviour untouched for T1–T8.
 
-To keep risk low, these will ship in **three separate sessions** in this order. Trying to do all three at once would tangle the CTA migration with the payment migration.
+## What gets added (data)
 
----
+`src/lib/q-trees.ts` — add 13 new tree objects to `TREES` and their L2/L3 nodes to `NODES`. Each tree follows the exact existing shape (root L1 → 3× L2 → 9× L3 terminals with `promptTemplate`, `contextFields`, `benchmarks`, `position`). Also add a `category` field to `Tree` so the canvas can colour-code:
 
-## Session 1 (this turn) — 2-E CTA Engine + tier matrix update + Bible status sync
+```
+category: "ops"        // blue   #5A7DC4  — Trees 9–13   (CSM daily)
+category: "shared"     // green  #4A9B6F  — Trees 14–17  (shared)
+category: "leadership" // purple #8A5AC4  — Trees 18–21  (VP/Director)
+category: "core"       // gold   (existing T1–T8 unchanged)
+```
 
-### A. Tier matrix update (small, prerequisite for CTA team-leader checks)
+New trees and their L1 parent node labels (verbatim from the bible):
 
-`src/lib/tiers.ts` + `src/lib/entitlements.ts`:
-- Insert **Reader** tier between Free and Practitioner: $19/mo, 20 Lumi/mo, full Codex + premium archive, **no CSFactors**.
-- Keep Practitioner $39 / Operator $89 / pools 500-2000-5000 (already correct).
-- `useSubscriptionTier`: extend `tier` union to include `'reader'`, set its Lumi cap to 20/mo, `canAccessCSFactors=false`, `canAccessCommunity=true`.
-- Update `PaywallOverlay` Reader-on-CSFactors variant (Bible's State C copy).
-- Update Codex banner copy: Reader+ gets "All 6 playbooks included" (currently Practitioner+).
-- Add new DB column `profiles.is_team_leader boolean default false` in a migration; expose via `useSubscriptionTier`. (Bible says `users.is_team_leader`; this project's user-facing table is `profiles` — same effect, correct location.)
+```
+T9   adoptionRescue          → "LOW ADOPTION"
+T10  expectationReset        → "BROKEN PROMISE"
+T11  commercialConversation  → "COMMERCIAL PRESSURE"
+T12  stakeholderConflict     → "INTERNAL CUSTOMER CONFLICT"
+T13  sentimentRecovery       → "NEGATIVE SENTIMENT"
+T14  onboardingCrisis        → "ONBOARDING STUCK"
+T15  executiveAccess         → "NEED EXEC ACCESS"
+T16  productGap              → "PRODUCT GAP"
+T17  winBack                 → "CHURNED ACCOUNT"
+T18  teamPerformance         → "TEAM PERFORMANCE"
+T19  leadershipComm          → "LEADERSHIP COMMUNICATION"
+T20  orgDesign               → "ORG DESIGN"
+T21  salesAlignment          → "SALES ALIGNMENT"
+```
 
-Update memory `mem://index.md` to reflect Reader $19 + revised gating.
+Each tree gets 3 L2 branches (e.g. for T9: "Feature dark", "Stakeholder drift", "Time-to-value slipping") and 3 L3 terminals per branch with the same prompt voice and `contextFields` pattern (`ARR_FIELD`, `TIMING_FIELD`, `CONTEXT_FIELD`) used by T1–T8.
 
-### B. 2-E CTA Engine
+## What gets changed (canvas)
 
-**Migration** (`supabase/migrations/...`)
-- `public.ctas` table per Bible schema, with two adjustments to match this project:
-  - `account_id uuid REFERENCES public.cs_accounts(id)` (Bible says `accounts`; our table is `cs_accounts`).
-  - `created_by` / `assigned_to` reference `auth.users(id)`, not a public `users` table.
-- Add `profiles.is_team_leader` (from section A).
-- GRANTs for `authenticated` + `service_role`; RLS:
-  - SELECT: row creator OR assignee OR `team_wide=true` for same-team viewers (via `is_team_member`).
-  - INSERT: authenticated users; `created_by = auth.uid()` enforced.
-  - UPDATE: creator, assignee, or `has_role(auth.uid(),'admin')`.
-  - DELETE: creator only.
-- Indexes on `(status, due_date)`, `(account_id, status)`, `(assigned_to, status)`.
+`src/routes/agent.framework.tsx`:
 
-**Server functions** — `src/lib/ctas.functions.ts`
-- `listCtas({ scope, status?, accountId?, assigneeId? })`
-- `getCta(id)`
-- `createCta(input)` (used by Create modal + Pulse "+" + Lumi push)
-- `updateCta({ id, patch })` (status, assignee, priority, due_date, description)
-- `completeCta({ id, outcome, note })`
-- `bulkUpdate({ ids, patch })` for list-view bulk actions
-- `pushLumiActions({ accountId?, runId, steps[3] })` — Lumi resolution drawer hook (3 inserts)
-All gated by `requireSupabaseAuth`.
+- Tree picker rail: keep the existing grid component, but render trees grouped by category with a subtle colour dot and category label. No layout rewrite.
+- `TreeWheel` and `TreeStack`: pass the tree's category-colour through as a CSS var so node strokes/dots pick up the gold/blue/green/purple family. Existing 8 trees keep gold.
+- Legend block under the wheel: lists the 4 colour families with descriptions from the bible.
+- System-prompt builder in `src/lib/q-agent.functions.ts` (and the CSFactors equivalent if it composes prompts): when the active tree's category is `ops`, append the bible's "Focus on practical, immediate, tactically executable guidance…" block; when `leadership`, append the "USER SENIORITY CONTEXT…" block. No change for `core`/`shared`.
 
-**Components** — `src/components/csfactors/ctas/`
-- `CtaConfig.ts` — `CTA_CONFIG` and `PRIORITY_CONFIG`. **Colors mapped to existing semantic tokens** (`--accent`, `--secondary-accent`, emerald, destructive, muted). Bible's hex values are reference only; we do not introduce them per the locked design-system rule.
-- `ActionCentrePanel.tsx` — Surface A, embedded in Pulse below existing content. Uses `SectionCard` + `HealthChip` primitives.
-- `AccountCtaTab.tsx` — Surface B, embedded as a tab on `csfactors.$accountId.tsx`.
-- `CtaCreateDrawer.tsx`, `CtaDetailDrawer.tsx`, `QuickCompleteModal.tsx`, `TeamAssignmentModal.tsx`.
-- `CtaListView.tsx`, `CtaBoardView.tsx` (HTML5 drag).
+## What gets changed (drawer "vectors" UI)
 
-**Routes**
-- `src/routes/csfactors.ctas.tsx` — Surface C (`/csfactors/ctas`). Metric strip + LIST/BOARD toggle.
-- Sidebar: insert "ACTION CENTRE" entry in `CSFactorsSidebar.tsx` **between Pulse and Accounts**, with badge for open count + red dot when overdue.
-- Path note: Bible says `/ctas`. This project namespaces CSFactors features under `/csfactors/*` (locked convention); we'll use `/csfactors/ctas`. Calling out so you can override if you'd rather break convention.
+`src/components/site/QAgentButton.tsx` lines 311–330 currently render `SUGGESTED_VECTORS` as `flex gap-2 overflow-x-auto … snap-x` — that is the horizontal scroll the user is rejecting. Replace with a **vertical vector list of tree headings**:
 
-**Integrations**
-- `PulseDashboard.tsx` — render `<ActionCentrePanel />` below existing content (additive, no rewrite).
-- `AccountsGrid` / `csfactors.$accountId.tsx` — "Next Best Action" chip pulls from `ctas` with the Bible's ordering; falls back to "+" trigger that opens Create drawer pre-filled with `account_id`.
-- `AskLumiDrawer` resolution footer — add "PUSH TO ACTION CENTRE" button next to existing actions; uses `pushLumiActions`.
-- Home "Open CTAs" tile (Practitioner state) — now reads live count.
+```
+Suggested Vectors
+─────────────────────────
+T1  · ESCALATION              Manage an Escalation        →
+T2  · CHAMPION CHANGE         Handle Champion Change      →
+T3  · UPSELL QUALIFICATION    Qualify an Upsell           →
+…
+T21 · SALES ALIGNMENT         Sales alignment             →
+```
 
-**Out of scope** (Bible mentions but we won't build here):
-- Email/push notifications — toasts only, per Bible §7.
-- Bridge to MAP Engine "linked CTAs" — separate work.
+- One row per tree, vertical stack, scrollable inside the sheet (`max-h` + `overflow-y-auto`).
+- Each row: category colour dot, mono eyebrow, display title, chevron.
+- Clicking a row navigates to `/agent/framework?tree=T{n}` and closes the sheet. (The framework route already reads `activeTree` from state — we'll add a `?tree=` URL param read on mount.)
+- `SUGGESTED_VECTORS` in `q-vectors.ts` is no longer needed by the drawer; leave the file in place (still referenced elsewhere indirectly? — none found) but the import is removed from `QAgentButton.tsx`.
 
-### C. Bible status housekeeping commit
+`src/components/csfactors/AskLumiDrawer.tsx`:
 
-A single commit that updates the Bible markdown in-place:
-- 0-A, 0-B, 1-E, 2-A, 2-B, 2-C → ✅ BUILT
-- 2-E → ✅ BUILT (after this session)
-- Add a note at the top: "Tier matrix updated to include Reader $19 (Jun 2026)."
+- Add the same vertical vector list above the conversation area when there are no messages yet (empty state), keeping the existing briefing card path untouched when a briefing is supplied.
+- Clicking a row deep-links to `/agent/framework?tree=Tx` and closes the drawer — consistent with single-agent rule.
 
-Stored at `docs/CS-Quarterly-Build-Bible.md` so it lives with the repo. Tell me if you'd rather keep it outside the repo.
+## Wiring + safety
 
----
+- `src/lib/discovery.functions.ts` already loops `for (const t of TREES)` and uses generic fields — automatically picks up the 13 new trees, no change needed.
+- `src/routes/admin.tsx` already maps `TREES` to a generic table — picks up new rows.
+- `scripts/check-wiring.ts` and `scripts/check-timeline-kinds.ts` are untouched — no new routes, no new event kinds.
+- Tier limits, Lumi session counters, banner: unchanged. New trees consume the same Lumi session pool.
 
-## Session 2 (next) — Stripe → Paddle migration
+## Technical details
 
-Large and risky; isolate from feature work. High-level outline only here.
+- New constant: `CATEGORY_COLOR: Record<TreeCategory, { dot: string; ring: string; label: string }>` in `q-trees.ts`, referenced from the picker rail, legend, and both drawers' vector list.
+- `q-agent.functions.ts` prompt builder: read `tree.category` from the resolved terminal node's `treeId`; concat the corresponding system-prompt rider before the existing instructions.
+- `agent.framework.tsx`: parse `?tree=Tx` once on mount via `useSearch` / `useRouterState`; if valid TreeId, set `activeTree`.
+- All new prompt templates follow the existing 1–2 sentence voice ("Build the operator response: …").
 
-1. **You disconnect Stripe** from the Payments dashboard (three-dots menu → Disconnect Stripe). I cannot do this step.
-2. Enable Lovable's seamless Paddle integration (`enable_paddle_payments`).
-3. Recreate products + prices in Paddle for: Free (no price), **Reader $19/mo**, Practitioner $39/mo, Operator $89/mo, Team, Scale, Enterprise — monthly + annual where applicable.
-4. Replace Stripe code in one pass:
-   - Delete `src/lib/stripe.server.ts`, `src/lib/payments.functions.ts` (Stripe variant), `src/components/StripeEmbeddedCheckout.tsx`, `PaymentTestModeBanner.tsx`.
-   - Rewrite checkout server fn for Paddle; rewrite `/subscribe` to use Paddle's checkout component.
-   - Replace webhook at `src/routes/api/public/payments/webhook.ts` with Paddle signature verification + Paddle event names (`subscription.created/updated/canceled`).
-   - Update `subscriptions` table writer to store Paddle's `customer_id` / `subscription_id` shape.
-5. Keep `subscriptions` table schema; add `provider text default 'paddle'` column for clarity. Existing Stripe rows stay readable but inactive.
-6. Remove Stripe env vars from references; leave secrets in place (managed by connector).
-7. Verify go-live readiness for Paddle, then publish.
+## Out of scope
 
-**Trade-offs to acknowledge before starting:** existing Stripe subscribers don't migrate automatically — they remain on Stripe until they cancel/resubscribe. If you want them moved, that's a manual customer-by-customer process outside the codebase.
-
----
-
-## Session 3 (later) — your call
-
-Slots open for: 1-C completion (AI Readiness blueprint paywall), 2-D EBR Builder, 1-F/G/H homepage animations, 3-A Lumi trees 9–13, or 3-C WhatsApp (needs `ctas` table → unblocked by Session 1).
-
----
-
-## Open questions before I start Session 1
-
-1. **Route path:** `/csfactors/ctas` (project convention) vs `/ctas` (Bible literal). OK with `/csfactors/ctas`?
-2. **Reader tier in Stripe:** while Stripe is still live, do you want me to also add a Reader $19 price in Stripe so it's purchasable during the interim before Paddle goes live — or skip the Stripe wiring entirely and only enable Reader once Paddle is live?
-3. **Bible file location:** OK to commit the status-synced Bible to `docs/CS-Quarterly-Build-Bible.md`?
-
-Once you confirm 1–3 I'll execute Session 1 end-to-end.
+- No change to the canvas wheel geometry beyond colour theming.
+- No change to AskLumi conversation logic, ElevenLabs STT, or session counters.
+- No new routes, no new DB tables, no migrations.
