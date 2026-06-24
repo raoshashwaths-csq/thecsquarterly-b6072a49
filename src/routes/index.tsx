@@ -326,33 +326,30 @@ function HomePage() {
 
       {/* Featured + Sidebar */}
       {featured && (
-        <main className="max-w-7xl w-full mx-auto px-6 py-20 animate-fade-up [animation-delay:400ms]">
-
-          <div className="grid lg:grid-cols-12 gap-16">
+        <main className="max-w-7xl w-full mx-auto px-6 py-14 md:py-16 animate-fade-up [animation-delay:400ms]">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-7">
-              <div className="mb-8 font-mono text-xs text-accent font-medium">
+              <div className="mb-6 font-mono text-xs text-accent font-medium">
                 {t("home.insightLabel", {
                   n: posts.length.toString().padStart(3, "0"),
                   min: featured.read_minutes,
                 })}
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
-                <h2 className="font-display text-4xl md:text-6xl mb-8 leading-[1.1] tracking-tight transition-all">
+                <h2 className="font-display text-4xl md:text-6xl mb-6 leading-[1.1] tracking-tight transition-all">
                   {featured.title}
                 </h2>
               </Link>
-              <p className="text-xl leading-relaxed text-foreground/80 mb-10 text-pretty">
+              <p className="text-xl leading-relaxed text-foreground/80 mb-8 text-pretty">
                 {featured.excerpt}
               </p>
               {featured.subtitle && (
-                <div className="border-y border-border py-8 mb-12">
+                <div className="border-y border-border py-6 mb-8">
                   <p className="font-display not-italic text-2xl md:text-3xl leading-snug text-pretty">
                     {featured.subtitle}
                   </p>
                 </div>
               )}
-
-
               <Link
                 to="/insights/$slug"
                 params={{ slug: featured.slug }}
@@ -362,26 +359,24 @@ function HomePage() {
               </Link>
             </div>
 
-
-            <aside className="lg:col-span-5 flex flex-col gap-12 lg:border-l lg:border-border lg:pl-12">
+            <aside className="lg:col-span-5 flex flex-col gap-10 lg:border-l lg:border-border lg:pl-12">
               <div>
                 <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   {t("home.thesis.eyebrow")}
                 </div>
-                <p className="text-lg italic leading-snug">
+                <p className="text-lg leading-snug">
                   "CS is no longer a service department; it is a revenue engine that requires the same mechanical precision as an assembly line."
                 </p>
               </div>
             </aside>
-
           </div>
         </main>
       )}
 
       {/* Recent grid */}
       {rest.length > 0 && (
-        <section className="max-w-7xl w-full mx-auto px-6 pb-24">
-          <div className="flex justify-between items-end mb-12">
+        <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-14 md:pb-16">
+          <div className="flex justify-between items-end mb-10">
             <h2 className="font-display text-4xl">{t("home.recent.title")}</h2>
             <Link
               to="/insights"
