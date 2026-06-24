@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Calendar, Phone, PresentationIcon, Crown, AlertTriangle, TrendingUp,
-  Handshake, FileText, Users, Sparkles, Trash2, Plus,
+  Handshake, FileText, Users, Sparkles, Trash2, Plus, ListChecks, CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,8 @@ const VECTORS: Vector[] = [
   { kind: "expansion.signal",   label: "Expansion signal",   icon: TrendingUp,       tint: "emerald" },
   { kind: "renewal.note",       label: "Renewal note",       icon: Handshake,        tint: "accent" },
   { kind: "champion.change",    label: "Champion change",    icon: Sparkles,         tint: "secondary" },
+  { kind: "cta.raised",         label: "CTA raised",         icon: ListChecks,       tint: "accent" },
+  { kind: "cta.completed",      label: "CTA completed",      icon: CheckCircle2,     tint: "emerald" },
   { kind: "note",               label: "Note",               icon: FileText,         tint: "neutral" },
 ];
 
