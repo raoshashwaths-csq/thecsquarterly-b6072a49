@@ -13,6 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { Mic, Send, Sparkle, Square } from "lucide-react";
 import { LumiMark } from "@/components/site/LumiMark";
+import { TreeVectorList } from "@/components/site/TreeVectorList";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { askCSFactorsQ } from "@/lib/csfactors-q.functions";
 import type { LumiBriefing } from "@/lib/lumi-briefings";
