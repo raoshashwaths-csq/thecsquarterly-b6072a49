@@ -411,5 +411,5 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
       },
     } as never);
 
-    return { ok: true, accountId: data.accountId, accountName: acct.name };
+    return { ok: true, accountId: data.accountId, accountName: acctRow.name };
   });
