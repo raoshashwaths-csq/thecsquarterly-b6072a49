@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
-  listAccountEvents, logAccountEvent, deleteAccountEvent,
+  listAccountEvents, logAccountEvent, deleteAccountEvent, deleteAccountEventsByKind,
   type CSAccountEvent,
 } from "@/lib/csfactors.functions";
 
@@ -71,6 +71,7 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
   const list = useServerFn(listAccountEvents);
   const log = useServerFn(logAccountEvent);
   const del = useServerFn(deleteAccountEvent);
+  const delByKind = useServerFn(deleteAccountEventsByKind);
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["cs-events", accountId],
@@ -160,6 +161,18 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
       await qc.invalidateQueries({ queryKey: ["cs-events", accountId] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Delete failed");
+    }
+  }
+
+  const fieldEditCount = presentKinds.get("field.edit") ?? 0;
+  async function clearFieldEdits() {
+    if (!confirm(`Remove all ${fieldEditCount} auto-logged field edits on this account?`)) return;
+    try {
+      const res = await delByKind({ data: { account_id: accountId, kind: "field.edit" } });
+      await qc.invalidateQueries({ queryKey: ["cs-events", accountId] });
+      toast.success(`Cleared ${res.deleted} field edit${res.deleted === 1 ? "" : "s"}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Clear failed");
     }
   }
 
@@ -259,6 +272,17 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
               <X className="h-3 w-3 mr-1" /> Clear
             </Button>
           )}
+          {fieldEditCount > 1 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFieldEdits}
+              className="h-8 px-2 font-mono uppercase tracking-wider text-[10px] text-muted-foreground hover:text-destructive"
+              title="Remove auto-logged field edits"
+            >
+              <Trash2 className="h-3 w-3 mr-1" /> Field edits ({fieldEditCount})
+            </Button>
+          )}
         </div>
         {presentKinds.size > 0 && (
           <div className="flex flex-wrap gap-1.5">
@@ -325,7 +349,7 @@ function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (i
   const Icon = vector.icon;
   const payload = (event.payload ?? {}) as { title?: string; details?: string; label?: string };
   const title = payload.title || payload.label || label;
-  const isManual = !!KIND_INDEX[event.kind] && !KIND_INDEX[event.kind].hidden;
+  const canDelete = !!KIND_INDEX[event.kind];
 
   return (
     <li className="ml-4">
@@ -355,7 +379,7 @@ function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (i
               month: "short", day: "2-digit", year: "2-digit",
             })}
           </time>
-          {isManual && (
+          {canDelete && (
             <button
               type="button"
               onClick={() => onDelete(event.id)}

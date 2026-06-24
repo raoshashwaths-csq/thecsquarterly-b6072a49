@@ -305,6 +305,22 @@ export const deleteAccountEvent = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const deleteAccountEventsByKind = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ account_id: z.string().uuid(), kind: z.string().min(1) }).parse(d),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase } = context;
+    const { error, count } = await supabase
+      .from("cs_account_events" as never)
+      .delete({ count: "exact" })
+      .eq("account_id", data.account_id)
+      .eq("kind", data.kind);
+    if (error) throw new Error(error.message);
+    return { ok: true, deleted: count ?? 0 };
+  });
+
 // =================== Portfolio trend (360 dashboard) ===================
 
 export type TrendPoint = {
