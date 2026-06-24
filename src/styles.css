@@ -687,4 +687,47 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/* CSFactors widget treatment                                         */
+/* Soft gold glow when a widget's underlying data is >7 days stale,   */
+/* plus a subtle hover lift on every dashboard widget.                */
+/* ------------------------------------------------------------------ */
+.csf-widget {
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  will-change: transform;
+}
+.csf-widget:hover {
+  transform: translateY(-2px) scale(1.005);
+}
+
+.stale-glow {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--secondary-accent) 40%, transparent),
+    0 0 24px -4px color-mix(in oklab, var(--secondary-accent) 35%, transparent);
+  animation: csf-stale-pulse 4s ease-in-out infinite;
+}
+.stale-glow:hover {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--secondary-accent) 55%, transparent),
+    0 6px 32px -4px color-mix(in oklab, var(--secondary-accent) 45%, transparent);
+}
+@keyframes csf-stale-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--secondary-accent) 30%, transparent),
+      0 0 18px -4px color-mix(in oklab, var(--secondary-accent) 25%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--secondary-accent) 50%, transparent),
+      0 0 28px -4px color-mix(in oklab, var(--secondary-accent) 45%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .csf-widget { transition: none; }
+  .csf-widget:hover { transform: none; }
+  .stale-glow { animation: none; }
+}
+
+
 

@@ -4,7 +4,7 @@ import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { LumiMark } from "@/components/site/LumiMark";
 import { cn } from "@/lib/utils";
-import { TOP_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
+import { NAV_GROUPS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
 
 export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => void }) {
   const [open, setOpen] = useState(false);
@@ -31,28 +31,37 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
         </SheetHeader>
 
         <nav className="flex-1 overflow-y-auto py-3">
-          <div className="px-2 space-y-0.5">
-            {TOP_LINKS.map((item) => {
-              const Icon = item.icon;
-              const emphasized = item.to === "/csfactors/360" && !item.hash;
-              return (
-                <a
-                  key={item.label}
-                  href={`${item.to}${item.hash ?? ""}`}
-                  onClick={close}
-                  className="flex items-center gap-3 px-3 py-3 text-sm border-l-2 border-transparent text-foreground/80 hover:bg-muted/60"
-                >
-                  <Icon className={cn("h-4 w-4 shrink-0", emphasized && "text-accent")} />
-                  <span className={cn(
-                    "font-mono uppercase tracking-wider text-xs",
-                    emphasized && "font-semibold",
-                  )}>
-                    {item.label}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={group.id} className={cn("px-2", gi > 0 && "mt-4")}>
+              <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-xs font-semibold text-foreground/50">
+                {group.label}
+              </div>
+              <div className="space-y-0.5">
+                {group.links.map((item) => {
+                  const Icon = item.icon;
+                  const linkProps = item.hash
+                    ? { to: item.to as "/csfactors", hash: item.hash }
+                    : { to: item.to };
+                  return (
+                    <Link
+                      key={`${item.to}${item.hash ?? ""}`}
+                      {...(linkProps as { to: string })}
+                      onClick={close}
+                      className="flex items-center gap-3 px-3 py-3 text-sm border-l-2 border-transparent text-foreground/80 hover:bg-muted/60"
+                    >
+                      <Icon className={cn("h-4 w-4 shrink-0", item.emphasized && "text-accent")} />
+                      <span className={cn(
+                        "font-mono uppercase tracking-wider text-xs",
+                        item.emphasized && "font-semibold",
+                      )}>
+                        {item.label}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
 
           <div className="mt-4 px-2">
             <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-xs font-semibold text-foreground/50">
@@ -102,4 +111,3 @@ export function MobileNavDrawer({ onOpenWorkspace }: { onOpenWorkspace: () => vo
     </Sheet>
   );
 }
-

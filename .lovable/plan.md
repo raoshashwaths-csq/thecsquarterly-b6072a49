@@ -1,89 +1,112 @@
-## Goal
+## What's broken today
 
-1. Extend the Lumi canvas from 8 → 21 decision trees per the Build Bible (Prompts 3-A and 3-B), fully functional like T1–T8.
-2. Replace the current horizontal "Suggested Vectors" scroll strip with a **vertical list of tree headings** inside the Lumi drawer surfaces (site `QAgentButton` sheet + CSFactors `AskLumiDrawer`).
-3. Keep all existing canvas / wheel / drawer / API behaviour untouched for T1–T8.
+1. **Sidebar navigation regresses to Pulse.** `CSFactorsSidebar.tsx` renders every TOP_LINK as a raw `<a href>`. That triggers a full document reload, which on the published bundle re-runs the root layout — combined with the hash-anchor entries (`/csfactors#accounts`, `/csfactors#renewals`) sharing the same path as Pulse, the visual result is "everything snaps back to Pulse." MAP Engine, Action Centre, and 360 Dashboard each have real routes (`/csfactors/maps`, `/csfactors/ctas`, `/csfactors/360`) but never benefit from client-side routing.
+2. **Analytics lenses are orphaned.** `NrrWaterfallView`, `RetentionFunnelView`, `StakeholderRadarView`, `TeamLeaderboardView`, and `account.executive.analytics` exist and are mounted on `/csfactors/360`, but the CSFactors sidebar has no entries pointing at the individual standalone lenses. From the user's POV they "disappeared" when the account section was reorganised.
+3. **No staleness signal.** Widgets that haven't refreshed in over a week look identical to fresh ones, so users can't tell when the portfolio data underneath has gone cold.
+4. **Widgets feel inert on hover.** No affordance that a card is a unit you can interact with.
 
-## What gets added (data)
+## Redesign — scope and rules
 
-`src/lib/q-trees.ts` — add 13 new tree objects to `TREES` and their L2/L3 nodes to `NODES`. Each tree follows the exact existing shape (root L1 → 3× L2 → 9× L3 terminals with `promptTemplate`, `contextFields`, `benchmarks`, `position`). Also add a `category` field to `Tree` so the canvas can colour-code:
+- Brand tokens only (`--accent`, `--secondary-accent`, `--border`, `--card`, `--muted`, `--foreground`, emerald/destructive for health). No new colours.
+- Original editorial layout preserved: same grid, same dashboard kit (`MetricCard`, `SectionCard`, `ProgressGauge`, `HealthChip`), same eyebrow/heading typography.
+- Pure presentation + nav wiring. No business-logic changes.
 
-```
-category: "ops"        // blue   #5A7DC4  — Trees 9–13   (CSM daily)
-category: "shared"     // green  #4A9B6F  — Trees 14–17  (shared)
-category: "leadership" // purple #8A5AC4  — Trees 18–21  (VP/Director)
-category: "core"       // gold   (existing T1–T8 unchanged)
-```
+### 1. Sidebar nav restructure (`src/components/csfactors/csfactorsNav.tsx` + `CSFactorsSidebar.tsx`)
 
-New trees and their L1 parent node labels (verbatim from the bible):
+Three labelled groups, all rendered as TanStack `<Link to>` (or hash-aware Link with `hash` prop) — never raw `<a href>`:
 
-```
-T9   adoptionRescue          → "LOW ADOPTION"
-T10  expectationReset        → "BROKEN PROMISE"
-T11  commercialConversation  → "COMMERCIAL PRESSURE"
-T12  stakeholderConflict     → "INTERNAL CUSTOMER CONFLICT"
-T13  sentimentRecovery       → "NEGATIVE SENTIMENT"
-T14  onboardingCrisis        → "ONBOARDING STUCK"
-T15  executiveAccess         → "NEED EXEC ACCESS"
-T16  productGap              → "PRODUCT GAP"
-T17  winBack                 → "CHURNED ACCOUNT"
-T18  teamPerformance         → "TEAM PERFORMANCE"
-T19  leadershipComm          → "LEADERSHIP COMMUNICATION"
-T20  orgDesign               → "ORG DESIGN"
-T21  salesAlignment          → "SALES ALIGNMENT"
-```
+```text
+COMMAND
+  Pulse                /csfactors
+  Action Centre        /csfactors/ctas
+  Accounts             /csfactors#accounts
+  Renewals             /csfactors#renewals
 
-Each tree gets 3 L2 branches (e.g. for T9: "Feature dark", "Stakeholder drift", "Time-to-value slipping") and 3 L3 terminals per branch with the same prompt voice and `contextFields` pattern (`ARR_FIELD`, `TIMING_FIELD`, `CONTEXT_FIELD`) used by T1–T8.
+PLANNING
+  MAP Engine           /csfactors/maps
+  Playbooks            /csfactors  (existing standalone, kept)
 
-## What gets changed (canvas)
+ANALYTICS LENSES
+  360 Dashboard        /csfactors/360                          (emphasised)
+  Portfolio Command    /account/executive/analytics
+  NRR Waterfall        /account/analytics/nrr-waterfall
+  Retention Funnel     /account/analytics/retention-funnel
+  Stakeholder Radar    /account/analytics/stakeholder-radar
+  Team Leaderboard     /account/analytics/team-leaderboard
 
-`src/routes/agent.framework.tsx`:
-
-- Tree picker rail: keep the existing grid component, but render trees grouped by category with a subtle colour dot and category label. No layout rewrite.
-- `TreeWheel` and `TreeStack`: pass the tree's category-colour through as a CSS var so node strokes/dots pick up the gold/blue/green/purple family. Existing 8 trees keep gold.
-- Legend block under the wheel: lists the 4 colour families with descriptions from the bible.
-- System-prompt builder in `src/lib/q-agent.functions.ts` (and the CSFactors equivalent if it composes prompts): when the active tree's category is `ops`, append the bible's "Focus on practical, immediate, tactically executable guidance…" block; when `leadership`, append the "USER SENIORITY CONTEXT…" block. No change for `core`/`shared`.
-
-## What gets changed (drawer "vectors" UI)
-
-`src/components/site/QAgentButton.tsx` lines 311–330 currently render `SUGGESTED_VECTORS` as `flex gap-2 overflow-x-auto … snap-x` — that is the horizontal scroll the user is rejecting. Replace with a **vertical vector list of tree headings**:
-
-```
-Suggested Vectors
-─────────────────────────
-T1  · ESCALATION              Manage an Escalation        →
-T2  · CHAMPION CHANGE         Handle Champion Change      →
-T3  · UPSELL QUALIFICATION    Qualify an Upsell           →
-…
-T21 · SALES ALIGNMENT         Sales alignment             →
+MODULES  (unchanged STANDALONE_LINKS — AI Readiness, ROI Calculator, NRR Benchmarks, Directory, Teams, Workspace)
 ```
 
-- One row per tree, vertical stack, scrollable inside the sheet (`max-h` + `overflow-y-auto`).
-- Each row: category colour dot, mono eyebrow, display title, chevron.
-- Clicking a row navigates to `/agent/framework?tree=T{n}` and closes the sheet. (The framework route already reads `activeTree` from state — we'll add a `?tree=` URL param read on mount.)
-- `SUGGESTED_VECTORS` in `q-vectors.ts` is no longer needed by the drawer; leave the file in place (still referenced elsewhere indirectly? — none found) but the import is removed from `QAgentButton.tsx`.
+Hash entries use `<Link to="/csfactors" hash="accounts">` so the route stays mounted and only the hash changes — no more full reloads.
 
-`src/components/csfactors/AskLumiDrawer.tsx`:
+`MobileNavDrawer` mirrors the same groups.
 
-- Add the same vertical vector list above the conversation area when there are no messages yet (empty state), keeping the existing briefing card path untouched when a briefing is supplied.
-- Clicking a row deep-links to `/agent/framework?tree=Tx` and closes the drawer — consistent with single-agent rule.
+### 2. Stale-widget soft glow
 
-## Wiring + safety
+New helper `src/components/dashboard/useFreshness.ts` exposing `useFreshness(updatedAt?: string | Date | null)` returning `{ stale: boolean, daysSince: number }`. Threshold: `> 7 days` or missing/null `updated_at`.
 
-- `src/lib/discovery.functions.ts` already loops `for (const t of TREES)` and uses generic fields — automatically picks up the 13 new trees, no change needed.
-- `src/routes/admin.tsx` already maps `TREES` to a generic table — picks up new rows.
-- `scripts/check-wiring.ts` and `scripts/check-timeline-kinds.ts` are untouched — no new routes, no new event kinds.
-- Tier limits, Lumi session counters, banner: unchanged. New trees consume the same Lumi session pool.
+Add an optional `updatedAt` prop to `SectionCard` and `MetricCard`. When stale, the outer wrapper gains a `data-stale="true"` attribute and a `stale-glow` class. Glow defined once in `src/styles.css`:
 
-## Technical details
+```css
+.stale-glow {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--secondary-accent) 40%, transparent),
+    0 0 24px -4px color-mix(in oklab, var(--secondary-accent) 35%, transparent);
+  animation: stale-pulse 4s ease-in-out infinite;
+}
+@keyframes stale-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px color-mix(in oklab, var(--secondary-accent) 30%, transparent),
+                        0 0 18px -4px color-mix(in oklab, var(--secondary-accent) 25%, transparent); }
+  50%      { box-shadow: 0 0 0 1px color-mix(in oklab, var(--secondary-accent) 50%, transparent),
+                        0 0 28px -4px color-mix(in oklab, var(--secondary-accent) 45%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .stale-glow { animation: none; } }
+```
 
-- New constant: `CATEGORY_COLOR: Record<TreeCategory, { dot: string; ring: string; label: string }>` in `q-trees.ts`, referenced from the picker rail, legend, and both drawers' vector list.
-- `q-agent.functions.ts` prompt builder: read `tree.category` from the resolved terminal node's `treeId`; concat the corresponding system-prompt rider before the existing instructions.
-- `agent.framework.tsx`: parse `?tree=Tx` once on mount via `useSearch` / `useRouterState`; if valid TreeId, set `activeTree`.
-- All new prompt templates follow the existing 1–2 sentence voice ("Build the operator response: …").
+A tiny mono tooltip pill in the card's top-right: `STALE · {n}D` (uses `--secondary-accent` text, transparent bg). No layout shift.
+
+Widgets wired with `updatedAt`:
+- Pulse Dashboard cards (Reckoning Ledger, Risk Heatmap, Pulse Header summary)
+- `BurningThree`, `AnalyticsHeader`, Master Account Matrix on `/csfactors/360`
+- Each lens section on `/csfactors/360` (NRR / Retention / Stakeholder / Team) — `updatedAt` derived from the freshest underlying account row (`max(updated_at)` from accounts), since these views are read-models of the portfolio
+- `TaggedLumiRunsWidget` (uses latest `tagged_at`)
+- Action Centre list (latest CTA `updated_at`)
+
+Source of `updatedAt`: existing `accounts.updated_at`, `q_runs.tagged_at`, `ctas.updated_at`. No schema changes.
+
+### 3. Hover lift (every CSFactors widget)
+
+In `SectionCard` and `MetricCard` outer wrapper add:
+
+```text
+transition: transform 220ms ease, box-shadow 220ms ease;
+hover: translateY(-2px) scale(1.005);
+```
+
+No colour or border change. Combines cleanly with the stale glow (transform + box-shadow are independent). Disabled under `prefers-reduced-motion`.
+
+### 4. `/csfactors/360` polish
+
+- Keep the existing five-section layout. Each `SectionCard` receives the derived `updatedAt` so the same hover/glow rules apply.
+- Add a small "Last refreshed" mono caption under each lens heading using the same value, so the glow has a visible cause.
+
+## Files touched
+
+- `src/components/csfactors/csfactorsNav.tsx` — regrouped link arrays.
+- `src/components/csfactors/CSFactorsSidebar.tsx` — `<Link>` + group rendering + active-state logic for hash links.
+- `src/components/csfactors/MobileNavDrawer.tsx` — mirror groups.
+- `src/components/dashboard/SectionCard.tsx` — `updatedAt` prop, hover + stale wrapper, stale pill.
+- `src/components/dashboard/MetricCard.tsx` — same.
+- `src/components/dashboard/useFreshness.ts` — new tiny hook.
+- `src/styles.css` — `.stale-glow`, `@keyframes stale-pulse`, hover transition utility class.
+- `src/routes/csfactors.tsx`, `src/routes/csfactors.360.tsx`, `src/routes/csfactors.ctas.tsx`, `src/components/csfactors/pulse/*`, `src/components/csfactors/TaggedLumiRunsWidget.tsx`, `src/components/csfactors/ctas/ActionCentrePanel.tsx` — pass `updatedAt` through.
 
 ## Out of scope
 
-- No change to the canvas wheel geometry beyond colour theming.
-- No change to AskLumi conversation logic, ElevenLabs STT, or session counters.
-- No new routes, no new DB tables, no migrations.
+- No changes to colours, fonts, spacing scale, or copy beyond the new "Last refreshed" caption.
+- No new data, no new tables, no new server functions.
+- No changes to `/account/analytics/*` route files themselves — only re-exposing them from the CSFactors sidebar.
+
+## Open question
+
+The four analytics lenses currently live at `/account/analytics/*`. Plan above keeps them there and links to them from the CSFactors sidebar. **Confirm** that's preferred, vs. mirroring them under `/csfactors/analytics/*` (would require new route files that re-export the same view components). I recommend keeping the `/account/analytics/*` URLs as the canonical home and just linking — zero duplication, no SEO split.

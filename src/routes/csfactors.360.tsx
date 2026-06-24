@@ -23,6 +23,7 @@ import { RetentionFunnelView } from "@/components/csfactors/threeSixty/Retention
 import { StakeholderRadarView } from "@/components/csfactors/threeSixty/StakeholderRadarView";
 import { TeamLeaderboardView } from "@/components/csfactors/threeSixty/TeamLeaderboardView";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
+import { latestUpdatedAt } from "@/components/dashboard/useFreshness";
 
 export const Route = createFileRoute("/csfactors/360")({
   head: () => ({
@@ -92,6 +93,7 @@ function ThreeSixtyPage() {
     const done = accounts.filter((a) => a.qbr_status === "Completed").length;
     return Math.round((done / accounts.length) * 100);
   }, [accounts]);
+  const portfolioUpdatedAt = useMemo(() => latestUpdatedAt(accounts as Array<{ updated_at?: string | null }>), [accounts]);
 
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
@@ -175,11 +177,12 @@ function ThreeSixtyPage() {
                   eyebrow="Lens 00 / Portfolio Command"
                   title="Burning Three"
                   description="The three accounts most likely to detonate this quarter — by ARR weight × risk."
+                  updatedAt={portfolioUpdatedAt}
                 >
                   <BurningThree accounts={accounts} />
                 </SectionCard>
 
-                <SectionCard eyebrow="Portfolio" title="Analytics overview">
+                <SectionCard eyebrow="Portfolio" title="Analytics overview" updatedAt={portfolioUpdatedAt}>
                   <AnalyticsHeader accounts={accounts} />
                 </SectionCard>
 
@@ -213,6 +216,7 @@ function ThreeSixtyPage() {
                     accent="accent"
                     trend={accounts.length ? `${accounts.length} accounts` : "Add your first account"}
                     trendDirection="flat"
+                    updatedAt={portfolioUpdatedAt}
                   />
                   <MetricCard
                     eyebrow="ARR At Immediate Risk"
@@ -220,6 +224,7 @@ function ThreeSixtyPage() {
                     accent="danger"
                     trend="Health below 50"
                     trendDirection="down"
+                    updatedAt={portfolioUpdatedAt}
                   />
                   <MetricCard
                     eyebrow="QBR Compliance"
@@ -229,6 +234,7 @@ function ThreeSixtyPage() {
                     footer={
                       <ProgressGauge value={compliance} accent={compliance >= 75 ? "success" : compliance >= 50 ? "secondary" : "danger"} />
                     }
+                    updatedAt={portfolioUpdatedAt}
                   />
                 </MetricGrid>
 
@@ -240,6 +246,7 @@ function ThreeSixtyPage() {
                       ? "Aggregate portfolio scoped to your whole team."
                       : "Your isolated book of business — 32 fields per account."
                   }
+                  updatedAt={portfolioUpdatedAt}
                 >
                   {isLoading ? (
                     <p className="text-sm text-muted-foreground py-6">Loading…</p>
@@ -262,6 +269,7 @@ function ThreeSixtyPage() {
                   title="NRR Waterfall"
                   description="Starting ARR through expansion, contraction, and churn to ending ARR."
                   actions={<StandaloneLink to="/account/analytics/nrr-waterfall" />}
+                  updatedAt={portfolioUpdatedAt}
                 >
                   <NrrWaterfallView />
                 </SectionCard>
@@ -273,6 +281,7 @@ function ThreeSixtyPage() {
                   title="Retention Funnel"
                   description="Stage-by-stage drop-off across the customer lifecycle."
                   actions={<StandaloneLink to="/account/analytics/retention-funnel" />}
+                  updatedAt={portfolioUpdatedAt}
                 >
                   <RetentionFunnelView />
                 </SectionCard>
@@ -284,6 +293,7 @@ function ThreeSixtyPage() {
                   title="Stakeholder Radar"
                   description="Five-axis pentagon across health, NPS, implementation, QBR cadence, and sentiment."
                   actions={<StandaloneLink to="/account/analytics/stakeholder-radar" />}
+                  updatedAt={portfolioUpdatedAt}
                 >
                   <StakeholderRadarView />
                 </SectionCard>
@@ -295,6 +305,7 @@ function ThreeSixtyPage() {
                   title="Team Leaderboard"
                   description="CSM-level performance: book of business, average health, and QBR completion."
                   actions={<StandaloneLink to="/account/analytics/team-leaderboard" />}
+                  updatedAt={portfolioUpdatedAt}
                 >
                   <TeamLeaderboardView />
                 </SectionCard>

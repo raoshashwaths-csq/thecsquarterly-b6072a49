@@ -11,6 +11,11 @@ import {
   BookUser,
   Map as MapIcon,
   Inbox,
+  TrendingUp,
+  Filter,
+  Radar,
+  Trophy,
+  Compass,
 } from "lucide-react";
 
 export type NavLink = {
@@ -19,18 +24,50 @@ export type NavLink = {
   label: string;
   icon: typeof Activity;
   external?: boolean;
+  emphasized?: boolean;
 };
 
-export const TOP_LINKS: NavLink[] = [
-  { to: "/csfactors", label: "Pulse", icon: Activity },
-  { to: "/csfactors/ctas", label: "Action Centre", icon: Inbox },
-  { to: "/csfactors", hash: "#accounts", label: "Accounts", icon: LayoutGrid },
-  { to: "/csfactors/maps", label: "MAP Engine", icon: MapIcon },
-  { to: "/csfactors", hash: "#renewals", label: "Renewals", icon: UsersIcon },
-  { to: "/csfactors/360", label: "360 Dashboard", icon: LayoutDashboard },
+export type NavGroup = {
+  id: string;
+  label: string;
+  links: NavLink[];
+};
+
+export const NAV_GROUPS: NavGroup[] = [
+  {
+    id: "command",
+    label: "Command",
+    links: [
+      { to: "/csfactors", label: "Pulse", icon: Activity },
+      { to: "/csfactors/ctas", label: "Action Centre", icon: Inbox },
+      { to: "/csfactors", hash: "accounts", label: "Accounts", icon: LayoutGrid },
+      { to: "/csfactors", hash: "renewals", label: "Renewals", icon: UsersIcon },
+    ],
+  },
+  {
+    id: "planning",
+    label: "Planning",
+    links: [
+      { to: "/csfactors/maps", label: "MAP Engine", icon: MapIcon },
+    ],
+  },
+  {
+    id: "analytics",
+    label: "Analytics Lenses",
+    links: [
+      { to: "/csfactors/360", label: "360 Dashboard", icon: LayoutDashboard, emphasized: true },
+      { to: "/account/executive/analytics", label: "Portfolio Command", icon: Compass },
+      { to: "/account/analytics/nrr-waterfall", label: "NRR Waterfall", icon: TrendingUp },
+      { to: "/account/analytics/retention-funnel", label: "Retention Funnel", icon: Filter },
+      { to: "/account/analytics/stakeholder-radar", label: "Stakeholder Radar", icon: Radar },
+      { to: "/account/analytics/team-leaderboard", label: "Team Leaderboard", icon: Trophy },
+    ],
+  },
 ];
 
-// Workspace handled separately (opens a Sheet)
+/** @deprecated kept for any legacy import; prefer NAV_GROUPS. */
+export const TOP_LINKS: NavLink[] = NAV_GROUPS.flatMap((g) => g.links);
+
 export const STANDALONE_LINKS: NavLink[] = [
   { to: "/ai-readiness", label: "AI Readiness Diagnostic", icon: Gauge },
   { to: "/calculator", label: "ROI Calculator", icon: Calculator },

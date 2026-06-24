@@ -3,7 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { CSFLogo } from "./CSFLogo";
-import { TOP_LINKS, STANDALONE_LINKS, WORKSPACE_ICON } from "./csfactorsNav";
+import { NAV_GROUPS, STANDALONE_LINKS, WORKSPACE_ICON, type NavLink } from "./csfactorsNav";
 
 const COLLAPSE_KEY = "csf.sidebar.collapsed";
 
@@ -26,10 +26,13 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
     });
   }
 
-  const isActiveTop = (to: string, h?: string) => {
-    const normalizedHash = hash ? (hash.startsWith("#") ? hash : `#${hash}`) : "";
-    if (h) return pathname === to && normalizedHash === h;
-    return (pathname === to && !normalizedHash) || pathname.startsWith(to + "/");
+  const normalizedHash = hash ? hash.replace(/^#/, "") : "";
+
+  const isActiveTop = (item: NavLink) => {
+    if (item.hash) return pathname === item.to && normalizedHash === item.hash;
+    // No-hash item on /csfactors should only be active when there is no hash either.
+    if (item.to === "/csfactors") return pathname === "/csfactors" && !normalizedHash;
+    return pathname === item.to || pathname.startsWith(item.to + "/");
   };
   const isActive = (to: string) => pathname === to || pathname.startsWith(to + "/");
 
@@ -56,35 +59,48 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
         </div>
 
         <nav className="flex-1 overflow-y-auto py-3">
-          <div className="px-2 space-y-0.5">
-            {TOP_LINKS.map((item) => {
-              const Icon = item.icon;
-              const active = isActiveTop(item.to, item.hash);
-              const emphasized = item.to === "/csfactors/360" && !item.hash;
-              return (
-                <a
-                  key={item.label}
-                  href={`${item.to}${item.hash ?? ""}`}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 text-sm border-l-2 transition-colors hover:bg-muted/60",
-                    active ? "border-accent text-foreground bg-muted/40" : "border-transparent text-foreground/70",
-                    emphasized && !active && "text-foreground",
-                  )}
-                  title={collapsed ? item.label : undefined}
-                >
-                  <Icon className={cn("h-4 w-4 shrink-0", emphasized && "text-accent")} />
-                  {!collapsed && (
-                    <span className={cn(
-                      "font-mono uppercase tracking-wider text-xs",
-                      emphasized && "font-semibold",
-                    )}>
-                      {item.label}
-                    </span>
-                  )}
-                </a>
-              );
-            })}
-          </div>
+          {NAV_GROUPS.map((group, gi) => (
+            <div key={group.id} className={cn("px-2", gi > 0 && "mt-4")}>
+              {!collapsed && (
+                <div className="px-3 pb-1 font-mono uppercase tracking-[0.22em] text-xs font-semibold text-foreground/50">
+                  {group.label}
+                </div>
+              )}
+              <div className="space-y-0.5">
+                {group.links.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActiveTop(item);
+                  const emphasized = item.emphasized;
+                  // Hash links stay on /csfactors so we use the Link `hash` prop.
+                  const linkProps = item.hash
+                    ? { to: item.to as "/csfactors", hash: item.hash }
+                    : { to: item.to };
+                  return (
+                    <Link
+                      key={`${item.to}${item.hash ?? ""}`}
+                      {...(linkProps as { to: string })}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 text-sm border-l-2 transition-colors hover:bg-muted/60",
+                        active ? "border-accent text-foreground bg-muted/40" : "border-transparent text-foreground/70",
+                        emphasized && !active && "text-foreground",
+                      )}
+                      title={collapsed ? item.label : undefined}
+                    >
+                      <Icon className={cn("h-4 w-4 shrink-0", emphasized && "text-accent")} />
+                      {!collapsed && (
+                        <span className={cn(
+                          "font-mono uppercase tracking-wider text-[11px] leading-tight",
+                          emphasized && "font-semibold",
+                        )}>
+                          {item.label}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
 
           <div className="mt-4 px-2" data-tour="standalone-modules">
             {!collapsed && (
@@ -138,4 +154,3 @@ export function CSFactorsSidebar({ onOpenWorkspace }: { onOpenWorkspace: () => v
     </aside>
   );
 }
-
