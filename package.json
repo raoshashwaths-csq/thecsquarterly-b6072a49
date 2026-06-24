@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "check:wiring": "bun scripts/check-wiring.ts",
+    "check:timeline-kinds": "bun scripts/check-timeline-kinds.ts",
     "format": "prettier --write ."
   },
   "dependencies": {

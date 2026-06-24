@@ -17,3 +17,5 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Sidebar / route / CTA wiring check
         run: bun run check:wiring
+      - name: Account-timeline kind ↔ renderer check
+        run: bun run check:timeline-kinds
