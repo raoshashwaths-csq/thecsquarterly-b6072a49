@@ -63,6 +63,7 @@ function AiReadinessLanding() {
         </p>
         <Link
           to="/ai-readiness/survey"
+          onClick={onStartAiReadiness}
           className="inline-block px-10 py-5 bg-foreground text-background font-mono text-xs uppercase tracking-widest font-bold hover:bg-accent transition-colors"
         >
           Start the diagnostic
