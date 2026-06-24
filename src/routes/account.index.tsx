@@ -224,14 +224,29 @@ function AccountPage() {
                 </div>
                 <div>
                   <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">
-                    {sub?.cancelAtPeriodEnd ? "Access ends" : "Renews"}
+                    {sub?.status === "canceled"
+                      ? "Access ended"
+                      : sub?.cancelAtPeriodEnd
+                        ? "Access ends"
+                        : sub?.status === "paused"
+                          ? "Paused since"
+                          : "Renews"}
                   </dt>
                   <dd>{periodEndLabel ?? "—"}</dd>
                 </div>
               </dl>
-              {sub?.cancelAtPeriodEnd && periodEndLabel && (
-                <p className="mt-3 text-xs text-secondary-accent font-mono uppercase tracking-widest">
-                  Cancellation scheduled · access continues until {periodEndLabel}
+              {statusBanner && (
+                <p
+                  className={
+                    "mt-3 text-xs font-mono uppercase tracking-widest " +
+                    (statusBanner.tone === "warning"
+                      ? "text-destructive"
+                      : statusBanner.tone === "secondary"
+                        ? "text-secondary-accent"
+                        : "text-muted-foreground")
+                  }
+                >
+                  {statusBanner.text}
                 </p>
               )}
             </SectionCard>
