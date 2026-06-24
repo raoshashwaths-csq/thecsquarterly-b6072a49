@@ -148,66 +148,90 @@ function AgentFrameworkPage() {
       <LumiSessionBanner sub={sub} />
 
 
-      {/* Tree picker rail — grouped by category */}
+      {/* Tree picker rail — collapses into a "Back to all decision trees" pill once a tree is focused. */}
       <RevealBlock>
-        <div className="space-y-6 mb-10">
-          {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
-            const group = TREES.filter((t) => t.category === cat);
-            if (group.length === 0) return null;
-            const c = CATEGORY_COLOR[cat];
-            return (
-              <div key={cat}>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/60">{c.label}</span>
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
+            focusMode ? "max-h-0 opacity-0 pointer-events-none -translate-y-2" : "max-h-[3000px] opacity-100 translate-y-0"
+          }`}
+          aria-hidden={focusMode}
+        >
+          <div className="space-y-6 mb-10">
+            {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
+              const group = TREES.filter((t) => t.category === cat);
+              if (group.length === 0) return null;
+              const c = CATEGORY_COLOR[cat];
+              return (
+                <div key={cat}>
+                  <div className="flex items-center gap-2 mb-2.5">
+                    <span aria-hidden className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.hex }} />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/60">{c.label}</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {group.map((t) => {
+                      const active = t.id === activeTree;
+                      return (
+                        <button
+                          key={t.id}
+                          onClick={() => handlePickTree(t.id)}
+                          className={`relative text-left p-4 border transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:-translate-y-0.5 ${
+                            active
+                              ? "border-foreground bg-foreground text-background shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]"
+                              : "border-border hover:border-foreground"
+                          }`}
+                          style={!active ? { boxShadow: `inset 3px 0 0 0 ${c.hex}` } : undefined}
+                        >
+                          <div className={`font-mono text-xs uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
+                            {cleanEyebrow(t.eyebrow)}
+                          </div>
+                          <div className="font-display text-base leading-tight break-words">{t.title}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {group.map((t) => {
-                    const active = t.id === activeTree;
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => setActiveTree(t.id)}
-                        className={`relative text-left p-4 border transition-all duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)] hover:-translate-y-0.5 ${
-                          active
-                            ? "border-foreground bg-foreground text-background shadow-[0_10px_30px_-12px_rgba(0,0,0,0.35)]"
-                            : "border-border hover:border-foreground"
-                        }`}
-                        style={!active ? { boxShadow: `inset 3px 0 0 0 ${c.hex}` } : undefined}
-                      >
-                        <div className={`font-mono text-xs uppercase tracking-[0.25em] mb-1.5 break-words ${active ? "text-background/70" : "text-accent"}`}>
-                          {cleanEyebrow(t.eyebrow)}
-                        </div>
-                        <div className="font-display text-base leading-tight break-words">{t.title}</div>
-                      </button>
-                    );
-                  })}
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className="border border-border bg-card/40 p-4 mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
+              const c = CATEGORY_COLOR[cat];
+              return (
+                <div key={cat} className="flex items-start gap-2.5">
+                  <span aria-hidden className="mt-1.5 inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.hex }} />
+                  <div className="min-w-0">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/80">{c.label}</div>
+                    <div className="text-xs text-foreground/60 leading-snug">{c.blurb}</div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        {/* Legend */}
-        <div className="border border-border bg-card/40 p-4 mb-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {(["core", "ops", "shared", "leadership"] as TreeCategory[]).map((cat) => {
-            const c = CATEGORY_COLOR[cat];
-            return (
-              <div key={cat} className="flex items-start gap-2.5">
-                <span aria-hidden className="mt-1.5 inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: c.hex }} />
-                <div className="min-w-0">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-foreground/80">{c.label}</div>
-                  <div className="text-xs text-foreground/60 leading-snug">{c.blurb}</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Back-to-picker pill — shown only in focus mode */}
+        {focusMode && (
+          <div className="mb-8 animate-fade-up">
+            <button
+              type="button"
+              onClick={handleBackToPicker}
+              className="inline-flex items-center gap-2 border border-border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.25em] text-foreground/70 hover:border-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              All decision trees
+            </button>
+          </div>
+        )}
       </RevealBlock>
 
       {/* Selected tree header */}
       <RevealBlock>
-        <div className="border-t border-border pt-6 mb-10">
+        <div
+          key={`hdr-${activeTree}`}
+          className="border-t border-border pt-6 mb-10 animate-fade-up"
+        >
           <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
             {cleanEyebrow(tree.eyebrow)}
           </div>
@@ -218,22 +242,24 @@ function AgentFrameworkPage() {
 
       {/* Desktop (lg+): circular wheel. Tablet & mobile: stacked cards. */}
       <RevealBlock>
-        <div className="hidden lg:block">
-          <TreeWheel
-            key={activeTree}
-            tree={tree}
-            terminals={terminals}
-            onTerminal={setRunTerminal}
-          />
-        </div>
-        <div className="lg:hidden">
-          <TreeStack
-            tree={tree}
-            terminals={terminals}
-            onTerminal={setRunTerminal}
-          />
+        <div ref={wheelRef} key={`wheel-${activeTree}`} className="animate-fade-up">
+          <div className="hidden lg:block">
+            <TreeWheel
+              tree={tree}
+              terminals={terminals}
+              onTerminal={setRunTerminal}
+            />
+          </div>
+          <div className="lg:hidden">
+            <TreeStack
+              tree={tree}
+              terminals={terminals}
+              onTerminal={setRunTerminal}
+            />
+          </div>
         </div>
       </RevealBlock>
+
 
       <RunHistory />
 
