@@ -1,14 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, ArrowLeft } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { Check, ArrowLeft, Loader2 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { QMark } from "@/components/site/QMark";
-import { TIERS, getTier, tierMailto, type Designation } from "@/lib/tiers";
+import {
+  TIERS,
+  getTier,
+  tierMailto,
+  priceIdFor,
+  type Cadence,
+  type Designation,
+} from "@/lib/tiers";
 import { useAuth } from "@/hooks/useAuth";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
-import { priceIdFor, type Cadence } from "@/lib/price-map";
+import { initializePaddle } from "@/lib/paddle-checkout";
+import { resolvePaddlePrice } from "@/lib/paddle.functions";
+import { getPaddleEnvironment } from "@/lib/paddle";
 
 const DESIGNATIONS = new Set<string>(TIERS.map((t) => t.designation));
 
