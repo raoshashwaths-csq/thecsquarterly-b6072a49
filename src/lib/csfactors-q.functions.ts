@@ -53,16 +53,29 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
 
 
     // Pull the operator's full portfolio context.
-    const [{ data: accountsRaw }, { data: stakeholdersRaw }, { data: eventsRaw }] =
-      await Promise.all([
-        supabase.from("cs_accounts" as never).select("*").order("arr", { ascending: false }),
-        supabase.from("cs_stakeholders" as never).select("*"),
-        supabase
-          .from("cs_account_events" as never)
-          .select("*")
-          .order("occurred_at", { ascending: false })
-          .limit(400),
-      ]);
+    const [
+      { data: accountsRaw },
+      { data: stakeholdersRaw },
+      { data: eventsRaw },
+      { data: ctasRaw },
+      { data: contractsRaw },
+    ] = await Promise.all([
+      supabase.from("cs_accounts" as never).select("*").order("arr", { ascending: false }),
+      supabase.from("cs_stakeholders" as never).select("*"),
+      supabase
+        .from("cs_account_events" as never)
+        .select("*")
+        .order("occurred_at", { ascending: false })
+        .limit(400),
+      supabase
+        .from("ctas" as never)
+        .select("id,title,status,priority,cta_type,account_id,account_name,due_date,completed_at,outcome,source,created_at")
+        .order("created_at", { ascending: false })
+        .limit(400),
+      supabase
+        .from("cs_contracts" as never)
+        .select("id,account_id,title,starts_on,renews_on,arr,currency,status"),
+    ]);
 
     type A = Record<string, unknown> & { id: string; name: string };
     const accounts = (accountsRaw ?? []) as unknown as A[];
@@ -70,8 +83,39 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       Record<string, unknown> & { account_id: string }
     >;
     const events = (eventsRaw ?? []) as unknown as Array<
-      Record<string, unknown> & { account_id: string; kind: string; occurred_at: string }
+      Record<string, unknown> & {
+        account_id: string;
+        kind: string;
+        occurred_at: string;
+        payload: Record<string, unknown> | null;
+      }
     >;
+    type CtaRow = {
+      id: string;
+      title: string;
+      status: string;
+      priority: string;
+      cta_type: string;
+      account_id: string | null;
+      account_name: string | null;
+      due_date: string | null;
+      completed_at: string | null;
+      outcome: string | null;
+      source: string;
+      created_at: string;
+    };
+    const ctas = (ctasRaw ?? []) as unknown as CtaRow[];
+    type ContractRow = {
+      id: string;
+      account_id: string;
+      title: string | null;
+      starts_on: string | null;
+      renews_on: string | null;
+      arr: number | null;
+      currency: string | null;
+      status: string | null;
+    };
+    const contracts = (contractsRaw ?? []) as unknown as ContractRow[];
 
     const stakesByAccount = new Map<string, typeof stakeholders>();
     for (const s of stakeholders) {
@@ -87,13 +131,36 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       eventsByAccount.set(e.account_id, arr);
     }
 
+    const ctasByAccount = new Map<string, CtaRow[]>();
+    for (const c of ctas) {
+      if (!c.account_id) continue;
+      const arr = ctasByAccount.get(c.account_id) ?? [];
+      arr.push(c);
+      ctasByAccount.set(c.account_id, arr);
+    }
+
+    const contractsByAccount = new Map<string, ContractRow[]>();
+    for (const c of contracts) {
+      const arr = contractsByAccount.get(c.account_id) ?? [];
+      arr.push(c);
+      contractsByAccount.set(c.account_id, arr);
+    }
+
+    const nowMs = Date.now();
+    const isOpen = (s: string) => s === "open" || s === "in_progress";
+    const isOverdue = (c: CtaRow) =>
+      isOpen(c.status) && c.due_date != null && new Date(c.due_date).getTime() < nowMs;
+
     // Compact, model-friendly shape. Trim and rename fields.
     const compact = accounts.map((a) => {
       const evs = eventsByAccount.get(a.id) ?? [];
+      const accCtas = ctasByAccount.get(a.id) ?? [];
+      const accContracts = contractsByAccount.get(a.id) ?? [];
       const leadership = evs.find((e) =>
         /leadership|exec|executive/i.test(String(e.kind ?? "")),
       );
       const lastQbr = evs.find((e) => /qbr/i.test(String(e.kind ?? "")));
+      const lastUpdate = evs[0];
       const renewal = fmtDate(a.contract_renewal_date as string | null);
       const daysToRenewal = daysUntil(a.contract_renewal_date as string | null);
       return {
@@ -129,9 +196,48 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
           ? { at: fmtDate(leadership.occurred_at), kind: leadership.kind }
           : null,
         last_qbr_event: lastQbr ? { at: fmtDate(lastQbr.occurred_at), kind: lastQbr.kind } : null,
-        recent_events: evs.slice(0, 5).map((e) => ({
+        last_update: lastUpdate
+          ? {
+              at: fmtDate(lastUpdate.occurred_at),
+              kind: lastUpdate.kind,
+              title:
+                (lastUpdate.payload as { title?: string } | null)?.title ?? null,
+            }
+          : null,
+        recent_events: evs.slice(0, 10).map((e) => ({
           at: fmtDate(e.occurred_at),
           kind: e.kind,
+          title: (e.payload as { title?: string } | null)?.title ?? null,
+        })),
+        ctas: {
+          open: accCtas.filter((c) => isOpen(c.status)).length,
+          overdue: accCtas.filter(isOverdue).length,
+          completed_30d: accCtas.filter(
+            (c) =>
+              c.status === "completed" &&
+              c.completed_at != null &&
+              nowMs - new Date(c.completed_at).getTime() < 30 * 86400000,
+          ).length,
+          top_open: accCtas
+            .filter((c) => isOpen(c.status))
+            .slice(0, 5)
+            .map((c) => ({
+              title: c.title,
+              priority: c.priority,
+              type: c.cta_type,
+              due: fmtDate(c.due_date),
+              days_to_due: daysUntil(c.due_date),
+              source: c.source,
+            })),
+        },
+        contracts: accContracts.map((c) => ({
+          title: c.title,
+          status: c.status,
+          starts_on: fmtDate(c.starts_on),
+          renews_on: fmtDate(c.renews_on),
+          days_to_renewal: daysUntil(c.renews_on),
+          arr: c.arr,
+          currency: c.currency,
         })),
       };
     });
@@ -146,19 +252,46 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
     const atRiskArr = compact
       .filter((a) => Number(a.health ?? 0) < 50)
       .reduce((s, a) => s + Number(a.arr ?? 0), 0);
+    const renewals90d = compact.filter(
+      (a) => a.days_to_renewal != null && a.days_to_renewal >= 0 && a.days_to_renewal <= 90,
+    );
+    const renewalsArr90d = renewals90d.reduce((s, a) => s + Number(a.arr ?? 0), 0);
+    const totalOpenCtas = compact.reduce((s, a) => s + a.ctas.open, 0);
+    const totalOverdueCtas = compact.reduce((s, a) => s + a.ctas.overdue, 0);
+    const accountsWithoutQbr = compact.filter((a) => a.qbr_status === "Overdue").length;
+    const marqueeAtRisk = compact.filter(
+      (a) => a.marquee_client && Number(a.health ?? 0) < 60,
+    ).length;
+    const updatedRecently = compact.filter((a) => {
+      const at = a.last_update?.at;
+      if (!at) return false;
+      return nowMs - new Date(at).getTime() < 14 * 86400000;
+    }).length;
+
+    const metricsBlock = [
+      `Portfolio totals: ${compact.length} accounts, total ARR $${totalArr.toLocaleString()}, ARR at risk (health < 50) $${atRiskArr.toLocaleString()}.`,
+      `Renewals in next 90d: ${renewals90d.length} accounts ($${renewalsArr90d.toLocaleString()} ARR).`,
+      `CTAs: ${totalOpenCtas} open, ${totalOverdueCtas} overdue across the portfolio.`,
+      `QBR status: ${accountsWithoutQbr} accounts overdue.`,
+      `Marquee accounts at risk (health < 60): ${marqueeAtRisk}.`,
+      `Accounts updated in last 14 days: ${updatedRecently}.`,
+    ].join("\n");
 
     const system = [
-      "You are Q, the analyst inside The CS Quarterly's CSFactors command center.",
+      "You are Lumi, the analyst inside The CS Quarterly's CSFactors command center.",
       "Audience: a VP/Director of Customer Success looking at their own book of business.",
       "Answer ONLY from the PORTFOLIO JSON below. If the data does not contain the answer, say so plainly — do not invent accounts, contacts, dates, or numbers.",
       "Cite account names verbatim. Use $ and commas for ARR. Use ISO dates (YYYY-MM-DD) when present.",
       "Be tight: 2–6 short paragraphs or a compact table/bullet list. McKinsey register. No emoji, no hype, no hedging.",
-      `Portfolio totals: ${compact.length} accounts, total ARR $${totalArr.toLocaleString()}, ARR at risk (health < 50) $${atRiskArr.toLocaleString()}.`,
+      "Each account record includes: identity & ownership, ARR, health, renewal timing, stakeholders, recent timeline events (including cta.raised / cta.completed and field edits), open/overdue/recently-completed CTAs with their top open items, and contracts with renewal dates.",
+      "PORTFOLIO METRICS:",
+      metricsBlock,
       `Today: ${new Date().toISOString().slice(0, 10)}.`,
       "",
       "PORTFOLIO JSON:",
       portfolioJson,
     ].join("\n");
+
 
 
 
