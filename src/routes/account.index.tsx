@@ -36,7 +36,8 @@ function AccountPage() {
   const navigate = useNavigate();
   const fetchMe = useServerFn(getMe);
   const fetchPurchases = useServerFn(listMyPurchases);
-  const openPortal = useServerFn(createPortalSession);
+  const fetchSubscription = useServerFn(getMyPaddleSubscription);
+  const openPortal = useServerFn(createPaddlePortalSession);
   const { group, isRecruiterOrLead } = usePersona();
   const { designation } = useEntitlements();
 
@@ -46,14 +47,16 @@ function AccountPage() {
 
   const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe(), enabled: !!user });
   const purchases = useQuery({ queryKey: ["my-purchases"], queryFn: () => fetchPurchases(), enabled: !!user });
+  const subscription = useQuery({
+    queryKey: ["my-paddle-subscription", getPaddleEnvironment()],
+    queryFn: () => fetchSubscription({ data: { environment: getPaddleEnvironment() } }),
+    enabled: !!user,
+  });
 
   const onManageBilling = async () => {
     try {
       const result = await openPortal({
-        data: {
-          environment: getStripeEnvironment(),
-          returnUrl: `${window.location.origin}/account`,
-        },
+        data: { environment: getPaddleEnvironment() },
       });
       if ("error" in result) throw new Error(result.error);
       window.open(result.url, "_blank", "noopener");
@@ -64,6 +67,14 @@ function AccountPage() {
 
   const designationLabel = DESIGNATION_LABEL[designation];
   const isPaid = designation !== "reader";
+  const sub = subscription.data;
+  const periodEndLabel = sub?.currentPeriodEnd
+    ? new Date(sub.currentPeriodEnd).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
 
   return (
     <div className="min-h-screen flex flex-col">
