@@ -44,7 +44,7 @@ function InsightsPage() {
           The Archive
         </div>
         <h1 className="font-display text-6xl md:text-8xl leading-[0.95] tracking-tight text-balance max-w-4xl">
-          Essays for the <span className="italic">post-sales</span> operator.
+          Essays for the <span className="not-italic">post-sales</span> operator.
         </h1>
       </header>
 

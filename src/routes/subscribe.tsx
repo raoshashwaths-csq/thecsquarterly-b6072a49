@@ -76,7 +76,7 @@ function FreeBriefingLanding() {
         The Weekly Dispatch
       </div>
       <h1 className="font-display text-6xl md:text-8xl leading-[0.95] tracking-tight text-balance mb-10 max-w-4xl">
-        Read what the <span className="italic">best CS leaders</span> read.
+        Read what the <span className="not-italic">best CS leaders</span> read.
       </h1>
       <p className="text-xl text-foreground/75 max-w-xl mb-8 text-pretty">
         Start free with the weekly briefing, or{" "}

@@ -134,7 +134,7 @@ function ThreeSixtyPage() {
                 CSFactors / 360 Dashboard
               </div>
               <h1 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight">
-                Every lens, <span className="italic text-accent">one page.</span>
+                Every lens, <span className="not-italic text-accent">one page.</span>
               </h1>
               <p className="text-foreground/70 mt-3 max-w-2xl text-sm md:text-base">
                 NRR movement, retention drop-off, stakeholder posture, and team performance — read in one scroll.

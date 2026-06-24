@@ -105,7 +105,7 @@ function TeamLeaderboardPage() {
   return (
     <AnalyticsShell
       eyebrow="Analytics / Team Leaderboard"
-      title={<>Who's holding <span className="italic text-accent">the line.</span></>}
+      title={<>Who's holding <span className="not-italic text-accent">the line.</span></>}
       description="CSM-level ranking by book of business, portfolio health, and QBR completion. Click a row to focus a CSM in CSFactors."
     >
       {isLoading ? (

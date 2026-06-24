@@ -56,7 +56,7 @@ export function BurningThree({ accounts }: { accounts: CSAccount[] }) {
         <div>
           <div className="eyebrow text-secondary-accent mb-1">The Burning Three</div>
           <h2 className="font-display text-2xl md:text-3xl tracking-tight leading-tight">
-            The burning three<span className="italic text-accent">.</span>
+            The burning three<span className="not-italic text-accent">.</span>
           </h2>
         </div>
         <Button

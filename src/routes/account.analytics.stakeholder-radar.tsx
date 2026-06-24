@@ -112,7 +112,7 @@ function StakeholderRadarPage() {
   return (
     <AnalyticsShell
       eyebrow="Analytics / Stakeholder Radar"
-      title={<>Five axes. <span className="italic text-accent">One account.</span></>}
+      title={<>Five axes. <span className="not-italic text-accent">One account.</span></>}
       description="Health, NPS, implementation, QBR cadence, and sentiment plotted as a pentagon. Compare any account to the portfolio average."
     >
       {isLoading ? (

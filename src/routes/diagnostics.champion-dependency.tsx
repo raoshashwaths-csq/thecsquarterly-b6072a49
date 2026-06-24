@@ -185,7 +185,7 @@ function LandingState({ onStart }: { onStart: () => void }) {
         </div>
         <h1 className="font-display text-4xl md:text-6xl leading-[1.1] tracking-tight text-balance mb-8">
           The Champion Dependency Diagnostic
-          <span className="block italic text-accent mt-2">How exposed is your book?</span>
+          <span className="block not-italic text-accent mt-2">How exposed is your book?</span>
         </h1>
         <p className="text-xl text-foreground/75 max-w-2xl mx-auto leading-relaxed">
           Calculate the percentage of your portfolio that depends on a single relationship.

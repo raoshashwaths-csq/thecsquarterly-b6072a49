@@ -37,7 +37,7 @@ function CodexPage() {
       <header className="max-w-7xl w-full mx-auto px-6 pt-20 pb-12 animate-fade-up">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">The CS Codex</div>
         <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance mb-6 max-w-4xl">
-          The reference library for <span className="italic text-accent">serious operators.</span>
+          The reference library for <span className="not-not-italic text-accent">serious operators.</span>
         </h1>
         <p className="text-xl text-foreground/75 max-w-2xl text-pretty">
           Frameworks, decks, calculators, and templates. Each one a self-contained executive asset. Buy à la carte or unlock the entire archive with Vanguard.
@@ -111,7 +111,7 @@ function CodexPage() {
         <div className="max-w-7xl w-full mx-auto px-6 py-16">
           <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6">Diagnostics</div>
           <h2 className="font-display text-3xl md:text-4xl leading-tight tracking-tight mb-10 max-w-3xl">
-            Short, structured diagnostics. <span className="italic text-accent">Run in minutes.</span>
+            Short, structured diagnostics. <span className="not-not-italic text-accent">Run in minutes.</span>
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <article className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors">
@@ -139,7 +139,7 @@ function CodexPage() {
         <div className="max-w-3xl mx-auto px-6 text-center">
           <div className="font-mono text-xs uppercase tracking-[0.3em] opacity-60 mb-6">The economics</div>
           <h3 className="font-display text-4xl md:text-5xl mb-6 leading-tight">
-            $500+ of playbooks. <span className="italic">$49 a month.</span>
+            $500+ of playbooks. <span className="not-italic">$49 a month.</span>
           </h3>
           <p className="text-background/70 mb-10 text-pretty">
             One Vanguard subscription pays for itself the moment you open a second playbook. Everything in the Codex, every premium dispatch, every Custom Blueprint, included.
