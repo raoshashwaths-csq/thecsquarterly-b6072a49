@@ -273,7 +273,7 @@ function CanvasShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
       <main className="flex-1 pt-28 md:pt-32 pb-24">
-        <div className="container max-w-6xl mx-auto px-5 sm:px-6 md:px-10">{children}</div>
+        <div className="container max-w-6xl 2xl:max-w-[88rem] 3xl:max-w-[104rem] mx-auto px-5 sm:px-6 md:px-10 2xl:px-14">{children}</div>
       </main>
       <SiteFooter />
     </div>
