@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useDiagnosticFlow, useCountUp } from "@/hooks/useDiagnosticFlow";
 import { useEntitlements } from "@/hooks/useEntitlements";

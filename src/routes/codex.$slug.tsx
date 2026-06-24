@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Lock } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Paywall, BlurredTeaser } from "@/components/site/Paywall";
 import { AudioBar } from "@/components/site/AudioBar";

@@ -3,6 +3,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Glasses, Smile, X } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { SeriesRail } from "@/components/site/SeriesRail";
