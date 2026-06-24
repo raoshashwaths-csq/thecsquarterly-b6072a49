@@ -1,6 +1,28 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { getPaddleClient, type PaddleEnv } from "@/lib/paddle.server";
+import { getPaddleClient, gatewayFetch, type PaddleEnv } from "@/lib/paddle.server";
+
+/**
+ * Resolves a human-readable Paddle price external_id (e.g. "practitioner_monthly")
+ * to the environment-specific Paddle internal ID (`pri_...`) required by Paddle.js.
+ */
+export const resolvePaddlePrice = createServerFn({ method: "POST" })
+  .inputValidator((data: { priceId: string; environment: PaddleEnv }) => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+    if (data.environment !== "sandbox" && data.environment !== "live") {
+      throw new Error("Invalid environment");
+    }
+    return data;
+  })
+  .handler(async ({ data }) => {
+    const res = await gatewayFetch(
+      data.environment,
+      `/prices?external_id=${encodeURIComponent(data.priceId)}`,
+    );
+    const body = (await res.json()) as { data?: Array<{ id: string }> };
+    if (!body.data?.length) throw new Error(`Price not found: ${data.priceId}`);
+    return body.data[0].id;
+  });
 
 type PortalResult = { url: string } | { error: string };
 
