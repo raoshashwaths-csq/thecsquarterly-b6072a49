@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { listPosts } from "@/lib/posts.functions";
+import { readAllArticleProgress } from "@/hooks/useArticleProgress";
 
 const postsQuery = queryOptions({
   queryKey: ["posts"],
@@ -33,6 +34,13 @@ function InsightsPage() {
   const { data: posts } = useSuspenseQuery(postsQuery);
   const categories = ["All", ...Array.from(new Set(posts.map((p) => p.category)))];
   const [active, setActive] = useState("All");
+  const [progress, setProgress] = useState<Record<string, { pct: number }>>({});
+  useEffect(() => {
+    const all = readAllArticleProgress();
+    const map: Record<string, { pct: number }> = {};
+    for (const [slug, e] of Object.entries(all)) map[slug] = { pct: e.pct };
+    setProgress(map);
+  }, []);
   const filtered = active === "All" ? posts : posts.filter((p) => p.category === active);
 
   return (
@@ -75,7 +83,16 @@ function InsightsPage() {
             >
               <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                 <span className="text-accent">{p.category}</span>
-                <span>{p.read_minutes} min</span>
+                <span className="inline-flex items-center gap-2">
+                  {progress[p.slug] && (
+                    <span
+                      title={`${progress[p.slug].pct}% read`}
+                      aria-label={`${progress[p.slug].pct}% read`}
+                      className="inline-block h-1.5 w-1.5 rounded-full bg-accent"
+                    />
+                  )}
+                  {p.read_minutes} min
+                </span>
               </div>
               <h2 className="font-display text-3xl md:text-4xl mb-3 leading-tight transition-all">
                 {p.title}
