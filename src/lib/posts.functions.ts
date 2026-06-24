@@ -158,6 +158,127 @@ export const listSeriesParts = createServerFn({ method: "GET" })
     return rows ?? [];
   });
 
+// ---- Related intelligence (public, read-only) ----
+import { TREES, type TreeId, type TreeCategory } from "@/lib/q-trees";
+
+const CATEGORY_TO_TREE_CAT: Record<string, TreeCategory> = {
+  "Stakeholder Management": "shared",
+  "Escalation": "core",
+  "Sales Qualification": "ops",
+  "Negotiation": "ops",
+  "AI in CS": "leadership",
+};
+
+const STOPWORDS = new Set([
+  "the","a","an","and","or","but","of","to","in","on","for","with","by","is","are","was","were","be","been","being","this","that","these","those","it","its","as","at","from","into","about","your","you","we","our","their","they","not","no","yes","how","why","what","when","where","who","which",
+]);
+
+function tokenize(s: string): Set<string> {
+  return new Set(
+    (s || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !STOPWORDS.has(w)),
+  );
+}
+
+function jaccard(a: Set<string>, b: Set<string>): number {
+  if (a.size === 0 || b.size === 0) return 0;
+  let inter = 0;
+  for (const w of a) if (b.has(w)) inter += 1;
+  const union = a.size + b.size - inter;
+  return union === 0 ? 0 : inter / union;
+}
+
+type RelatedPick = { slug: string; title: string };
+type RelatedTreePick = { id: TreeId; title: string };
+
+export const getRelatedIntelligence = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ slug: z.string().min(1).max(200) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { data: current, error: e0 } = await supabaseAdmin
+      .from("posts")
+      .select("id, slug, title, excerpt, category, section, published_at")
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (e0) throw new Error(e0.message);
+    if (!current) {
+      return { playbook: null, tree: null, foundational: null } as {
+        playbook: RelatedPick | null;
+        tree: RelatedTreePick | null;
+        foundational: RelatedPick | null;
+      };
+    }
+
+    const articleTokens = tokenize(`${current.title} ${current.excerpt}`);
+
+    // 1. Codex playbook — best codex post by category match then jaccard.
+    const { data: codexRows } = await supabaseAdmin
+      .from("posts")
+      .select("slug, title, excerpt, category")
+      .eq("section", "codex")
+      .eq("published", true)
+      .lte("published_at", new Date().toISOString())
+      .neq("slug", current.slug);
+    let playbook: RelatedPick | null = null;
+    if (codexRows && codexRows.length > 0) {
+      const scored = codexRows.map((p) => {
+        const sameCat = p.category === current.category ? 0.25 : 0;
+        return { p, score: sameCat + jaccard(articleTokens, tokenize(`${p.title} ${p.excerpt}`)) };
+      });
+      scored.sort((a, b) => b.score - a.score);
+      const best = scored[0];
+      if (best && best.score > 0) playbook = { slug: best.p.slug, title: best.p.title };
+    }
+
+    // 2. Lumi tree — static category map then jaccard against tree title+blurb.
+    const treeCat = CATEGORY_TO_TREE_CAT[current.category];
+    const candidateTrees = treeCat ? TREES.filter((t) => t.category === treeCat) : TREES;
+    const treePool = candidateTrees.length > 0 ? candidateTrees : TREES;
+    const treeScored = treePool.map((t) => ({
+      t,
+      score: jaccard(articleTokens, tokenize(`${t.title} ${t.blurb}`)),
+    }));
+    treeScored.sort((a, b) => b.score - a.score);
+    const bestTree = treeScored[0];
+    const tree: RelatedTreePick | null = bestTree
+      ? { id: bestTree.t.id, title: bestTree.t.title }
+      : null;
+
+    // 3. Foundational article — earliest in same section+category, fallback to section.
+    let foundational: RelatedPick | null = null;
+    const { data: foundCatRow } = await supabaseAdmin
+      .from("posts")
+      .select("slug, title")
+      .eq("section", current.section)
+      .eq("category", current.category)
+      .eq("published", true)
+      .neq("slug", current.slug)
+      .order("published_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (foundCatRow) {
+      foundational = { slug: foundCatRow.slug, title: foundCatRow.title };
+    } else {
+      const { data: foundSecRow } = await supabaseAdmin
+        .from("posts")
+        .select("slug, title")
+        .eq("section", current.section)
+        .eq("published", true)
+        .neq("slug", current.slug)
+        .order("published_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (foundSecRow) foundational = { slug: foundSecRow.slug, title: foundSecRow.title };
+    }
+
+    return { playbook, tree, foundational };
+  });
+
+
 // ----- Admin -----
 const PostSchema = z.object({
   id: z.string().uuid().optional(),
