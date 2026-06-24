@@ -5,6 +5,7 @@ import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useDiagnosticFlow, useCountUp } from "@/hooks/useDiagnosticFlow";
 import { useEntitlements } from "@/hooks/useEntitlements";
+import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 
 export const Route = createFileRoute("/diagnostics/champion-dependency")({
   head: () => ({
