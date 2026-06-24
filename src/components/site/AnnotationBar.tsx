@@ -58,31 +58,50 @@ export function AnnotationBar({ slug }: { slug: string }) {
         return;
       }
       try {
-        // One-time migration of any local annotations for this slug
+        // Fetch server state first — it's the source of truth.
+        const res = await fetchList({ data: { slug } });
+        if (cancelled) return;
+
+        // One-time migration: only run if the user has NO server-side annotations
+        // at all. Otherwise re-importing the local cache creates duplicates on
+        // every new browser / cleared-storage session.
         if (typeof window !== "undefined" && !localStorage.getItem(MIGRATED_FLAG)) {
-          const local: Annotation[] = [];
-          for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (!k?.startsWith("csq.annotations.")) continue;
-            try {
-              const arr = JSON.parse(localStorage.getItem(k) || "[]") as Annotation[];
-              if (Array.isArray(arr)) local.push(...arr);
-            } catch { /* */ }
-          }
-          if (local.length) {
-            await bulkImport({
-              data: {
-                annotations: local.slice(0, 500).map((a) => ({
-                  slug: a.slug, kind: a.kind, text: a.text, note: a.note ?? null,
-                })),
-                items: [],
-              },
+          const hasServerRows = (res.annotations ?? []).length > 0;
+          if (!hasServerRows) {
+            const local: Annotation[] = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (!k?.startsWith("csq.annotations.")) continue;
+              try {
+                const arr = JSON.parse(localStorage.getItem(k) || "[]") as Annotation[];
+                if (Array.isArray(arr)) local.push(...arr);
+              } catch { /* */ }
+            }
+            // Dedupe local payload before sending.
+            const seen = new Set<string>();
+            const unique = local.filter((a) => {
+              const key = `${a.slug}|${a.kind}|${a.text}|${a.note ?? ""}`;
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
             });
+            if (unique.length) {
+              await bulkImport({
+                data: {
+                  annotations: unique.slice(0, 500).map((a) => ({
+                    slug: a.slug, kind: a.kind, text: a.text, note: a.note ?? null,
+                  })),
+                  items: [],
+                },
+              });
+              // Re-fetch after import so UI reflects the canonical server rows.
+              const refreshed = await fetchList({ data: { slug } });
+              res.annotations = refreshed.annotations;
+            }
           }
           localStorage.setItem(MIGRATED_FLAG, "1");
         }
-        const res = await fetchList({ data: { slug } });
-        if (cancelled) return;
+
         const mapped: Annotation[] = (res.annotations ?? []).map((r) => ({
           id: r.id, slug: r.slug, kind: r.kind as "highlight" | "note",
           text: r.text, note: r.note ?? undefined, createdAt: new Date(r.created_at).getTime(),

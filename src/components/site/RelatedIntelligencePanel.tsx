@@ -46,12 +46,12 @@ export function RelatedIntelligencePanel({ slug }: Props) {
         {tree && (
           <li>
             <Link
-              to="/csfactors"
+              to="/agent/framework"
               search={{ tree: tree.id } as never}
               onClick={() => onClick("tree", tree.id)}
               className="group flex items-start justify-between gap-6 px-5 py-4 transition-transform hover:-translate-y-px"
             >
-              <RowBody eyebrow={`LUMI TREE · ${tree.id}`} title={tree.title} />
+              <RowBody eyebrow={`LUMI TREE · ${tree.id}`} title={`Run on canvas — ${tree.title}`} />
               <Arrow />
             </Link>
           </li>
