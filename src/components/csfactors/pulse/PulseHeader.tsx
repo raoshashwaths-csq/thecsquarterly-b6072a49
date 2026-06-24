@@ -49,9 +49,9 @@ export function PulseHeader({
           suppressHydrationWarning
         >
           {greet},{" "}
-          <em className="italic font-display tracking-tight pr-[0.04em]">
+          <span className="font-display tracking-tight pr-[0.04em] not-italic">
             {firstName}
-          </em>
+          </span>
           <span className="text-accent not-italic">.</span>
         </h1>
         <div
