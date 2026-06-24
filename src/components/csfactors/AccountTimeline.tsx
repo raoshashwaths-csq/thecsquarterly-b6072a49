@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Calendar, Phone, PresentationIcon, Crown, AlertTriangle, TrendingUp,
   Handshake, FileText, Users, Sparkles, Trash2, Plus, ListChecks, CheckCircle2,
+  Pencil, RefreshCw, Search, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,9 +22,13 @@ type Vector = {
   label: string;
   icon: typeof Calendar;
   tint: "accent" | "secondary" | "emerald" | "destructive" | "neutral";
+  hidden?: boolean; // not shown in the "what happened?" picker, but rendered + filterable
 };
 
-const VECTORS: Vector[] = [
+// VECTORS is the single source of truth for renderable event kinds.
+// Every kind a server function writes into cs_account_events MUST appear here,
+// or the timeline-kinds CI check will fail. See scripts/check-timeline-kinds.ts.
+export const VECTORS: Vector[] = [
   { kind: "meeting.new",        label: "New meeting",        icon: Calendar,         tint: "accent" },
   { kind: "cadence.mom",        label: "Cadence call MoM",   icon: Phone,            tint: "secondary" },
   { kind: "qbr",                label: "QBR",                icon: PresentationIcon, tint: "accent" },
@@ -36,6 +41,9 @@ const VECTORS: Vector[] = [
   { kind: "cta.raised",         label: "CTA raised",         icon: ListChecks,       tint: "accent" },
   { kind: "cta.completed",      label: "CTA completed",      icon: CheckCircle2,     tint: "emerald" },
   { kind: "note",               label: "Note",               icon: FileText,         tint: "neutral" },
+  // System-emitted kinds (not user-selectable from the picker)
+  { kind: "field.edit",         label: "Field edit",         icon: Pencil,           tint: "neutral", hidden: true },
+  { kind: "qbr.override",       label: "QBR override",       icon: RefreshCw,        tint: "neutral", hidden: true },
 ];
 
 const TINT_CLASS: Record<Vector["tint"], string> = {
@@ -47,10 +55,10 @@ const TINT_CLASS: Record<Vector["tint"], string> = {
 };
 
 const KIND_INDEX: Record<string, Vector> = Object.fromEntries(VECTORS.map((v) => [v.kind, v]));
+const PICKER_VECTORS = VECTORS.filter((v) => !v.hidden);
 
 function describe(kind: string): { vector: Vector; label: string } {
   if (KIND_INDEX[kind]) return { vector: KIND_INDEX[kind], label: KIND_INDEX[kind].label };
-  // Legacy/system events fall back to neutral.
   return {
     vector: { kind, label: kind, icon: FileText, tint: "neutral" },
     label: kind.replace(/[._]/g, " "),
@@ -73,6 +81,48 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
   const [details, setDetails] = useState("");
   const [when, setWhen] = useState(() => new Date().toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
+
+  // Filter state
+  const [filterKinds, setFilterKinds] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState("");
+
+  // Kinds present in this account's history (for filter chips).
+  const presentKinds = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const e of events) counts.set(e.kind, (counts.get(e.kind) ?? 0) + 1);
+    return counts;
+  }, [events]);
+
+  const filteredEvents = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return events.filter((e) => {
+      if (filterKinds.size && !filterKinds.has(e.kind)) return false;
+      if (!q) return true;
+      const payload = (e.payload ?? {}) as { title?: string; details?: string; label?: string };
+      const blob = [
+        payload.title, payload.details, payload.label,
+        describe(e.kind).label, e.kind,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return blob.includes(q);
+    });
+  }, [events, filterKinds, query]);
+
+  function toggleFilter(kind: string) {
+    setFilterKinds((prev) => {
+      const next = new Set(prev);
+      if (next.has(kind)) next.delete(kind);
+      else next.add(kind);
+      return next;
+    });
+  }
+
+  function clearFilters() {
+    setFilterKinds(new Set());
+    setQuery("");
+  }
 
   async function submit() {
     if (!selected) return toast.error("Pick an event type first");
@@ -112,6 +162,8 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
     }
   }
 
+  const activeFilters = filterKinds.size > 0 || query.length > 0;
+
   return (
     <div className="space-y-5">
       {/* Vector chips */}
@@ -120,7 +172,7 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
           What happened?
         </div>
         <div className="flex flex-wrap gap-2">
-          {VECTORS.map((v) => {
+          {PICKER_VECTORS.map((v) => {
             const Icon = v.icon;
             const active = selected?.kind === v.kind;
             return (
@@ -184,10 +236,68 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
         </div>
       )}
 
+      {/* Filter + search bar */}
+      <div className="space-y-2 pt-2 border-t border-border">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search title, notes, kind…"
+              className="h-8 pl-7 text-sm"
+            />
+          </div>
+          {activeFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+              className="h-8 px-2 font-mono uppercase tracking-wider text-[10px]"
+            >
+              <X className="h-3 w-3 mr-1" /> Clear
+            </Button>
+          )}
+        </div>
+        {presentKinds.size > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {[...presentKinds.entries()]
+              .sort((a, b) => b[1] - a[1])
+              .map(([kind, count]) => {
+                const v = describe(kind).vector;
+                const Icon = v.icon;
+                const on = filterKinds.has(kind);
+                return (
+                  <button
+                    key={kind}
+                    type="button"
+                    onClick={() => toggleFilter(kind)}
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2 py-1 border text-[10px] font-mono uppercase tracking-[0.14em] transition-colors",
+                      TINT_CLASS[v.tint],
+                      on
+                        ? "ring-2 ring-offset-1 ring-offset-card ring-foreground/40"
+                        : "opacity-70 hover:opacity-100",
+                    )}
+                    aria-pressed={on}
+                  >
+                    <Icon className="h-3 w-3" />
+                    {describe(kind).label}
+                    <span className="ml-0.5 text-foreground/60 tabular-nums">{count}</span>
+                  </button>
+                );
+              })}
+          </div>
+        )}
+      </div>
+
       {/* Timeline */}
       <div>
         <div className="font-mono uppercase tracking-[0.22em] text-[10px] text-muted-foreground mb-3">
-          Milestones · {events.length}
+          Milestones · {filteredEvents.length}
+          {activeFilters && events.length !== filteredEvents.length && (
+            <span className="ml-1 text-foreground/50">of {events.length}</span>
+          )}
         </div>
         {isLoading ? (
           <p className="text-xs text-muted-foreground">Loading timeline…</p>
@@ -195,9 +305,13 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
           <p className="text-xs text-muted-foreground italic">
             No events yet. Pick a vector above to log the first milestone.
           </p>
+        ) : filteredEvents.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic">
+            No events match the current filter.
+          </p>
         ) : (
           <ol className="relative border-l border-border ml-2 space-y-4">
-            {events.map((e) => <TimelineItem key={e.id} event={e} onDelete={remove} />)}
+            {filteredEvents.map((e) => <TimelineItem key={e.id} event={e} onDelete={remove} />)}
           </ol>
         )}
       </div>
@@ -210,7 +324,7 @@ function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (i
   const Icon = vector.icon;
   const payload = (event.payload ?? {}) as { title?: string; details?: string; label?: string };
   const title = payload.title || payload.label || label;
-  const isManual = !!KIND_INDEX[event.kind];
+  const isManual = !!KIND_INDEX[event.kind] && !KIND_INDEX[event.kind].hidden;
 
   return (
     <li className="ml-4">
