@@ -4,7 +4,19 @@
 // viewport so the SVG scales responsively.
 
 export type TreeId =
-  | "T1" | "T2" | "T3" | "T4" | "T5" | "T6" | "T7" | "T8";
+  | "T1" | "T2" | "T3" | "T4" | "T5" | "T6" | "T7" | "T8"
+  | "T9" | "T10" | "T11" | "T12" | "T13"
+  | "T14" | "T15" | "T16" | "T17"
+  | "T18" | "T19" | "T20" | "T21";
+
+export type TreeCategory = "core" | "ops" | "shared" | "leadership";
+
+export const CATEGORY_COLOR: Record<TreeCategory, { hex: string; label: string; blurb: string }> = {
+  core: { hex: "#B8862C", label: "Core scenarios", blurb: "Trees 1–8 · the original operator canvas." },
+  ops: { hex: "#5A7DC4", label: "CSM daily operations", blurb: "Trees 9–13 · in-the-room tactical guidance." },
+  shared: { hex: "#4A9B6F", label: "Shared scenarios", blurb: "Trees 14–17 · cross-role CSM + VP plays." },
+  leadership: { hex: "#8A5AC4", label: "Leadership & strategic", blurb: "Trees 18–21 · systemic, board-aware." },
+};
 
 export interface ContextField {
   key: string;
@@ -35,18 +47,39 @@ export interface Tree {
   title: string;
   eyebrow: string;
   blurb: string;
+  category: TreeCategory;
 }
 
 export const TREES: Tree[] = [
-  { id: "T1", title: "Manage an Escalation", eyebrow: "T1 · ESCALATION", blurb: "Contain a board-temperature account in 24 hours." },
-  { id: "T2", title: "Handle Champion Change", eyebrow: "T2 · CHAMPION CHANGE", blurb: "Your evangelist left. The heir is hostile or unknown." },
-  { id: "T3", title: "Qualify an Upsell", eyebrow: "T3 · UPSELL QUALIFICATION", blurb: "Expansion talk without the churn risk that usually follows." },
-  { id: "T4", title: "Diagnose Renewal Risk", eyebrow: "T4 · RENEWAL RISK", blurb: "What the True Health Index actually says, 90 days out." },
-  { id: "T5", title: "Prepare a QBR", eyebrow: "T5 · QBR PREP", blurb: "A QBR the customer wants to attend, not endure." },
-  { id: "T6", title: "Onboarding Stall", eyebrow: "T6 · ONBOARDING STALL", blurb: "Time-to-value is slipping. Find what's actually blocking." },
-  { id: "T7", title: "Exec Misalignment", eyebrow: "T7 · EXEC MISALIGNMENT", blurb: "Your VP and the customer's VP are no longer reading the same memo." },
-  { id: "T8", title: "Career & Alignment", eyebrow: "T8 · CAREER & ALIGNMENT", blurb: "Appraisals, stretch burden, and cross-functional conflict." },
+  { id: "T1", title: "Manage an Escalation", eyebrow: "T1 · ESCALATION", blurb: "Contain a board-temperature account in 24 hours.", category: "core" },
+  { id: "T2", title: "Handle Champion Change", eyebrow: "T2 · CHAMPION CHANGE", blurb: "Your evangelist left. The heir is hostile or unknown.", category: "core" },
+  { id: "T3", title: "Qualify an Upsell", eyebrow: "T3 · UPSELL QUALIFICATION", blurb: "Expansion talk without the churn risk that usually follows.", category: "core" },
+  { id: "T4", title: "Diagnose Renewal Risk", eyebrow: "T4 · RENEWAL RISK", blurb: "What the True Health Index actually says, 90 days out.", category: "core" },
+  { id: "T5", title: "Prepare a QBR", eyebrow: "T5 · QBR PREP", blurb: "A QBR the customer wants to attend, not endure.", category: "core" },
+  { id: "T6", title: "Onboarding Stall", eyebrow: "T6 · ONBOARDING STALL", blurb: "Time-to-value is slipping. Find what's actually blocking.", category: "core" },
+  { id: "T7", title: "Exec Misalignment", eyebrow: "T7 · EXEC MISALIGNMENT", blurb: "Your VP and the customer's VP are no longer reading the same memo.", category: "core" },
+  { id: "T8", title: "Career & Alignment", eyebrow: "T8 · CAREER & ALIGNMENT", blurb: "Appraisals, stretch burden, and cross-functional conflict.", category: "core" },
+  // ---- CSM daily ops (blue) ----
+  { id: "T9", title: "Adoption Rescue", eyebrow: "T9 · LOW ADOPTION", blurb: "Logins look fine. Usage is hollow. Rebuild the habit loop.", category: "ops" },
+  { id: "T10", title: "Expectation Reset", eyebrow: "T10 · BROKEN PROMISE", blurb: "Sales promised a thing. We can't ship it. Own it, restage it.", category: "ops" },
+  { id: "T11", title: "Commercial Conversation", eyebrow: "T11 · COMMERCIAL PRESSURE", blurb: "The customer wants a discount. Defend the price, not the ego.", category: "ops" },
+  { id: "T12", title: "Stakeholder Conflict", eyebrow: "T12 · INTERNAL CUSTOMER CONFLICT", blurb: "Two buyers inside the account want opposite things from us.", category: "ops" },
+  { id: "T13", title: "Sentiment Recovery", eyebrow: "T13 · NEGATIVE SENTIMENT", blurb: "Tone has turned. Bring the relationship back to neutral first.", category: "ops" },
+  // ---- Shared (green) ----
+  { id: "T14", title: "Onboarding Crisis", eyebrow: "T14 · ONBOARDING STUCK", blurb: "Implementation is openly failing. Escalate without losing the room.", category: "shared" },
+  { id: "T15", title: "Executive Access", eyebrow: "T15 · NEED EXEC ACCESS", blurb: "You need 20 minutes with their CFO. Earn the calendar.", category: "shared" },
+  { id: "T16", title: "Product Gap", eyebrow: "T16 · PRODUCT GAP", blurb: "We don't have what they need. Hold the relationship anyway.", category: "shared" },
+  { id: "T17", title: "Win-Back", eyebrow: "T17 · CHURNED ACCOUNT", blurb: "They left. The story isn't over — open the second window.", category: "shared" },
+  // ---- Leadership (purple) ----
+  { id: "T18", title: "Team Performance", eyebrow: "T18 · TEAM PERFORMANCE", blurb: "A CSM is underperforming. Coach, restage, or part — on evidence.", category: "leadership" },
+  { id: "T19", title: "Leadership Communication", eyebrow: "T19 · LEADERSHIP COMMUNICATION", blurb: "Frame the board update without burying the bad news.", category: "leadership" },
+  { id: "T20", title: "Org Design", eyebrow: "T20 · ORG DESIGN", blurb: "Pooled vs named. Onshore vs offshore. Build the model that scales.", category: "leadership" },
+  { id: "T21", title: "Sales Alignment", eyebrow: "T21 · SALES ALIGNMENT", blurb: "CS and Sales are pulling in different directions. Re-cut the seam.", category: "leadership" },
 ];
+
+export function getTree(id: TreeId): Tree | undefined {
+  return TREES.find((t) => t.id === id);
+}
 
 // ---- shared context-field presets ----
 const ARR_FIELD: ContextField = {
