@@ -41,6 +41,7 @@ import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DiagnosticsChampionDependencyRouteImport } from './routes/diagnostics.champion-dependency'
 import { Route as DesignSystemLumiBadgeRouteImport } from './routes/design-system.lumi-badge'
+import { Route as CsfactorsCtasRouteImport } from './routes/csfactors.ctas'
 import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
 import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
 import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
@@ -233,6 +234,11 @@ const DesignSystemLumiBadgeRoute = DesignSystemLumiBadgeRouteImport.update({
   id: '/design-system/lumi-badge',
   path: '/design-system/lumi-badge',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CsfactorsCtasRoute = CsfactorsCtasRouteImport.update({
+  id: '/ctas',
+  path: '/ctas',
+  getParentRoute: () => CsfactorsRoute,
 } as any)
 const Csfactors360Route = Csfactors360RouteImport.update({
   id: '/360',
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
+  '/csfactors/ctas': typeof CsfactorsCtasRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -495,6 +502,7 @@ export interface FileRoutesByTo {
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
+  '/csfactors/ctas': typeof CsfactorsCtasRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -561,6 +569,7 @@ export interface FileRoutesById {
   '/codex/$slug': typeof CodexSlugRoute
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
+  '/csfactors/ctas': typeof CsfactorsCtasRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -628,6 +637,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/csfactors/360'
+    | '/csfactors/ctas'
     | '/design-system/lumi-badge'
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
@@ -690,6 +700,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/csfactors/360'
+    | '/csfactors/ctas'
     | '/design-system/lumi-badge'
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
@@ -755,6 +766,7 @@ export interface FileRouteTypes {
     | '/codex/$slug'
     | '/csfactors/$accountId'
     | '/csfactors/360'
+    | '/csfactors/ctas'
     | '/design-system/lumi-badge'
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
@@ -1066,6 +1078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DesignSystemLumiBadgeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/csfactors/ctas': {
+      id: '/csfactors/ctas'
+      path: '/ctas'
+      fullPath: '/csfactors/ctas'
+      preLoaderRoute: typeof CsfactorsCtasRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
     '/csfactors/360': {
       id: '/csfactors/360'
       path: '/360'
@@ -1327,6 +1346,7 @@ const CodexRouteWithChildren = CodexRoute._addFileChildren(CodexRouteChildren)
 interface CsfactorsRouteChildren {
   CsfactorsAccountIdRoute: typeof CsfactorsAccountIdRoute
   Csfactors360Route: typeof Csfactors360Route
+  CsfactorsCtasRoute: typeof CsfactorsCtasRoute
   CsfactorsMapsIdRoute: typeof CsfactorsMapsIdRoute
   CsfactorsMapsNewRoute: typeof CsfactorsMapsNewRoute
   CsfactorsPlaybookSlugRoute: typeof CsfactorsPlaybookSlugRoute
@@ -1336,6 +1356,7 @@ interface CsfactorsRouteChildren {
 const CsfactorsRouteChildren: CsfactorsRouteChildren = {
   CsfactorsAccountIdRoute: CsfactorsAccountIdRoute,
   Csfactors360Route: Csfactors360Route,
+  CsfactorsCtasRoute: CsfactorsCtasRoute,
   CsfactorsMapsIdRoute: CsfactorsMapsIdRoute,
   CsfactorsMapsNewRoute: CsfactorsMapsNewRoute,
   CsfactorsPlaybookSlugRoute: CsfactorsPlaybookSlugRoute,
