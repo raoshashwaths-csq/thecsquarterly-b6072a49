@@ -272,6 +272,17 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
               <X className="h-3 w-3 mr-1" /> Clear
             </Button>
           )}
+          {fieldEditCount > 1 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearFieldEdits}
+              className="h-8 px-2 font-mono uppercase tracking-wider text-[10px] text-muted-foreground hover:text-destructive"
+              title="Remove auto-logged field edits"
+            >
+              <Trash2 className="h-3 w-3 mr-1" /> Field edits ({fieldEditCount})
+            </Button>
+          )}
         </div>
         {presentKinds.size > 0 && (
           <div className="flex flex-wrap gap-1.5">
