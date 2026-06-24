@@ -206,3 +206,31 @@ export function tierMailto(label: string): string {
   const subject = encodeURIComponent(`${label} tier — The CS Quarterly`);
   return `mailto:${CONTACT_EMAIL}?subject=${subject}`;
 }
+
+// ---------- Paddle price ID helpers ----------
+// External IDs created via Paddle batch_create_product use `<designation>_monthly`
+// and `<designation>_annual`. Keep cadence labels UI-facing ("yearly") but map
+// to Paddle's `_annual` suffix when resolving price IDs.
+
+export type Cadence = "monthly" | "yearly";
+
+const PAID_DESIGNATIONS = new Set<Designation>([
+  "practitioner",
+  "operator",
+  "team",
+  "scale",
+]);
+
+export function priceIdFor(designation: Designation, cadence: Cadence): string | null {
+  if (!PAID_DESIGNATIONS.has(designation)) return null;
+  return `${designation}_${cadence === "monthly" ? "monthly" : "annual"}`;
+}
+
+export function designationFromPriceId(
+  priceId: string | null | undefined,
+): Designation | null {
+  if (!priceId) return null;
+  const [base] = priceId.split("_");
+  return PAID_DESIGNATIONS.has(base as Designation) ? (base as Designation) : null;
+}
+

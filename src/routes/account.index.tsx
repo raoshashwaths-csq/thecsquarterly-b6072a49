@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -21,6 +21,8 @@ import { getPaddleEnvironment } from "@/lib/paddle";
 
 
 
+type AccountSearch = { checkout?: "success" | "cancel"; tier?: string };
+
 export const Route = createFileRoute("/account/")({
   head: () => ({
     meta: [
@@ -28,12 +30,21 @@ export const Route = createFileRoute("/account/")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (input: Record<string, unknown>): AccountSearch => {
+    const c = input.checkout;
+    const t = input.tier;
+    return {
+      checkout: c === "success" || c === "cancel" ? c : undefined,
+      tier: typeof t === "string" ? t : undefined,
+    };
+  },
   component: AccountPage,
 });
 
 function AccountPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const fetchMe = useServerFn(getMe);
   const fetchPurchases = useServerFn(listMyPurchases);
   const fetchSubscription = useServerFn(getMyPaddleSubscription);
@@ -51,7 +62,25 @@ function AccountPage() {
     queryKey: ["my-paddle-subscription", getPaddleEnvironment()],
     queryFn: () => fetchSubscription({ data: { environment: getPaddleEnvironment() } }),
     enabled: !!user,
+    // Paddle webhook delivery is near-instant but not synchronous with the
+    // success redirect. Poll briefly until we see an active row.
+    refetchInterval: (q) =>
+      search.checkout === "success" && !q.state.data?.hasSubscription ? 2000 : false,
   });
+
+  // Post-checkout toast + URL cleanup. Refetch immediately on landing.
+  useEffect(() => {
+    if (!search.checkout) return;
+    if (search.checkout === "success") {
+      toast.success("Subscription activated. Welcome aboard.");
+      subscription.refetch();
+      me.refetch();
+    } else if (search.checkout === "cancel") {
+      toast("Checkout canceled. No charges were made.");
+    }
+    navigate({ to: "/account", search: {}, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.checkout]);
 
   const onManageBilling = async () => {
     try {
@@ -75,6 +104,51 @@ function AccountPage() {
         day: "numeric",
       })
     : null;
+
+  const statusBanner = useMemo(() => {
+    if (!sub?.hasSubscription) return null;
+    const status = sub.status ?? "";
+    if (sub.cancelAtPeriodEnd && periodEndLabel) {
+      return {
+        tone: "secondary" as const,
+        text: `Cancellation scheduled · access continues until ${periodEndLabel}`,
+      };
+    }
+    if (status === "paused") {
+      return {
+        tone: "secondary" as const,
+        text: "Subscription paused · resume any time from the billing portal",
+      };
+    }
+    if (status === "past_due") {
+      return {
+        tone: "warning" as const,
+        text: "Payment failed · update your card to keep access",
+      };
+    }
+    if (status === "canceled") {
+      return {
+        tone: "warning" as const,
+        text: periodEndLabel
+          ? `Subscription canceled · access ended ${periodEndLabel}`
+          : "Subscription canceled",
+      };
+    }
+    if (status === "trialing" && periodEndLabel) {
+      return {
+        tone: "secondary" as const,
+        text: `Trial · billing starts ${periodEndLabel}`,
+      };
+    }
+    if (status === "active" && periodEndLabel) {
+      return {
+        tone: "neutral" as const,
+        text: `Renews on ${periodEndLabel}`,
+      };
+    }
+    return null;
+  }, [sub, periodEndLabel]);
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -150,14 +224,29 @@ function AccountPage() {
                 </div>
                 <div>
                   <dt className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground mb-1">
-                    {sub?.cancelAtPeriodEnd ? "Access ends" : "Renews"}
+                    {sub?.status === "canceled"
+                      ? "Access ended"
+                      : sub?.cancelAtPeriodEnd
+                        ? "Access ends"
+                        : sub?.status === "paused"
+                          ? "Paused since"
+                          : "Renews"}
                   </dt>
                   <dd>{periodEndLabel ?? "—"}</dd>
                 </div>
               </dl>
-              {sub?.cancelAtPeriodEnd && periodEndLabel && (
-                <p className="mt-3 text-xs text-secondary-accent font-mono uppercase tracking-widest">
-                  Cancellation scheduled · access continues until {periodEndLabel}
+              {statusBanner && (
+                <p
+                  className={
+                    "mt-3 text-xs font-mono uppercase tracking-widest " +
+                    (statusBanner.tone === "warning"
+                      ? "text-destructive"
+                      : statusBanner.tone === "secondary"
+                        ? "text-secondary-accent"
+                        : "text-muted-foreground")
+                  }
+                >
+                  {statusBanner.text}
                 </p>
               )}
             </SectionCard>

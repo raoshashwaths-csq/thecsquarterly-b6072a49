@@ -1,14 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, ArrowLeft } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { Check, ArrowLeft, Loader2 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { QMark } from "@/components/site/QMark";
-import { TIERS, getTier, tierMailto, type Designation } from "@/lib/tiers";
+import {
+  TIERS,
+  getTier,
+  tierMailto,
+  priceIdFor,
+  type Cadence,
+  type Designation,
+} from "@/lib/tiers";
 import { useAuth } from "@/hooks/useAuth";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
-import { priceIdFor, type Cadence } from "@/lib/price-map";
+import { initializePaddle } from "@/lib/paddle-checkout";
+import { resolvePaddlePrice } from "@/lib/paddle.functions";
+import { getPaddleEnvironment } from "@/lib/paddle";
 
 const DESIGNATIONS = new Set<string>(TIERS.map((t) => t.designation));
 
@@ -86,7 +96,8 @@ function TierConfirm({ designation }: { designation: Designation }) {
   const tier = getTier(designation)!;
   const { user } = useAuth();
   const [cadence, setCadence] = useState<Cadence>("monthly");
-  const [checkingOut, setCheckingOut] = useState(false);
+  const [opening, setOpening] = useState(false);
+  const resolvePrice = useServerFn(resolvePaddlePrice);
 
   const priceId = priceIdFor(designation, cadence);
   const annualSaving =
@@ -94,7 +105,7 @@ function TierConfirm({ designation }: { designation: Designation }) {
       ? `Save ~$${(tier.priceMonthlyValue * 12 - tier.priceMonthlyValue * 10).toLocaleString()} a year`
       : "";
 
-  const onCheckout = () => {
+  const onCheckout = async () => {
     if (tier.ctaKind === "contact" || !priceId) {
       window.location.href = tierMailto(tier.label);
       return;
@@ -103,32 +114,31 @@ function TierConfirm({ designation }: { designation: Designation }) {
       window.location.href = `/login?return=/subscribe?tier=${designation}`;
       return;
     }
-    setCheckingOut(true);
+    setOpening(true);
+    try {
+      const env = getPaddleEnvironment();
+      await initializePaddle();
+      const paddlePriceId = await resolvePrice({
+        data: { priceId, environment: env },
+      });
+      const successUrl = `${window.location.origin}/account?checkout=success&tier=${designation}`;
+      window.Paddle.Checkout.open({
+        items: [{ priceId: paddlePriceId, quantity: 1 }],
+        customer: user.email ? { email: user.email } : undefined,
+        customData: { userId: user.id },
+        settings: {
+          displayMode: "overlay",
+          successUrl,
+          allowLogout: false,
+          variant: "one-page",
+        },
+      });
+    } catch (e) {
+      toast.error((e as Error).message || "Could not open checkout");
+    } finally {
+      setOpening(false);
+    }
   };
-
-  if (checkingOut && priceId && user) {
-    return (
-      <section className="max-w-2xl mx-auto px-6 py-16 animate-fade-up">
-        <button
-          type="button"
-          onClick={() => setCheckingOut(false)}
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.25em] text-foreground/60 hover:text-foreground mb-8"
-        >
-          <ArrowLeft size={12} />
-          Back
-        </button>
-        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
-          Secure checkout · {cadence === "monthly" ? "Monthly" : "Annual"}
-        </div>
-        <h1 className="font-display text-3xl tracking-tight mb-6">{tier.label}.</h1>
-        <StripeEmbeddedCheckout
-          priceId={priceId}
-          userId={user.id}
-          customerEmail={user.email ?? undefined}
-        />
-      </section>
-    );
-  }
 
   return (
     <section className="max-w-3xl mx-auto px-6 py-20 animate-fade-up">
@@ -211,13 +221,17 @@ function TierConfirm({ designation }: { designation: Designation }) {
 
         <button
           onClick={onCheckout}
-          className="block w-full py-3.5 text-center font-mono text-xs uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all"
+          disabled={opening}
+          className="flex items-center justify-center gap-2 w-full py-3.5 font-mono text-xs uppercase tracking-[0.25em] bg-accent text-accent-foreground hover:opacity-90 transition-all disabled:opacity-60"
         >
+          {opening && <Loader2 size={14} className="animate-spin" />}
           {tier.ctaKind === "contact"
             ? tier.cta
             : !user
               ? "Sign in to continue"
-              : "Continue to checkout"}
+              : opening
+                ? "Opening checkout…"
+                : "Continue to checkout"}
         </button>
 
         {tier.ctaKind !== "contact" && (
