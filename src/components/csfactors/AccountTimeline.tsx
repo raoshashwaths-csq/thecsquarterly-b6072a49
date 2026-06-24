@@ -41,6 +41,7 @@ export const VECTORS: Vector[] = [
   { kind: "cta.raised",         label: "CTA raised",         icon: ListChecks,       tint: "accent" },
   { kind: "cta.completed",      label: "CTA completed",      icon: CheckCircle2,     tint: "emerald" },
   { kind: "note",               label: "Note",               icon: FileText,         tint: "neutral" },
+  { kind: "lumi.run.tagged",    label: "Lumi run tagged",    icon: Compass,          tint: "secondary" },
   // System-emitted kinds (not user-selectable from the picker)
   { kind: "field.edit",         label: "Field edit",         icon: Pencil,           tint: "neutral", hidden: true },
   { kind: "qbr.override",       label: "QBR override",       icon: RefreshCw,        tint: "neutral", hidden: true },
