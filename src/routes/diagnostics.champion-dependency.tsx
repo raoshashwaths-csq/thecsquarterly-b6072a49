@@ -195,6 +195,23 @@ function ChampionDependencyDiagnostic() {
 
   const [showGate, setShowGate] = useState(false);
 
+  if (sharedScore !== null) {
+    const bucket = bucketOf(sharedScore);
+    const meta = BUCKET_META[bucket];
+    return (
+      <SharedScoreView
+        eyebrow="Shared diagnostic result"
+        diagnosticName="The Champion Dependency Diagnostic"
+        scoreLabel="Single-threading exposure"
+        scoreDisplay={`${sharedScore}%`}
+        tierLabel={meta.label}
+        tierTone={meta.tone}
+        interpretation={INTERPRETATION[bucket]}
+        retakeHref="/diagnostics/champion-dependency"
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col page-enter">
       <SiteHeader />
