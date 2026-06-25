@@ -699,21 +699,21 @@ function TierStrip({ compact = false }: { compact?: boolean } = {}) {
   // TEAM / SCALE / ENTERPRISE — team summary
   return (
     <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-10">
-      <div className="border border-border bg-card px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
-        <div>
+      <div className="border border-border bg-card px-5 py-4 grid grid-cols-1 gap-3 sm:flex sm:items-center sm:justify-between sm:flex-wrap sm:gap-4">
+        <div className="min-w-0">
           <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-1">Your team</div>
           <p className="text-sm text-foreground/80">
             Lumi pool: {sub.lumiSessionsUsed} / {sub.lumiSessionsAllowed} sessions used this month.
           </p>
         </div>
-        <div className="flex gap-3">
-          <Link to="/csfactors/360" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+          <Link to="/csfactors/360" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground whitespace-nowrap">
             Team Pulse
           </Link>
-          <Link to="/csfactors/maps" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground">
+          <Link to="/csfactors/maps" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground whitespace-nowrap">
             MAP engine
           </Link>
-          <Link to="/account/workspace" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground">
+          <Link to="/account/workspace" className="font-mono text-[11px] uppercase tracking-[0.22em] border border-border px-4 py-2 hover:border-foreground whitespace-nowrap">
             Workspace
           </Link>
         </div>
@@ -721,6 +721,7 @@ function TierStrip({ compact = false }: { compact?: boolean } = {}) {
     </section>
   );
 }
+
 
 function Tile({ eyebrow, title, body, to, cta }: { eyebrow: string; title: string; body: string; to: string; cta: string }) {
   return (
