@@ -22,6 +22,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SentimentTrendPanel } from "@/components/site/SentimentTrendPanel";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { RequireAuth } from "@/components/site/RequireAuth";
+import { ExportDialog } from "@/components/site/ExportDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -230,6 +231,7 @@ function WorkspacePageInner() {
   const [tab, setTab] = useState<"history" | "highlights" | "ledger">("history");
   const [query, setQuery] = useState("");
   const [searchHintDismissed, setSearchHintDismissed] = useState(true);
+  const [exportOpen, setExportOpen] = useState(false);
 
 
 
@@ -263,10 +265,10 @@ function WorkspacePageInner() {
             Your Workspace<span className="text-accent">.</span>
           </h1>
           <button
-            onClick={() => exportWorkspacePDF({ links, assets, annotations })}
+            onClick={() => setExportOpen(true)}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors min-h-[44px]"
           >
-            <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
+            <Download className="w-3.5 h-3.5" /> Export to branded PDF
           </button>
         </div>
         <p className="text-foreground/65 mb-6 max-w-2xl">
@@ -334,11 +336,12 @@ function WorkspacePageInner() {
 
         <div className="mt-8 will-change-transform">
           {tab === "history" && <HistoryPanel query={query} />}
-          {tab === "highlights" && <HighlightsPanel query={query} annotations={annotations} links={links} assets={assets} />}
+          {tab === "highlights" && <HighlightsPanel query={query} annotations={annotations} links={links} assets={assets} onExport={() => setExportOpen(true)} />}
           {tab === "ledger" && <LedgerPanel query={query} links={links} assets={assets} />}
         </div>
       </main>
       <SiteFooter />
+      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} />
     </div>
   );
 }
@@ -431,177 +434,6 @@ function DailyBriefing({ links, assets, annotations }: { links: SavedLink[]; ass
   );
 }
 
-// ---------- Unified PDF export (lazy-loads jsPDF) ----------
-async function exportWorkspacePDF({ links, assets, annotations }: { links: SavedLink[]; assets: SavedAsset[]; annotations: Annotation[] }) {
-  if (links.length === 0 && assets.length === 0 && annotations.length === 0) {
-    toast.error("Workspace is empty — add a link, file, or highlight first.");
-    return;
-  }
-  let jsPDFCtor: typeof import("jspdf").jsPDF;
-  try {
-    const mod = await import("jspdf");
-    jsPDFCtor = mod.jsPDF ?? (mod as unknown as { default: typeof import("jspdf").jsPDF }).default;
-  } catch (e) {
-    console.error(e);
-    toast.error("Could not load PDF engine. Check your connection and retry.");
-    return;
-  }
-  const briefing = generateBriefing(links, assets, annotations);
-  const doc = new jsPDFCtor({ unit: "pt", format: "letter" });
-  const W = doc.internal.pageSize.getWidth();
-  const H = doc.internal.pageSize.getHeight();
-  const M = 56;
-  let y = 0;
-
-  const drawHeader = () => {
-    doc.setFillColor(20, 20, 20);
-    doc.rect(0, 0, W, 72, "F");
-    doc.setTextColor(245, 240, 230);
-    doc.setFont("times", "bold");
-    doc.setFontSize(22);
-    doc.text("The CS Quarterly", M, 44);
-    doc.setTextColor(208, 106, 76);
-    doc.text(".", M + doc.getTextWidth("The CS Quarterly"), 44);
-    doc.setFont("courier", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(245, 240, 230);
-    doc.text("WORKSPACE EXPORT", W - M, 44, { align: "right" });
-  };
-  const drawFooter = () => {
-    doc.setFont("courier", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(140, 140, 140);
-    doc.text("thecsquarterly.com · Operator-grade Customer Success", M, H - 30);
-    doc.text(`Page ${doc.getNumberOfPages()}`, W - M, H - 30, { align: "right" });
-  };
-  const ensureRoom = (need: number) => {
-    if (y > H - 80 - need) {
-      drawFooter();
-      doc.addPage();
-      drawHeader();
-      y = 100;
-    }
-  };
-  const sectionTitle = (label: string, eyebrow: string) => {
-    ensureRoom(60);
-    doc.setFont("courier", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(208, 106, 76);
-    doc.text(eyebrow.toUpperCase(), M, y);
-    y += 16;
-    doc.setFont("times", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(20, 20, 20);
-    doc.text(label, M, y);
-    y += 12;
-    doc.setDrawColor(208, 106, 76);
-    doc.setLineWidth(1);
-    doc.line(M, y, W - M, y);
-    y += 20;
-  };
-
-  drawHeader();
-  y = 110;
-  doc.setTextColor(20, 20, 20);
-  doc.setFont("times", "bold");
-  doc.setFontSize(28);
-  doc.text("Your margin.", M, y);
-  y += 22;
-  doc.setFont("courier", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(120, 120, 120);
-  doc.text(`${briefing.today.toUpperCase()} · ${links.length} LINKS · ${assets.length} ASSETS · ${annotations.length} ANNOTATIONS`, M, y);
-  y += 28;
-
-  sectionTitle("Daily Operational Briefing", "Section 01 · Briefing");
-  doc.setFont("times", "normal");
-  doc.setFontSize(11);
-  doc.setTextColor(40, 40, 40);
-  briefing.list.forEach((line) => {
-    const wrapped = doc.splitTextToSize(`•  ${line}`, W - 2 * M);
-    ensureRoom(wrapped.length * 14 + 6);
-    doc.text(wrapped, M, y);
-    y += wrapped.length * 14 + 6;
-  });
-  y += 10;
-
-  if (links.length > 0) {
-    sectionTitle("Saved Links", `Section 02 · ${links.length} items`);
-    links.forEach((l) => {
-      ensureRoom(40);
-      doc.setFont("courier", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(208, 106, 76);
-      doc.text(`${l.tag.toUpperCase()} · ${new Date(l.createdAt).toLocaleDateString()}`, M, y);
-      y += 12;
-      doc.setFont("times", "bold");
-      doc.setFontSize(11);
-      doc.setTextColor(20, 20, 20);
-      const t = doc.splitTextToSize(l.title, W - 2 * M);
-      doc.text(t, M, y);
-      y += t.length * 13;
-      doc.setFont("courier", "normal");
-      doc.setFontSize(8);
-      doc.setTextColor(110, 110, 110);
-      const u = doc.splitTextToSize(l.url, W - 2 * M);
-      doc.text(u, M, y);
-      y += u.length * 11 + 10;
-    });
-  }
-
-  if (assets.length > 0) {
-    sectionTitle("Saved Assets", `Section 03 · ${assets.length} items`);
-    assets.forEach((a) => {
-      ensureRoom(28);
-      doc.setFont("courier", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(208, 106, 76);
-      doc.text(`${a.tag.toUpperCase()} · ${(a.size / 1024).toFixed(1)} KB`, M, y);
-      y += 12;
-      doc.setFont("times", "normal");
-      doc.setFontSize(11);
-      doc.setTextColor(20, 20, 20);
-      const n = doc.splitTextToSize(a.name, W - 2 * M);
-      doc.text(n, M, y);
-      y += n.length * 13 + 8;
-    });
-  }
-
-  if (annotations.length > 0) {
-    sectionTitle("Highlights & Annotations", `Section 04 · ${annotations.length} marks`);
-    annotations.forEach((a) => {
-      ensureRoom(50);
-      doc.setFont("courier", "bold");
-      doc.setFontSize(8);
-      doc.setTextColor(208, 106, 76);
-      doc.text(`${a.kind.toUpperCase()} · ${new Date(a.createdAt).toLocaleDateString()} · ${a.slug}`, M, y);
-      y += 14;
-      doc.setFont("times", "italic");
-      doc.setFontSize(11);
-      doc.setTextColor(40, 40, 40);
-      const quoted = doc.splitTextToSize(`"${a.text}"`, W - 2 * M);
-      doc.text(quoted, M, y);
-      y += quoted.length * 14 + 4;
-      if (a.note) {
-        doc.setFont("times", "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(60, 60, 60);
-        const note = doc.splitTextToSize(`Note: ${a.note}`, W - 2 * M);
-        ensureRoom(note.length * 13 + 8);
-        doc.text(note, M, y);
-        y += note.length * 13;
-      }
-      y += 10;
-      doc.setDrawColor(230, 225, 215);
-      doc.line(M, y - 4, W - M, y - 4);
-      y += 8;
-    });
-  }
-
-  drawFooter();
-  doc.save(`csq-workspace-${new Date().toISOString().slice(0, 10)}.pdf`);
-  toast.success("Workspace exported.");
-}
 
 // ---------- A. History ----------
 function HistoryPanel({ query = "" }: { query?: string }) {
@@ -702,7 +534,8 @@ function HighlightsPanel({
   annotations,
   links,
   assets,
-}: { query?: string; annotations: Annotation[]; links: SavedLink[]; assets: SavedAsset[] }) {
+  onExport,
+}: { query?: string; annotations: Annotation[]; links: SavedLink[]; assets: SavedAsset[]; onExport: () => void }) {
   const qc = useQueryClient();
   const remove = useServerFn(deleteAnnotation);
   const q = query.trim().toLowerCase();
@@ -726,10 +559,10 @@ function HighlightsPanel({
           {items.length} entries across the site
         </p>
         <button
-          onClick={() => exportWorkspacePDF({ links, assets, annotations })}
+          onClick={onExport}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors min-h-[44px]"
         >
-          <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
+          <Download className="w-3.5 h-3.5" /> Export to branded PDF
         </button>
       </div>
 

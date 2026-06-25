@@ -46,7 +46,7 @@ export function SharedRunGate({
       const rect = el.getBoundingClientRect();
       const total = el.scrollHeight;
       const seen = Math.min(total, Math.max(0, window.innerHeight - rect.top));
-      if (seen / total >= 0.5) setPastHalf(true);
+      if (total > 0 && seen / total >= 0.5) setPastHalf(true);
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -57,10 +57,17 @@ export function SharedRunGate({
     };
   }, [unlocked]);
 
+  // Freeze page scroll while gated — lock html + body so iOS Safari respects it.
   useEffect(() => {
     if (pastHalf && !unlocked) {
+      const prevHtml = document.documentElement.style.overflow;
+      const prevBody = document.body.style.overflow;
+      document.documentElement.style.overflow = "hidden";
       document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
+      return () => {
+        document.documentElement.style.overflow = prevHtml;
+        document.body.style.overflow = prevBody;
+      };
     }
   }, [pastHalf, unlocked]);
 
@@ -73,7 +80,6 @@ export function SharedRunGate({
       markUnlocked(runId);
       setUnlocked(true);
       setShowWelcome(true);
-      document.body.style.overflow = "";
     } catch (err) {
       toast.error((err as Error).message || "Couldn't unlock — please try again.");
     } finally {
@@ -81,43 +87,52 @@ export function SharedRunGate({
     }
   }
 
+  const gated = pastHalf && !unlocked;
+
   return (
     <>
-      <div ref={contentRef} className={pastHalf && !unlocked ? "relative" : undefined}>
-        {children}
-        {pastHalf && !unlocked && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-b from-transparent via-background/85 to-background backdrop-blur-sm" />
-        )}
-      </div>
+      <div ref={contentRef}>{children}</div>
 
-      {pastHalf && !unlocked && (
-        <div className="fixed inset-x-0 bottom-0 z-40 px-5 pb-6 pt-10 bg-gradient-to-t from-background via-background to-background/0">
-          <div className="max-w-xl mx-auto border border-accent/40 bg-card rounded-md p-6 shadow-xl">
-            <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
-              <QMark periodClassName="text-foreground" /> Reader unlock
+      {gated && (
+        <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center pointer-events-none">
+          {/* Heavy blur + dark wash across the whole viewport so no body text leaks through */}
+          <div
+            className="absolute inset-0 pointer-events-auto"
+            style={{
+              backdropFilter: "blur(14px) saturate(120%)",
+              WebkitBackdropFilter: "blur(14px) saturate(120%)",
+              background:
+                "linear-gradient(to bottom, hsl(var(--background) / 0.55) 0%, hsl(var(--background) / 0.92) 35%, hsl(var(--background)) 70%)",
+            }}
+          />
+          <div className="relative pointer-events-auto w-full max-w-xl mx-auto px-4 pb-6 sm:pb-0">
+            <div className="border border-accent/40 bg-card rounded-md p-5 sm:p-6 shadow-2xl">
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
+                <QMark periodClassName="text-foreground" /> Reader unlock
+              </div>
+              <h3 className="font-display text-xl sm:text-2xl tracking-tight mb-2">
+                Share your email to read the rest of this Lumi run<span className="text-accent">.</span>
+              </h3>
+              <p className="text-sm text-foreground/70 mb-4">
+                You'll also unlock the weekly briefing, the Codex, and the free diagnostic score sheet.
+              </p>
+              <form onSubmit={submit} className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  type="email"
+                  required
+                  placeholder="you@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1"
+                />
+                <Button type="submit" disabled={busy}>
+                  {busy ? "Unlocking…" : "Unlock"}
+                </Button>
+              </form>
+              <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50 mt-3">
+                No password. One email. Unsubscribe anytime.
+              </p>
             </div>
-            <h3 className="font-display text-xl md:text-2xl tracking-tight mb-2">
-              Share your email to read the rest of this Lumi run<span className="text-accent">.</span>
-            </h3>
-            <p className="text-sm text-foreground/70 mb-4">
-              You'll also unlock the weekly briefing, the Codex, and the free diagnostic score sheet.
-            </p>
-            <form onSubmit={submit} className="flex flex-col sm:flex-row gap-2">
-              <Input
-                type="email"
-                required
-                placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1"
-              />
-              <Button type="submit" disabled={busy}>
-                {busy ? "Unlocking…" : "Unlock"}
-              </Button>
-            </form>
-            <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-foreground/50 mt-3">
-              No password. One email. Unsubscribe anytime.
-            </p>
           </div>
         </div>
       )}
