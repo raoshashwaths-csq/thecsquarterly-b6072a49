@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SentimentTrendPanel } from "@/components/site/SentimentTrendPanel";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { RequireAuth } from "@/components/site/RequireAuth";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -218,15 +219,19 @@ function useLegacyMigration() {
 
 // ---------- main page ----------
 function WorkspacePage() {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
+  return (
+    <RequireAuth>
+      <WorkspacePageInner />
+    </RequireAuth>
+  );
+}
+
+function WorkspacePageInner() {
   const [tab, setTab] = useState<"history" | "highlights" | "ledger">("history");
   const [query, setQuery] = useState("");
   const [searchHintDismissed, setSearchHintDismissed] = useState(true);
 
-  useEffect(() => {
-    if (!loading && !user) navigate({ to: "/login" });
-  }, [user, loading, navigate]);
+
 
   useEffect(() => {
     try { setSearchHintDismissed(localStorage.getItem(SEARCH_HINT_KEY) === "1"); } catch { /* */ }
