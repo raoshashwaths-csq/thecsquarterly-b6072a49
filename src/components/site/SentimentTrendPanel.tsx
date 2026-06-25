@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getMonthlySentiment } from "@/lib/sentiment.functions";
+import { useAuth } from "@/hooks/useAuth";
 
 const COLORS = {
   positive: "hsl(152 60% 42%)", // emerald
@@ -10,11 +11,13 @@ const COLORS = {
 } as const;
 
 export function SentimentTrendPanel() {
+  const { user, loading } = useAuth();
   const fetcher = useServerFn(getMonthlySentiment);
   const { data, isLoading, error } = useQuery({
-    queryKey: ["sentiment-monthly"],
+    queryKey: ["sentiment-monthly", user?.id ?? "anon"],
     queryFn: () => fetcher(),
     staleTime: 60_000,
+    enabled: !loading && !!user,
   });
 
   const rows = data?.rows ?? [];
