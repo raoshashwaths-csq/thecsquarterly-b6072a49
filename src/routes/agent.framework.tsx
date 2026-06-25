@@ -85,8 +85,19 @@ function AgentFrameworkPage() {
     setFocusMode(true);
     trackLumiEvent("tree.select", { treeId: id, surface: "canvas", meta: { from: fromTree } });
     trackLumiEvent("tree.focus", { treeId: id, surface: "canvas" });
-    // Smooth-scroll the wheel into view after the animation kicks off.
-    setTimeout(() => wheelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+    // Smooth-scroll the wheel into the viewport centre after the animation kicks off.
+    // Use block: "center" so the entire decision wheel sits in the middle of the screen
+    // rather than snapping the top edge to the viewport top (which pushed short pages
+    // to the bottom). Fall back to "start" if the wheel is taller than the viewport.
+    setTimeout(() => {
+      const el = wheelRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const block: ScrollLogicalPosition =
+        rect.height > window.innerHeight - 80 ? "start" : "center";
+      el.scrollIntoView({ behavior: "smooth", block });
+    }, 80);
+
   }
 
   function handleBackToPicker() {
