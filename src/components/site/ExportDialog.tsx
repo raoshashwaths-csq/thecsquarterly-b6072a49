@@ -212,7 +212,7 @@ export function ExportDialog({
                     <div className="min-w-0">
                       <div className="font-display text-sm truncate">{w.title || "Untitled"}</div>
                       <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                        {w.item_type} · {new Date(w.created_at).toLocaleDateString()}
+                        {w.kind} · {new Date(w.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   </label>
