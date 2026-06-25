@@ -153,6 +153,10 @@ function subScores(answers: Record<number, number>) {
 }
 
 function ChampionDependencyDiagnostic() {
+  // If a shared score is present in the URL, short-circuit to the read-only
+  // shared view so recipients land on the score, not the start of the flow.
+  const sharedScore = useSharedScoreParam();
+
   const flow = useDiagnosticFlow({
     questions: QUESTIONS,
     calcSteps: CALC_STEPS,
