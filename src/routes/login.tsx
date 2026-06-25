@@ -27,6 +27,8 @@ function LoginPage() {
   const [persona, setPersona] = useState<Persona | "">("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
+
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +62,6 @@ function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Signed in.");
-        const { redirect } = Route.useSearch();
         navigate({ to: redirect ?? "/" });
       }
     } catch (err) {
