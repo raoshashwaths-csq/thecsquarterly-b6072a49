@@ -730,10 +730,10 @@ function HighlightsPanel({
           {items.length} entries across the site
         </p>
         <button
-          onClick={() => exportWorkspacePDF({ links, assets, annotations })}
+          onClick={onExport}
           className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors min-h-[44px]"
         >
-          <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
+          <Download className="w-3.5 h-3.5" /> Export to branded PDF
         </button>
       </div>
 
