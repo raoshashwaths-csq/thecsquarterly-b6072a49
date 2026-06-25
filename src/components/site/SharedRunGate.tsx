@@ -94,18 +94,17 @@ export function SharedRunGate({
       <div ref={contentRef}>{children}</div>
 
       {gated && (
-        <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center pointer-events-none">
-          {/* Heavy blur + dark wash across the whole viewport so no body text leaks through */}
+        <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
+          {/* Solid opaque wash — no backdrop-filter (kills mobile perf and freezes scroll) */}
           <div
             className="absolute inset-0 pointer-events-auto"
             style={{
-              backdropFilter: "blur(14px) saturate(120%)",
-              WebkitBackdropFilter: "blur(14px) saturate(120%)",
               background:
-                "linear-gradient(to bottom, hsl(var(--background) / 0.55) 0%, hsl(var(--background) / 0.92) 35%, hsl(var(--background)) 70%)",
+                "linear-gradient(to bottom, hsl(var(--background) / 0.85) 0%, hsl(var(--background)) 40%)",
             }}
+            aria-hidden
           />
-          <div className="relative pointer-events-auto w-full max-w-xl mx-auto px-4 pb-6 sm:pb-0">
+          <div className="relative pointer-events-auto w-full max-w-xl mx-auto px-4">
             <div className="border border-accent/40 bg-card rounded-md p-5 sm:p-6 shadow-2xl">
               <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent mb-2">
                 <QMark periodClassName="text-foreground" /> Reader unlock
@@ -136,6 +135,7 @@ export function SharedRunGate({
           </div>
         </div>
       )}
+
 
       <ReaderWelcomeDialog open={showWelcome} onClose={() => setShowWelcome(false)} />
     </>
