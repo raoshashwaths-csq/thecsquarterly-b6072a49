@@ -343,13 +343,24 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
           </p>
         ) : (
           <ol className="relative border-l border-border ml-2 space-y-4">
-            {filteredEvents.map((e) => <TimelineItem key={e.id} event={e} onDelete={remove} />)}
+            {filteredEvents.map((e) => (
+              <TimelineItem key={e.id} event={e} onDelete={remove} onOpen={setOpenEvent} />
+            ))}
           </ol>
         )}
       </div>
+
+      <TimelineEventDialog
+        event={openEvent}
+        vector={openEvent ? describe(openEvent.kind).vector : null}
+        label={openEvent ? describe(openEvent.kind).label : ""}
+        open={!!openEvent}
+        onOpenChange={(o) => { if (!o) setOpenEvent(null); }}
+      />
     </div>
   );
 }
+
 
 function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (id: string) => void }) {
   const { vector, label } = describe(event.kind);
