@@ -23,6 +23,7 @@ import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as JobBoardRouteImport } from './routes/job-board'
 import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as DirectoryRouteImport } from './routes/directory'
 import { Route as CsfactorsRouteImport } from './routes/csfactors'
 import { Route as CodexRouteImport } from './routes/codex'
@@ -147,6 +148,11 @@ const JobBoardRoute = JobBoardRouteImport.update({
 const InsightsRoute = InsightsRouteImport.update({
   id: '/insights',
   path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DirectoryRoute = DirectoryRouteImport.update({
@@ -448,6 +454,7 @@ export interface FileRoutesByFullPath {
   '/codex': typeof CodexRouteWithChildren
   '/csfactors': typeof CsfactorsRouteWithChildren
   '/directory': typeof DirectoryRoute
+  '/faq': typeof FaqRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
@@ -517,6 +524,7 @@ export interface FileRoutesByTo {
   '/calculator': typeof CalculatorRoute
   '/csfactors': typeof CsfactorsRouteWithChildren
   '/directory': typeof DirectoryRoute
+  '/faq': typeof FaqRoute
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
   '/outcome-forum': typeof OutcomeForumRoute
@@ -587,6 +595,7 @@ export interface FileRoutesById {
   '/codex': typeof CodexRouteWithChildren
   '/csfactors': typeof CsfactorsRouteWithChildren
   '/directory': typeof DirectoryRoute
+  '/faq': typeof FaqRoute
   '/insights': typeof InsightsRouteWithChildren
   '/job-board': typeof JobBoardRoute
   '/login': typeof LoginRoute
@@ -660,6 +669,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/csfactors'
     | '/directory'
+    | '/faq'
     | '/insights'
     | '/job-board'
     | '/login'
@@ -729,6 +739,7 @@ export interface FileRouteTypes {
     | '/calculator'
     | '/csfactors'
     | '/directory'
+    | '/faq'
     | '/job-board'
     | '/login'
     | '/outcome-forum'
@@ -798,6 +809,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/csfactors'
     | '/directory'
+    | '/faq'
     | '/insights'
     | '/job-board'
     | '/login'
@@ -870,6 +882,7 @@ export interface RootRouteChildren {
   CodexRoute: typeof CodexRouteWithChildren
   CsfactorsRoute: typeof CsfactorsRouteWithChildren
   DirectoryRoute: typeof DirectoryRoute
+  FaqRoute: typeof FaqRoute
   InsightsRoute: typeof InsightsRouteWithChildren
   JobBoardRoute: typeof JobBoardRoute
   LoginRoute: typeof LoginRoute
@@ -1012,6 +1025,13 @@ declare module '@tanstack/react-router' {
       path: '/insights'
       fullPath: '/insights'
       preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/directory': {
@@ -1506,6 +1526,7 @@ const rootRouteChildren: RootRouteChildren = {
   CodexRoute: CodexRouteWithChildren,
   CsfactorsRoute: CsfactorsRouteWithChildren,
   DirectoryRoute: DirectoryRoute,
+  FaqRoute: FaqRoute,
   InsightsRoute: InsightsRouteWithChildren,
   JobBoardRoute: JobBoardRoute,
   LoginRoute: LoginRoute,

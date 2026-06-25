@@ -27,6 +27,7 @@ export function SiteFooter() {
   const COMPANY = [
     { labelKey: "footer.companyLinks.mission", path: "/about" },
     { labelKey: "footer.companyLinks.editorial", path: "/about" },
+    { labelKey: "footer.companyLinks.faq", path: "/faq" },
     { labelKey: "footer.companyLinks.contact", path: "/subscribe" },
     { labelKey: "footer.companyLinks.login", path: "/login" },
   ] as const;
