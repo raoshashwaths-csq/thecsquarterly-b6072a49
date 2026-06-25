@@ -678,3 +678,70 @@ function Section({ eyebrow, title, children }: { eyebrow: string; title: string;
     </div>
   );
 }
+
+/* ───────────────────────── PDF input builder ───────────────────────── */
+
+function buildPdfInput(
+  exposure: number,
+  subs: ReturnType<typeof subScores>,
+  bucket: Bucket,
+  isUnlocked: boolean,
+) {
+  const meta = BUCKET_META[bucket];
+  const gaps = Object.entries(subs).sort((a, b) => a[1] - b[1]).slice(0, 2).map(([k]) => k);
+  const gapLabel: Record<string, string> = {
+    relationshipDepth: "relationship depth",
+    detectionCapability: "departure detection",
+    structuralProcess: "structural process",
+  };
+  return {
+    slug: "champion-dependency",
+    diagnosticName: "Champion Dependency Diagnostic",
+    scoreLabel: "Single-threading exposure",
+    scoreValue: `${exposure}%`,
+    tierLabel: meta.label,
+    interpretation: INTERPRETATION[bucket],
+    subScores: [
+      { label: "Relationship Depth", value: subs.relationshipDepth },
+      { label: "Departure Detection", value: subs.detectionCapability },
+      { label: "Structural Process", value: subs.structuralProcess },
+    ],
+    isUnlocked,
+    shareUrlPath: "/diagnostics/champion-dependency",
+    blueprintSections: isUnlocked
+      ? [
+          {
+            eyebrow: "Section 01",
+            title: "Single-threading risk map",
+            body: `Your weakest vectors are ${gapLabel[gaps[0]]} and ${gapLabel[gaps[1]]}. In practice this shows up first on your highest-ARR accounts — where a single departure carries the largest revenue cost. Concentrate the first sweep there.`,
+          },
+          {
+            eyebrow: "Section 02",
+            title: "The multi-threading sequence",
+            body: "Minimum contact count by tier: Enterprise 4+ across 3 seniority levels · Mid-market 2–3 contacts · SMB 1–2 acceptable. CSFactors' Stakeholder Graph tracks this automatically and flags any tier dropping below threshold.",
+          },
+          {
+            eyebrow: "Section 03",
+            title: "Executive sponsor mapping",
+            body: "Identify the economic buyer — usually one level above your day-to-day contact. Open the relationship via a value-realisation briefing (quarterly outcomes, not status) so the existing champion is reinforced, not bypassed.",
+          },
+          {
+            eyebrow: "Section 04",
+            title: "Champion departure detection protocol",
+            body: "Weekly LinkedIn role-change sweep on top 20 accounts, email engagement drop >40% over 14 days, two consecutive meeting cancellations. When triggered, Lumi's Champion Change Navigator walks the CSM through the re-engagement sequence for that account's tier and stage.",
+          },
+          {
+            eyebrow: "Section 05",
+            title: "30-day re-threading action plan",
+            body: [
+              "Week 1 — Stakeholder audit on top 10 accounts by ARR.",
+              "Week 2 — Identify and prioritise the 5 most single-threaded accounts.",
+              "Week 3 — Initiate outreach to secondary contacts on those 5.",
+              "Week 4 — Establish quarterly stakeholder-map refresh cadence.",
+            ],
+          },
+        ]
+      : [],
+  } as const;
+}
+
