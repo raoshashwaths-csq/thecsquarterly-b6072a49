@@ -286,7 +286,9 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
   };
 
   const handleCopyLink = async () => {
-    const url = canonicalUrl("/diagnostics/ai-readiness");
+    const url = canonicalUrl(
+      `/diagnostics/ai-readiness?score=${result.finalScore}&tier=${encodeURIComponent(result.tier)}`,
+    );
     const text = `I scored ${result.finalScore}/100 (${result.tierLabel}) on The CS Quarterly's CS Operating Maturity Diagnostic. ${url}`;
     if (typeof navigator !== "undefined" && navigator.share) {
       try { await navigator.share({ title: "My CS Operating Maturity score", text, url }); return; } catch { /* fallthrough */ }
