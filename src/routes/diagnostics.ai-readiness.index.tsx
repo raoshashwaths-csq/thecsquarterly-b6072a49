@@ -82,6 +82,23 @@ const PILLARS = [
 ];
 
 function AiReadinessLanding() {
+  const shared = useSharedAiReadiness();
+  if (shared) {
+    const meta = TIER_INTERPRETATION[shared.tier];
+    return (
+      <SharedScoreView
+        eyebrow="Shared diagnostic result"
+        diagnosticName="CS Operating Maturity Diagnostic"
+        scoreLabel="Final score"
+        scoreDisplay={`${shared.score}/100`}
+        tierLabel={meta.label}
+        tierTone={meta.tone}
+        interpretation={meta.body}
+        retakeHref="/diagnostics/ai-readiness/survey"
+        retakeLabel="Run the diagnostic on yourself →"
+      />
+    );
+  }
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
