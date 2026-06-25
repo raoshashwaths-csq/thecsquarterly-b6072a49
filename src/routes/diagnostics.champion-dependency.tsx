@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useDiagnosticFlow, useCountUp } from "@/hooks/useDiagnosticFlow";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
+import { LeadCaptureGate } from "@/components/diagnostics/LeadCaptureGate";
+import { canonicalUrl } from "@/lib/canonical-url";
+import { downloadDiagnosticPdf } from "@/lib/diagnostic-pdf";
 
 export const Route = createFileRoute("/diagnostics/champion-dependency")({
   head: () => ({
@@ -156,6 +159,11 @@ function ChampionDependencyDiagnostic() {
     calculateSubScores: subScores,
   });
 
+  // Lead-capture gate — every diagnostic must collect work email before the
+  // survey is rendered. Once unlocked for this session we don't ask again
+  // even if the user retakes.
+  const [leadUnlocked, setLeadUnlocked] = useState(false);
+
   useEffect(() => {
     if (flow.stage === "survey") {
       trackDiagnosticEvent("diagnostic.survey_start", {
@@ -171,6 +179,17 @@ function ChampionDependencyDiagnostic() {
     }
   }, [flow.stage, flow.score]);
 
+  const handleStart = () => {
+    if (!leadUnlocked) {
+      // Show the gate; flow.start() will run after onUnlock.
+      setShowGate(true);
+      return;
+    }
+    flow.start();
+  };
+
+  const [showGate, setShowGate] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col page-enter">
       <SiteHeader />
@@ -179,7 +198,20 @@ function ChampionDependencyDiagnostic() {
       </div>
       <main className="flex-1">
 
-        {flow.stage === "landing" && <LandingState onStart={flow.start} />}
+        {flow.stage === "landing" && !showGate && <LandingState onStart={handleStart} />}
+        {flow.stage === "landing" && showGate && (
+          <LeadCaptureGate
+            slug="champion-dependency"
+            eyebrow="Free assessment — 2 of 8"
+            title={<>Unlock the Champion Dependency Diagnostic<span className="text-accent">.</span></>}
+            subtitle="Calculate the percentage of your portfolio that depends on a single relationship. Results delivered instantly."
+            onUnlock={() => {
+              setLeadUnlocked(true);
+              setShowGate(false);
+              flow.start();
+            }}
+          />
+        )}
         {flow.stage === "survey" && <SurveyState flow={flow} />}
         {flow.stage === "calculating" && <CalculatingState step={flow.calcStep} steps={flow.calcSteps} />}
         {flow.stage === "results" && (
@@ -194,6 +226,8 @@ function ChampionDependencyDiagnostic() {
     </div>
   );
 }
+
+
 
 /* ───────────────────────── Landing ───────────────────────── */
 
@@ -423,7 +457,7 @@ function ResultsState({
   );
 
   const onShare = async () => {
-    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/diagnostics/champion-dependency?score=${exposure}`;
+    const url = canonicalUrl(`/diagnostics/champion-dependency?score=${exposure}`);
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ title: "Champion Dependency Diagnostic", text: shareText, url });
@@ -512,22 +546,23 @@ function ResultsState({
                       to="/pricing"
                       className="px-6 py-3 bg-accent text-accent-foreground font-mono text-[11px] uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-opacity"
                     >
-                      $29/mo Vanguard
+                      $39/mo Practitioner
                     </Link>
                   </div>
                   <div className="mt-4 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
-                    Vanguard includes all diagnostics + $500 in playbooks
+                    Practitioner unlocks the full blueprint for every diagnostic + all six Codex playbooks
                   </div>
                 </div>
               </>
             )}
           </div>
 
-          {isUnlocked && (
-            <button className="mt-6 w-full px-6 py-4 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-opacity">
-              Download full blueprint (PDF)
-            </button>
-          )}
+          <button
+            onClick={() => downloadDiagnosticPdf(buildPdfInput(exposure, subs, bucket, isUnlocked))}
+            className="mt-6 w-full px-6 py-4 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-opacity"
+          >
+            {isUnlocked ? "Download branded PDF (score + blueprint)" : "Download branded score PDF"}
+          </button>
         </div>
       </div>
 
@@ -643,3 +678,70 @@ function Section({ eyebrow, title, children }: { eyebrow: string; title: string;
     </div>
   );
 }
+
+/* ───────────────────────── PDF input builder ───────────────────────── */
+
+function buildPdfInput(
+  exposure: number,
+  subs: ReturnType<typeof subScores>,
+  bucket: Bucket,
+  isUnlocked: boolean,
+) {
+  const meta = BUCKET_META[bucket];
+  const gaps = Object.entries(subs).sort((a, b) => a[1] - b[1]).slice(0, 2).map(([k]) => k);
+  const gapLabel: Record<string, string> = {
+    relationshipDepth: "relationship depth",
+    detectionCapability: "departure detection",
+    structuralProcess: "structural process",
+  };
+  return {
+    slug: "champion-dependency",
+    diagnosticName: "Champion Dependency Diagnostic",
+    scoreLabel: "Single-threading exposure",
+    scoreValue: `${exposure}%`,
+    tierLabel: meta.label,
+    interpretation: INTERPRETATION[bucket],
+    subScores: [
+      { label: "Relationship Depth", value: subs.relationshipDepth },
+      { label: "Departure Detection", value: subs.detectionCapability },
+      { label: "Structural Process", value: subs.structuralProcess },
+    ],
+    isUnlocked,
+    shareUrlPath: "/diagnostics/champion-dependency",
+    blueprintSections: isUnlocked
+      ? [
+          {
+            eyebrow: "Section 01",
+            title: "Single-threading risk map",
+            body: `Your weakest vectors are ${gapLabel[gaps[0]]} and ${gapLabel[gaps[1]]}. In practice this shows up first on your highest-ARR accounts — where a single departure carries the largest revenue cost. Concentrate the first sweep there.`,
+          },
+          {
+            eyebrow: "Section 02",
+            title: "The multi-threading sequence",
+            body: "Minimum contact count by tier: Enterprise 4+ across 3 seniority levels · Mid-market 2–3 contacts · SMB 1–2 acceptable. CSFactors' Stakeholder Graph tracks this automatically and flags any tier dropping below threshold.",
+          },
+          {
+            eyebrow: "Section 03",
+            title: "Executive sponsor mapping",
+            body: "Identify the economic buyer — usually one level above your day-to-day contact. Open the relationship via a value-realisation briefing (quarterly outcomes, not status) so the existing champion is reinforced, not bypassed.",
+          },
+          {
+            eyebrow: "Section 04",
+            title: "Champion departure detection protocol",
+            body: "Weekly LinkedIn role-change sweep on top 20 accounts, email engagement drop >40% over 14 days, two consecutive meeting cancellations. When triggered, Lumi's Champion Change Navigator walks the CSM through the re-engagement sequence for that account's tier and stage.",
+          },
+          {
+            eyebrow: "Section 05",
+            title: "30-day re-threading action plan",
+            body: [
+              "Week 1 — Stakeholder audit on top 10 accounts by ARR.",
+              "Week 2 — Identify and prioritise the 5 most single-threaded accounts.",
+              "Week 3 — Initiate outreach to secondary contacts on those 5.",
+              "Week 4 — Establish quarterly stakeholder-map refresh cadence.",
+            ],
+          },
+        ]
+      : [],
+  };
+}
+

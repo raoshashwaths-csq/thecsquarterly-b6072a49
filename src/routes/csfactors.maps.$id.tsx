@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { canonicalUrl } from "@/lib/canonical-url";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -47,7 +48,7 @@ function MapDetail() {
   const blocked = milestones.filter((m) => m.status === "blocked").length;
   const completePhase = completing ? phases.find((p) => p.id === completing.phase_id) : null;
 
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/m/${map.share_token}` : "";
+  const shareUrl = canonicalUrl(`/m/${map.share_token}`);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

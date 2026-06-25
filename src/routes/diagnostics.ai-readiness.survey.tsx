@@ -7,6 +7,10 @@ import { QUESTIONS, SCORE_OPTIONS, GAP_FIXES, AGENT_INFO } from "@/lib/survey";
 import type { ScoreResult } from "@/lib/survey";
 import { submitSurvey } from "@/lib/survey.functions";
 import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { downloadDiagnosticPdf } from "@/lib/diagnostic-pdf";
+import { canonicalUrl } from "@/lib/canonical-url";
+import { toast } from "sonner";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -246,6 +250,52 @@ function SurveyPage() {
 }
 
 function ResultsView({ result, email, firstName, company }: { result: ScoreResult; email: string; firstName: string; company: string }) {
+  const { rank } = useEntitlements();
+  const isUnlocked = rank >= 1; // Practitioner+ gets the full blueprint PDF
+
+  const handleDownload = () => {
+    downloadDiagnosticPdf({
+      slug: "ai-readiness",
+      diagnosticName: "CS Operating Maturity Diagnostic",
+      scoreLabel: "Final score",
+      scoreValue: `${result.finalScore}/100`,
+      tierLabel: result.tierLabel,
+      interpretation: result.headline,
+      subScores: Object.values(result.dimensionScores).map((d) => ({
+        label: d.label,
+        value: Math.round((d.weighted / d.weight) * 100),
+      })),
+      isUnlocked,
+      shareUrlPath: "/diagnostics/ai-readiness",
+      blueprintSections: isUnlocked
+        ? [
+            { eyebrow: "Recommended Path", title: "Where to start", body: result.recommendation },
+            ...result.topGaps.map((d, i) => ({
+              eyebrow: `Gap 0${i + 1}`,
+              title: d.label,
+              body: GAP_FIXES[d.id] ?? "",
+            })),
+            ...result.ninetyDayPlan.map((p, i) => ({
+              eyebrow: p.week,
+              title: `${i + 1}. ${p.title}`,
+              body: p.items.map((it) => `• ${it}`),
+            })),
+          ]
+        : [],
+    });
+  };
+
+  const handleCopyLink = async () => {
+    const url = canonicalUrl("/diagnostics/ai-readiness");
+    const text = `I scored ${result.finalScore}/100 (${result.tierLabel}) on The CS Quarterly's CS Operating Maturity Diagnostic. ${url}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try { await navigator.share({ title: "My CS Operating Maturity score", text, url }); return; } catch { /* fallthrough */ }
+    }
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      try { await navigator.clipboard.writeText(text); toast.success("Link copied"); } catch { /* noop */ }
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
@@ -359,6 +409,31 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
             ))}
           </ol>
         </section>
+
+        <div className="flex flex-wrap gap-3 mb-8 pt-8 border-t border-border">
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="px-6 py-3 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-widest font-bold hover:opacity-90 transition-opacity"
+          >
+            {isUnlocked ? "Download branded PDF (score + 90-day plan)" : "Download branded score PDF"}
+          </button>
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="px-6 py-3 border border-border font-mono text-xs uppercase tracking-widest hover:border-foreground transition-colors"
+          >
+            Share result
+          </button>
+          {!isUnlocked && (
+            <Link
+              to="/pricing"
+              className="px-6 py-3 border border-accent text-accent font-mono text-xs uppercase tracking-widest hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              Unlock full blueprint — $39/mo
+            </Link>
+          )}
+        </div>
 
         <div className="bg-foreground text-background p-10">
           <h3 className="font-display text-3xl mb-3">You're now on the dispatch.</h3>

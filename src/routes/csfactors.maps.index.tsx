@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { canonicalUrl } from "@/lib/canonical-url";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -179,7 +180,7 @@ function MapRow({ map, archive }: { map: MapRecord & { elapsed: number; ttvState
   const ttvColor =
     map.ttvState === "over" ? "text-destructive" : map.ttvState === "warn" ? "text-secondary-accent" : "text-emerald-600 dark:text-emerald-400";
 
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/m/${map.share_token}` : "";
+  const shareUrl = canonicalUrl(`/m/${map.share_token}`);
 
   return (
     <tr className="border-b border-border/60 hover:bg-muted/30">

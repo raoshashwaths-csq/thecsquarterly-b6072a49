@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { canonicalCurrentUrl } from "@/lib/canonical-url";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -55,7 +56,7 @@ function ResponsePage() {
       await updateShared({ data: { runId: run.id, shared: next } });
       setRun({ ...run, shared: next });
       if (next) {
-        await navigator.clipboard.writeText(window.location.href);
+        await navigator.clipboard.writeText(canonicalCurrentUrl());
         toast.success("Share link copied to clipboard");
       } else {
         toast.success("Sharing disabled");
@@ -68,7 +69,7 @@ function ResponsePage() {
   }
 
   async function copyLink() {
-    await navigator.clipboard.writeText(window.location.href);
+    await navigator.clipboard.writeText(canonicalCurrentUrl());
     toast.success("Link copied");
   }
 
