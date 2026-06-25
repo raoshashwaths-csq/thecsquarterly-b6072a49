@@ -159,6 +159,11 @@ function ChampionDependencyDiagnostic() {
     calculateSubScores: subScores,
   });
 
+  // Lead-capture gate — every diagnostic must collect work email before the
+  // survey is rendered. Once unlocked for this session we don't ask again
+  // even if the user retakes.
+  const [leadUnlocked, setLeadUnlocked] = useState(false);
+
   useEffect(() => {
     if (flow.stage === "survey") {
       trackDiagnosticEvent("diagnostic.survey_start", {
@@ -174,6 +179,17 @@ function ChampionDependencyDiagnostic() {
     }
   }, [flow.stage, flow.score]);
 
+  const handleStart = () => {
+    if (!leadUnlocked) {
+      // Show the gate; flow.start() will run after onUnlock.
+      setShowGate(true);
+      return;
+    }
+    flow.start();
+  };
+
+  const [showGate, setShowGate] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col page-enter">
       <SiteHeader />
@@ -182,7 +198,20 @@ function ChampionDependencyDiagnostic() {
       </div>
       <main className="flex-1">
 
-        {flow.stage === "landing" && <LandingState onStart={flow.start} />}
+        {flow.stage === "landing" && !showGate && <LandingState onStart={handleStart} />}
+        {flow.stage === "landing" && showGate && (
+          <LeadCaptureGate
+            slug="champion-dependency"
+            eyebrow="Free assessment — 2 of 8"
+            title={<>Unlock the Champion Dependency Diagnostic<span className="text-accent">.</span></>}
+            subtitle="Calculate the percentage of your portfolio that depends on a single relationship. Results delivered instantly."
+            onUnlock={() => {
+              setLeadUnlocked(true);
+              setShowGate(false);
+              flow.start();
+            }}
+          />
+        )}
         {flow.stage === "survey" && <SurveyState flow={flow} />}
         {flow.stage === "calculating" && <CalculatingState step={flow.calcStep} steps={flow.calcSteps} />}
         {flow.stage === "results" && (
@@ -197,6 +226,8 @@ function ChampionDependencyDiagnostic() {
     </div>
   );
 }
+
+
 
 /* ───────────────────────── Landing ───────────────────────── */
 
