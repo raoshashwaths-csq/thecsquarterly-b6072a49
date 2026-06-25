@@ -61,9 +61,9 @@ export function SiteHeader() {
         !visible && "smart-nav-hidden",
       )}
     >
-      <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-3 md:gap-8">
-        <Link to="/" className="group leading-none shrink-0 min-w-0">
-          <span className="font-display font-semibold tracking-tight leading-none text-xl md:text-[1.75rem] whitespace-nowrap block text-foreground drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
+      <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:items-center sm:justify-between sm:gap-3 md:gap-8">
+        <Link to="/" className="group leading-none min-w-0 sm:shrink-0">
+          <span className="font-display font-semibold tracking-tight leading-none text-base sm:text-xl md:text-[1.75rem] truncate sm:whitespace-nowrap block text-foreground drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
             The CS Quarterly<span
               aria-hidden
               className="text-secondary-accent group-hover:text-accent transition-colors font-bold"
@@ -71,7 +71,8 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-4 md:gap-6 font-mono text-xs font-semibold uppercase tracking-widest">
+        <div className="shrink-0 flex items-center gap-2 sm:gap-4 md:gap-6 font-mono text-xs font-semibold uppercase tracking-widest">
+
           {isHome && (
             <div className="hidden lg:flex items-center gap-6">
               {sections.map((item, i) => (
@@ -221,10 +222,11 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/login"
-              className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-xs md:text-xs font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
+              className="shrink-0 whitespace-nowrap px-2 py-1 sm:px-2.5 md:px-3 md:py-1.5 border border-foreground text-[11px] sm:text-xs font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
             >
               {t("nav.login")}
             </Link>
+
 
 
           )}

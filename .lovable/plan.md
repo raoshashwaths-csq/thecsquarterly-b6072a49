@@ -1,117 +1,102 @@
-## Tier-gating audit — Reader Engagement Features (Planned)
 
-Source of truth: `src/lib/tiers.ts` (Designation: `reader`, `practitioner`, `operator`, `team`, `scale`, `enterprise`, `strategic_partner`) with Lumi caps `Reader 1/week · Practitioner 50/mo · Operator 100/mo · Team 500 pool · Scale 2,000 pool · Enterprise 5,000 pool · Strategic unlimited`. Engagement section lives at `docs/CS-Quarterly-Build-Bible.md` lines 2899–3131.
+## 1. Timeline — Lumi run tag shows tree heading + click-to-open detail dialog (all event kinds)
 
-This plan **only updates the Bible section** (no code, no tables, no routes). Approval will let me rewrite the matrix and append an "Edge cases & open questions" subsection.
+**Problem:** `lumi.run.tagged` events only render the label "Lumi run tagged". The tree heading is not surfaced, payload only stores `node_id` (e.g. `T1`), and rows aren't clickable.
 
----
+**Fix in `src/components/csfactors/AccountTimeline.tsx`:**
 
-### A. Naming / tier conflicts (must fix before build)
+- Extend the row title computation for `lumi.run.tagged`: derive tree id from `payload.node_id` (prefix `T\d+`), resolve via `getTree()` from `src/lib/q-trees.ts`, and use `tree.title` (e.g. *"Manage an Escalation"*) as the row title. Append the stakeholder if present (e.g. *"Manage an Escalation · Champion"*). Never show `T1`/`T7` as the visible title.
+- Make every `TimelineItem` a clickable button (keyboard + aria) that opens a centred modal — shadcn `Dialog` (centred by default at viewport centre). One generic `TimelineEventDialog` component, with a kind-specific renderer map.
 
-1. **"Vanguard only" is undefined.** `Lumi Memory` and `Tuesday Morning Brief` are gated to "Vanguard," but Vanguard is not a designation in `tiers.ts`. Workspace knowledge still references Vanguard as the legacy paid tier name. Decide one of:
-   - Re-gate to **Operator+** (next premium individual tier above Practitioner), or
-   - Re-gate to **Practitioner+** (broader access, faster habit formation).
-   Recommendation: **Practitioner+ for Lumi Memory** (it is the moat — every paid reader needs it) and **Operator+ for Tuesday Morning Brief** (per-user generation cost).
+**Kind-specific dialog content** (keyed off `event.kind`):
 
-2. **Team / Scale / Enterprise / Strategic Partner not enumerated.** Matrix stops at "Vanguard." Inheritance is implied but ambiguous for pooled tiers — especially Lumi Memory (personal artifact) on a shared seat pool. Decide: memory is **per-seat**, not pooled.
-
-3. **"Operator+ for unlimited" Situation Room.** Operator is capped at 100 Lumi/month, not unlimited. Either remove "unlimited" wording or define the Practitioner cap (e.g., 5 Situation Rooms/mo) and let Operator inherit the pool ceiling.
-
----
-
-### B. Lumi-cap accounting (cost / fairness issues)
-
-Every feature that calls Lumi should declare whether it counts against the monthly cap. Today the matrix is silent. Proposed accounting:
-
-| Feature | Counts against Lumi cap? | Notes |
+| Kind | Dialog title | Body |
 |---|---|---|
-| Lumi Debrief | Yes | Free 1/mo conflicts with Reader's 1/week ceiling — pick one accounting axis. |
-| Tuesday Brief | No (system push) | Generation cost absorbed by editorial budget. |
-| Weekly Check-In | No (3 short Q/A) | Or count as 1 session. |
-| Framework Extractor | Yes | 1 session per extract. |
-| Situation Room | Yes | Multi-turn; count as 1 per opened room. |
-| Archive Intelligence | Yes | RAG-heavy — could burn Practitioner's 50/mo in a week. |
-| Deep Research | Yes (heavy) | Count as 5 sessions or expose a separate "Research credit." |
-| Lumi Draft | Yes | 1 per draft. |
-| 5-min Brief Toggle | **Conflict** | Doc gates as Free; uses Lumi. Either pre-render briefs at publish time (no per-user call) or move to Practitioner+. |
-| Ask Lumi on annotation | Yes | 1 per thread. |
-| Personalised Reading Path | No (weekly batch) | Pre-computed, not on-demand. |
-| Your Benchmark Position | No (interp paragraph cached) | One-shot per submission. |
+| `lumi.run.tagged` | Tree heading | Eyebrow (cleaned tree.eyebrow), tree blurb, tagged stakeholder, "Open Lumi run →" link to `/agent/response/$runId` using `payload.run_id` |
+| `meeting.new` / `cadence.mom` / `qbr` / `leadership.connect` / `exec.sync` | Payload title | Date, details, attendee/stakeholder if in payload |
+| `escalation` | "Escalation" + title | Severity (if any), details, "Open account →" |
+| `expansion.signal` | "Expansion signal" + title | Details, ARR delta if present |
+| `renewal.note` | "Renewal note" + title | Details, renewal date if present |
+| `champion.change` | "Champion change" | From/To if present, details |
+| `cta.raised` / `cta.completed` | "CTA — <title>" | Owner, due/closed date, details, link to `/csfactors/ctas` |
+| `note` | "Note" | Details (whitespace-preserved) |
+| `field.edit` | "Field edit" | Field name, before → after (read-only) |
+| `qbr.override` | "QBR override" | Before/after score + reason |
+| _fallback_ | Label | Pretty-printed JSON payload (last-resort, behind a `<details>`) |
 
----
+All dialogs share a header (icon, tinted by `TINT_CLASS[vector.tint]`, eyebrow label, occurred_at) and a footer with a close button. No edit/delete inside the dialog — keep delete on the row (only for owner).
 
-### C. Free-tier overreach
+**Visibility:** the timeline list itself is already gated by `listAccountEvents`. The new dialog is purely client-side rendering of already-fetched events, so anyone who can see the account dashboard sees the same detail. No new server function, no new RLS.
 
-The current matrix gives Free more than the canonical Reader tier can support:
+**No payload migration** required — `payload.run_id` and `payload.node_id` are already written by `tagQRunToAccount` (lines 407–413 in `src/lib/q-agent.functions.ts`). Older rows without `node_id` fall back to the existing label.
 
-- **Inline annotation (Free: highlight + note)** — requires per-user persisted workspace storage; Reader tier does not currently include a workspace. Either ship a minimal annotation store for Reader or move annotation to Practitioner+.
-- **5-min Brief Toggle (Free)** — Lumi call on a tier capped at 1 session/week (see B).
-- **Operator Profile onboarding (All tiers)** — visitors (unauthenticated) cannot have a profile. Either trigger on first sign-up (Reader+) or capture anonymously and bind on auth.
-- **Dispatch Reactions (All tiers)** — fine, but Reader contributions feed editorial dashboard; confirm anonymisation rules.
-- **Operator Index read (Free)** — fine, but Reader cannot contribute (Check-In is Practitioner+), so the index aggregate excludes the Free base. Acceptable, document explicitly.
+## 2. Homepage card under the headline — mobile render fix
 
----
+**Target:** the Team/Scale/Enterprise summary card (`src/routes/index.tsx` lines 700–722) containing the *Team Pulse / MAP engine / Workspace* buttons. On mobile the row uses `flex items-center justify-between gap-4 flex-wrap` so the three pills overflow / clip beside the text block.
 
-### D. Cross-feature dependency edges
+**Fix:** restructure to mobile-first stack, promote to row at `sm:`:
 
-- **Lumi Memory** is a prerequisite for Tuesday Brief, Situation Room, Personalised Reading Path, Your Benchmark Position (interpretation), Lumi Draft (voice tuning). Any tier that unlocks these without Memory will feel generic. Implication: Memory must be gated **no higher** than the lowest-gated dependent (Framework Extractor / Annotation Ask Lumi at Practitioner+). Confirms recommendation A.1.
-- **Operator Debate** publishes a community artifact authored by Practitioner+ pairs. Reader read access requires moderation surface — not yet planned.
-- **Board-ready PDF (Practitioner+)** overlaps in name with **Scale tier's "Quarterly branded benchmark PDF"**. Different artifact (per-dispatch export vs. quarterly benchmark report); rename one to avoid pricing-page confusion.
-- **Audio mode (Practitioner+)** has TTS cost per dispatch per listener. Define a per-tier listen cap or pre-render once per voice per dispatch.
-- **Deep Research (Operator+)** on pooled tiers (Team/Scale/Enterprise) — token-heavy; one user could drain the pool. Recommend a per-seat soft cap.
-
----
-
-### E. Proposed corrected matrix (to replace lines 3095–3119)
-
-```
-Feature                        | Reader      | Practitioner    | Operator        | Team/Scale/Ent (per seat) | Strategic
-Lumi Debrief                   | 1 / month*  | unlimited       | unlimited       | unlimited                 | unlimited
-Lumi Memory                    | —           | ✅              | ✅              | ✅ (per seat, not pooled) | ✅
-Tuesday Morning Brief          | —           | —               | ✅              | ✅                        | ✅
-Lumi Framework Extractor       | —           | ✅ (1 cap unit) | ✅              | ✅                        | ✅
-Lumi Situation Room            | —           | 5 / month       | within 100 cap  | within pool               | unlimited
-Lumi Weekly Check-In           | —           | ✅ (uncounted)  | ✅              | ✅                        | ✅
-Inline annotation              | highlight+note (requires Reader workspace) | + Ask Lumi | + Ask Lumi | + Ask Lumi | + Ask Lumi
-Audio mode                     | —           | 4 dispatches/mo | unlimited       | unlimited                 | unlimited
-5-min brief toggle             | ✅ (pre-rendered) | ✅          | ✅              | ✅                        | ✅
-Live benchmark callouts        | render      | + drill-down    | + drill-down    | + drill-down              | + drill-down
-Board-ready PDF (per dispatch) | —           | ✅              | ✅              | ✅                        | ✅
-Operator profile onboarding    | ✅ (on sign-up) | ✅           | ✅              | ✅                        | ✅
-Personalised reading path      | —           | ✅              | ✅              | ✅                        | ✅
-Your benchmark position        | —           | ✅              | ✅              | ✅                        | ✅
-Dispatch reactions             | ✅          | ✅              | ✅              | ✅                        | ✅
-Operator Debate                | read        | participate     | participate     | participate               | participate
-Operator Index                 | read        | read+contribute | read+contribute | read+contribute           | read+contribute
-Deep Research mode             | —           | —               | ✅ (5 cap units)| ✅ (soft per-seat cap)    | ✅
-Archive Intelligence           | —           | ✅              | ✅              | ✅                        | ✅
-Lumi Draft                     | —           | ✅              | ✅              | ✅                        | ✅
-* Lumi Debrief on Reader competes with Reader's 1-session/week ceiling — choose one accounting axis.
+```text
+<div className="grid grid-cols-1 gap-3 sm:flex sm:items-center sm:justify-between sm:flex-wrap">
+  <div className="min-w-0">...eyebrow + sentence...</div>
+  <div className="flex flex-wrap gap-2 sm:gap-3">...three pills...</div>
+</div>
 ```
 
----
+Add `min-w-0` to the text block and `whitespace-nowrap` to each pill so labels never wrap mid-word. No business logic touched.
 
-### F. Edge cases to document inline
+If the user actually meant the four-card grid above (AI Readiness / CSFactors / Workspace / Decision Canvas, lines 115–233), I'll confirm during build — that grid is already `md:grid-cols-2` and renders fine on the 400px viewport. The Pulse/Map/Workspace wording matches only the team summary card, so that's the assumed target.
 
-1. **Anonymous / logged-out visitors** — which features render at all (5-min brief, reactions, callouts)?
-2. **Trial / lapsed subscribers** — does Memory persist or freeze on downgrade? Recommend freeze + read-only access for 30 days.
-3. **Team seat downgrade** — Memory artifact ownership when a seat is removed.
-4. **GDPR delete** — cascading from Memory into Operator Index aggregate (anonymisation must survive deletion).
-5. **Admin / impersonation** — admins viewing as a reader should not write to that reader's Memory.
-6. **Pooled Lumi exhaustion** — Team/Scale/Enterprise pool drained mid-month: which features degrade first (Deep Research → Situation Room → Draft → Debrief)?
-7. **Free reader hitting weekly cap mid-Debrief** — graceful upgrade nudge, not a hard cut.
-8. **Audio mode language fallback** — multilingual voices (mem://product/prd-v3 §Lumi Multilingual) interact with the two-voice (Analytical/Witty) toggle — define matrix.
-9. **Operator Debate moderation** — Free readers see Practitioner+ authored content; abuse / takedown path is undefined.
-10. **Editorial overrides** — any feature should be flag-toggleable per-dispatch (e.g. suppress Debrief on light essays).
+## 3. Site header — mobile portrait alignment (login button + dark toggle clipped)
 
----
+**File:** `src/components/site/SiteHeader.tsx` (lines 64–138).
 
-### Scope of change if approved
+**Root cause:** at narrow widths the wordmark *"The CS Quarterly."* is `text-xl` and `whitespace-nowrap`. Combined with `gap-3` and the right-cluster (LanguageSwitcher + ThemeToggle + Sign-in/avatar), total intrinsic width exceeds the viewport, pushing the right edge off-screen. There's no `min-w-0` on the logo, no shrink rules, and the cluster has no flex-shrink containment.
 
-Single file edit: `docs/CS-Quarterly-Build-Bible.md`.
-- Replace tier-gating table at lines 3095–3119 with the corrected matrix above.
-- Update Lumi Memory and Tuesday Morning Brief gating lines (2930, 2938) to remove "Vanguard."
-- Append a new "Edge cases & open questions" subsection after line 3131.
-- Leave the feature cards, indispensability ladder, and build sequence untouched.
+**Fixes (portrait-only — keep landscape untouched):**
 
-No code, components, routes, server functions, migrations, env vars, or memory writes.
+- Wrap the nav in `grid-cols-[minmax(0,1fr)_auto] sm:flex sm:items-center sm:justify-between` so on mobile portrait the logo column gets a real `minmax(0,1fr)` track and the cluster is `auto` and `shrink-0`. From `sm:` upward, revert to the current flex layout (landscape mobile and tablet ≥ 640px is unchanged).
+- Logo: add `min-w-0` to the `<Link>` and `truncate` to the inner span — landscape uses `sm:` overrides to keep `whitespace-nowrap` and the larger size.
+- Right cluster: wrap in a `shrink-0 flex items-center gap-3 md:gap-4` container. Add `gap-2` on the smallest breakpoint, and reduce LanguageSwitcher/ThemeToggle padding only at `max-sm` via existing utility classes (no component-internal edits if avoidable — confirm at build).
+- Sign-in pill keeps `shrink-0 whitespace-nowrap` and gets slightly tighter horizontal padding (`px-2`) at portrait.
+
+All landscape rules use `sm:` upward, so 640px+ (which covers landscape phones and tablets) is byte-identical to today.
+
+## 4. Decision Canvas — selecting a tree scrolls past the wheel
+
+**File:** `src/routes/agent.framework.tsx` line 89.
+
+**Bug:** after selecting a tree, the code calls
+`wheelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })`.
+With `block: "start"` the wheel's top edge snaps to the viewport top — on mobile and short desktops this puts the wheel's bottom past the fold so the page appears scrolled to the bottom.
+
+**Fix:** change to `block: "center", inline: "center"` so the wheel is centred in the viewport. Also guard for short viewports — if the wheel's height exceeds the viewport, fall back to `block: "start"` with a small top offset so the eyebrow/title is still visible:
+
+```text
+const el = wheelRef.current;
+const vh = window.innerHeight;
+const rect = el.getBoundingClientRect();
+el.scrollIntoView({
+  behavior: "smooth",
+  block: rect.height > vh - 80 ? "start" : "center",
+});
+```
+
+Apply the same change everywhere `wheelRef.scrollIntoView` is called (search the file). No structural / layout changes to the wheel itself.
+
+## Files touched (build phase)
+
+- `src/components/csfactors/AccountTimeline.tsx` — clickable rows, dialog, kind-specific renderers
+- `src/components/csfactors/TimelineEventDialog.tsx` (new) — kind-routed detail dialog
+- `src/routes/index.tsx` — Team summary card responsive layout
+- `src/components/site/SiteHeader.tsx` — mobile portrait grid + min-w-0/shrink-0 rules
+- `src/routes/agent.framework.tsx` — `scrollIntoView` block: "center"
+
+## Out of scope
+
+- No new server functions, migrations, or RLS changes.
+- No copy or translation changes outside what's needed for the dialog header labels (reuse existing `VECTORS[].label`).
+- No design-system token changes; reuse `TINT_CLASS`, shadcn `Dialog`, mono eyebrow style.
+- Landscape header layout (≥ 640px) untouched.
+
+Used the redesign skill's anchor / pin-taste discipline only to scope what changes — no new visual directions needed because every fix is a deterministic correction, not a styling refresh.

@@ -16,6 +16,9 @@ import {
   listAccountEvents, logAccountEvent, deleteAccountEvent, deleteAccountEventsByKind,
   type CSAccountEvent,
 } from "@/lib/csfactors.functions";
+import { getTree, type TreeId } from "@/lib/q-trees";
+import { TimelineEventDialog } from "@/components/csfactors/TimelineEventDialog";
+
 
 type Vector = {
   kind: string;
@@ -84,9 +87,13 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
   const [when, setWhen] = useState(() => new Date().toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
 
+  // Detail dialog state
+  const [openEvent, setOpenEvent] = useState<CSAccountEvent | null>(null);
+
   // Filter state
   const [filterKinds, setFilterKinds] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
+
 
   // Kinds present in this account's history (for filter chips).
   const presentKinds = useMemo(() => {
@@ -336,19 +343,53 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
           </p>
         ) : (
           <ol className="relative border-l border-border ml-2 space-y-4">
-            {filteredEvents.map((e) => <TimelineItem key={e.id} event={e} onDelete={remove} />)}
+            {filteredEvents.map((e) => (
+              <TimelineItem key={e.id} event={e} onDelete={remove} onOpen={setOpenEvent} />
+            ))}
           </ol>
         )}
       </div>
+
+      <TimelineEventDialog
+        event={openEvent}
+        vector={openEvent ? describe(openEvent.kind).vector : null}
+        label={openEvent ? describe(openEvent.kind).label : ""}
+        open={!!openEvent}
+        onOpenChange={(o) => { if (!o) setOpenEvent(null); }}
+      />
     </div>
   );
 }
 
-function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (id: string) => void }) {
+
+function TimelineItem({
+  event,
+  onDelete,
+  onOpen,
+}: {
+  event: CSAccountEvent;
+  onDelete: (id: string) => void;
+  onOpen: (e: CSAccountEvent) => void;
+}) {
   const { vector, label } = describe(event.kind);
   const Icon = vector.icon;
-  const payload = (event.payload ?? {}) as { title?: string; details?: string; label?: string };
-  const title = payload.title || payload.label || label;
+  const payload = (event.payload ?? {}) as {
+    title?: string;
+    details?: string;
+    label?: string;
+    node_id?: string;
+    stakeholder?: string | null;
+  };
+
+  // Special-case lumi.run.tagged: show the tree heading (and stakeholder) instead of the generic label.
+  let title = payload.title || payload.label || label;
+  if (event.kind === "lumi.run.tagged") {
+    const treeIdMatch = payload.node_id?.match(/^(T\d+)/);
+    const tree = treeIdMatch ? getTree(treeIdMatch[1] as TreeId) : undefined;
+    if (tree) {
+      title = payload.stakeholder ? `${tree.title} · ${payload.stakeholder}` : tree.title;
+    }
+  }
   const canDelete = !!KIND_INDEX[event.kind];
 
   return (
@@ -362,17 +403,24 @@ function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (i
         <Icon className="h-2.5 w-2.5" />
       </span>
       <div className="flex items-baseline justify-between gap-3">
-        <div className="min-w-0">
+        <button
+          type="button"
+          onClick={() => onOpen(event)}
+          className="min-w-0 text-left flex-1 group/row rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+          aria-label={`Open details for ${title}`}
+        >
           <div className="font-mono uppercase tracking-[0.18em] text-[10px] text-muted-foreground">
             {label}
           </div>
-          <div className="text-sm text-foreground/90 break-words">{title}</div>
+          <div className="text-sm text-foreground/90 break-words group-hover/row:text-accent transition-colors">
+            {title}
+          </div>
           {payload.details && (
-            <p className="text-xs text-foreground/70 mt-1 whitespace-pre-wrap leading-relaxed">
+            <p className="text-xs text-foreground/70 mt-1 whitespace-pre-wrap leading-relaxed line-clamp-2">
               {payload.details}
             </p>
           )}
-        </div>
+        </button>
         <div className="flex items-center gap-1 shrink-0">
           <time className="font-mono text-[10px] text-muted-foreground tabular-nums">
             {new Date(event.occurred_at).toLocaleDateString(undefined, {
@@ -394,3 +442,4 @@ function TimelineItem({ event, onDelete }: { event: CSAccountEvent; onDelete: (i
     </li>
   );
 }
+
