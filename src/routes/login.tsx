@@ -7,6 +7,9 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { PERSONA_OPTIONS, type Persona } from "@/hooks/usePersona";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" && search.redirect.startsWith("/") ? search.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign in, The CS Quarterly" },
@@ -24,6 +27,8 @@ function LoginPage() {
   const [persona, setPersona] = useState<Persona | "">("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { redirect } = Route.useSearch();
+
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +62,7 @@ function LoginPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Signed in.");
-        navigate({ to: "/" });
+        navigate({ to: redirect ?? "/" });
       }
     } catch (err) {
       toast.error((err as Error).message || "Authentication failed.");
