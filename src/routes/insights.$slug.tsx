@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Glasses, Smile, X } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { BackButton } from "@/components/site/BackButton";
@@ -105,7 +105,7 @@ function renderMarkdownLite(body: string) {
     if (h3) {
       return (
         <h3 key={i} className="font-display text-2xl md:text-3xl mt-12 mb-4 leading-tight tracking-tight">
-          {h3[1].trim()}
+          {renderInline(h3[1].trim())}
         </h3>
       );
     }
@@ -113,7 +113,7 @@ function renderMarkdownLite(body: string) {
     if (h2) {
       return (
         <h2 key={i} className="font-display text-3xl md:text-4xl mt-14 mb-6 leading-tight tracking-tight">
-          {h2[1].trim()}
+          {renderInline(h2[1].trim())}
         </h2>
       );
     }
@@ -121,7 +121,7 @@ function renderMarkdownLite(body: string) {
     if (h1) {
       return (
         <h2 key={i} className="font-display text-3xl md:text-4xl mt-14 mb-6 leading-tight tracking-tight">
-          {h1[1].trim()}
+          {renderInline(h1[1].trim())}
         </h2>
       );
     }
@@ -133,8 +133,10 @@ function renderMarkdownLite(body: string) {
         </ol>
       );
     }
-    if (/^[-*]\s/m.test(p)) {
-      const items = p.split("\n").map((l) => l.replace(/^\s*[-*]\s+/, ""));
+    // Bullet: hyphen, or a single asterisk NOT followed by another asterisk
+    // (so "**Bold thing**" at line-start is never mis-detected as a bullet).
+    if (/^(?:-|\*(?!\*))\s/m.test(p)) {
+      const items = p.split("\n").map((l) => l.replace(/^\s*(?:-|\*(?!\*))\s+/, ""));
       return (
         <ul key={i} className="list-disc pl-6 space-y-2 text-lg leading-relaxed my-6 marker:text-secondary-accent">
           {items.map((it, j) => (<li key={j}>{renderInline(it)}</li>))}
@@ -149,16 +151,43 @@ function renderMarkdownLite(body: string) {
   });
 }
 
-function renderInline(text: string) {
-  // Minimal bold rendering for **...**
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) =>
-    /^\*\*[^*]+\*\*$/.test(part) ? (
-      <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
-    ) : (
-      <span key={i}>{part}</span>
-    ),
-  );
+// Tolerant inline renderer:
+//   ***x*** → <strong><em>x</em></strong>
+//   **x**   → <strong>x</strong>  (non-greedy, allows inner single *)
+//   *x*     → <em>x</em>          (only when not adjacent to another *)
+// Any surviving stray ** or lone * (unbalanced authoring) is stripped so it
+// never renders as a literal glyph in the article body.
+function renderInline(text: string): React.ReactNode {
+  type Token = { type: "text" | "bi" | "b" | "i"; value: string };
+  const tokens: Token[] = [];
+  let rest = text;
+  // Order matters: triple, then double, then single.
+  const patterns: { type: Token["type"]; re: RegExp }[] = [
+    { type: "bi", re: /\*\*\*([^\n*][\s\S]*?[^\n*]|[^\n*])\*\*\*/ },
+    { type: "b", re: /\*\*([\s\S]+?)\*\*/ },
+    { type: "i", re: /(?<![\*\w])\*(?!\*)([^*\n]+?)\*(?!\*)/ },
+  ];
+  outer: while (rest.length) {
+    for (const { type, re } of patterns) {
+      const m = rest.match(re);
+      if (m && m.index !== undefined) {
+        if (m.index > 0) tokens.push({ type: "text", value: rest.slice(0, m.index) });
+        tokens.push({ type, value: m[1] });
+        rest = rest.slice(m.index + m[0].length);
+        continue outer;
+      }
+    }
+    tokens.push({ type: "text", value: rest });
+    break;
+  }
+  // Strip stray ** or lone * from text tokens (unbalanced authoring residue).
+  const clean = (s: string) => s.replace(/\*\*+/g, "").replace(/(^|\s)\*(\s|$)/g, "$1$2");
+  return tokens.map((t, i) => {
+    if (t.type === "bi") return <strong key={i} className="font-semibold text-foreground"><em>{t.value}</em></strong>;
+    if (t.type === "b") return <strong key={i} className="font-semibold text-foreground">{t.value}</strong>;
+    if (t.type === "i") return <em key={i}>{t.value}</em>;
+    return <span key={i}>{clean(t.value)}</span>;
+  });
 }
 
 type Tone = "mckinsey" | "wodehouse";
