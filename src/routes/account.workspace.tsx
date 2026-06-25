@@ -265,10 +265,10 @@ function WorkspacePageInner() {
             Your Workspace<span className="text-accent">.</span>
           </h1>
           <button
-            onClick={() => exportWorkspacePDF({ links, assets, annotations })}
+            onClick={() => setExportOpen(true)}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors min-h-[44px]"
           >
-            <Download className="w-3.5 h-3.5" /> Export Workspace to PDF
+            <Download className="w-3.5 h-3.5" /> Export to branded PDF
           </button>
         </div>
         <p className="text-foreground/65 mb-6 max-w-2xl">
