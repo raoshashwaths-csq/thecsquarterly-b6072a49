@@ -546,22 +546,23 @@ function ResultsState({
                       to="/pricing"
                       className="px-6 py-3 bg-accent text-accent-foreground font-mono text-[11px] uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-opacity"
                     >
-                      $29/mo Vanguard
+                      $39/mo Practitioner
                     </Link>
                   </div>
                   <div className="mt-4 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
-                    Vanguard includes all diagnostics + $500 in playbooks
+                    Practitioner unlocks the full blueprint for every diagnostic + all six Codex playbooks
                   </div>
                 </div>
               </>
             )}
           </div>
 
-          {isUnlocked && (
-            <button className="mt-6 w-full px-6 py-4 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-opacity">
-              Download full blueprint (PDF)
-            </button>
-          )}
+          <button
+            onClick={() => downloadDiagnosticPdf(buildPdfInput(exposure, subs, bucket, isUnlocked))}
+            className="mt-6 w-full px-6 py-4 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.2em] font-bold hover:opacity-90 transition-opacity"
+          >
+            {isUnlocked ? "Download branded PDF (score + blueprint)" : "Download branded score PDF"}
+          </button>
         </div>
       </div>
 
