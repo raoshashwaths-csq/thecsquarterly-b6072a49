@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
+import { ExportDialog } from "@/components/site/ExportDialog";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
