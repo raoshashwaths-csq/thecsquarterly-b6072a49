@@ -145,9 +145,19 @@ function ResponsePage() {
                 </div>
               )}
 
-              <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
-              <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
-              <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+              {run.isOwner || !!user || isRunUnlocked(run.id) ? (
+                <>
+                  <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+                  <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+                  <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                </>
+              ) : (
+                <SharedRunGate runId={run.id}>
+                  <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+                  <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+                  <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                </SharedRunGate>
+              )}
 
               {run.isOwner && node && (
                 <RunAccountTagger
