@@ -3154,6 +3154,27 @@ Do not build features in level N until level N−1 is shipped and instrumented.
 
 ---
 
+### Edge cases & open questions
+
+1. **Anonymous / logged-out visitors.** Which engagement features render at all? Default: 5-min brief, dispatch reactions, and live benchmark callout chips render publicly; all Lumi surfaces, annotation, and Operator Profile require sign-in.
+2. **Trial / lapsed subscribers.** Does Lumi Memory persist or freeze on downgrade? Recommendation: freeze + read-only access for 30 days, then archive (recoverable on re-subscribe within 12 months).
+3. **Team seat downgrade.** Memory artifact ownership when a seat is removed from a Team/Scale/Enterprise pool — Memory is per-seat. Recommendation: export-on-removal, then delete.
+4. **GDPR delete.** Cascading delete from Memory into Operator Index aggregate — anonymisation must survive deletion (no re-identifiable joins back to deleted user_id).
+5. **Admin / impersonation.** Admins viewing as a reader must NOT write to that reader's Memory or Check-In history. Read-only impersonation flag required.
+6. **Pooled Lumi exhaustion.** Team / Scale / Enterprise pool drained mid-month: degrade order — Deep Research → Situation Room → Draft → Debrief. Tuesday Brief and Weekly Check-In never gated by pool (system / lightweight).
+7. **Free reader hitting weekly cap mid-Debrief.** Render upgrade nudge with the Debrief preview, do not hard-cut the conversation mid-turn.
+8. **Audio mode × multilingual voices.** The Analytical/Witty toggle interacts with the multilingual voice matrix (mem://product/prd-v3 §Lumi Multilingual). Define explicit matrix per supported language; fall back to English Analytical when a tone is unavailable in the chosen language.
+9. **Operator Debate moderation.** Free readers see Practitioner+ authored debate artifacts — abuse / takedown path is undefined. Need editorial moderation queue before launch.
+10. **Editorial overrides.** Every engagement feature must be toggleable per-dispatch (e.g. suppress Debrief on light essays, suppress Extractor on opinion pieces).
+11. **Lumi Memory dependency chain.** Tuesday Brief, Situation Room, Personalised Reading Path, Benchmark interpretation, and Lumi Draft all degrade to "generic" without Memory. Never gate Memory higher than the lowest-gated dependent (currently Practitioner+ Framework Extractor / Annotation Ask Lumi). Already satisfied by the corrected matrix above.
+12. **Naming overlap.** "Board-ready PDF (per dispatch)" at Practitioner+ vs. Scale tier's "Quarterly branded benchmark PDF" — different artifacts. Pricing page copy must rename one (suggested: "Dispatch PDF export" vs. "Quarterly benchmark report") before either ships.
+13. **Operator Index aggregate.** Reader cannot contribute (Weekly Check-In is Practitioner+), so the aggregate represents the paid base only. Document this explicitly on the Index surface — not the full readership.
+14. **Operator Profile for visitors.** Cannot have a profile pre-auth. Capture intent anonymously (cookie / localStorage) on first visit and bind on sign-up; otherwise trigger profile flow on Reader sign-up.
+15. **Audio mode TTS cost.** Pre-render once per voice per dispatch at publish time; do not regenerate per listener. Caches on CDN.
+16. **Deep Research on pooled tiers.** Single seat can drain a Team pool. Enforce a per-seat soft cap (e.g. Team: 50 research units / seat / month) on top of the shared pool.
+
+---
+
 
 ## IMMEDIATE NEXT 5 (paste these in order)
 
