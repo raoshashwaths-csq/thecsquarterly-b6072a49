@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useDiagnosticFlow, useCountUp } from "@/hooks/useDiagnosticFlow";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
+import { LeadCaptureGate } from "@/components/diagnostics/LeadCaptureGate";
+import { canonicalUrl } from "@/lib/canonical-url";
+import { downloadDiagnosticPdf } from "@/lib/diagnostic-pdf";
 
 export const Route = createFileRoute("/diagnostics/champion-dependency")({
   head: () => ({
