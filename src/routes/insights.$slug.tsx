@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Glasses, Smile, X } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { BackButton } from "@/components/site/BackButton";
