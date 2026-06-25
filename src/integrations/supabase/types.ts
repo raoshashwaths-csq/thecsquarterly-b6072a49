@@ -512,6 +512,39 @@ export type Database = {
           },
         ]
       }
+      diagnostic_leads: {
+        Row: {
+          company: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          segment: string | null
+          slug: string
+          title: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          segment?: string | null
+          slug: string
+          title: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          segment?: string | null
+          slug?: string
+          title?: string
+        }
+        Relationships: []
+      }
       directory_profiles: {
         Row: {
           bio: string | null
