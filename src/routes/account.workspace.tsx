@@ -336,11 +336,12 @@ function WorkspacePageInner() {
 
         <div className="mt-8 will-change-transform">
           {tab === "history" && <HistoryPanel query={query} />}
-          {tab === "highlights" && <HighlightsPanel query={query} annotations={annotations} links={links} assets={assets} />}
+          {tab === "highlights" && <HighlightsPanel query={query} annotations={annotations} links={links} assets={assets} onExport={() => setExportOpen(true)} />}
           {tab === "ledger" && <LedgerPanel query={query} links={links} assets={assets} />}
         </div>
       </main>
       <SiteFooter />
+      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} />
     </div>
   );
 }
