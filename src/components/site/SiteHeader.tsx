@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { LanguageSwitcher } from "@/components/site/LanguageSwitcher";
+import { ExportDialog } from "@/components/site/ExportDialog";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
@@ -22,6 +24,7 @@ import { Search, LayoutGrid, Compass } from "lucide-react";
 export function SiteHeader() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [exportOpen, setExportOpen] = useState(false);
   const { canUniversalSearch, canWorkspace } = useEntitlements();
   const { isRecruiterOrLead } = usePersona();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -168,6 +171,12 @@ export function SiteHeader() {
                     {t("menu.yourWorkspace")}
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(e) => { e.preventDefault(); setExportOpen(true); }}
+                  className="font-mono text-xs uppercase tracking-widest"
+                >
+                  Export PDF
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/account" className="font-mono text-xs uppercase tracking-widest">
                     {t("menu.account")}
@@ -232,6 +241,7 @@ export function SiteHeader() {
           )}
         </div>
       </nav>
+      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} />
     </header>
   );
 }

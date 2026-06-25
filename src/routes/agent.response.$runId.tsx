@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { getQRun, setQRunShared, type RunZones } from "@/lib/q-agent.functions";
+import { getSharedQRun } from "@/lib/shared-run.functions";
+import { useAuth } from "@/hooks/useAuth";
 import { getNode, breadcrumbFor } from "@/lib/q-trees";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { RunAccountTagger } from "@/components/agent/RunAccountTagger";
 import { QMark } from "@/components/site/QMark";
 import { Switch } from "@/components/ui/switch";
+import { SharedRunGate, isRunUnlocked } from "@/components/site/SharedRunGate";
 
 export const Route = createFileRoute("/agent/response/$runId")({
   head: () => ({
@@ -31,20 +34,32 @@ type Run = {
 function ResponsePage() {
   const { runId } = Route.useParams();
   const fetchRun = useServerFn(getQRun);
+  const fetchShared = useServerFn(getSharedQRun);
   const updateShared = useServerFn(setQRunShared);
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     let alive = true;
     setRun(null); setError(null);
-    fetchRun({ data: { runId } })
-      .then((r) => { if (alive) setRun(r as Run); })
+    const loader = user
+      ? fetchRun({ data: { runId } }).then((r) => r as Run)
+      : fetchShared({ data: { runId } }).then((r) => ({
+          ...r,
+          isOwner: false,
+          account_id: null,
+          tagged_stakeholder: null,
+          tagged_at: null,
+        }) as Run);
+    loader
+      .then((r) => { if (alive) setRun(r); })
       .catch((e) => { if (alive) setError((e as Error).message); });
     return () => { alive = false; };
-  }, [runId, fetchRun]);
+  }, [runId, fetchRun, fetchShared, user, authLoading]);
 
   const node = run ? getNode(run.node_id) : null;
   const crumb = run ? breadcrumbFor(run.node_id) : [];
@@ -130,9 +145,19 @@ function ResponsePage() {
                 </div>
               )}
 
-              <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
-              <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
-              <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+              {run.isOwner || !!user || isRunUnlocked(run.id) ? (
+                <>
+                  <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+                  <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+                  <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                </>
+              ) : (
+                <SharedRunGate runId={run.id}>
+                  <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+                  <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+                  <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                </SharedRunGate>
+              )}
 
               {run.isOwner && node && (
                 <RunAccountTagger
