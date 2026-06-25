@@ -1,58 +1,52 @@
-# Diagnostics gating, branded share PDFs, and canonical share URLs
+# Plan — Add Engagement Features to the Build Bible (planning only)
 
-## 1. Lead-capture gate on every diagnostic
+Append a new top-level section to `docs/CS-Quarterly-Build-Bible.md`, just above the final "IMMEDIATE NEXT 5" block, capturing the 19 engagement features from `csq_engagement_features.html`. **No code, components, routes, tables, or migrations.** Status for every entry: `⬜ NOT STARTED`.
 
-**Pattern**: The AI Readiness survey already captures name / work email / company / title / segment before showing questions (`diagnostics.ai-readiness.survey.tsx` lines 40–155). We promote that to a shared component and reuse it.
+## Section structure
 
-- New `src/components/diagnostics/LeadCaptureGate.tsx` — extracts the existing AI Readiness gate UI (name, work email, company, title, segment, optional HCM toggle) and emits `onUnlock({ name, email, company, title, segment })`.
-- Refactor `diagnostics.ai-readiness.survey.tsx` to consume the shared gate (no UX change).
-- Wrap `diagnostics.champion-dependency.tsx` in the same gate — survey/questions only render after unlock. Persist the captured lead via the same server fn AI Readiness uses (`submitAiReadiness` writes a lead row; for Champion we add a thin `submitChampionLead` server fn that inserts into `diagnostic_leads` keyed by `diagnostic_slug`).
-- Document the pattern at the top of `LeadCaptureGate.tsx` so future diagnostics (e.g., the next one added under `/diagnostics`) plug in the same way. Add a short note to the Build Bible's Diagnostics section.
+`## Reader Engagement Features (Planned)` with a short preamble noting source (uploaded brief), the indispensability levels (Useful → Trusted → Habitual → Irreplaceable), the design principle ("Lumi must always have something to say first"), and that memory is the moat.
 
-## 2. Fix stale pricing in Champion Dependency results
+Then 5 sub-sections matching the brief's tabs. Each feature gets a compact card: **Name**, one-liner, badges (category / impact / retention), 2–3 sentence description, "Why it matters" line, tier gating, and a `Status` row.
 
-`diagnostics.champion-dependency.tsx` lines 515–519 hardcode "$29/mo Vanguard" and "$500 in playbooks". Source of truth is `src/lib/tiers.ts`.
+### 1. Lumi as companion
+- Lumi Debrief — post-read conversation trigger (High / Retention; scroll ≥90%; free 1/mo, Vanguard unlimited)
+- Lumi Memory — per-reader profile via semantic recall; viewable/editable in account (GDPR); Vanguard only
+- Tuesday Morning Brief — n8n cron at publish; 3-sentence personalised signpost; Vanguard only
+- Lumi Framework Extractor — one-click structured template from any dispatch
+- Lumi Situation Room — describe live problem → matched dispatches + Socratic coaching; saved as Situation Log
+- Lumi Weekly Check-In — Monday 3-question reset → personalised focus brief
 
-- Replace the hardcoded copy with values pulled from `TIERS` (Practitioner $39 / Operator $89, per current matrix).
-- Audit all diagnostic results screens (AI Readiness results view, share text) for any other stale dollar figures and swap to `tiers.ts` lookups.
+### 2. Reading experience (editorial)
+- In-line annotation — highlight / note / Ask Lumi anchored to passage
+- Audio mode — Analytical vs Witty Lumi narration
+- 5-minute brief vs full dispatch toggle (Lumi-generated brief uses 3-2-1)
+- Live benchmark callouts — inline chips reading `benchmark_aggregates`
+- Board-ready PDF export — branded masthead, live chip snapshot
 
-## 3. Branded PDF share for diagnostic scores
+### 3. Personalisation
+- Operator profile onboarding — 5 conversational questions (role, ACV band, ARR, challenges, segment)
+- Personalised reading path — top 3 dispatches by relevance
+- Your benchmark position — private NRR/payback vs ACV-band cohort with Lumi interpretation
 
-Today the "share" action copies a link to the diagnostic landing page, not the score. We replace it with a CS Quarterly-branded PDF.
+### 4. Community & social
+- Dispatch reactions — single structured signal (4 options incl. "I disagree")
+- Operator Debate — Lumi-facilitated 3-round Socratic argument on contested dispatches
+- The Operator Index — anonymised weekly Operator Pulse from check-in data
 
-- New server fn `src/lib/diagnostic-pdf.functions.ts` → `generateDiagnosticPdf({ slug, scoreId })`. Uses `pdf-lib` (Worker-safe) to compose:
-  - CS Quarterly wordmark header (serif display + colored period), eyebrow mono meta line, paper-grain background tint matching brand tokens.
-  - Score block (numeric + tier label + subscores).
-  - **Free tier**: score + 1-paragraph interpretation + CTA panel "What Vanguard unlocks" listing Practitioner/Operator deltas from `tiers.ts` + canonical link to `https://thecsquarterly.com/pricing`.
-  - **Vanguard / paid tier** (`useSubscriptionTier` rank ≥ practitioner): score + full custom blueprint section (existing Champion remediation plan / AI Readiness 90-day playbook copy) + per-pillar breakdown.
-- Score persistence: write completed diagnostic results to a new `diagnostic_results` row (id, user/email, slug, score, subscores, blueprint payload, created_at) so the PDF can be regenerated and the share link is stable. RLS: owner read by email/user_id; service role for PDF render. Includes GRANTs per project rules.
-- "Share score" button on each results screen now:
-  1. Calls the server fn → returns a signed URL or inline blob.
-  2. Triggers download of `cs-quarterly-{slug}-score.pdf`.
-  3. Secondary action "Copy link" copies the canonical results URL (see §4) rather than the landing page.
+### 5. Depth features
+- Deep Research mode — 5-part structured research brief
+- Archive Intelligence — natural-language Q&A across the full archive
+- Lumi Draft — convert insight into message / email / Slack post
 
-## 4. Canonical share URLs (no lovable.app in shared links)
+## Tier-gating summary table
+Small table mapping each feature to: Free / Practitioner / Operator / Vanguard, per the brief (Memory + Tuesday Brief Vanguard-only; Debrief tiered; rest mostly Practitioner+).
 
-All shareable surfaces currently use `window.location.origin`, which leaks `*.lovable.app` on preview/published.
+## Indispensability ladder + build sequence
+Reproduce the four levels (Useful → Trusted → Habitual → Irreplaceable) and the brief's recommended sequence: Memory + Onboarding first → Debrief + Situation Room → Annotation + Audio → Tuesday Brief + Weekly Check-In → Operator Index + Debate → Deep Research + Draft + Archive Intelligence.
 
-- Add `src/lib/canonical-url.ts` exporting `CANONICAL_ORIGIN = "https://thecsquarterly.com"` and `canonicalUrl(path)`.
-- Replace `window.location.origin` in user-facing share builders:
-  - `diagnostics.champion-dependency.tsx` (line 426)
-  - `csfactors.maps.index.tsx` (line 182) and `csfactors.maps.$id.tsx` (line 50) — MAP public links `/m/{token}`
-  - `agent.response.$runId.tsx` share toggle — canvas response public link
-  - `codex.$slug.tsx` and `csfactors.playbook.$slug.tsx` — playbook share buttons (audit + swap)
-  - Diagnostic results "copy link" (new in §3)
-- Leave OAuth `emailRedirectTo`, Paddle `successUrl`, and other internal-flow URLs on `window.location.origin` — those must match the current host. Only outbound share copy uses the canonical origin.
-
-## Technical notes
-
-- Lead-capture insert uses an authenticated/anon `createServerFn` writing to `public.diagnostic_leads (id, slug, name, email, company, title, segment, created_at)` with RLS allowing service-role writes and owner reads. Migration includes the standard `GRANT` block.
-- `diagnostic_results` migration mirrors the same structure + a `payload jsonb` for blueprint content.
-- PDF generation runs server-side (Worker-compatible) — no `sharp`/`canvas`; `pdf-lib` only. Brand fonts embedded as base64 from `src/assets`.
-- Sitemap and OG metadata unchanged.
+## Backlog index entry
+Add one row to the Standing Rule status table at the end of the bible:
+`| 5-A Reader Engagement Suite | ⬜ NOT STARTED | This document — Reader Engagement Features section |`
 
 ## Out of scope
-
-- No visual redesign of diagnostic landing/result pages beyond the gate insertion and pricing text.
-- No new tiers or pricing changes — only sync stale copy to `tiers.ts`.
-- No changes to Lumi run sharing data model (only the displayed URL string).
+No new files, components, routes, tables, server functions, env vars, migrations, or memory updates. Single file edit: `docs/CS-Quarterly-Build-Bible.md`.
