@@ -87,9 +87,13 @@ export function AccountTimeline({ accountId }: { accountId: string }) {
   const [when, setWhen] = useState(() => new Date().toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
 
+  // Detail dialog state
+  const [openEvent, setOpenEvent] = useState<CSAccountEvent | null>(null);
+
   // Filter state
   const [filterKinds, setFilterKinds] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
+
 
   // Kinds present in this account's history (for filter chips).
   const presentKinds = useMemo(() => {
