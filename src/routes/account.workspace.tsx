@@ -705,7 +705,8 @@ function HighlightsPanel({
   annotations,
   links,
   assets,
-}: { query?: string; annotations: Annotation[]; links: SavedLink[]; assets: SavedAsset[] }) {
+  onExport,
+}: { query?: string; annotations: Annotation[]; links: SavedLink[]; assets: SavedAsset[]; onExport: () => void }) {
   const qc = useQueryClient();
   const remove = useServerFn(deleteAnnotation);
   const q = query.trim().toLowerCase();
