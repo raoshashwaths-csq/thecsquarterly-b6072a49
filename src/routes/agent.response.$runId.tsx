@@ -33,21 +33,35 @@ type Run = {
 
 function ResponsePage() {
   const { runId } = Route.useParams();
+function ResponsePage() {
+  const { runId } = Route.useParams();
   const fetchRun = useServerFn(getQRun);
+  const fetchShared = useServerFn(getSharedQRun);
   const updateShared = useServerFn(setQRunShared);
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     let alive = true;
     setRun(null); setError(null);
-    fetchRun({ data: { runId } })
-      .then((r) => { if (alive) setRun(r as Run); })
+    const loader = user
+      ? fetchRun({ data: { runId } }).then((r) => r as Run)
+      : fetchShared({ data: { runId } }).then((r) => ({
+          ...r,
+          isOwner: false,
+          account_id: null,
+          tagged_stakeholder: null,
+          tagged_at: null,
+        }) as Run);
+    loader
+      .then((r) => { if (alive) setRun(r); })
       .catch((e) => { if (alive) setError((e as Error).message); });
     return () => { alive = false; };
-  }, [runId, fetchRun]);
+  }, [runId, fetchRun, fetchShared, user, authLoading]);
 
   const node = run ? getNode(run.node_id) : null;
   const crumb = run ? breadcrumbFor(run.node_id) : [];
