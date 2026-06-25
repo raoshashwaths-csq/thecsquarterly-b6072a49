@@ -31,6 +31,32 @@ import {
   deleteAnnotation,
   bulkImportWorkspace,
 } from "@/lib/workspace.functions";
+import { getTree, NODES, type TreeId } from "@/lib/q-trees";
+
+function resolveRun(nodeId: string) {
+  const treeId = nodeId.split("-")[0] as TreeId;
+  const tree = getTree(treeId);
+  const path: string[] = [];
+  let cur = NODES.find((n) => n.id === nodeId);
+  while (cur && cur.parentId) {
+    path.unshift(cur.label);
+    const parentId: string = cur.parentId;
+    cur = NODES.find((n) => n.id === parentId);
+  }
+  return { heading: tree?.title ?? "Scenario", breadcrumb: path.join(" · ") };
+}
+
+function pickContextLine(ctx: Record<string, unknown>): string | null {
+  const keys = ["one_sentence_context", "context", "summary", "prompt_context"];
+  for (const k of keys) {
+    const v = ctx?.[k];
+    if (typeof v === "string" && v.trim()) {
+      const s = v.trim();
+      return s.length > 180 ? s.slice(0, 177) + "…" : s;
+    }
+  }
+  return null;
+}
 
 export const Route = createFileRoute("/account/workspace")({
   head: () => ({
