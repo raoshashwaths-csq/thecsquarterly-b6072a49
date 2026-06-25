@@ -241,6 +241,7 @@ export function SiteHeader() {
           )}
         </div>
       </nav>
+      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} />
     </header>
   );
 }
