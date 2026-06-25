@@ -7,6 +7,10 @@ import { QUESTIONS, SCORE_OPTIONS, GAP_FIXES, AGENT_INFO } from "@/lib/survey";
 import type { ScoreResult } from "@/lib/survey";
 import { submitSurvey } from "@/lib/survey.functions";
 import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { downloadDiagnosticPdf } from "@/lib/diagnostic-pdf";
+import { canonicalUrl } from "@/lib/canonical-url";
+import { toast } from "sonner";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
