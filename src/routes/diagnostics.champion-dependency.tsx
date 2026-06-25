@@ -9,6 +9,7 @@ import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 import { LeadCaptureGate } from "@/components/diagnostics/LeadCaptureGate";
 import { canonicalUrl } from "@/lib/canonical-url";
 import { downloadDiagnosticPdf } from "@/lib/diagnostic-pdf";
+import { SharedScoreView } from "@/components/diagnostics/SharedScoreView";
 
 export const Route = createFileRoute("/diagnostics/champion-dependency")({
   head: () => ({
