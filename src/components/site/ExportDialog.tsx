@@ -103,9 +103,9 @@ export function ExportDialog({
         if (i > 0) out.push({ kind: "divider" });
         out.push({
           kind: "prose",
-          eyebrow: w.item_type.toUpperCase(),
-          title: w.title || "Saved article",
-          body: w.snippet || "(No excerpt saved for this item.)",
+          eyebrow: `${w.kind}${w.tag ? ` · ${w.tag}` : ""}`.toUpperCase(),
+          title: w.title || "Saved item",
+          body: w.url || "(Saved reference — open from your workspace for the full source.)",
         });
         return out;
       });
