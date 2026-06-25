@@ -171,6 +171,12 @@ export function SiteHeader() {
                     {t("menu.yourWorkspace")}
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(e) => { e.preventDefault(); setExportOpen(true); }}
+                  className="font-mono text-xs uppercase tracking-widest"
+                >
+                  Export PDF
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/account" className="font-mono text-xs uppercase tracking-widest">
                     {t("menu.account")}
