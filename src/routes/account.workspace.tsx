@@ -619,14 +619,20 @@ function HistoryPanel({ query = "" }: { query?: string }) {
 
   if (runs.isLoading) return <p className="text-muted-foreground">Loading transcripts…</p>;
   const q = query.trim().toLowerCase();
-  const items = (runs.data ?? []).filter((r) => !q || r.node_id.toLowerCase().includes(q) || JSON.stringify(r.context).toLowerCase().includes(q));
+  const enriched = (runs.data ?? []).map((r) => ({ run: r, ...resolveRun(r.node_id) }));
+  const items = enriched.filter(({ run, heading, breadcrumb }) =>
+    !q ||
+    heading.toLowerCase().includes(q) ||
+    breadcrumb.toLowerCase().includes(q) ||
+    JSON.stringify(run.context).toLowerCase().includes(q),
+  );
   if (items.length === 0) {
     return (
       <div className="border border-dashed border-border p-10 text-center">
         <p className="font-mono uppercase tracking-widest text-xs text-muted-foreground mb-2">No transcripts yet</p>
-        <p className="text-foreground/70 mb-4">Run a diagnostic with Q to see it land here.</p>
+        <p className="text-foreground/70 mb-4">Run a diagnostic with Lumi to see it land here.</p>
         <Link to="/agent/framework" className="inline-block px-5 py-3 bg-foreground text-background font-mono uppercase tracking-widest text-xs">
-          Open Q canvas →
+          Open Lumi canvas →
         </Link>
       </div>
     );
@@ -634,8 +640,10 @@ function HistoryPanel({ query = "" }: { query?: string }) {
 
   return (
     <ul className="divide-y divide-border border border-border">
-      {items.map((r) => {
+      {items.map(({ run: r, heading, breadcrumb }) => {
         const isOpen = !!open[r.id];
+        const ctxLine = pickContextLine(r.context);
+        const accountName = typeof r.context?.account_name === "string" ? (r.context.account_name as string) : null;
         return (
           <li key={r.id}>
             <button
@@ -644,25 +652,35 @@ function HistoryPanel({ query = "" }: { query?: string }) {
             >
               {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
               <div className="flex-1 min-w-0">
-                <div className="font-mono uppercase tracking-widest text-xs text-accent">
-                  {r.node_id}
+                <div className="font-display text-base md:text-lg leading-tight truncate">
+                  {heading}
                 </div>
-                <div className="text-sm text-foreground/80 truncate">
+                <div className="text-xs text-muted-foreground truncate mt-0.5">
                   {new Date(r.created_at).toLocaleString()}
+                  {accountName ? <> · {accountName}</> : null}
                 </div>
               </div>
             </button>
             {isOpen && (
-              <div className="px-4 pb-4 pl-11">
-                <pre className="text-xs bg-muted/30 p-3 rounded overflow-x-auto whitespace-pre-wrap font-mono">
-                  {JSON.stringify(r.context, null, 2)}
-                </pre>
+              <div className="px-4 pb-4 pl-11 space-y-3">
+                {breadcrumb && (
+                  <div>
+                    <div className="font-mono uppercase tracking-widest text-[10px] text-muted-foreground mb-1">Path</div>
+                    <div className="text-sm text-foreground/85">{breadcrumb}</div>
+                  </div>
+                )}
+                {ctxLine && (
+                  <div>
+                    <div className="font-mono uppercase tracking-widest text-[10px] text-muted-foreground mb-1">Context</div>
+                    <p className="text-sm text-foreground/80">{ctxLine}</p>
+                  </div>
+                )}
                 <Link
                   to="/agent/response/$runId"
                   params={{ runId: r.id }}
-                  className="inline-block mt-3 font-mono uppercase tracking-widest text-xs underline underline-offset-4 hover:text-accent"
+                  className="inline-block mt-1 px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-[11px] hover:opacity-90"
                 >
-                  Open full response →
+                  See full run →
                 </Link>
               </div>
             )}
