@@ -3094,28 +3094,50 @@ Testing:
 
 ### Tier-gating summary
 
-| Feature | Free | Practitioner | Operator | Vanguard |
-|---|---|---|---|---|
-| Lumi Debrief | 1 / month | unlimited | unlimited | unlimited |
-| Lumi Memory | — | — | — | ✅ |
-| Tuesday Morning Brief | — | — | — | ✅ |
-| Lumi Framework Extractor | — | ✅ | ✅ | ✅ |
-| Lumi Situation Room | — | limited | ✅ | ✅ |
-| Lumi Weekly Check-In | — | ✅ | ✅ | ✅ |
-| In-line annotation | highlight/note | + Ask Lumi | + Ask Lumi | + Ask Lumi |
-| Audio mode | — | ✅ | ✅ | ✅ |
-| 5-min brief toggle | ✅ | ✅ | ✅ | ✅ |
-| Live benchmark callouts | render | + drill-down | + drill-down | + drill-down |
-| Board-ready PDF | — | ✅ | ✅ | ✅ |
-| Operator profile onboarding | ✅ | ✅ | ✅ | ✅ |
-| Personalised reading path | — | ✅ | ✅ | ✅ |
-| Your benchmark position | — | ✅ | ✅ | ✅ |
-| Dispatch reactions | ✅ | ✅ | ✅ | ✅ |
-| Operator Debate | read | participate | participate | participate |
-| Operator Index | read | read + contribute | read + contribute | read + contribute |
-| Deep Research mode | — | — | ✅ | ✅ |
-| Archive Intelligence | — | ✅ | ✅ | ✅ |
-| Lumi Draft | — | ✅ | ✅ | ✅ |
+Canonical tiers per `src/lib/tiers.ts`: Reader (free, 1 Lumi/week) · Practitioner ($39, 50/mo) · Operator ($89, 100/mo) · Team ($599, 500 pool) · Scale ($1,499, 2,000 pool) · Enterprise ($3,500, 5,000 pool) · Strategic Partner (unlimited). The legacy "Vanguard" label is retired — use Practitioner+ / Operator+ instead.
+
+| Feature | Reader | Practitioner | Operator | Team / Scale / Ent (per seat) | Strategic |
+|---|---|---|---|---|---|
+| Lumi Debrief | 1 / month* | unlimited | unlimited | unlimited | unlimited |
+| Lumi Memory | — | ✅ | ✅ | ✅ (per seat, not pooled) | ✅ |
+| Tuesday Morning Brief | — | — | ✅ | ✅ | ✅ |
+| Lumi Framework Extractor | — | ✅ (1 cap unit) | ✅ | ✅ | ✅ |
+| Lumi Situation Room | — | 5 / month | within 100 cap | within pool | unlimited |
+| Lumi Weekly Check-In | — | ✅ (uncounted) | ✅ | ✅ | ✅ |
+| Inline annotation | highlight + note† | + Ask Lumi | + Ask Lumi | + Ask Lumi | + Ask Lumi |
+| Audio mode | — | 4 dispatches / mo | unlimited | unlimited | unlimited |
+| 5-min brief toggle | ✅ (pre-rendered) | ✅ | ✅ | ✅ | ✅ |
+| Live benchmark callouts | render | + drill-down | + drill-down | + drill-down | + drill-down |
+| Board-ready PDF (per dispatch) | — | ✅ | ✅ | ✅ | ✅ |
+| Operator profile onboarding | ✅ (on sign-up) | ✅ | ✅ | ✅ | ✅ |
+| Personalised reading path | — | ✅ | ✅ | ✅ | ✅ |
+| Your benchmark position | — | ✅ | ✅ | ✅ | ✅ |
+| Dispatch reactions | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Operator Debate | read | participate | participate | participate | participate |
+| Operator Index | read | read + contribute | read + contribute | read + contribute | read + contribute |
+| Deep Research mode | — | — | ✅ (5 cap units) | ✅ (soft per-seat cap) | ✅ |
+| Archive Intelligence | — | ✅ | ✅ | ✅ | ✅ |
+| Lumi Draft | — | ✅ | ✅ | ✅ | ✅ |
+
+\* Lumi Debrief on Reader competes with Reader's 1-session/week ceiling — Debrief is the canonical use of the weekly session, not an additional grant.
+† Reader annotation requires a minimal per-user annotation store; if a Reader workspace is not in scope, move annotation to Practitioner+.
+
+#### Lumi-cap accounting
+
+| Feature | Counts against Lumi cap? | Notes |
+|---|---|---|
+| Lumi Debrief | Yes | Free Debrief = Reader's weekly session. |
+| Tuesday Brief | No (system push) | Editorial cost, not user cap. |
+| Weekly Check-In | No | 3 short Q/A; absorbed. |
+| Framework Extractor | Yes | 1 unit per extract. |
+| Situation Room | Yes | 1 unit per opened room (multi-turn within). |
+| Archive Intelligence | Yes | RAG-heavy; consider per-query budget. |
+| Deep Research | Yes (heavy) | 5 units, or a separate "Research credit." |
+| Lumi Draft | Yes | 1 per draft. |
+| 5-min Brief Toggle | No | Pre-rendered at publish time; not a per-user call. |
+| Ask Lumi on annotation | Yes | 1 per thread. |
+| Personalised Reading Path | No | Weekly batch. |
+| Your Benchmark Position | No | One-shot interpretation cached on submission. |
 
 ---
 
