@@ -222,10 +222,11 @@ export function SiteHeader() {
           ) : (
             <Link
               to="/login"
-              className="shrink-0 whitespace-nowrap px-2.5 py-1 md:px-3 md:py-1.5 border border-foreground text-xs md:text-xs font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
+              className="shrink-0 whitespace-nowrap px-2 py-1 sm:px-2.5 md:px-3 md:py-1.5 border border-foreground text-[11px] sm:text-xs font-semibold hover:bg-foreground hover:text-background transition-all duration-300"
             >
               {t("nav.login")}
             </Link>
+
 
 
           )}
