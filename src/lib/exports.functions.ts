@@ -118,7 +118,8 @@ export const getLumiQuotaSnapshot = createServerFn({ method: "GET" })
     let d: Designation = "reader";
     if (isAdmin) d = "strategic_partner";
     else if (sub) {
-      d = ((sub as { designation?: Designation | null }).designation ?? null) ?? tierToDesignation(sub.tier);
+      const raw = (sub as { designation?: Designation | null }).designation;
+      d = raw ?? tierToDesignation(sub.tier);
     }
     const cap = Q_MONTHLY_CAP[d];
     const used = await countMonthlyQRuns(context.userId);
