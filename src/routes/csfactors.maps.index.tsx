@@ -179,7 +179,7 @@ function MapRow({ map, archive }: { map: MapRecord & { elapsed: number; ttvState
   const ttvColor =
     map.ttvState === "over" ? "text-destructive" : map.ttvState === "warn" ? "text-secondary-accent" : "text-emerald-600 dark:text-emerald-400";
 
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/m/${map.share_token}` : "";
+  const shareUrl = canonicalUrl(`/m/${map.share_token}`);
 
   return (
     <tr className="border-b border-border/60 hover:bg-muted/30">

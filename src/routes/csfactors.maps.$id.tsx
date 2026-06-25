@@ -47,7 +47,7 @@ function MapDetail() {
   const blocked = milestones.filter((m) => m.status === "blocked").length;
   const completePhase = completing ? phases.find((p) => p.id === completing.phase_id) : null;
 
-  const shareUrl = typeof window !== "undefined" ? `${window.location.origin}/m/${map.share_token}` : "";
+  const shareUrl = canonicalUrl(`/m/${map.share_token}`);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
