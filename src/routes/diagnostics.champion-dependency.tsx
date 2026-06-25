@@ -457,7 +457,7 @@ function ResultsState({
   );
 
   const onShare = async () => {
-    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/diagnostics/champion-dependency?score=${exposure}`;
+    const url = canonicalUrl(`/diagnostics/champion-dependency?score=${exposure}`);
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({ title: "Champion Dependency Diagnostic", text: shareText, url });
