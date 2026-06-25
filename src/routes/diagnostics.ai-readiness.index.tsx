@@ -1,16 +1,56 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { BackButton } from "@/components/site/BackButton";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { MetricCard, MetricGrid } from "@/components/dashboard/MetricCard";
 import { SectionCard } from "@/components/dashboard/SectionCard";
 import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
+import { SharedScoreView } from "@/components/diagnostics/SharedScoreView";
 
 const onStartAiReadiness = () =>
   trackDiagnosticEvent("diagnostic.cta_click", {
     slug: "ai-readiness",
     surface: "ai-readiness.landing",
   });
+
+const TIER_INTERPRETATION: Record<string, { label: string; tone: string; body: string }> = {
+  Block: {
+    label: "Block — foundation gaps",
+    tone: "text-destructive",
+    body: "The operating model is not yet ready to absorb agentic AI. Foundational gaps in segmentation, health scoring, or onboarding will compound under automation. Fix the discipline first; the AI layer comes after.",
+  },
+  Pilot: {
+    label: "Pilot — selective deployment",
+    tone: "text-secondary-accent",
+    body: "Several dimensions are operating at top-quartile discipline, but pockets of inconsistency remain. Deploy AI in two or three contained motions where the underlying playbook is already proven — not as a horizontal sweep.",
+  },
+  Scale: {
+    label: "Scale — productionising the motion",
+    tone: "text-accent",
+    body: "The operating model is mature enough to scale AI across the full CS motion. Focus the next 90 days on instrumentation: telemetry on every play, feedback loops into health scores, and clear ownership of the AI-assisted workflows.",
+  },
+  "AI Native": {
+    label: "AI Native — top decile",
+    tone: "text-foreground",
+    body: "You operate in the top decile. Your edge is no longer process discipline — it is the speed at which you can ship new agentic motions against your competitors. Treat AI roadmap as a product roadmap, not a project list.",
+  },
+};
+
+function useSharedAiReadiness(): { score: number; tier: string } | null {
+  const [val, setVal] = useState<{ score: number; tier: string } | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const score = Number(sp.get("score"));
+    const tier = sp.get("tier") ?? "";
+    if (!Number.isFinite(score) || score < 0 || score > 100) return;
+    if (!TIER_INTERPRETATION[tier]) return;
+    setVal({ score: Math.round(score), tier });
+  }, []);
+  return val;
+}
+
 
 
 export const Route = createFileRoute("/diagnostics/ai-readiness/")({
