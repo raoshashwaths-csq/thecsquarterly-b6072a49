@@ -270,8 +270,11 @@ export const createShareLink = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const token = `mock_${data.accountId.slice(0, 8)}_${Date.now().toString(36)}`;
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    // Outbound share URLs always resolve to the canonical origin so links
+    // never leak a preview / *.lovable.app host.
+    const { CANONICAL_ORIGIN } = await import("@/lib/canonical-url");
     return {
-      url: `/api/public/exec-dashboard/${token}`,
+      url: `${CANONICAL_ORIGIN}/api/public/exec-dashboard/${token}`,
       token,
       expiresAt,
       mock: true,

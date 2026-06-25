@@ -9,6 +9,7 @@ import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 import { LeadCaptureGate } from "@/components/diagnostics/LeadCaptureGate";
 import { canonicalUrl } from "@/lib/canonical-url";
 import { downloadDiagnosticPdf } from "@/lib/diagnostic-pdf";
+import { SharedScoreView } from "@/components/diagnostics/SharedScoreView";
 
 export const Route = createFileRoute("/diagnostics/champion-dependency")({
   head: () => ({
@@ -151,7 +152,23 @@ function subScores(answers: Record<number, number>) {
   };
 }
 
+function useSharedScoreParam(): number | null {
+  const [score, setScore] = useState<number | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = new URLSearchParams(window.location.search).get("score");
+    if (raw === null) return;
+    const n = Number(raw);
+    if (Number.isFinite(n) && n >= 0 && n <= 100) setScore(Math.round(n));
+  }, []);
+  return score;
+}
+
 function ChampionDependencyDiagnostic() {
+  // If a shared score is present in the URL, short-circuit to the read-only
+  // shared view so recipients land on the score, not the start of the flow.
+  const sharedScore = useSharedScoreParam();
+
   const flow = useDiagnosticFlow({
     questions: QUESTIONS,
     calcSteps: CALC_STEPS,
@@ -189,6 +206,23 @@ function ChampionDependencyDiagnostic() {
   };
 
   const [showGate, setShowGate] = useState(false);
+
+  if (sharedScore !== null) {
+    const bucket = bucketOf(sharedScore);
+    const meta = BUCKET_META[bucket];
+    return (
+      <SharedScoreView
+        eyebrow="Shared diagnostic result"
+        diagnosticName="The Champion Dependency Diagnostic"
+        scoreLabel="Single-threading exposure"
+        scoreDisplay={`${sharedScore}%`}
+        tierLabel={meta.label}
+        tierTone={meta.tone}
+        interpretation={INTERPRETATION[bucket]}
+        retakeHref="/diagnostics/champion-dependency"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col page-enter">
