@@ -19,7 +19,7 @@ export const listExportable = createServerFn({ method: "GET" })
         .limit(50),
       supabase
         .from("user_workspace_items")
-        .select("id, item_type, item_id, title, snippet, created_at")
+        .select("id, kind, tag, title, url, created_at")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(100),
