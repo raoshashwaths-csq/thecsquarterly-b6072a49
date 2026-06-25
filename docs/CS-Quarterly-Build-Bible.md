@@ -2927,7 +2927,7 @@ Testing:
 - **One-liner.** Lumi remembers what you've read, what you've asked, and what situations you're navigating — and brings that context to every new conversation.
 - **Description.** Per-reader profile that accumulates dispatches read, frameworks engaged with in debriefs, declared professional challenges, and check-in answers. Retrieved via semantic similarity search before each Lumi response. Reader can view, edit, and delete their memory from account settings (GDPR).
 - **Why it matters.** This is the moat. Without memory, every other Lumi feature is a generic chatbot.
-- **Tier gating.** Vanguard only.
+- **Tier gating.** Practitioner+ (per seat, not pooled across team seats).
 - **Status.** ⬜ NOT STARTED
 
 #### Tuesday Morning Brief — Lumi's weekly personalised dispatch summary
