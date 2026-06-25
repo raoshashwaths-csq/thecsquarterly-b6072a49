@@ -24,6 +24,7 @@ import { Search, LayoutGrid, Compass } from "lucide-react";
 export function SiteHeader() {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [exportOpen, setExportOpen] = useState(false);
   const { canUniversalSearch, canWorkspace } = useEntitlements();
   const { isRecruiterOrLead } = usePersona();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
