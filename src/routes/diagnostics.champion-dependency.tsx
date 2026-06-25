@@ -742,6 +742,6 @@ function buildPdfInput(
           },
         ]
       : [],
-  } as const;
+  };
 }
 
