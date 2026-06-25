@@ -231,6 +231,7 @@ function WorkspacePageInner() {
   const [tab, setTab] = useState<"history" | "highlights" | "ledger">("history");
   const [query, setQuery] = useState("");
   const [searchHintDismissed, setSearchHintDismissed] = useState(true);
+  const [exportOpen, setExportOpen] = useState(false);
 
 
 
