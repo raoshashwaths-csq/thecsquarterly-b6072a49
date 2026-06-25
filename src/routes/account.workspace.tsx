@@ -22,6 +22,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SentimentTrendPanel } from "@/components/site/SentimentTrendPanel";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { RequireAuth } from "@/components/site/RequireAuth";
+import { ExportDialog } from "@/components/site/ExportDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import {
