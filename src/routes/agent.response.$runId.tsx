@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { getQRun, setQRunShared, type RunZones } from "@/lib/q-agent.functions";
+import { getSharedQRun } from "@/lib/shared-run.functions";
+import { useAuth } from "@/hooks/useAuth";
 import { getNode, breadcrumbFor } from "@/lib/q-trees";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { RunAccountTagger } from "@/components/agent/RunAccountTagger";
 import { QMark } from "@/components/site/QMark";
 import { Switch } from "@/components/ui/switch";
+import { SharedRunGate, isRunUnlocked } from "@/components/site/SharedRunGate";
 
 export const Route = createFileRoute("/agent/response/$runId")({
   head: () => ({
