@@ -410,6 +410,31 @@ function ResultsView({ result, email, firstName, company }: { result: ScoreResul
           </ol>
         </section>
 
+        <div className="flex flex-wrap gap-3 mb-8 pt-8 border-t border-border">
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="px-6 py-3 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-widest font-bold hover:opacity-90 transition-opacity"
+          >
+            {isUnlocked ? "Download branded PDF (score + 90-day plan)" : "Download branded score PDF"}
+          </button>
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            className="px-6 py-3 border border-border font-mono text-xs uppercase tracking-widest hover:border-foreground transition-colors"
+          >
+            Share result
+          </button>
+          {!isUnlocked && (
+            <Link
+              to="/pricing"
+              className="px-6 py-3 border border-accent text-accent font-mono text-xs uppercase tracking-widest hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              Unlock full blueprint — $39/mo
+            </Link>
+          )}
+        </div>
+
         <div className="bg-foreground text-background p-10">
           <h3 className="font-display text-3xl mb-3">You're now on the dispatch.</h3>
           <p className="text-background/70 mb-6">
