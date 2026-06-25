@@ -33,8 +33,6 @@ type Run = {
 
 function ResponsePage() {
   const { runId } = Route.useParams();
-function ResponsePage() {
-  const { runId } = Route.useParams();
   const fetchRun = useServerFn(getQRun);
   const fetchShared = useServerFn(getSharedQRun);
   const updateShared = useServerFn(setQRunShared);
