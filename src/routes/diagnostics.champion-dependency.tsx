@@ -152,6 +152,18 @@ function subScores(answers: Record<number, number>) {
   };
 }
 
+function useSharedScoreParam(): number | null {
+  const [score, setScore] = useState<number | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = new URLSearchParams(window.location.search).get("score");
+    if (raw === null) return;
+    const n = Number(raw);
+    if (Number.isFinite(n) && n >= 0 && n <= 100) setScore(Math.round(n));
+  }, []);
+  return score;
+}
+
 function ChampionDependencyDiagnostic() {
   // If a shared score is present in the URL, short-circuit to the read-only
   // shared view so recipients land on the score, not the start of the flow.
