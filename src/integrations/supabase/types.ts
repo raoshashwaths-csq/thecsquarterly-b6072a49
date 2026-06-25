@@ -677,6 +677,39 @@ export type Database = {
         }
         Relationships: []
       }
+      faq_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          item_slug: string
+          locale: string
+          section_slug: string
+          user_agent: string | null
+          user_id: string | null
+          vote: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_slug: string
+          locale?: string
+          section_slug: string
+          user_agent?: string | null
+          user_id?: string | null
+          vote: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_slug?: string
+          locale?: string
+          section_slug?: string
+          user_agent?: string | null
+          user_id?: string | null
+          vote?: number
+        }
+        Relationships: []
+      }
       job_listings: {
         Row: {
           apply_url: string | null
