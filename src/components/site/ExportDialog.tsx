@@ -11,7 +11,7 @@ import { listExportable, summarizeWorkspaceForExport, getLumiQuotaSnapshot } fro
 import { getNode, breadcrumbFor } from "@/lib/q-trees";
 
 type RunRow = { id: string; node_id: string; created_at: string; witty: boolean; zones: { diagnosis: string; playbook: string; executable: string }; context: Record<string, string> };
-type WorkspaceRow = { id: string; item_type: string; item_id: string; title: string; snippet: string | null; created_at: string };
+type WorkspaceRow = { id: string; kind: string; tag: string; title: string; url: string | null; created_at: string };
 
 export function ExportDialog({
   open,
