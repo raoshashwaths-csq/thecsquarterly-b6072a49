@@ -84,7 +84,7 @@ export function NotificationBell() {
     }
     if (n.action_route) {
       await acted({ data: { id: n.id } });
-      router.navigate({ to: n.action_route as never });
+      window.location.assign(n.action_route);
     }
     await queryClient.invalidateQueries({ queryKey: ["future-operator", "panel"] });
   }
