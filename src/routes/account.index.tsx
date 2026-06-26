@@ -18,6 +18,8 @@ import {
   getMyPaddleSubscription,
 } from "@/lib/paddle.functions";
 import { getPaddleEnvironment } from "@/lib/paddle";
+import { MemorySettings } from "@/components/account/MemorySettings";
+import { LumiMemoryNudge } from "@/components/site/LumiMemoryNudge";
 
 
 
