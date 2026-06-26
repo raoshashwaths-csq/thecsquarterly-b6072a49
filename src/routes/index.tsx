@@ -205,12 +205,8 @@ function HomePage() {
                 <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
                   A personal command centre for the CSM in the trenches. Triage the burning three before standup, surface the renewals that need a real conversation, and keep every account note in one operator-grade canvas.
                 </p>
-                <Link
-                  to="/csfactors"
-                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-                >
-                  Start free →
-                </Link>
+                <StageCta featureId="csfactors" label="Start free →" />
+
               </div>
             ),
             right: <StageMock variant="pulse" />,
