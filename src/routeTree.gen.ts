@@ -83,6 +83,7 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
 import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
+import { Route as ApiPublicHooksAnalyzeInteractionsRouteImport } from './routes/api/public/hooks/analyze-interactions'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
@@ -470,6 +471,12 @@ const ApiPublicHooksIngestArticlesRoute =
     path: '/api/public/hooks/ingest-articles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksAnalyzeInteractionsRoute =
+  ApiPublicHooksAnalyzeInteractionsRouteImport.update({
+    id: '/api/public/hooks/analyze-interactions',
+    path: '/api/public/hooks/analyze-interactions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -537,6 +544,7 @@ export interface FileRoutesByFullPath {
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
+  '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -609,6 +617,7 @@ export interface FileRoutesByTo {
   '/account/analytics': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
+  '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -686,6 +695,7 @@ export interface FileRoutesById {
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
+  '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -764,6 +774,7 @@ export interface FileRouteTypes {
     | '/account/analytics/'
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
+    | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -836,6 +847,7 @@ export interface FileRouteTypes {
     | '/account/analytics'
     | '/csfactors/maps'
     | '/diagnostics/ai-readiness'
+    | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -912,6 +924,7 @@ export interface FileRouteTypes {
     | '/account/analytics/'
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
+    | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -971,6 +984,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   QResponseRunIdRoute: typeof QResponseRunIdRoute
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
+  ApiPublicHooksAnalyzeInteractionsRoute: typeof ApiPublicHooksAnalyzeInteractionsRoute
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
   ApiPublicHooksPullExternalIntelRoute: typeof ApiPublicHooksPullExternalIntelRoute
   ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -1502,6 +1516,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/analyze-interactions': {
+      id: '/api/public/hooks/analyze-interactions'
+      path: '/api/public/hooks/analyze-interactions'
+      fullPath: '/api/public/hooks/analyze-interactions'
+      preLoaderRoute: typeof ApiPublicHooksAnalyzeInteractionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1647,6 +1668,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   QResponseRunIdRoute: QResponseRunIdRoute,
   AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
+  ApiPublicHooksAnalyzeInteractionsRoute:
+    ApiPublicHooksAnalyzeInteractionsRoute,
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
   ApiPublicHooksPullExternalIntelRoute: ApiPublicHooksPullExternalIntelRoute,
   ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
