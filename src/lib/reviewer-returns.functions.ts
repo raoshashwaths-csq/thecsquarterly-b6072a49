@@ -44,7 +44,7 @@ export const applyReviewerDecisions = createServerFn({ method: "POST" })
     const results: Array<{ id: string; ok: boolean; error?: string }> = [];
 
     for (const d of data.decisions) {
-      let update: Record<string, unknown> = {};
+      let update: { translation_reviewed?: boolean; content?: string; is_active?: boolean } = {};
       if (d.status === "APPROVED") {
         update = { translation_reviewed: true };
       } else if (d.status === "CORRECTED") {
