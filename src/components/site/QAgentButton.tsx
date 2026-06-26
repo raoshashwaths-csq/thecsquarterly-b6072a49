@@ -97,6 +97,43 @@ export function QAgentButton() {
     } catch { /* */ }
   }, []);
 
+  // Future Operator notification seed reader. Reflection prompts route here
+  // via `?lumi=open&seed=<notificationId>`. We open the drawer, load the
+  // notification (auto-marking it read), and pre-pend it as the first turn.
+  // Then we strip the params so a refresh doesn't re-open.
+  const seedId = typeof search?.seed === "string" ? (search.seed as string) : null;
+  const wantsOpen = search?.lumi === "open";
+  useEffect(() => {
+    if (!seedId || !wantsOpen || !user) return;
+    let cancelled = false;
+    setOpen(true);
+    fetchSeed({ data: { id: seedId } })
+      .then((r) => {
+        if (cancelled) return;
+        if (r.notification) {
+          const n = r.notification as { id: string; message: string; subtext: string | null };
+          setSeeded({ id: n.id, message: n.message, subtext: n.subtext });
+          trackLumiEvent("drawer.open", { surface: "site", briefingShown: true, messageCount: 1 });
+        }
+      })
+      .catch(() => { /* silent */ })
+      .finally(() => {
+        if (cancelled) return;
+        // Strip the seed/lumi params so refresh doesn't replay.
+        navigate({
+          to: ".",
+          search: (prev) => {
+            const next = { ...(prev as Record<string, unknown>) };
+            delete next.lumi;
+            delete next.seed;
+            return next;
+          },
+          replace: true,
+        });
+      });
+    return () => { cancelled = true; };
+  }, [seedId, wantsOpen, user, fetchSeed, navigate]);
+
   // Persist draft as user types (resilience layer).
   useEffect(() => {
     if (typeof window === "undefined") return;
