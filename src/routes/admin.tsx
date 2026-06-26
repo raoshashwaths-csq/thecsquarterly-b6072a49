@@ -22,6 +22,7 @@ import {
   getQAdminStats, listQRunsAdmin, listQEntitlementsAdmin,
 } from "@/lib/admin.functions";
 import { exportDataset, importArticles, listAuditLog } from "@/lib/admin-ops.functions";
+import { backfillEmbeddings } from "@/lib/embeddings.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/admin")({
