@@ -457,7 +457,8 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
     if (!acct) throw new Error("Account not found or not yours");
     const acctRow = acct as unknown as { id: string; name: string };
 
-    // Confirm the run is owned by this user, then update
+    // Confirm the run is owned by this user, then update.
+    // Pull context.question and zones.executable so we can infer sentiment.
     const { data: runRow, error: runErr } = await supabase
       .from("q_runs")
       .update({
@@ -467,11 +468,16 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
       } as never)
       .eq("id", data.runId)
       .eq("user_id", userId)
-      .select("id, node_id")
+      .select("id, node_id, context, zones")
       .maybeSingle();
     if (runErr) throw new Error(runErr.message);
     if (!runRow) throw new Error("Run not found or not yours");
-    const runFields = runRow as unknown as { id: string; node_id: string };
+    const runFields = runRow as unknown as {
+      id: string;
+      node_id: string;
+      context: { question?: string } | null;
+      zones: { executable?: string; diagnosis?: string; playbook?: string } | null;
+    };
 
     // Write a timeline event so the account card shows the tagged Lumi run.
     await supabase.from("cs_account_events" as never).insert({
@@ -485,7 +491,128 @@ export const tagQRunToAccount = createServerFn({ method: "POST" })
       },
     } as never);
 
-    return { ok: true, accountId: data.accountId, accountName: acctRow.name };
+    // ── Sentiment inference ────────────────────────────────────────────
+    // Best-effort: never fail the tag if sentiment scoring throws.
+    let inferred: {
+      label: "Positive" | "Neutral" | "Critical";
+      confidence: "low" | "med" | "high";
+      source: "lexicon" | "ai";
+      rationale: string;
+    } | null = null;
+    try {
+      const { inferLumiRunSentiment, rollingAccountSentiment } = await import("./lumi-sentiment.server");
+
+      const question = runFields.context?.question ?? "";
+      const reply =
+        runFields.zones?.executable ??
+        [runFields.zones?.diagnosis, runFields.zones?.playbook].filter(Boolean).join("\n\n") ??
+        "";
+
+      // Prior account sentiment (for the disagree heuristic).
+      const { data: acctSentRow } = await supabase
+        .from("cs_accounts" as never)
+        .select("csm_sentiment")
+        .eq("id", data.accountId)
+        .maybeSingle();
+      const priorAccount =
+        (acctSentRow as unknown as { csm_sentiment: "Positive" | "Neutral" | "Critical" | null } | null)
+          ?.csm_sentiment ?? null;
+
+      // Prior stakeholder sentiment if the tag names one we can match.
+      let stakeholderRowId: string | null = null;
+      let priorStakeholder: "positive" | "neutral" | "negative" | null = null;
+      if (data.stakeholder) {
+        const { data: sRows } = await supabase
+          .from("cs_stakeholders" as never)
+          .select("id, contact_name, sentiment")
+          .eq("account_id", data.accountId);
+        const list = (sRows ?? []) as unknown as Array<{
+          id: string;
+          contact_name: string;
+          sentiment: "positive" | "neutral" | "negative";
+        }>;
+        const needle = data.stakeholder.trim().toLowerCase();
+        const match = list.find((s) => s.contact_name.trim().toLowerCase() === needle);
+        if (match) {
+          stakeholderRowId = match.id;
+          priorStakeholder = match.sentiment;
+        }
+      }
+
+      const result = await inferLumiRunSentiment({
+        question,
+        reply,
+        priorAccount,
+        priorStakeholder,
+      });
+      inferred = {
+        label: result.label,
+        confidence: result.confidence,
+        source: result.source,
+        rationale: result.rationale,
+      };
+
+      // Audit trail — always recorded.
+      await supabase.from("cs_account_events" as never).insert({
+        account_id: data.accountId,
+        user_id: userId,
+        kind: "sentiment.inferred",
+        payload: {
+          run_id: data.runId,
+          label: result.label,
+          stakeholder_label: result.stakeholderLabel,
+          confidence: result.confidence,
+          source: result.source,
+          rationale: result.rationale,
+          raw_score: result.rawScore,
+          prior_account: priorAccount,
+          prior_stakeholder: priorStakeholder,
+          stakeholder: data.stakeholder,
+        },
+      } as never);
+
+      // Rolling chip update — use the last 4 prior inferred events + this one.
+      const { data: prevEvents } = await supabase
+        .from("cs_account_events" as never)
+        .select("payload, occurred_at")
+        .eq("account_id", data.accountId)
+        .eq("kind", "sentiment.inferred")
+        .order("occurred_at", { ascending: false })
+        .limit(5);
+      const priorLabels = ((prevEvents ?? []) as unknown as Array<{
+        payload: { label?: "Positive" | "Neutral" | "Critical" };
+      }>)
+        .map((e) => e.payload?.label)
+        .filter((l): l is "Positive" | "Neutral" | "Critical" => !!l);
+      // The just-inserted event may or may not be in this read (race-safe: include explicitly).
+      const recent = [result.label, ...priorLabels].slice(0, 5).reverse();
+      const newChip = rollingAccountSentiment(recent);
+      if (newChip !== priorAccount) {
+        await supabase
+          .from("cs_accounts" as never)
+          .update({ csm_sentiment: newChip } as never)
+          .eq("id", data.accountId)
+          .eq("user_id", userId);
+      }
+
+      // Stakeholder write-through — only if we matched a row.
+      if (stakeholderRowId) {
+        await supabase
+          .from("cs_stakeholders" as never)
+          .update({ sentiment: result.stakeholderLabel } as never)
+          .eq("id", stakeholderRowId)
+          .eq("user_id", userId);
+      }
+    } catch {
+      // Silent: sentiment inference must never block tagging.
+    }
+
+    return {
+      ok: true,
+      accountId: data.accountId,
+      accountName: acctRow.name,
+      sentiment: inferred,
+    };
   });
 
 // ─────────────────────────────────────────────────────────────────────────────
