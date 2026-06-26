@@ -506,7 +506,7 @@ function MatrixTab({
     const key = `${planId}:${featureId}`;
     setDraft((d) => ({
       ...d,
-      [key]: { enabled: false, numeric_value: null, override: null, ...d[key], ...patch },
+      [key]: { ...({ enabled: false, numeric_value: null, override: null } as DraftAssignment), ...(d[key] ?? {}), ...patch },
     }));
   }
 
