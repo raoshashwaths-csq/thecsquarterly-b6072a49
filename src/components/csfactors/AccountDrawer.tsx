@@ -200,6 +200,26 @@ export function AccountDrawer({
                   onSave={(v) => save({ qbr_status: v as CSAccount["qbr_status"] })}
                 />
               </Grid>
+              {lastInferred?.label && (
+                <p className="mt-3 text-xs font-mono text-foreground/55">
+                  Last inferred from a tagged Lumi run:{" "}
+                  <span
+                    className={
+                      lastInferred.label === "Critical"
+                        ? "text-destructive"
+                        : lastInferred.label === "Positive"
+                          ? "text-emerald-500"
+                          : "text-foreground/70"
+                    }
+                  >
+                    {lastInferred.label}
+                  </span>
+                  {lastInferred.source ? ` · ${lastInferred.source}` : ""}
+                  {lastInferred.confidence ? ` · ${lastInferred.confidence}` : ""}
+                  {" · "}
+                  {new Date(lastInferred.at).toISOString().slice(0, 10)}
+                </p>
+              )}
             </Section>
 
             <Section value="lifecycle" title="Lifecycle">
