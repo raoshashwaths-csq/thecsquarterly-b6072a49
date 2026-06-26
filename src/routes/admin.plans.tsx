@@ -101,6 +101,8 @@ function AdminPlansPage() {
               ["plans", "Plans"],
               ["matrix", "Feature matrix"],
               ["sku", "SKU reference"],
+              ["drafts", "Drafts"],
+              ["audit", "Audit log"],
             ] as Array<[Tab, string]>
           ).map(([k, label]) => (
             <button
@@ -145,6 +147,8 @@ function AdminPlansPage() {
                 assignments={plansQ.data.assignments}
               />
             )}
+            {tab === "drafts" && <DraftsTab live={plansQ.data} />}
+            {tab === "audit" && <AuditLogTab />}
           </>
         )}
       </main>
