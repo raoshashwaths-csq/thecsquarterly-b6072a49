@@ -20,6 +20,7 @@ import { ExportDialog } from "@/components/site/ExportDialog";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
+import { NotificationBell } from "@/components/site/NotificationBell";
 
 export function SiteHeader() {
   const { t } = useTranslation();
