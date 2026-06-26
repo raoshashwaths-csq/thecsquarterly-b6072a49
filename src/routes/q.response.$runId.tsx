@@ -6,6 +6,7 @@ import { getNode, breadcrumbFor } from "@/lib/q-trees";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { QMark } from "@/components/site/QMark";
+import { LumiFeedbackBar } from "@/components/agent/LumiFeedbackBar";
 
 export const Route = createFileRoute("/q/response/$runId")({
   head: () => ({
@@ -146,6 +147,7 @@ function PublicResponsePage() {
                     <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
                     <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
                     <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                    {run.isOwner && <LumiFeedbackBar runId={run.id} />}
                   </>
                 )}
               </>
