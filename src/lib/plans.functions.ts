@@ -2,6 +2,7 @@
 // plan_feature_assignments tables. See supabase/migrations for schema.
 // Public reads use a publishable-key server client (RLS gates active rows).
 // Admin writes use requireSupabaseAuth + has_role('admin') check.
+// Every admin write is mirrored into admin_audit_log.
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -92,13 +93,55 @@ export const listPublishedPlans = createServerFn({ method: "GET" }).handler(asyn
   };
 });
 
-// ---------------- Admin functions ----------------
+// ---------------- Admin helpers ----------------
 
 async function assertAdmin(supabase: any, userId: string) {
   const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error) throw error;
   if (!data) throw new Error("Forbidden");
 }
+
+/**
+ * Insert an admin_audit_log row using the service-role client so the write
+ * succeeds regardless of RLS. Best-effort: never throws to caller.
+ */
+async function logAudit(
+  actorId: string,
+  action: string,
+  target_table: string | null,
+  target_id: string | null,
+  details: Record<string, unknown>,
+) {
+  const detailsJson = JSON.parse(JSON.stringify(details));
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Try to resolve email for nicer audit display.
+    let actor_email: string | null = null;
+    try {
+      const { data: prof } = await supabaseAdmin
+        .from("profiles")
+        .select("email")
+        .eq("id", actorId)
+        .maybeSingle();
+      actor_email = (prof as { email?: string | null } | null)?.email ?? null;
+    } catch {
+      /* ignore */
+    }
+    await supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: actorId,
+      actor_email,
+      action,
+      target_table,
+      target_id,
+      details: detailsJson,
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error("[plans:logAudit] failed", e);
+  }
+}
+
+// ---------------- Admin reads ----------------
 
 /** Admin: read all plans (active + inactive) + features + assignments. */
 export const adminListPlans = createServerFn({ method: "GET" })
@@ -119,6 +162,8 @@ export const adminListPlans = createServerFn({ method: "GET" })
       assignments: (assignmentsRes.data ?? []) as PublicAssignment[],
     };
   });
+
+// ---------------- Plan mutations ----------------
 
 const PlanUpsertSchema = z.object({
   id: z.string().uuid().optional(),
@@ -149,10 +194,25 @@ export const adminUpsertPlan = createServerFn({ method: "POST" })
   .inputValidator((d: z.infer<typeof PlanUpsertSchema>) => PlanUpsertSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await context.supabase
+    // Snapshot prior row for audit diff
+    const { data: prior } = await context.supabase
       .from("subscription_plans")
-      .upsert(data, { onConflict: "designation" });
+      .select("*")
+      .eq("designation", data.designation)
+      .maybeSingle();
+    const { data: saved, error } = await context.supabase
+      .from("subscription_plans")
+      .upsert(data, { onConflict: "designation" })
+      .select()
+      .maybeSingle();
     if (error) throw error;
+    await logAudit(
+      context.userId,
+      prior ? "plan.update" : "plan.create",
+      "subscription_plans",
+      (saved as { id?: string } | null)?.id ?? null,
+      { designation: data.designation, before: prior, after: saved },
+    );
     return { ok: true };
   });
 
@@ -161,10 +221,18 @@ export const adminDeletePlan = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const { data: prior } = await context.supabase
+      .from("subscription_plans")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await context.supabase.from("subscription_plans").delete().eq("id", data.id);
     if (error) throw error;
+    await logAudit(context.userId, "plan.delete", "subscription_plans", data.id, { before: prior });
     return { ok: true };
   });
+
+// ---------------- Feature mutations ----------------
 
 const FeatureUpsertSchema = z.object({
   id: z.string().uuid().optional(),
@@ -183,10 +251,24 @@ export const adminUpsertFeature = createServerFn({ method: "POST" })
   .inputValidator((d: z.infer<typeof FeatureUpsertSchema>) => FeatureUpsertSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
-    const { error } = await context.supabase
+    const { data: prior } = await context.supabase
       .from("plan_features")
-      .upsert(data, { onConflict: "code" });
+      .select("*")
+      .eq("code", data.code)
+      .maybeSingle();
+    const { data: saved, error } = await context.supabase
+      .from("plan_features")
+      .upsert(data, { onConflict: "code" })
+      .select()
+      .maybeSingle();
     if (error) throw error;
+    await logAudit(
+      context.userId,
+      prior ? "feature.update" : "feature.create",
+      "plan_features",
+      (saved as { id?: string } | null)?.id ?? null,
+      { code: data.code, before: prior, after: saved },
+    );
     return { ok: true };
   });
 
@@ -195,10 +277,18 @@ export const adminDeleteFeature = createServerFn({ method: "POST" })
   .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const { data: prior } = await context.supabase
+      .from("plan_features")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await context.supabase.from("plan_features").delete().eq("id", data.id);
     if (error) throw error;
+    await logAudit(context.userId, "feature.delete", "plan_features", data.id, { before: prior });
     return { ok: true };
   });
+
+// ---------------- Assignment mutations ----------------
 
 const AssignmentSchema = z.object({
   plan_id: z.string().uuid(),
@@ -213,19 +303,31 @@ export const adminSetAssignment = createServerFn({ method: "POST" })
   .inputValidator((d: z.infer<typeof AssignmentSchema>) => AssignmentSchema.parse(d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
+    const { data: prior } = await context.supabase
+      .from("plan_feature_assignments")
+      .select("*")
+      .match({ plan_id: data.plan_id, feature_id: data.feature_id })
+      .maybeSingle();
     if (!data.enabled && data.numeric_value === null && data.marketing_label_override === null) {
-      // Remove row entirely when toggled off and no overrides exist
       const { error } = await context.supabase
         .from("plan_feature_assignments")
         .delete()
         .match({ plan_id: data.plan_id, feature_id: data.feature_id });
       if (error) throw error;
+      await logAudit(context.userId, "assignment.delete", "plan_feature_assignments", `${data.plan_id}:${data.feature_id}`, { before: prior });
       return { ok: true, deleted: true };
     }
     const { error } = await context.supabase
       .from("plan_feature_assignments")
       .upsert(data, { onConflict: "plan_id,feature_id" });
     if (error) throw error;
+    await logAudit(
+      context.userId,
+      prior ? "assignment.update" : "assignment.create",
+      "plan_feature_assignments",
+      `${data.plan_id}:${data.feature_id}`,
+      { before: prior, after: data },
+    );
     return { ok: true };
   });
 
@@ -244,6 +346,248 @@ export const adminBulkSetAssignments = createServerFn({ method: "POST" })
       .from("plan_feature_assignments")
       .upsert(data.rows, { onConflict: "plan_id,feature_id" });
     if (error) throw error;
+    await logAudit(context.userId, "assignment.bulk_set", "plan_feature_assignments", data.plan_id, {
+      plan_id: data.plan_id,
+      row_count: data.rows.length,
+      rows: data.rows,
+    });
+    return { ok: true };
+  });
+
+// ---------------- Audit log reader ----------------
+
+export const adminListAuditLog = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { limit?: number; actions?: string[] } | undefined) =>
+    z
+      .object({ limit: z.number().int().min(1).max(500).default(200), actions: z.array(z.string()).optional() })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    let q = context.supabase
+      .from("admin_audit_log")
+      .select("id, actor_id, actor_email, action, target_table, target_id, details, created_at")
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (data.actions?.length) q = q.in("action", data.actions);
+    const { data: rows, error } = await q;
+    if (error) throw error;
+    return { rows: rows ?? [] };
+  });
+
+// ---------------- CSV exports ----------------
+
+function csvEscape(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  const s = String(v);
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+function toCsv(headers: string[], rows: Array<Array<unknown>>): string {
+  const lines = [headers.map(csvEscape).join(",")];
+  for (const r of rows) lines.push(r.map(csvEscape).join(","));
+  return lines.join("\n");
+}
+
+/** Admin: CSV of the SKU catalog (one row per feature). */
+export const adminExportSkuCsv = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { data: features, error } = await context.supabase
+      .from("plan_features")
+      .select("*")
+      .order("category", { ascending: true })
+      .order("display_order", { ascending: true });
+    if (error) throw error;
+    const csv = toCsv(
+      ["code", "label", "category", "kind", "default_value", "description", "display_order", "is_active"],
+      (features ?? []).map((f: any) => [
+        f.code,
+        f.label,
+        f.category,
+        f.kind,
+        f.default_value,
+        f.description,
+        f.display_order,
+        f.is_active,
+      ]),
+    );
+    await logAudit(context.userId, "export.sku_csv", "plan_features", null, { count: features?.length ?? 0 });
+    return { filename: `sku-catalog-${new Date().toISOString().slice(0, 10)}.csv`, csv };
+  });
+
+/** Admin: CSV of current per-plan feature assignments (one row per plan × feature). */
+export const adminExportAssignmentsCsv = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const [plansRes, featuresRes, assignsRes] = await Promise.all([
+      context.supabase.from("subscription_plans").select("id, designation, label, display_order").order("display_order"),
+      context.supabase.from("plan_features").select("id, code, label, category, kind, display_order").order("category").order("display_order"),
+      context.supabase.from("plan_feature_assignments").select("*"),
+    ]);
+    if (plansRes.error) throw plansRes.error;
+    if (featuresRes.error) throw featuresRes.error;
+    if (assignsRes.error) throw assignsRes.error;
+    const assignMap = new Map<string, any>();
+    for (const a of (assignsRes.data ?? []) as any[]) assignMap.set(`${a.plan_id}:${a.feature_id}`, a);
+    const rows: Array<Array<unknown>> = [];
+    for (const p of plansRes.data ?? []) {
+      for (const f of featuresRes.data ?? []) {
+        const a = assignMap.get(`${(p as any).id}:${(f as any).id}`);
+        rows.push([
+          (p as any).designation,
+          (p as any).label,
+          (f as any).code,
+          (f as any).label,
+          (f as any).category,
+          (f as any).kind,
+          a?.enabled ?? false,
+          a?.numeric_value ?? "",
+          a?.marketing_label_override ?? "",
+        ]);
+      }
+    }
+    const csv = toCsv(
+      ["plan_designation", "plan_label", "feature_code", "feature_label", "category", "kind", "enabled", "numeric_value", "marketing_label_override"],
+      rows,
+    );
+    await logAudit(context.userId, "export.assignments_csv", "plan_feature_assignments", null, { rows: rows.length });
+    return { filename: `plan-assignments-${new Date().toISOString().slice(0, 10)}.csv`, csv };
+  });
+
+// ---------------- Draft / Publish workflow ----------------
+// Drafts live in app_settings under key 'pricing.draft' as a JSONB containing
+// proposed plans/features/assignments overrides. Admin can preview, then
+// Publish (atomic apply) or Discard.
+
+type DraftBundle = {
+  plans: PublicPlan[];
+  features: PublicFeature[];
+  assignments: PublicAssignment[];
+  saved_at: string;
+  saved_by: string | null;
+};
+
+async function readDraft(): Promise<DraftBundle | null> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("app_settings")
+    .select("value")
+    .eq("key", "pricing.draft")
+    .maybeSingle();
+  return (data?.value as DraftBundle | undefined) ?? null;
+}
+
+export const adminGetDraft = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ draft: DraftBundle | null }> => {
+    await assertAdmin(context.supabase, context.userId);
+    const draft = await readDraft();
+    return { draft };
+  });
+
+const DraftSaveSchema = z.object({
+  plans: z.array(z.any()),
+  features: z.array(z.any()),
+  assignments: z.array(z.any()),
+});
+
+export const adminSaveDraft = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: z.infer<typeof DraftSaveSchema>) => DraftSaveSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const payload: DraftBundle = {
+      plans: data.plans as PublicPlan[],
+      features: data.features as PublicFeature[],
+      assignments: data.assignments as PublicAssignment[],
+      saved_at: new Date().toISOString(),
+      saved_by: context.userId,
+    };
+    const { error } = await supabaseAdmin.from("app_settings").upsert({
+      key: "pricing.draft",
+      value: JSON.parse(JSON.stringify(payload)),
+      updated_by: context.userId,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) throw error;
+    await logAudit(context.userId, "draft.save", "app_settings", "pricing.draft", {
+      plans: data.plans.length,
+      features: data.features.length,
+      assignments: data.assignments.length,
+    });
+    return { ok: true };
+  });
+
+export const adminDiscardDraft = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("app_settings").delete().eq("key", "pricing.draft");
+    if (error) throw error;
+    await logAudit(context.userId, "draft.discard", "app_settings", "pricing.draft", {});
+    return { ok: true };
+  });
+
+export const adminPublishDraft = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const draft = await readDraft();
+    if (!draft) throw new Error("No draft to publish");
+
+    // Apply atomically (best-effort sequential). Upsert plans, features, then
+    // overwrite assignments for affected plans (we replace the full set per
+    // plan to honour deletions in the draft).
+    if (draft.plans?.length) {
+      // strip id when creating new
+      const planRows = draft.plans.map((p: any) => ({ ...p, id: p.id }));
+      const { error } = await supabaseAdmin
+        .from("subscription_plans")
+        .upsert(planRows, { onConflict: "designation" });
+      if (error) throw new Error(`plans: ${error.message}`);
+    }
+    if (draft.features?.length) {
+      const featRows = draft.features.map((f: any) => ({ ...f }));
+      const { error } = await supabaseAdmin
+        .from("plan_features")
+        .upsert(featRows, { onConflict: "code" });
+      if (error) throw new Error(`features: ${error.message}`);
+    }
+    if (draft.assignments) {
+      const planIds = Array.from(new Set(draft.assignments.map((a: any) => a.plan_id)));
+      if (planIds.length) {
+        // Wipe current assignments for affected plans, then insert draft set.
+        const { error: delErr } = await supabaseAdmin
+          .from("plan_feature_assignments")
+          .delete()
+          .in("plan_id", planIds);
+        if (delErr) throw new Error(`assignments wipe: ${delErr.message}`);
+        if (draft.assignments.length) {
+          const { error: insErr } = await supabaseAdmin
+            .from("plan_feature_assignments")
+            .insert(draft.assignments);
+          if (insErr) throw new Error(`assignments insert: ${insErr.message}`);
+        }
+      }
+    }
+
+    // Clear the draft
+    await supabaseAdmin.from("app_settings").delete().eq("key", "pricing.draft");
+
+    await logAudit(context.userId, "draft.publish", "app_settings", "pricing.draft", {
+      plans: draft.plans?.length ?? 0,
+      features: draft.features?.length ?? 0,
+      assignments: draft.assignments?.length ?? 0,
+      saved_at: draft.saved_at,
+      saved_by: draft.saved_by,
+    });
     return { ok: true };
   });
 
@@ -278,31 +622,6 @@ export const adminResnapshotAll = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sql = `
-      UPDATE public.subscriptions s
-      SET plan_snapshot = jsonb_build_object(
-            'designation', p.designation,
-            'label', p.label,
-            'price_monthly_cents', p.price_monthly_cents,
-            'snapshot_at', now(),
-            'features', (
-              SELECT COALESCE(jsonb_object_agg(
-                f.code,
-                jsonb_build_object('enabled', a.enabled, 'value', a.numeric_value, 'kind', f.kind)
-              ), '{}'::jsonb)
-              FROM public.plan_feature_assignments a
-              JOIN public.plan_features f ON f.id = a.feature_id
-              WHERE a.plan_id = p.id
-            )
-          ),
-          grandfathered_at = now()
-      FROM public.subscription_plans p
-      WHERE p.designation = COALESCE(s.designation, s.tier)
-        AND s.status IN ('active','trialing','past_due')
-        ${data.designation ? "AND p.designation = $1" : ""};
-    `;
-    // Use a raw exec via PostgREST RPC fallback isn't available; use admin client RPC via sql.
-    // Simpler: do it row-by-row in JS since the admin client can't run raw SQL.
     const { data: plans, error: pErr } = await supabaseAdmin
       .from("subscription_plans")
       .select("id, designation, label, price_monthly_cents");
@@ -364,6 +683,9 @@ export const adminResnapshotAll = createServerFn({ method: "POST" })
         .eq("id", (s as any).id);
       updated++;
     }
-    void sql;
+    await logAudit(context.userId, "subscriptions.resnapshot", "subscriptions", data.designation ?? null, {
+      designation: data.designation ?? "all",
+      updated,
+    });
     return { ok: true, updated };
   });
