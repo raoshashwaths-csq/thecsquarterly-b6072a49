@@ -174,7 +174,11 @@ export function SiteHeader() {
                     {t("menu.yourWorkspace")}
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
+                <DropdownMenuItem asChild>
+                  <Link to="/account/quests" className="font-mono text-xs uppercase tracking-widest">
+                    {t("menu.futureOperator")}
+                  </Link>
+                </DropdownMenuItem>
                   onSelect={(e) => { e.preventDefault(); setExportOpen(true); }}
                   className="font-mono text-xs uppercase tracking-widest"
                 >
