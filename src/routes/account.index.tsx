@@ -338,6 +338,8 @@ function AccountPage() {
               <div className="text-xs text-muted-foreground">Available to Enterprise and Strategic Partner.</div>
             </SectionCard>
 
+            <MemorySettings />
+
             {me.data.isAdmin && (
               <SectionCard
                 eyebrow="Editorial"
