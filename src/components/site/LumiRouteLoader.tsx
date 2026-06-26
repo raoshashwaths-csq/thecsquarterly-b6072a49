@@ -6,13 +6,13 @@ import { getLoaderPrompts } from "@/hooks/useRouteTips";
 
 /**
  * LumiRouteLoader — branded route-pending state for heavy navigations.
- * Centered, full-bleed overlay with a pulsing Lumi badge and use-case
- * "bubbles" rising beneath it. Bubble copy is pulled from the existing
- * route-aware tip registry so it always matches the destination route.
+ * Centered, full-bleed overlay with a pulsing Lumi badge above a static
+ * cluster of quoted use-case lines pulled from the route-aware tip
+ * registry. No motion under the badge — quotes are static.
  */
 export function LumiRouteLoader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const prompts = useMemo(() => getLoaderPrompts(pathname), [pathname]);
+  const prompts = useMemo(() => getLoaderPrompts(pathname).slice(0, 3), [pathname]);
 
   return (
     <div
@@ -21,7 +21,6 @@ export function LumiRouteLoader() {
       aria-label="Loading"
       className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-background/85 backdrop-blur-sm"
     >
-      {/* Pulsing badge */}
       <div className="lumi-loader-badge relative w-24 h-24 sm:w-28 sm:h-28">
         <img
           src={darkAsset.url}
@@ -43,18 +42,19 @@ export function LumiRouteLoader() {
         Lumi is warming up…
       </p>
 
-      {/* Bubble field */}
-      <div className="lumi-bubble-field relative mt-8 h-[160px] w-full max-w-xl overflow-hidden">
-        {prompts.slice(0, 5).map((prompt, i) => (
-          <span
+      {/* Static use-case quotes */}
+      <ul className="mt-8 w-full max-w-xl space-y-3 px-6">
+        {prompts.map((prompt, i) => (
+          <li
             key={`${prompt}-${i}`}
-            className="lumi-bubble"
-            style={{ animationDelay: `${i * 0.7}s`, left: `${10 + i * 18}%` }}
+            className="border-l-2 border-secondary-accent/40 pl-4 text-sm md:text-base text-foreground/75 italic"
           >
+            <span aria-hidden>“</span>
             {prompt}
-          </span>
+            <span aria-hidden>”</span>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
