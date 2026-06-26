@@ -41,6 +41,18 @@ export function ResumeRunPrompt() {
     return () => { alive = false; };
   }, [list]);
 
+  // Broadcast open/close so LumiBubble can cede priority.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isOpen = open && !!run;
+    (window as any).__lumiResumeRunOpen = isOpen;
+    window.dispatchEvent(new CustomEvent("lumi:resume-run-open", { detail: { open: isOpen } }));
+    return () => {
+      (window as any).__lumiResumeRunOpen = false;
+      window.dispatchEvent(new CustomEvent("lumi:resume-run-open", { detail: { open: false } }));
+    };
+  }, [open, run]);
+
   function dismiss() {
     setOpen(false);
     if (typeof window !== "undefined") window.sessionStorage.setItem(SESSION_KEY, "1");
@@ -54,8 +66,9 @@ export function ResumeRunPrompt() {
     <div
       role="dialog"
       aria-label="Resume your last Lumi run"
-      className="fixed bottom-6 right-6 z-50 max-w-sm border border-border bg-card shadow-lg"
+      className="fixed z-50 bottom-[140px] right-5 md:bottom-[180px] md:right-8 max-w-sm border border-border bg-card shadow-lg"
     >
+
       <div className="p-4">
         <div className="flex items-start gap-3">
           <History className="h-4 w-4 text-secondary-accent mt-0.5" />

@@ -23,7 +23,11 @@ export function LumiBubble({
   const [mounted, setMounted] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [hiddenByScroll, setHiddenByScroll] = useState(false);
+  const [resumeOpen, setResumeOpen] = useState(
+    typeof window !== "undefined" && (window as any).__lumiResumeRunOpen === true,
+  );
   const reducedMotion = useRef(false);
+
 
   // Init: respect reduced motion, session dismiss, session messaged.
   useEffect(() => {
@@ -73,12 +77,23 @@ export function LumiBubble({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Cede priority to Resume Run popup whenever it is showing.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onChange = (e: Event) => {
+      const detail = (e as CustomEvent<{ open: boolean }>).detail;
+      setResumeOpen(!!detail?.open);
+    };
+    window.addEventListener("lumi:resume-run-open", onChange as EventListener);
+    return () => window.removeEventListener("lumi:resume-run-open", onChange as EventListener);
+  }, []);
+
   const dismiss = () => {
     try { sessionStorage.setItem(DISMISS_KEY, "1"); } catch { /* */ }
     setDismissed(true);
   };
 
-  if (!mounted || dismissed || drawerOpen || hiddenByScroll || actions.length === 0) {
+  if (!mounted || dismissed || drawerOpen || hiddenByScroll || resumeOpen || actions.length === 0) {
     return null;
   }
 
@@ -86,7 +101,8 @@ export function LumiBubble({
 
   return (
     <div
-      className="lumi-bubble fixed z-30 bottom-[140px] right-5 md:bottom-[180px] md:right-8 w-[220px] max-w-[calc(100vw-48px)]"
+      className="lumi-bubble fixed z-40 bottom-[140px] right-5 md:bottom-[180px] md:right-8 w-[220px] max-w-[calc(100vw-48px)]"
+
       role="status"
       aria-live="polite"
     >
