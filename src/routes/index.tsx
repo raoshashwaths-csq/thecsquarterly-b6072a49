@@ -113,67 +113,38 @@ function HomePage() {
         <TierStrip compact />
 
 
-        {/* Primary destination grid — four equal cards, each with a clear primary CTA */}
+        {/* Primary destination grid — four equal cards. Tier-gated cards
+            (Diagnostics, CSFactors, Decision Canvas / Lumi) pull badge,
+            headline, body and CTA from the central tierCopyConfig. */}
         <div className="mt-10 grid gap-4 md:grid-cols-2 text-left">
-          {/* AI Readiness */}
-          <Link
+          {/* AI Readiness — diagnostics feature */}
+          <TierAwareHeroCard
+            featureId="diagnostics"
             to="/diagnostics"
-            data-tour="ai-readiness-box"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7 card-lift"
-            aria-label="Take the AI Readiness Audit"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                aria-hidden
-                className="flex h-10 w-10 shrink-0 items-center justify-center bg-secondary-accent text-background rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
-              >
-                AR
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary-accent font-semibold">
-                {t("home.aiCard.eyebrow")}
-              </span>
-            </div>
-            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
-              {t("home.aiCard.title")}
-            </h3>
-            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
-              {t("home.aiCard.body")}
-            </p>
-            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent border-b border-secondary-accent/40 group-hover:border-secondary-accent pb-1 self-start">
-              {t("home.aiCard.cta")}
-            </span>
-            <QHint>{t("home.aiCard.hint")}</QHint>
-          </Link>
+            dataTour="ai-readiness-box"
+            ariaLabel={t("home.aiCard.title")}
+            accentClass="secondary-accent"
+            icon={<span className="font-mono text-sm font-bold tracking-tight">AR</span>}
+            hint={t("home.aiCard.hint")}
+            fallbackTitle={t("home.aiCard.title")}
+            fallbackBody={t("home.aiCard.body")}
+            fallbackCta={t("home.aiCard.cta")}
+          />
 
-          {/* CSFactors Command Centre */}
-          <Link
+          {/* CSFactors Command Centre — csfactors feature */}
+          <TierAwareHeroCard
+            featureId="csfactors"
             to="/csfactors"
-            data-tour="csf-box"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 card-lift"
-            aria-label="Open CSFactors Command Centre"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                aria-hidden
-                className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
-              >
-                CSF
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent font-semibold">
-                {t("home.csfCard.eyebrow")}
-              </span>
-            </div>
-            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
-              {t("home.csfCard.title")}
-            </h3>
-            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
-              {t("home.csfCard.body")}
-            </p>
-            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-1 self-start">
-              {t("home.csfCard.cta")}
-            </span>
-            <QHint>{t("home.csfCard.hint")}</QHint>
-          </Link>
+            dataTour="csf-box"
+            ariaLabel="Open CSFactors Command Centre"
+            accentClass="accent"
+            icon={<span className="font-mono text-sm font-bold tracking-tight">CSF</span>}
+            hint={t("home.csfCard.hint")}
+            fallbackTitle={t("home.csfCard.title")}
+            fallbackBody={t("home.csfCard.body")}
+            fallbackCta={t("home.csfCard.cta")}
+          />
+
 
           {/* Workspace */}
           <Link
