@@ -27,6 +27,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useEntitlements } from "@/hooks/useEntitlements";
 import { TierGateOverlay } from "@/components/site/TierGateOverlay";
+import { CSFactorsLanding } from "@/components/csfactors/CSFactorsLanding";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 
 export const Route = createFileRoute("/csfactors")({
