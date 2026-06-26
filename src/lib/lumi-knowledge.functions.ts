@@ -103,6 +103,92 @@ export async function getLumiKnowledgeContext(opts: {
 }
 
 // ---------------------------------------------------------------------------
+// buildLumiSystemPrompt — 3-layer assembly (spec'd by editorial).
+//
+// LAYER 1: static base voice (never changes).
+// LAYER 2: live benchmarks from benchmark_drops_latest (the canonical view —
+//          there is no lumi_benchmarks table; benchmark_drops is what
+//          workflow 2 writes into).
+// LAYER 3: 8 knowledge records — up to 5 tree-specific (any content_type)
+//          + up to 3 general benchmark_data records, recency-ordered, no
+//          semantic match. Use getLumiKnowledgeContext() instead when the
+//          caller has a free-form query and wants embedding similarity.
+//
+// userTier is accepted for future gating (e.g. expanded benchmark detail
+// for paid tiers); currently does not change the assembled prompt.
+// ---------------------------------------------------------------------------
+
+const LUMI_BASE_VOICE = [
+  "You are Lumi — The CS Quarterly's operational advisor.",
+  "The institutional knowledge of a 40-year Customer Success veteran, available at 11pm.",
+  "Audience: VPs and Directors of Customer Success at $20M–$1B ARR SaaS companies.",
+  "Voice: Economist / Stratechery register — structured, opinionated, specific. No hype, no hedging, no emoji.",
+  "Lead with the operator answer, then the why. Reference benchmarks where they sharpen the call.",
+].join("\n");
+
+export async function buildLumiSystemPrompt(
+  treeId: string | null | undefined,
+  userTier: string | null | undefined,
+): Promise<string> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  // LAYER 2 — live benchmarks
+  const { data: benchmarks } = await supabaseAdmin
+    .from("benchmark_drops_latest")
+    .select("metric, segment, value, p25, p50, p75, sample_size, period")
+    .limit(12);
+
+  const benchmarkLines = (benchmarks ?? [])
+    .filter((b) => b.metric != null && b.value != null)
+    .map((b) => {
+      const seg = b.segment ? ` (${b.segment})` : "";
+      const pct = b.p75 != null ? `, p75: ${b.p75}` : "";
+      const n = b.sample_size != null ? `, n=${b.sample_size}` : "";
+      return `${b.metric}${seg}: ${b.value}${pct}${n}`;
+    })
+    .join("\n");
+
+  const BENCHMARK_CONTEXT = benchmarkLines
+    ? `CURRENT RETENTION LEDGER DATA (live, updated weekly):\n${benchmarkLines}`
+    : "";
+
+  // LAYER 3 — knowledge records
+  const treeSpecificQuery = supabaseAdmin
+    .from("lumi_knowledge")
+    .select("content, confidence_level")
+    .eq("is_active", true)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  const treeSpecificPromise = treeId
+    ? treeSpecificQuery.contains("tree_relevance", [treeId])
+    : Promise.resolve({ data: [] as Array<{ content: string; confidence_level: string | null }> });
+
+  const [{ data: treeSpecific }, { data: general }] = await Promise.all([
+    treeSpecificPromise,
+    supabaseAdmin
+      .from("lumi_knowledge")
+      .select("content, confidence_level")
+      .eq("is_active", true)
+      .eq("content_type", "benchmark_data")
+      .order("created_at", { ascending: false })
+      .limit(3),
+  ]);
+
+  const allKnowledge = [...(treeSpecific ?? []), ...(general ?? [])];
+  const KNOWLEDGE_CONTEXT = allKnowledge.length
+    ? `CURRENT INTELLIGENCE (from The CS Quarterly research):\n${allKnowledge
+        .map((k) => `• ${k.content}`)
+        .join("\n")}`
+    : "";
+
+  // userTier reserved for future gating (paid tiers may unlock deeper benchmark slices).
+  void userTier;
+
+  return [LUMI_BASE_VOICE, BENCHMARK_CONTEXT, KNOWLEDGE_CONTEXT].filter(Boolean).join("\n\n");
+}
+
+// ---------------------------------------------------------------------------
 // Ingestion — distill an article into 3 knowledge records + embed + insert.
 // Called by the n8n article workflow (POST) and from the admin panel.
 // ---------------------------------------------------------------------------
