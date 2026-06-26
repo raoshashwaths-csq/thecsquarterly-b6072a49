@@ -159,6 +159,12 @@ function AccountPage() {
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">Members</div>
         <h1 className="font-display text-5xl tracking-tight mb-10">Your account</h1>
 
+        {user && (
+          <div className="mb-8">
+            <LumiMemoryNudge />
+          </div>
+        )}
+
         {isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
 
         {me.data && (
