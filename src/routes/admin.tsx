@@ -34,7 +34,7 @@ type SectionKey =
   | "dashboard" | "posts" | "conversations" | "playbooks"
   | "subscribers" | "subscriptions" | "purchases" | "payment-links"
   | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
-  | "import-articles" | "audit-log";
+  | "import-articles" | "audit-log" | "reader-signals";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
@@ -47,6 +47,7 @@ const NAV: NavItem[] = [
   { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
   { key: "subscriptions", label: "Members", icon: Users, group: "Audience" },
   { key: "diagnostic", label: "Diagnostic Responses", icon: BarChart3, group: "Audience" },
+  { key: "reader-signals", label: "Reader Signals", icon: BarChart3, group: "Audience" },
   { key: "community", label: "Community", icon: UsersRound, soon: true, group: "Audience" },
   { key: "purchases", label: "Purchases", icon: ShoppingBag, group: "Commerce" },
   { key: "payment-links", label: "Payment Links", icon: LinkIcon, soon: true, group: "Commerce" },
@@ -176,6 +177,7 @@ function AdminPage() {
               {active === "purchases" && <PurchasesList />}
               {active === "diagnostic" && <DiagnosticList />}
               {active === "q-agent" && <QAgentAdmin />}
+              {active === "reader-signals" && <ReaderSignalsAdmin />}
               {active === "import-articles" && <ImportArticlesAdmin />}
               {active === "audit-log" && <AuditLogAdmin />}
               {active === "conversations" && <ComingSoon
