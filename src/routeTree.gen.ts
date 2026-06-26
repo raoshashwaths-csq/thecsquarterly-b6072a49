@@ -80,6 +80,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.retention-ledger.ticker'
 import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
 
 const VanguardRoute = VanguardRouteImport.update({
@@ -450,6 +451,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRefreshBenchmarksRoute =
+  ApiPublicHooksRefreshBenchmarksRouteImport.update({
+    id: '/api/public/hooks/refresh-benchmarks',
+    path: '/api/public/hooks/refresh-benchmarks',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksIngestArticlesRoute =
   ApiPublicHooksIngestArticlesRouteImport.update({
     id: '/api/public/hooks/ingest-articles',
@@ -524,6 +531,7 @@ export interface FileRoutesByFullPath {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
+  '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -594,6 +602,7 @@ export interface FileRoutesByTo {
   '/csfactors/maps': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
+  '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -669,6 +678,7 @@ export interface FileRoutesById {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
+  '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -745,6 +755,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/ingest-articles'
+    | '/api/public/hooks/refresh-benchmarks'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -815,6 +826,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps'
     | '/diagnostics/ai-readiness'
     | '/api/public/hooks/ingest-articles'
+    | '/api/public/hooks/refresh-benchmarks'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -889,6 +901,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/ingest-articles'
+    | '/api/public/hooks/refresh-benchmarks'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -946,6 +959,7 @@ export interface RootRouteChildren {
   QResponseRunIdRoute: typeof QResponseRunIdRoute
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
+  ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
   ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
@@ -1453,6 +1467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/refresh-benchmarks': {
+      id: '/api/public/hooks/refresh-benchmarks'
+      path: '/api/public/hooks/refresh-benchmarks'
+      fullPath: '/api/public/hooks/refresh-benchmarks'
+      preLoaderRoute: typeof ApiPublicHooksRefreshBenchmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/ingest-articles': {
       id: '/api/public/hooks/ingest-articles'
       path: '/api/public/hooks/ingest-articles'
@@ -1606,6 +1627,7 @@ const rootRouteChildren: RootRouteChildren = {
   QResponseRunIdRoute: QResponseRunIdRoute,
   AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
+  ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
   ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
