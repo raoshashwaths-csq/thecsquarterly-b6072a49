@@ -23,6 +23,7 @@ import {
 } from "@/lib/admin.functions";
 import { exportDataset, importArticles, listAuditLog } from "@/lib/admin-ops.functions";
 import { backfillEmbeddings } from "@/lib/embeddings.functions";
+import { listReactionAggregates } from "@/lib/post-reactions.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/admin")({
