@@ -3,8 +3,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { QMark } from "@/components/site/QMark";
+import { LumiMark } from "@/components/site/LumiMark";
 import { PERSONA_OPTIONS, type Persona } from "@/hooks/usePersona";
 import { finishOnboarding } from "@/lib/onboarding.functions";
+import { saveFutureOperatorOnboarding } from "@/lib/future-operator.functions";
+import { useEntitlements } from "@/hooks/useEntitlements";
 
 type Props = {
   open: boolean;
