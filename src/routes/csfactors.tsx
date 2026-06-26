@@ -112,6 +112,38 @@ function CSFactorsPageInner() {
     enabled: !!user,
   });
 
+  // Realtime: when a tagged Lumi run updates account/stakeholder sentiment in
+  // the background (or from another tab), repaint the chips and stakeholder
+  // map without a manual refresh. RLS keeps each subscriber scoped to their
+  // own rows.
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel("csfactors-sentiment")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "cs_accounts" },
+        () => qc.invalidateQueries({ queryKey: ["cs-accounts"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "cs_stakeholders" },
+        () => qc.invalidateQueries({ queryKey: ["cs-stakeholders"] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "cs_account_events" },
+        () => {
+          qc.invalidateQueries({ queryKey: ["cs-account-events"] });
+          qc.invalidateQueries({ queryKey: ["cs-accounts"] });
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, qc]);
+
   const accounts = useMemo(() => applyQFilter(allAccounts, filter), [allAccounts, filter]);
 
   const [drawerId, setDrawerId] = useState<string | null>(null);
