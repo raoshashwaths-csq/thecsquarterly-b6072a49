@@ -454,6 +454,11 @@ function PostPage() {
       </div>
 
       <SiteFooter />
+
+      {/* Lumi Debrief — triggers at 90% scroll, once per slug per session. */}
+      {!post.locked || sub.tier !== "free" ? (
+        <LumiDebriefCard postId={post.id} slug={slug} title={post.title} progress={progress} />
+      ) : null}
     </div>
   );
 }
