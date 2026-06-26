@@ -198,6 +198,19 @@ function PageTransition() {
 
 
 
+function OnboardingGateMount() {
+  const gate = useOnboardingGate();
+  if (!gate.open) return null;
+  return (
+    <OnboardingStepper
+      open={gate.open}
+      initialPersona={gate.initialPersona as Persona | null}
+      onComplete={gate.complete}
+      onDismiss={gate.dismiss}
+    />
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -217,6 +230,9 @@ function RootComponent() {
         <Suspense fallback={null}>
           <CommandPalette />
         </Suspense>
+      </ClientOnly>
+      <ClientOnly fallback={null}>
+        <OnboardingGateMount />
       </ClientOnly>
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
