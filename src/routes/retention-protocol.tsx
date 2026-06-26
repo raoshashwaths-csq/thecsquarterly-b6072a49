@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { SectionPage, sectionPostsQuery } from "@/components/site/SectionPage";
 
 export const Route = createFileRoute("/retention-protocol")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "The Retention Protocol, Identify and mitigate churn" },

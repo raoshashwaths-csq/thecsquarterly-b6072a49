@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -9,6 +10,7 @@ import { SectionCard } from "@/components/dashboard/SectionCard";
 import { listBenchmarks } from "@/lib/enterprise.functions";
 
 export const Route = createFileRoute("/benchmarks")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "Benchmarks, The CS Quarterly" },

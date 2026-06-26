@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { canonicalUrl } from "@/lib/canonical-url";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +12,7 @@ import { ArrowLeft, Check, Sparkles, Mail, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/csfactors/maps/$id")({
+  pendingComponent: LumiRouteLoader,
   head: ({ params }) => ({ meta: [{ title: `MAP ${params.id} — CSFactors` }] }),
   component: MapDetail,
 });

@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { CSFactorsSidebar } from "@/components/csfactors/CSFactorsSidebar";
@@ -19,6 +20,7 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/csfactors/$accountId")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "Account — CSFactors" },

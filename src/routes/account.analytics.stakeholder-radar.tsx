@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnalyticsShell, AnalyticsEmpty } from "@/components/analytics/AnalyticsShell";
@@ -12,6 +13,7 @@ import { useEntitlements } from "@/hooks/useEntitlements";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 
 export const Route = createFileRoute("/account/analytics/stakeholder-radar")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "Stakeholder Radar — Analytics" },

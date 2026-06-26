@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -47,6 +48,7 @@ import {
 
 
 export const Route = createFileRoute("/admin/control-panel")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "Control Panel · The CS Quarterly" },

@@ -273,12 +273,69 @@
    - .cta-lift        → soft scale + tone hover for primary CTAs
    --------------------------------------------------------------- */
 @keyframes page-enter {
-  from { opacity: 0; transform: translate3d(0, 20px, 0); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 .page-enter {
-  animation: page-enter 400ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  will-change: opacity, transform;
+  animation: page-enter 150ms ease-out both;
+  will-change: opacity;
+}
+
+/* ---------------------------------------------------------------
+   Lumi route loader — pulsing badge + rising use-case bubbles.
+   Used as the router's defaultPendingComponent for slow routes.
+   --------------------------------------------------------------- */
+@keyframes lumi-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+@keyframes lumi-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-secondary-accent) 35%, transparent),
+                0 0 28px 4px color-mix(in oklab, var(--color-secondary-accent) 18%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 12px color-mix(in oklab, var(--color-secondary-accent) 0%, transparent),
+                0 0 44px 10px color-mix(in oklab, var(--color-secondary-accent) 32%, transparent);
+  }
+}
+.lumi-loader-badge {
+  animation: lumi-pulse 1.8s ease-in-out infinite;
+}
+.lumi-loader-badge::after {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  border-radius: 9999px;
+  pointer-events: none;
+  animation: lumi-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes lumi-bubble-rise {
+  0%   { transform: translateY(100%) scale(0.9); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateY(-40%) scale(1); opacity: 0; }
+}
+.lumi-bubble-field {
+  --bubble-duration: 5.5s;
+}
+.lumi-bubble {
+  position: absolute;
+  bottom: 0;
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--color-secondary-accent) 40%, transparent);
+  background: color-mix(in oklab, var(--color-secondary-accent) 8%, transparent);
+  color: var(--color-foreground);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: lumi-bubble-rise var(--bubble-duration) ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .reveal-up {
@@ -442,6 +499,9 @@
   .reveal-up { opacity: 1; transform: none; transition: none; }
   .smart-nav { transition: none; }
   .smart-nav-hidden { transform: none; }
+  .lumi-loader-badge,
+  .lumi-loader-badge::after,
+  .lumi-bubble { animation: none; opacity: 1; }
   .card-lift, .card-lift:hover,
   .widget-lift, .widget-lift:hover,
   .cta-lift, .cta-lift:hover, .cta-lift:active {

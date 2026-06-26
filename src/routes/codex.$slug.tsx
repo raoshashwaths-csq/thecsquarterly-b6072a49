@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { queryOptions, useSuspenseQuery, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ const playbookQuery = (slug: string) => queryOptions({
 });
 
 export const Route = createFileRoute("/codex/$slug")({
+  pendingComponent: LumiRouteLoader,
   loader: async ({ context, params }) => {
     const pb = await context.queryClient.ensureQueryData(playbookQuery(params.slug));
     if (!pb) throw notFound();

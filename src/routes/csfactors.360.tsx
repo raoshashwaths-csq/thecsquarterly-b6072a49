@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -26,6 +27,7 @@ import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 import { latestUpdatedAt } from "@/components/dashboard/useFreshness";
 
 export const Route = createFileRoute("/csfactors/360")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "360 Dashboard — CSFactors" },

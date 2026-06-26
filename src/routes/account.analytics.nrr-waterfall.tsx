@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AnalyticsShell, AnalyticsEmpty } from "@/components/analytics/AnalyticsShell";
@@ -13,6 +14,7 @@ import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/account/analytics/nrr-waterfall")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "NRR Waterfall — Analytics" },
