@@ -322,10 +322,6 @@ function HomePage() {
       {/* Operator / unknown: tools surface AFTER the editorial */}
       {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
-      {/* Paid logged-in users see the three Stages here at the bottom,
-          below the Operator Toolkit, above the closing CTA. */}
-      {stagesAtBottom && <HomeStages />}
-
       <ClosingCTA />
 
       <SiteFooter />
@@ -334,75 +330,7 @@ function HomePage() {
   );
 }
 
-// Stage 01/02/03 block — one definition rendered in either the top slot
-// (visitor / free) or the bottom slot (paid logged-in) by HomePage above.
-function HomeStages() {
-  return (
-    <StageRevealSection
-      stages={[
-        {
-          label: "The CSM",
-          caption: (
-            <div className="max-w-xl">
-              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                Stage 01 / Practitioner
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                For the practitioner managing thirty accounts.
-              </h2>
-              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                A personal command centre for the CSM in the trenches. Triage the burning three before standup, surface the renewals that need a real conversation, and keep every account note in one operator-grade canvas.
-              </p>
-              <StageCta featureId="csfactors" label="Start free →" />
-            </div>
-          ),
-          mock: <StageMock variant="pulse" />,
-        },
-        {
-          label: "The Leader",
-          caption: (
-            <div className="max-w-xl">
-              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                Stage 02 / Operator · Team
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                For the VP carrying the NRR number.
-              </h2>
-              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                Roll every CSM's book into a single 360° portfolio. Watch NRR move in real time, see which segments are bleeding gross retention, and act before the QBR turns into a post-mortem.
-              </p>
-              <StageCta featureId="csfactors" label="See the platform →" />
-            </div>
-          ),
-          mock: <StageMock variant="threeSixty" />,
-        },
-        {
-          label: "The Enterprise",
-          caption: (
-            <div className="max-w-xl">
-              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                Stage 03 / Scale · Enterprise
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                For the CCO presenting to the board on Monday.
-              </h2>
-              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                A risk register, capacity model and renewal waterfall the board will actually read. Export the slide, defend the number, and walk out with the next quarter already mapped.
-              </p>
-              <Link
-                to="/pricing"
-                className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-              >
-                View enterprise →
-              </Link>
-            </div>
-          ),
-          mock: <StageMock variant="risk" />,
-        },
-      ]}
-    />
-  );
-}
+
 
 
 // ─────────────────────────────────────────────────────────────────────────────
