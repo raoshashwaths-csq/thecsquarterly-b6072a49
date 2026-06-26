@@ -210,13 +210,12 @@ function FutureOperatorQuestsPage() {
                         Mark complete
                       </button>
                     ) : (
-                      <Link
-                        to="/"
-                        search={{ lumi: "open" } as never}
+                      <a
+                        href="/?lumi=open"
                         className="font-mono text-[11px] uppercase tracking-widest text-secondary-accent hover:text-accent"
                       >
                         Open Lumi debrief →
-                      </Link>
+                      </a>
                     )}
                   </div>
                 </div>
