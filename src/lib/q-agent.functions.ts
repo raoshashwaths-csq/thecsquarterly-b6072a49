@@ -5,6 +5,7 @@ import { getNode, breadcrumbFor, getTree } from "./q-trees";
 import { assertQUnderCap } from "./q-usage.functions";
 import { computeCostMicros } from "./q-pricing";
 import { recallMemoryFor, recordMemoryFor, renderMemoryBlock } from "./lumi-memory.functions";
+import { getLumiKnowledgeContext } from "./lumi-knowledge.functions";
 
 const Q_MODEL = "google/gemini-2.5-flash";
 
@@ -75,7 +76,9 @@ export const askQ = createServerFn({ method: "POST" })
     // Pull semantic memory before the model call (no-op for free tier).
     const memories = await recallMemoryFor(context.userId, data.question, 6);
     const memoryBlock = renderMemoryBlock(memories);
-    const system = memoryBlock ? `${baseSystem}\n\n${memoryBlock}` : baseSystem;
+    // Layer 3: portfolio-wide knowledge injection (distinct from Layer 3.5 per-user lumi_memory above).
+    const knowledge = await getLumiKnowledgeContext({ query: data.question });
+    const system = [baseSystem, memoryBlock, knowledge.block].filter(Boolean).join("\n\n");
 
     const t0 = Date.now();
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -117,6 +120,8 @@ export const askQ = createServerFn({ method: "POST" })
       latency_ms: latencyMs,
       cost_micros: costMicros,
       model: Q_MODEL,
+      knowledge_records_injected: knowledge.recordCount,
+      query_text: data.question.slice(0, 4000),
     });
 
 

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { assertQUnderCap } from "./q-usage.functions";
+import { getLumiKnowledgeContext } from "./lumi-knowledge.functions";
 
 const EMBED_MODEL = "openai/text-embedding-3-small";
 const EMBED_DIM = 1536;
@@ -223,6 +224,8 @@ export const startSituation = createServerFn({ method: "POST" })
     const dispatchContext = dispatches
       .map((d, i) => `[${i + 1}] "${d.title}" — framework: ${d.framework}\nExcerpt: ${d.excerpt}`)
       .join("\n\n");
+    // Layer 3: portfolio-wide knowledge injection.
+    const knowledge = await getLumiKnowledgeContext({ query: situation });
     const openingSystem = [
       "You are Lumi, the CS analyst inside The CS Quarterly's Situation Room.",
       "An operator just pasted a high-stakes live situation. You have retrieved 3 relevant dispatches from the archive.",
@@ -234,6 +237,7 @@ export const startSituation = createServerFn({ method: "POST" })
       "",
       "RETRIEVED DISPATCHES:",
       dispatchContext || "(no dispatches matched — proceed from first principles)",
+      knowledge.block ? "\n" + knowledge.block : "",
     ].join("\n");
 
     const opening = await callChat(apiKey, openingSystem, [
@@ -260,6 +264,8 @@ export const startSituation = createServerFn({ method: "POST" })
       context: { situation: situation.slice(0, 2000), sessionId: (inserted as { id: string }).id },
       witty: false,
       zones: { diagnosis: "", playbook: "", executable: opening.slice(0, 8000) },
+      knowledge_records_injected: knowledge.recordCount,
+      query_text: situation.slice(0, 4000),
     });
 
 

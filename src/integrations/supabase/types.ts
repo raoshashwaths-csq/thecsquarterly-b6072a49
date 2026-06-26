@@ -128,6 +128,9 @@ export type Database = {
           id: string
           metric: string
           notes: string | null
+          p25: number | null
+          p50: number | null
+          p75: number | null
           period: string
           published: boolean
           segment: string | null
@@ -138,6 +141,9 @@ export type Database = {
           id?: string
           metric: string
           notes?: string | null
+          p25?: number | null
+          p50?: number | null
+          p75?: number | null
           period: string
           published?: boolean
           segment?: string | null
@@ -148,6 +154,9 @@ export type Database = {
           id?: string
           metric?: string
           notes?: string | null
+          p25?: number | null
+          p50?: number | null
+          p75?: number | null
           period?: string
           published?: boolean
           segment?: string | null
@@ -782,6 +791,54 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_translation_queue: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_note: string | null
+          id: string
+          source_record_id: string
+          status: string
+          target_language: string
+          translated_record_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_note?: string | null
+          id?: string
+          source_record_id: string
+          status?: string
+          target_language: string
+          translated_record_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_note?: string | null
+          id?: string
+          source_record_id?: string
+          status?: string
+          target_language?: string
+          translated_record_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_translation_queue_source_record_id_fkey"
+            columns: ["source_record_id"]
+            isOneToOne: false
+            referencedRelation: "lumi_knowledge"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_translation_queue_translated_record_id_fkey"
+            columns: ["translated_record_id"]
+            isOneToOne: false
+            referencedRelation: "lumi_knowledge"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lumi_events: {
         Row: {
           briefing_shown: boolean
@@ -814,6 +871,114 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      lumi_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          knowledge_record_id: string | null
+          note: string | null
+          rating: string
+          run_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          knowledge_record_id?: string | null
+          note?: string | null
+          rating: string
+          run_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          knowledge_record_id?: string | null
+          note?: string | null
+          rating?: string
+          run_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lumi_feedback_knowledge_record_id_fkey"
+            columns: ["knowledge_record_id"]
+            isOneToOne: false
+            referencedRelation: "lumi_knowledge"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lumi_feedback_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "q_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lumi_feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lumi_knowledge: {
+        Row: {
+          content: string
+          content_type: string
+          created_at: string
+          embedding: string | null
+          id: string
+          is_active: boolean
+          language: string
+          source_record_id: string | null
+          source_slug: string | null
+          source_title: string | null
+          topic_tags: string[]
+          tree_relevance: string[]
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          content_type: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          source_record_id?: string | null
+          source_slug?: string | null
+          source_title?: string | null
+          topic_tags?: string[]
+          tree_relevance?: string[]
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          content_type?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          is_active?: boolean
+          language?: string
+          source_record_id?: string | null
+          source_slug?: string | null
+          source_title?: string | null
+          topic_tags?: string[]
+          tree_relevance?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lumi_knowledge_source_record_id_fkey"
+            columns: ["source_record_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lumi_memory: {
         Row: {
@@ -1357,9 +1522,11 @@ export type Database = {
           cost_micros: number | null
           created_at: string
           id: string
+          knowledge_records_injected: number | null
           latency_ms: number | null
           model: string | null
           node_id: string
+          query_text: string | null
           shared: boolean
           tagged_at: string | null
           tagged_stakeholder: string | null
@@ -1375,9 +1542,11 @@ export type Database = {
           cost_micros?: number | null
           created_at?: string
           id?: string
+          knowledge_records_injected?: number | null
           latency_ms?: number | null
           model?: string | null
           node_id: string
+          query_text?: string | null
           shared?: boolean
           tagged_at?: string | null
           tagged_stakeholder?: string | null
@@ -1393,9 +1562,11 @@ export type Database = {
           cost_micros?: number | null
           created_at?: string
           id?: string
+          knowledge_records_injected?: number | null
           latency_ms?: number | null
           model?: string | null
           node_id?: string
+          query_text?: string | null
           shared?: boolean
           tagged_at?: string | null
           tagged_stakeholder?: string | null
@@ -2060,7 +2231,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      benchmark_drops_latest: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          metric: string | null
+          notes: string | null
+          p25: number | null
+          p50: number | null
+          p75: number | null
+          period: string | null
+          published: boolean | null
+          segment: string | null
+          value: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_post_reaction_aggregates: {
@@ -2101,6 +2287,24 @@ export type Database = {
       is_team_member: {
         Args: { _team: string; _user: string }
         Returns: boolean
+      }
+      match_lumi_knowledge: {
+        Args: {
+          _k?: number
+          _language?: string
+          _query: string
+          _tree_id?: string
+        }
+        Returns: {
+          content: string
+          content_type: string
+          id: string
+          similarity: number
+          source_slug: string
+          source_title: string
+          topic_tags: string[]
+          tree_relevance: string[]
+        }[]
       }
       match_lumi_memory: {
         Args: { _k?: number; _query: string; _user_id: string }
