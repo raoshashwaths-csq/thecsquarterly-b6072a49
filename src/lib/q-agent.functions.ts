@@ -119,6 +119,17 @@ export const askQ = createServerFn({ method: "POST" })
       model: Q_MODEL,
     });
 
+    // Fire-and-forget: extract durable memories from this exchange.
+    if (reply) {
+      const extracted = await extractMemoriesFromExchange(apiKey, data.question, reply);
+      if (extracted.length) {
+        await recordMemoryFor(
+          context.userId,
+          extracted.map((m) => ({ ...m, source: "lumi_chat" })),
+        );
+      }
+    }
+
     return { reply };
   });
 
