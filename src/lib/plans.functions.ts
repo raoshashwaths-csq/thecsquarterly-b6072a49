@@ -112,6 +112,7 @@ async function logAudit(
   target_id: string | null,
   details: Record<string, unknown>,
 ) {
+  const detailsJson = JSON.parse(JSON.stringify(details));
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Try to resolve email for nicer audit display.
