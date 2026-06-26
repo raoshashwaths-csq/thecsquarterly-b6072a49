@@ -85,11 +85,6 @@ function HomePage() {
     ? seededPosts.filter((p) => p.slug !== featured?.slug).slice(0, 4)
     : restRecency;
 
-  // Stages render under hero for visitors/free, at the bottom for paid users.
-  // While entitlements are still resolving, render NEITHER slot to keep order
-  // stable across hard refresh (no flash + re-mount when tier flips).
-  const stagesAtTop = !sub.loading && !sub.canAccessCSFactors;
-  const stagesAtBottom = !sub.loading && sub.canAccessCSFactors;
 
   // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
   // server render; swap to the viewer's local day-of-week after mount.
