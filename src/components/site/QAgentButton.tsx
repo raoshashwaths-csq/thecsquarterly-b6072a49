@@ -288,10 +288,7 @@ export function QAgentButton() {
                   visible={!answer}
                   onActionSelect={(prompt) => {
                     setQuery(prompt);
-                    // Auto-submit after state flush.
-                    setTimeout(() => {
-                      void handleAsk();
-                    }, 0);
+                    void submitQuestion(prompt);
                   }}
                 />
               </div>
