@@ -280,6 +280,117 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
               </div>
             </Step>
           )}
+
+          {step === 5 && isPractitionerPlus && (
+            <Step
+              eyebrow="Future Operator · One last thing"
+              title="Where are you heading?"
+              hint="Lumi's Future Operator persona will reference this in your daily quests and drift signals."
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <LumiMark variant="gold" className="h-10 w-10" />
+                <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent">
+                  Practitioner+ · Future Operator
+                </div>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/70 mb-2 block">
+                    1 · The future state of your team or book
+                  </label>
+                  <textarea
+                    value={form.future_team_state}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, future_team_state: e.target.value.slice(0, 400) }))
+                    }
+                    rows={2}
+                    placeholder="e.g. NRR above 120%, zero unforecasted churn, every CSM owning a strategic account."
+                    className="w-full p-3 bg-transparent border border-border focus:border-foreground outline-none text-sm font-serif resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/70 mb-2 block">
+                    2 · Your 1–3 core commitments to get there
+                  </label>
+                  <div className="space-y-2 mb-2">
+                    {form.core_commitments.map((c, i) => (
+                      <div key={i} className="flex items-center justify-between border border-border px-3 py-2 text-sm font-serif">
+                        <span className="truncate">{c}</span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setForm((f) => ({
+                              ...f,
+                              core_commitments: f.core_commitments.filter((_, j) => j !== i),
+                            }))
+                          }
+                          className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-accent ml-3"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  {form.core_commitments.length < 3 && (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={commitmentDraft}
+                        onChange={(e) => setCommitmentDraft(e.target.value.slice(0, 280))}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && commitmentDraft.trim()) {
+                            e.preventDefault();
+                            setForm((f) => ({
+                              ...f,
+                              core_commitments: [...f.core_commitments, commitmentDraft.trim()],
+                            }));
+                            setCommitmentDraft("");
+                          }
+                        }}
+                        placeholder="e.g. Lead every renewal conversation, not react to it."
+                        className="flex-1 p-3 bg-transparent border border-border focus:border-foreground outline-none text-sm font-serif"
+                      />
+                      <button
+                        type="button"
+                        disabled={!commitmentDraft.trim()}
+                        onClick={() => {
+                          if (!commitmentDraft.trim()) return;
+                          setForm((f) => ({
+                            ...f,
+                            core_commitments: [...f.core_commitments, commitmentDraft.trim()],
+                          }));
+                          setCommitmentDraft("");
+                        }}
+                        className="px-4 border border-border font-mono text-[10px] uppercase tracking-widest hover:border-accent hover:text-accent disabled:opacity-40 disabled:cursor-not-allowed"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  )}
+                  <div className="mt-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {form.core_commitments.length}/3 commitments
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/70 mb-2 block">
+                    3 · Your single most important focus account right now
+                  </label>
+                  <input
+                    type="text"
+                    value={form.current_focus_account}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, current_focus_account: e.target.value.slice(0, 280) }))
+                    }
+                    placeholder="Optional. Name + the one outcome that matters."
+                    className="w-full p-3 bg-transparent border border-border focus:border-foreground outline-none text-sm font-serif"
+                  />
+                </div>
+              </div>
+            </Step>
+          )}
         </div>
 
         {/* Footer */}
