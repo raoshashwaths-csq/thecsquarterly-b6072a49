@@ -72,12 +72,36 @@ function articleCopy(tier: UiTier, continueAvailable: boolean): Copy {
   };
 }
 
+const GATE_TO_FEATURE = {
+  codex: "codex-library",
+  csfactors: "csfactors",
+  lumi: "lumi",
+} as const;
+
 export function PaywallOverlay({ gate, tier: tierOverride, onContinueFree, continueAvailable }: Props) {
   const sub = useSubscriptionTier();
   const tier = tierOverride ?? sub.tier;
   const allowContinue =
     tier === "free" && gate === "article" && !!onContinueFree && (continueAvailable ?? true);
-  const copy = copyFor(gate, tier, allowContinue);
+
+  // TIER-AWARE — pull copy from tierCopyConfig for feature gates. The hook
+  // call is unconditional; we always ask for a feature key and only use the
+  // result when the gate maps to one.
+  const featureId = gate === "article" ? "csfactors" : GATE_TO_FEATURE[gate];
+  const featureCopy = useTierCopy(featureId);
+  const practitionerPrice = getTier("practitioner")?.priceMonthly ?? "$39";
+
+  const copy: Copy = gate === "article"
+    ? articleCopy(tier, allowContinue)
+    : {
+        headline: featureCopy.headline ?? "Upgrade to continue.",
+        subhead: featureCopy.body ?? "This content sits a tier above your current plan.",
+        primaryLabel: featureCopy.cta,
+        primaryTo: featureCopy.lockIcon ? "/pricing" : routeForGate(gate),
+        secondaryLabel: featureCopy.lockIcon && sub.isLoggedIn ? "Stay on current plan" : undefined,
+        secondaryTo: featureCopy.lockIcon && sub.isLoggedIn ? "/account" : undefined,
+        price: featureCopy.lockIcon ? `${practitionerPrice} per month. Cancel any time.` : undefined,
+      };
 
   return (
     <div className="absolute inset-x-0 top-0 z-20 flex justify-center pt-12 pb-20 pointer-events-none">
