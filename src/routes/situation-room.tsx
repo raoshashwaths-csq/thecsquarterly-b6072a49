@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Mic, Save, Send, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowLeft, Mic, Save, Sparkles, ChevronRight, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { LumiMark } from "@/components/site/LumiMark";
@@ -11,9 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
   startSituation,
-  continueSituation,
   saveSituationLog,
   listSituationSessions,
+  getSituationQuota,
 } from "@/lib/situation-room.functions";
 import { listMyQRuns, listMyTaggedLumiRuns } from "@/lib/q-agent.functions";
 import { getNode, getTree } from "@/lib/q-trees";
