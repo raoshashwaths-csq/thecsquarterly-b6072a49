@@ -20,6 +20,8 @@ import { ExportDialog } from "@/components/site/ExportDialog";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
+import lumiBadgeDark from "@/assets/lumi-badge-dark.jpg.asset.json";
+import lumiBadgeLight from "@/assets/lumi-badge-light.png.asset.json";
 
 export function SiteHeader() {
   const { t } = useTranslation();
