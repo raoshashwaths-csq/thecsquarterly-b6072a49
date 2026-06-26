@@ -22,7 +22,7 @@ import {
   type PublicAssignment,
 } from "@/lib/plans.functions";
 
-export const Route = createFileRoute("/_authenticated/admin/plans")({
+export const Route = createFileRoute("/admin/plans")({
   head: () => ({
     meta: [{ title: "Plan & SKU editor — Admin" }],
   }),

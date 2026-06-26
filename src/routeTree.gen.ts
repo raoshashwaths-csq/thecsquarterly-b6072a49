@@ -52,6 +52,7 @@ import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
 import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
+import { Route as AdminPlansRouteImport } from './routes/admin.plans'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
@@ -75,7 +76,6 @@ import { Route as AccountAnalyticsTeamLeaderboardRouteImport } from './routes/ac
 import { Route as AccountAnalyticsStakeholderRadarRouteImport } from './routes/account.analytics.stakeholder-radar'
 import { Route as AccountAnalyticsRetentionFunnelRouteImport } from './routes/account.analytics.retention-funnel'
 import { Route as AccountAnalyticsNrrWaterfallRouteImport } from './routes/account.analytics.nrr-waterfall'
-import { Route as AuthenticatedAdminPlansRouteImport } from './routes/_authenticated/admin.plans'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -310,6 +310,11 @@ const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
   path: '/agent/framework',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPlansRoute = AdminPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
@@ -432,11 +437,6 @@ const AccountAnalyticsNrrWaterfallRoute =
     path: '/account/analytics/nrr-waterfall',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedAdminPlansRoute = AuthenticatedAdminPlansRouteImport.update({
-  id: '/_authenticated/admin/plans',
-  path: '/admin/plans',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -570,6 +570,7 @@ export interface FileRoutesByFullPath {
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/plans': typeof AdminPlansRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -588,7 +589,6 @@ export interface FileRoutesByFullPath {
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
-  '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
@@ -653,6 +653,7 @@ export interface FileRoutesByTo {
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/plans': typeof AdminPlansRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -670,7 +671,6 @@ export interface FileRoutesByTo {
   '/codex': typeof CodexIndexRoute
   '/diagnostics': typeof DiagnosticsIndexRoute
   '/insights': typeof InsightsIndexRoute
-  '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
@@ -739,6 +739,7 @@ export interface FileRoutesById {
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/plans': typeof AdminPlansRoute
   '/agent/framework': typeof AgentFrameworkRoute
   '/ai-readiness/survey': typeof AiReadinessSurveyRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -757,7 +758,6 @@ export interface FileRoutesById {
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
-  '/_authenticated/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
@@ -827,6 +827,7 @@ export interface FileRouteTypes {
     | '/account/workspace'
     | '/admin/control-panel'
     | '/admin/payments'
+    | '/admin/plans'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/checkout/return'
@@ -845,7 +846,6 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
-    | '/admin/plans'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
     | '/account/analytics/stakeholder-radar'
@@ -910,6 +910,7 @@ export interface FileRouteTypes {
     | '/account/workspace'
     | '/admin/control-panel'
     | '/admin/payments'
+    | '/admin/plans'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/checkout/return'
@@ -927,7 +928,6 @@ export interface FileRouteTypes {
     | '/codex'
     | '/diagnostics'
     | '/insights'
-    | '/admin/plans'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
     | '/account/analytics/stakeholder-radar'
@@ -995,6 +995,7 @@ export interface FileRouteTypes {
     | '/account/workspace'
     | '/admin/control-panel'
     | '/admin/payments'
+    | '/admin/plans'
     | '/agent/framework'
     | '/ai-readiness/survey'
     | '/checkout/return'
@@ -1013,7 +1014,6 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
-    | '/_authenticated/admin/plans'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
     | '/account/analytics/stakeholder-radar'
@@ -1089,7 +1089,6 @@ export interface RootRouteChildren {
   MTokenRoute: typeof MTokenRoute
   AccountIndexRoute: typeof AccountIndexRoute
   DiagnosticsIndexRoute: typeof DiagnosticsIndexRoute
-  AuthenticatedAdminPlansRoute: typeof AuthenticatedAdminPlansRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
   AccountAnalyticsRetentionFunnelRoute: typeof AccountAnalyticsRetentionFunnelRoute
   AccountAnalyticsStakeholderRadarRoute: typeof AccountAnalyticsStakeholderRadarRoute
@@ -1423,6 +1422,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentFrameworkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/plans': {
+      id: '/admin/plans'
+      path: '/plans'
+      fullPath: '/admin/plans'
+      preLoaderRoute: typeof AdminPlansRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/payments': {
       id: '/admin/payments'
       path: '/payments'
@@ -1584,13 +1590,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAnalyticsNrrWaterfallRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin/plans': {
-      id: '/_authenticated/admin/plans'
-      path: '/admin/plans'
-      fullPath: '/admin/plans'
-      preLoaderRoute: typeof AuthenticatedAdminPlansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1716,12 +1715,14 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminControlPanelRoute: typeof AdminControlPanelRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminPlansRoute: typeof AdminPlansRoute
   AdminContentTranslationRoute: typeof AdminContentTranslationRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminControlPanelRoute: AdminControlPanelRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminPlansRoute: AdminPlansRoute,
   AdminContentTranslationRoute: AdminContentTranslationRoute,
 }
 
@@ -1845,7 +1846,6 @@ const rootRouteChildren: RootRouteChildren = {
   MTokenRoute: MTokenRoute,
   AccountIndexRoute: AccountIndexRoute,
   DiagnosticsIndexRoute: DiagnosticsIndexRoute,
-  AuthenticatedAdminPlansRoute: AuthenticatedAdminPlansRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
   AccountAnalyticsRetentionFunnelRoute: AccountAnalyticsRetentionFunnelRoute,
   AccountAnalyticsStakeholderRadarRoute: AccountAnalyticsStakeholderRadarRoute,
