@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Reveal } from "@/components/site/Reveal";
 import { QMark } from "@/components/site/QMark";
 import { TIERS, tierMailto, type Tier } from "@/lib/tiers";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { DESIGNATION_RANK } from "@/lib/entitlements";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -260,16 +262,43 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
 }
 
 function TierCta({ tier, emphasized }: { tier: Tier; emphasized: boolean }) {
+  const sub = useSubscriptionTier();
   const cls =
     "block w-full py-3.5 text-center font-mono text-xs uppercase tracking-[0.25em] transition-all " +
     (emphasized
       ? "bg-accent text-accent-foreground hover:opacity-90"
       : "border border-foreground hover:bg-foreground hover:text-background");
 
+  // Tier-aware routing — show "Your current plan" when the user already
+  // owns this tier, "Manage plan" for any tier strictly below their
+  // current designation, and the usual upgrade/contact CTAs otherwise.
+  if (!sub.loading && sub.isLoggedIn) {
+    const currentRank = DESIGNATION_RANK[sub.designation] ?? 0;
+    const rowRank = DESIGNATION_RANK[tier.designation] ?? 0;
+    if (rowRank === currentRank) {
+      return (
+        <span
+          aria-current="true"
+          className={`${cls} bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 cursor-default`}
+        >
+          Your current plan
+        </span>
+      );
+    }
+    if (rowRank < currentRank) {
+      return (
+        <Link to="/account" className={cls}>
+          Manage plan
+        </Link>
+      );
+    }
+    // rowRank > currentRank → upgrade path; fall through to defaults.
+  }
+
   if (tier.ctaKind === "free") {
     return (
-      <Link to="/login" className={cls}>
-        {tier.cta}
+      <Link to={sub.isLoggedIn ? "/account" : "/login"} className={cls}>
+        {sub.isLoggedIn ? "Manage plan" : tier.cta}
       </Link>
     );
   }
@@ -281,8 +310,12 @@ function TierCta({ tier, emphasized }: { tier: Tier; emphasized: boolean }) {
     );
   }
   return (
-    <Link to="/subscribe" search={{ tier: tier.designation }} className={cls}>
-      {tier.cta}
+    <Link
+      to={sub.isLoggedIn ? "/subscribe" : "/login"}
+      search={sub.isLoggedIn ? { tier: tier.designation } : undefined}
+      className={cls}
+    >
+      {sub.isLoggedIn ? `Upgrade to ${tier.label}` : tier.cta}
     </Link>
   );
 }

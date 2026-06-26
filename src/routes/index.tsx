@@ -205,12 +205,8 @@ function HomePage() {
                 <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
                   A personal command centre for the CSM in the trenches. Triage the burning three before standup, surface the renewals that need a real conversation, and keep every account note in one operator-grade canvas.
                 </p>
-                <Link
-                  to="/csfactors"
-                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-                >
-                  Start free →
-                </Link>
+                <StageCta featureId="csfactors" label="Start free →" />
+
               </div>
             ),
             right: <StageMock variant="pulse" />,
@@ -228,12 +224,7 @@ function HomePage() {
                 <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
                   Roll every CSM's book into a single 360° portfolio. Watch NRR move in real time, see which segments are bleeding gross retention, and act before the QBR turns into a post-mortem.
                 </p>
-                <Link
-                  to="/csfactors/360"
-                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-                >
-                  See the platform →
-                </Link>
+                <StageCta featureId="csfactors" label="See the platform →" />
               </div>
             ),
             right: <StageMock variant="threeSixty" />,
@@ -414,7 +405,7 @@ function TierAwareHeroCard({
   const ctaColor = isAccent ? "text-accent border-accent/40 group-hover:border-accent" : "text-secondary-accent border-secondary-accent/40 group-hover:border-secondary-accent";
   return (
     <Link
-      to={to}
+      to={(copy.ctaHref ?? to) as never}
       data-tour={dataTour}
       className={`group relative flex flex-col h-full bg-card border border-border ${borderColor} border-l-4 transition-colors p-6 md:p-7 card-lift`}
       aria-label={ariaLabel}
@@ -438,6 +429,28 @@ function TierAwareHeroCard({
         {copy.cta ?? fallbackCta}
       </span>
       {hint && <QHint>{hint}</QHint>}
+    </Link>
+  );
+}
+
+// Stage CTA — keeps the editorial label (e.g. "Start free →") but routes
+// to the right destination based on the viewer's tier. Visitors land on
+// /login, free/reader users on /pricing (upgrade), entitled users on the
+// feature itself. Drives off the same CTA_ROUTES table as the hero cards.
+function StageCta({
+  featureId,
+  label,
+}: {
+  featureId: import("@/config/tierCopyConfig").FeatureId;
+  label: string;
+}) {
+  const copy = useTierCopy(featureId);
+  return (
+    <Link
+      to={copy.ctaHref as never}
+      className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+    >
+      {label}
     </Link>
   );
 }
