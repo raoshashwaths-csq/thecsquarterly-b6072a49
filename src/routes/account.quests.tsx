@@ -76,7 +76,7 @@ function FutureOperatorQuestsPage() {
         <SectionCard
           eyebrow="Future Operator"
           title="Available for Practitioner subscribers"
-          subtitle="The Future Operator is a Lumi persona that sends you daily quests, drift signals, and reflection prompts from the version of you 12 months from now."
+          description="The Future Operator is a Lumi persona that sends you daily quests, drift signals, and reflection prompts from the version of you 12 months from now."
         >
           <div className="mt-4">
             <Link
@@ -99,7 +99,7 @@ function FutureOperatorQuestsPage() {
         <SectionCard
           eyebrow="Future Operator"
           title="Meet the version of you who already figured it out."
-          subtitle="Complete the three onboarding questions to activate your Future Operator. Today's quests will arrive tomorrow morning."
+          description="Complete the three onboarding questions to activate your Future Operator. Today's quests will arrive tomorrow morning."
         >
           <div className="mt-4 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
             Onboarding step coming soon · for now, your profile is empty.
@@ -158,7 +158,7 @@ function FutureOperatorQuestsPage() {
         <SectionCard
           eyebrow="No quests yet"
           title="Your first three quests arrive tomorrow morning."
-          subtitle="The Future Operator generates a new set every day at 07:30 in your timezone."
+          description="The Future Operator generates a new set every day at 07:30 in your timezone."
         />
       ) : (
         <ul className="space-y-4">
@@ -244,7 +244,7 @@ function FutureOperatorQuestsPage() {
         <SectionCard
           eyebrow={paused ? "Paused" : "Cadence"}
           title={paused ? "Future Operator is paused." : "Pause Future Operator"}
-          subtitle={
+          description={
             paused
               ? `Resumes ${new Date(profile.paused_until!).toLocaleDateString()}.`
               : "Mute drift signals, daily quests, and reflection prompts."
