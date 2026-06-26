@@ -5,6 +5,8 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { Reveal } from "@/components/site/Reveal";
 import { QMark } from "@/components/site/QMark";
 import { TIERS, tierMailto, type Tier } from "@/lib/tiers";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { DESIGNATION_RANK } from "@/lib/entitlements";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
