@@ -474,8 +474,7 @@
   .smart-nav { transition: none; }
   .smart-nav-hidden { transform: none; }
   .lumi-loader-badge,
-  .lumi-loader-badge::after,
-  .lumi-bubble { animation: none; opacity: 1; }
+  .lumi-loader-badge::after { animation: none; opacity: 1; }
   .card-lift, .card-lift:hover,
   .widget-lift, .widget-lift:hover,
   .cta-lift, .cta-lift:hover, .cta-lift:active {
