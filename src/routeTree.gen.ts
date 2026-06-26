@@ -81,6 +81,7 @@ import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.
 import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
+import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
 
 const VanguardRoute = VanguardRouteImport.update({
@@ -457,6 +458,12 @@ const ApiPublicHooksRefreshBenchmarksRoute =
     path: '/api/public/hooks/refresh-benchmarks',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPullExternalIntelRoute =
+  ApiPublicHooksPullExternalIntelRouteImport.update({
+    id: '/api/public/hooks/pull-external-intel',
+    path: '/api/public/hooks/pull-external-intel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksIngestArticlesRoute =
   ApiPublicHooksIngestArticlesRouteImport.update({
     id: '/api/public/hooks/ingest-articles',
@@ -531,6 +538,7 @@ export interface FileRoutesByFullPath {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
+  '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
@@ -602,6 +610,7 @@ export interface FileRoutesByTo {
   '/csfactors/maps': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
+  '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
@@ -678,6 +687,7 @@ export interface FileRoutesById {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
+  '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
@@ -755,6 +765,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/ingest-articles'
+    | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
@@ -826,6 +837,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps'
     | '/diagnostics/ai-readiness'
     | '/api/public/hooks/ingest-articles'
+    | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
@@ -901,6 +913,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/ingest-articles'
+    | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
@@ -959,6 +972,7 @@ export interface RootRouteChildren {
   QResponseRunIdRoute: typeof QResponseRunIdRoute
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
+  ApiPublicHooksPullExternalIntelRoute: typeof ApiPublicHooksPullExternalIntelRoute
   ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
@@ -1474,6 +1488,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRefreshBenchmarksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/pull-external-intel': {
+      id: '/api/public/hooks/pull-external-intel'
+      path: '/api/public/hooks/pull-external-intel'
+      fullPath: '/api/public/hooks/pull-external-intel'
+      preLoaderRoute: typeof ApiPublicHooksPullExternalIntelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/ingest-articles': {
       id: '/api/public/hooks/ingest-articles'
       path: '/api/public/hooks/ingest-articles'
@@ -1627,6 +1648,7 @@ const rootRouteChildren: RootRouteChildren = {
   QResponseRunIdRoute: QResponseRunIdRoute,
   AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
+  ApiPublicHooksPullExternalIntelRoute: ApiPublicHooksPullExternalIntelRoute,
   ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
