@@ -70,7 +70,10 @@ export function QAgentButton() {
   const fetchEntitlement = useServerFn(getQEntitlement);
   const fetchUsage = useServerFn(getMonthlyQUsage);
   const runUniversal = useServerFn(globalSearch);
+  const fetchSeed = useServerFn(getFutureOperatorNotification);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useRouterState({ select: (s) => s.location.search as Record<string, unknown> });
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const tour = useTour();
