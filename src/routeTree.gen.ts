@@ -75,6 +75,7 @@ import { Route as AccountAnalyticsTeamLeaderboardRouteImport } from './routes/ac
 import { Route as AccountAnalyticsStakeholderRadarRouteImport } from './routes/account.analytics.stakeholder-radar'
 import { Route as AccountAnalyticsRetentionFunnelRouteImport } from './routes/account.analytics.retention-funnel'
 import { Route as AccountAnalyticsNrrWaterfallRouteImport } from './routes/account.analytics.nrr-waterfall'
+import { Route as AuthenticatedAdminPlansRouteImport } from './routes/_authenticated/admin.plans'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -431,6 +432,11 @@ const AccountAnalyticsNrrWaterfallRoute =
     path: '/account/analytics/nrr-waterfall',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminPlansRoute = AuthenticatedAdminPlansRouteImport.update({
+  id: '/_authenticated/admin/plans',
+  path: '/admin/plans',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -582,6 +588,7 @@ export interface FileRoutesByFullPath {
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
@@ -663,6 +670,7 @@ export interface FileRoutesByTo {
   '/codex': typeof CodexIndexRoute
   '/diagnostics': typeof DiagnosticsIndexRoute
   '/insights': typeof InsightsIndexRoute
+  '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
@@ -749,6 +757,7 @@ export interface FileRoutesById {
   '/codex/': typeof CodexIndexRoute
   '/diagnostics/': typeof DiagnosticsIndexRoute
   '/insights/': typeof InsightsIndexRoute
+  '/_authenticated/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/account/analytics/nrr-waterfall': typeof AccountAnalyticsNrrWaterfallRoute
   '/account/analytics/retention-funnel': typeof AccountAnalyticsRetentionFunnelRoute
   '/account/analytics/stakeholder-radar': typeof AccountAnalyticsStakeholderRadarRoute
@@ -836,6 +845,7 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
+    | '/admin/plans'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
     | '/account/analytics/stakeholder-radar'
@@ -917,6 +927,7 @@ export interface FileRouteTypes {
     | '/codex'
     | '/diagnostics'
     | '/insights'
+    | '/admin/plans'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
     | '/account/analytics/stakeholder-radar'
@@ -1002,6 +1013,7 @@ export interface FileRouteTypes {
     | '/codex/'
     | '/diagnostics/'
     | '/insights/'
+    | '/_authenticated/admin/plans'
     | '/account/analytics/nrr-waterfall'
     | '/account/analytics/retention-funnel'
     | '/account/analytics/stakeholder-radar'
@@ -1077,6 +1089,7 @@ export interface RootRouteChildren {
   MTokenRoute: typeof MTokenRoute
   AccountIndexRoute: typeof AccountIndexRoute
   DiagnosticsIndexRoute: typeof DiagnosticsIndexRoute
+  AuthenticatedAdminPlansRoute: typeof AuthenticatedAdminPlansRoute
   AccountAnalyticsNrrWaterfallRoute: typeof AccountAnalyticsNrrWaterfallRoute
   AccountAnalyticsRetentionFunnelRoute: typeof AccountAnalyticsRetentionFunnelRoute
   AccountAnalyticsStakeholderRadarRoute: typeof AccountAnalyticsStakeholderRadarRoute
@@ -1571,6 +1584,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAnalyticsNrrWaterfallRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/plans': {
+      id: '/_authenticated/admin/plans'
+      path: '/admin/plans'
+      fullPath: '/admin/plans'
+      preLoaderRoute: typeof AuthenticatedAdminPlansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1825,6 +1845,7 @@ const rootRouteChildren: RootRouteChildren = {
   MTokenRoute: MTokenRoute,
   AccountIndexRoute: AccountIndexRoute,
   DiagnosticsIndexRoute: DiagnosticsIndexRoute,
+  AuthenticatedAdminPlansRoute: AuthenticatedAdminPlansRoute,
   AccountAnalyticsNrrWaterfallRoute: AccountAnalyticsNrrWaterfallRoute,
   AccountAnalyticsRetentionFunnelRoute: AccountAnalyticsRetentionFunnelRoute,
   AccountAnalyticsStakeholderRadarRoute: AccountAnalyticsStakeholderRadarRoute,

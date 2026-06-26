@@ -1,136 +1,189 @@
-## Future Operator — implementation plan
 
-Builds the PRD as a Lumi persona (not a new agent), gated at Practitioner+, with a separate admin-controlled budget. New `/account/quests` route, header bell, and reflection prompts that open the Lumi drawer with a seeded first message.
+# Admin Pricing & Feature Control Panel
 
----
+Today `src/lib/tiers.ts` is the hardcoded source of truth for tier copy, price, caps, and the bulleted "features" string list. There is no SKU concept — features are free-text bullets, so admin edits can't drive RBAC. This plan moves plans + features into the database, builds the admin editor, makes the pricing page read live, ties RBAC to a granular feature catalog, and grandfathers existing subscribers.
 
-### 1. Data model (one migration)
+## 1. Granular SKU catalog (the "feature units")
 
-`supabase/migrations/<ts>_future_operator.sql`:
+Every entitlement becomes a row in a new `plan_features` table — one row = one toggleable SKU. The admin picks which SKUs belong to which tier; the pricing page renders the SKU's marketing label; the RBAC layer checks the SKU's `code`.
 
-- `future_operator_profiles` — keyed by `user_id uuid references auth.users(id) on delete cascade`, unique. Fields per PRD plus:
-  - `pending_renewal_at timestamptz` (replaces loose `pending_renewal text` so the 14-day drift check is deterministic)
-  - `timezone text default 'UTC'`, `notification_window_start time default '08:00'`, `notification_window_end time default '21:00'`
-  - `paused_until timestamptz` (subscriber-controlled mute)
-  - `check (array_length(core_commitments, 1) between 1 and 3)`
-- `future_operator_notifications` — per PRD, plus `idx_fo_notifications_user_unread`.
-- GRANTs in the same migration (project rule):
-  ```
-  grant select, update on public.future_operator_notifications to authenticated;
-  grant select, insert, update on public.future_operator_profiles to authenticated;
-  grant all on both tables to service_role;
-  ```
-- Enable RLS, then:
-  - `future_operator_profiles`: `for all to authenticated using (user_id = auth.uid())`.
-  - `future_operator_notifications`: SELECT + UPDATE `using (user_id = auth.uid())`. No INSERT policy — server-only via `supabaseAdmin`.
-- `app_settings` row: `key='future_operator.limits'`, `value={"daily_quest_calls_per_user_per_day":1,"drift_signals_per_user_per_day":2,"reflection_calls_per_user_per_day":4,"monthly_global_cap":null}`.
-- No `last_active_at` column added — reuse `lumi_memory.last_seen_at` + `q_usage` activity for inactivity detection.
+Proposed initial SKU list (admin can add/remove later — this is the seed):
 
-### 2. Tier gate — Practitioner+
+```text
+Content / Editorial
+  feature.dispatch.weekly              Weekly Tuesday dispatch
+  feature.archive.public               Public archive access
+  feature.archive.premium              Full premium archive
+  feature.tone.two_voice               Two-voice analytical/witty toggle
+  feature.codex.playbooks              All Codex playbooks
+  feature.codex.cobranded              Co-branded Codex content
 
-- New helper `canUseFutureOperator(designation)` in `src/lib/tiers.ts` → `true` for `practitioner | operator | team | scale | enterprise | strategic_partner`.
-- Every server fn and the `/account/quests` route call `useEntitlements()` / server-side `has_role`-style check before doing work; lower tiers see an upsell card.
+Diagnostics & Benchmarks
+  feature.ai_diagnostic.score          AI Diagnostic — score only
+  feature.ai_diagnostic.blueprint      AI Diagnostic — full blueprint
+  feature.benchmarks.quartiles         Retention Ledger quartile benchmarks
+  feature.benchmarks.branded_pdf       Quarterly branded benchmark PDF
+  feature.benchmarks.whitelabel        White-label benchmark reports
+  feature.ledger.api                   Retention Ledger API access
+  feature.ledger.api_full              Retention Ledger API — full segments
 
-### 3. Lumi persona, not a new agent
+CSFactors / Dashboards
+  feature.csfactors.personal           CSFactors personal dashboard
+  feature.csfactors.operator_analytics Operator analytics (risk + waterfall)
+  feature.csfactors.team_dashboard     Shared team CS dashboard
+  feature.csfactors.advanced           Advanced (cohort + churn heatmap)
+  feature.csfactors.admin_analytics    Admin usage analytics
+  feature.csfactors.learning_paths     Assignable learning paths
+  feature.csfactors.learning_custom    Custom learning paths + certs
 
-- All generation uses the Lovable AI Gateway (`ai.gateway.lovable.dev`, `LOVABLE_API_KEY`) — same shape as `lumi-knowledge.functions.ts`. Models:
-  - Quests + drift signals: `google/gemini-2.5-flash`.
-  - Intro message + reflection prompts: `google/gemini-2.5-pro`.
-- New `src/lib/future-operator-voice.ts` exports `FUTURE_OPERATOR_VOICE_RULES` (the PRD's voice block). Every prompt = `LUMI_BASE_VOICE` + `FUTURE_OPERATOR_VOICE_RULES` + the specific task instructions, so the Lumi voice owns the persona.
-- UI uses `<LumiMark />` (gold variant) as the "Future Operator" avatar — no new mark asset, no new agent name in chrome.
+Lumi (agent)
+  feature.lumi.quota                   Lumi monthly session quota (numeric)
+  feature.lumi.whiteboard              Whiteboard + URL paste
+  feature.lumi.future_operator         Future Operator persona
 
-### 4. Server functions — `src/lib/future-operator.functions.ts`
+Community & Jobs
+  feature.community.vp                 VP+ community access
+  feature.community.dedicated          Dedicated team community space
+  feature.jobboard.candidate           Job board as candidate
+  feature.jobboard.posts               Job board posting credits (numeric)
 
-All use `createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(...).handler(...)` and read user state via `context.supabase` (RLS-scoped):
+Ops / Admin
+  feature.sso.prep                     SSO preparation
+  feature.sso.saml                     SSO / SAML integration
+  feature.notifications.priority       Priority content notifications
+  feature.briefing.quarterly_call      Quarterly briefing call
+  feature.partner.speaking_slot        Speaking slot at events
+  feature.partner.footer_logo          Editorial footer logo placement
+  feature.partner.integration_support  Dedicated integration support
+```
 
-- `getFutureOperatorProfile()` — returns row or null.
-- `saveFutureOperatorOnboarding({ future_team_state, core_commitments[], current_focus_account, timezone })` — upserts profile, kicks intro message generation.
-- `getQuests()` — returns today's `active_quests` + today's notifications.
-- `completeQuest({ questId })` — flips `completed:true`, creates a `reflection-prompt` notification using that quest's `lumi_followup`. If all 3 done, creates a "Future Operator completion" notification.
-- `listNotifications({ limit })` / `markNotificationRead({ id })` / `markAllRead()` / `actOnNotification({ id })`.
-- `pauseFutureOperator({ days })` / `resumeFutureOperator()`.
+Each SKU has: `code`, `label`, `category`, `kind` ('boolean' | 'numeric'), `default_value`, `description`, `display_order`, `is_active`. Numeric SKUs (Lumi quota, job posts) store a per-tier value; boolean SKUs are simple ON/OFF per tier.
 
-Service-role-only helpers in `src/lib/future-operator.server.ts` (loaded inside handlers / hook routes):
+## 2. Database schema
 
-- `generateDailyQuestsFor(userId)`
-- `generateDriftSignalFor(userId, triggerType, triggerContext)`
-- `generateReflectionPromptFor(userId, triggerEvent, triggerContext)`
-- `generateIntroMessageFor(userId)`
-- `assertFutureOperatorBudget(userId, kind)` — reads `app_settings.future_operator.limits`, counts today's notifications by `type`, throws on exceed and writes a `lumi_events` row (`future_operator.budget_blocked`). This is the SEPARATE admin budget — never decrements `q_usage`.
+New migration adds three tables + a snapshot column:
 
-### 5. n8n webhook endpoints
+```text
+subscription_plans
+  id (uuid pk), designation (text unique), label, tagline,
+  band ('individual' | 'team' | 'partner'),
+  price_monthly_cents (int), price_annual_cents (int nullable),
+  price_monthly_display (text), price_annual_display (text nullable),
+  seat_cap (int), seat_cap_display (text),
+  cta_label, cta_kind ('free'|'checkout'|'contact'),
+  highlight (bool), highlight_label (text nullable),
+  contact_only (bool), display_order (int), is_active (bool),
+  paddle_price_id (text nullable),    -- ties to existing Paddle catalog
+  created_at, updated_at
 
-Under `src/routes/api/public/hooks/`, HMAC-verified with new secret `FUTURE_OPERATOR_WEBHOOK_SECRET` (mirrors existing hooks like `analyze-interactions.ts`):
+plan_features
+  id, code (text unique), label, category, kind ('boolean'|'numeric'),
+  description, display_order, is_active
 
-- `generate-daily-quests.ts` — body `{ batch_timezone }`. Fan-out: every Practitioner+ user with a profile, `paused_until` null, `last_quest_generated_at < today`. Calls `generateDailyQuestsFor` per user.
-- `check-drift-signals.ts` — runs every 24h. Per user: enforce per-day cap + notification window + `paused_until` + 24h spacing, evaluate the 5 PRD trigger conditions (inactivity, quest drift, missed Monday check-in, `pending_renewal_at <= now()+14d`, Lumi drift), call `generateDriftSignalFor` when matched, else bump `next_drift_signal_at` by random 6–28h.
-- `dispatch-read.ts` — called from the dispatch page when scroll depth ≥ 90%. Calls `generateReflectionPromptFor(userId, 'dispatch_read', { slug })`.
+plan_feature_assignments
+  plan_id (fk), feature_id (fk),
+  enabled (bool), numeric_value (int nullable),
+  marketing_label_override (text nullable),  -- override SKU label per tier
+  PRIMARY KEY (plan_id, feature_id)
 
-### 6. Onboarding extension
+subscriptions
+  + plan_snapshot (jsonb nullable)   -- frozen entitlements at purchase time
+  + grandfathered_at (timestamptz nullable)
+```
 
-`src/lib/onboarding.functions.ts` already handles the 5-question flow. Add a follow-on step rendered after `finishOnboarding` returns, ONLY for Practitioner+ users:
+RLS:
+- `subscription_plans`, `plan_features`, `plan_feature_assignments`: public `SELECT` to `anon` + `authenticated` (pricing page is public); `ALL` restricted to `has_role(auth.uid(),'admin')`.
+- Grants follow the public-schema-grants rule.
 
-- New component `src/components/onboarding/FutureOperatorStep.tsx` — three sequential questions per PRD, typing UI, dark background, `<LumiMark variant="gold" />`. On submit calls `saveFutureOperatorOnboarding`. Intro message is generated server-side and the next route render shows it as a full-screen modal once, then it lives in the notification panel.
+Seed migration ports current `TIERS` content + the SKU list above and writes default assignments matching today's tiers exactly. After this runs, the live pricing page is unchanged byte-for-byte.
 
-### 7. New surface: `/account/quests`
+## 3. Server functions (`src/lib/plans.functions.ts`)
 
-- New route file `src/routes/account.quests.tsx` (sibling of existing `account.workspace.tsx`, `account.api.tsx` — flat dotted convention, generated route id `/account/quests`).
-- `head()` with route-specific title/description.
-- `loader` calls `context.queryClient.ensureQueryData(questsQueryOptions())`; component uses `useSuspenseQuery`.
-- Renders:
-  - Top: "Today's quests" — 3 `MetricCard`-styled cards (project dashboard kit) per PRD layout (label, instruction, commitment + estimated minutes, "Mark complete" button using `--accent`). Completed state with gold check + "Open Lumi debrief" secondary CTA.
-  - Below: Future Operator commitments, focus account, paused state with "Pause for 7 days / Resume" controls.
-- Tier gate: lower tiers see an upsell card instead of quests.
+Public:
+- `listPublishedPlans()` — returns plans + assignments + feature metadata for the pricing page. No auth.
 
-### 8. Header — link in avatar dropdown + bell
+Admin-only (`requireSupabaseAuth` + `has_role admin` check):
+- `adminListPlans()`, `adminUpsertPlan(plan)`, `adminTogglePlanActive(id, active)`, `adminReorderPlans(ids)`
+- `adminListFeatures()`, `adminUpsertFeature(feature)`, `adminToggleFeatureActive(id, active)`
+- `adminSetAssignment({ planId, featureId, enabled, numeric_value, marketing_label_override })`
+- `adminBulkSetAssignments(planId, rows[])` — used by the matrix editor
 
-`src/components/site/SiteHeader.tsx`:
+Cache invalidation: every admin write also calls `queryClient.invalidateQueries(['plans:public'])` on the client; the pricing page uses a 30s `staleTime` so changes appear immediately on refetch/refocus.
 
-- Add a new `DropdownMenuItem` linking to `/account/quests` inside the existing avatar dropdown (positioned right under "Your Workspace"). Label: `t("menu.futureOperator")` → "Future Operator" (mono uppercase, matches surrounding items).
-- New `NotificationBell` component placed to the left of the avatar (logged-in only, Practitioner+ only):
-  - Bell icon (lucide `Bell`), unread-count badge in `--secondary-accent` (gold).
-  - Click opens a `Popover` panel (max-h 480, scrollable) per PRD spec — gold left border for unread, mono eyebrow label for type, serif body, gold text-link CTA.
-  - CTAs navigate to `/account/quests`, `/account?lumi=open&seed=<notificationId>`, etc.
-  - Logged-out users get nothing; sub-Practitioner users see the bell with a one-line "Upgrade for Future Operator" empty state (no upsell pressure in the chrome).
+## 4. Admin UI — `/admin/plans`
 
-### 9. Reflection prompts → Lumi drawer (not Situation Room)
+New route `src/routes/admin.plans.tsx` (linked from `admin.tsx` sidebar). Two tabs:
 
-- The Lumi drawer (`?lumi=open` is already used elsewhere — confirmed during exploration of CSFactors Q wiring) gains a `seed` query param: `?lumi=open&seed=<notificationId>`.
-- On open, the drawer fetches the notification, pre-pends its `message` as the first Lumi turn ("Future Operator persona"), and the user replies inline. This does NOT call `startSituation` and does NOT touch the Situation Room one-shot lock or its quota.
-- Each reflection-prompt notification stores `action_route: '/?lumi=open&seed=<id>'` (or the user's current route + `?lumi=open&seed=<id>` when generated from an in-product event).
+**Tab 1 — Plans**
+- Table of plans with inline edit drawer: label, tagline, band, monthly/annual price (cents + display string), seat cap, CTA label/kind, highlight + highlight label, contact-only toggle, active toggle, display order, optional `paddle_price_id`.
+- "New plan" button. Reorder via up/down arrows.
 
-### 10. Admin control panel
+**Tab 2 — Feature Matrix**
+- Rows = features (grouped by category, collapsible). Columns = active plans.
+- Each cell: checkbox for boolean SKUs, number input for numeric SKUs, optional label-override popover.
+- Sticky header, "Save" button shows pending diff count.
+- "New feature SKU" button opens a side panel (code, label, category, kind, default, description).
 
-Extend `src/lib/control-panel.functions.ts` and `src/routes/admin.control-panel.tsx` Overview tab:
+**Tab 3 — SKU Reference**
+- Read-only printable list of every SKU with its `code`, label, category, and which tiers currently include it. This is the "publish a clear SKU list" deliverable.
 
-- New `FutureOperatorLimitsCard`: inputs for `daily_quest_calls_per_user_per_day`, `drift_signals_per_user_per_day`, `reflection_calls_per_user_per_day`, optional `monthly_global_cap`. Server fns `getFutureOperatorSettings` / `updateFutureOperatorSettings` (admin-gated, `admin_audit_log` entry on write).
-- Diagnostics tab gains a "Future Operator" tile: 30-day counters for notifications by type, budget blocks, paused-user count — from `lumi_events` + the notifications table.
+## 5. Pricing page goes live-driven
 
-### 11. Voice rules constant (`src/lib/future-operator-voice.ts`)
+`src/routes/pricing.tsx` and `src/routes/subscribe.tsx`:
+- Replace `import { TIERS } from "@/lib/tiers"` with a `useQuery(['plans:public'])` powered by `listPublishedPlans()`.
+- Loader uses `ensureQueryData` so SSR still renders cards with metadata.
+- A thin adapter shapes DB rows into the existing `Tier` type so the rest of the page (FAQ, comparison matrix, CTA buttons) keeps working.
+- `src/lib/tiers.ts` stays as a typed fallback for offline/build-time rendering only; runtime always reads DB.
 
-Exports the PRD voice block verbatim. Concatenated into every Future Operator prompt. Also enforces: under 80 / 60 / 40 words (drift / quest instruction / reflection), first person, at least one piece of user-specific context referenced (account name, commitment, metric, or situation) — the constant includes the explicit "if it could have been sent to anyone, it fails" line.
+The comparison matrix at the bottom of `/pricing` now renders from `plan_feature_assignments` — every SKU that's marked `is_active` becomes a row, and a check / number / em-dash appears per tier column.
 
-### 12. Verification (mirrors PRD checklist + project-specific items)
+## 6. RBAC tied to SKUs (not tier names)
 
-1. Migration applies; GRANTs present; RLS denies cross-user reads (verified via `supabase--read_query` with `set role authenticated`).
-2. Onboarding extension appears only for Practitioner+; on Reader/free, the 6th step is skipped.
-3. Intro message renders as a full-screen modal once, then persists in the notification panel.
-4. n8n hook with valid HMAC populates `active_quests`; with bad HMAC returns 401.
-5. `/account/quests` renders 3 quest cards; marking complete creates a reflection notification and the "Open Lumi debrief" CTA opens the Lumi drawer pre-seeded with `lumi_followup`.
-6. Drift checker honours per-day cap, notification window, `paused_until`, and 4h spacing; `next_drift_signal_at` is randomised.
-7. Bell shows correct unread count, gold left border on unread items, max-h 480, scrollable.
-8. Pause/resume from `/account/quests` suppresses generation across all three workflows.
-9. Future Operator generation does NOT decrement `q_usage`; admin budget block writes `future_operator.budget_blocked` to `lumi_events`.
-10. Reflection-prompt CTAs never navigate to `/situation-room`.
-11. Every generated message contains at least one user-specific token (account name, commitment, metric, or situation) — spot-check via prompt logging in dev.
+Today gating is `dRank >= 1` style checks. New helper in `src/lib/entitlements.ts`:
 
----
+```ts
+hasFeature(user, "feature.csfactors.personal"): boolean
+featureValue(user, "feature.lumi.quota"): number
+```
 
-### Technical notes
+Implementation:
+- New SQL function `public.user_has_feature(uid, code)` and `public.user_feature_value(uid, code)` (security definer). They read the user's active subscription, prefer the row's `plan_snapshot` if present (grandfathered users), otherwise read live `plan_feature_assignments`. Admins always return true / Infinity.
+- Client hook `useEntitlements()` is extended to return `features: Record<code, boolean|number>` derived from the same source.
+- Existing call sites that key off `dRank` keep working (designations stay), but new gates use `hasFeature()`. We migrate the high-traffic ones in this change: CSFactors gate, Future Operator gate, Codex playbook gate, Lumi quota lookup, job-board posting credits. Rest of the codebase migrates opportunistically.
 
-- Server fns live under `src/lib/`, never `src/server/` (project rule).
-- All AI calls go through `ai.gateway.lovable.dev` with `LOVABLE_API_KEY`. No Anthropic SDK, no direct `api.anthropic.com`.
-- Service-role client (`supabaseAdmin`) is imported only inside handler bodies, never at module scope of route files or `*.functions.ts`.
-- Avatar dropdown link uses TanStack `<Link to="/account/quests">` — never `<a href>`.
-- New route file is `src/routes/account.quests.tsx` with `createFileRoute("/account/quests")`.
-- Secret to add via `secrets--add_secret`: `FUTURE_OPERATOR_WEBHOOK_SECRET`.
+## 7. Grandfathering existing users
+
+On every successful Paddle webhook (`subscription.created` / `subscription.updated`) we now also write `plan_snapshot` = JSON of the plan's current feature assignments + price, and stamp `grandfathered_at = now()`.
+
+When the admin edits a plan:
+- Existing subscription rows are **not** mutated. They keep their `plan_snapshot`.
+- `user_has_feature` / `user_feature_value` prefer `plan_snapshot` over live assignments, so grandfathered users keep what they bought even if the admin removes a feature from the tier.
+- New signups after the edit get the new shape (no snapshot → reads live).
+- Admin UI shows a "Grandfathered subscribers: N" counter per plan and a (dangerous) "Re-snapshot all active subscribers to current plan" button for the case where admin explicitly wants to push changes to everyone. Confirmation modal required.
+
+Backfill migration: for every existing active subscription row, write a `plan_snapshot` based on the current tier so the grandfather guarantee covers everyone signed up before this rollout.
+
+## 8. Out of scope (call-outs)
+
+- Paddle price entities themselves: the admin can edit the displayed price + attach a `paddle_price_id`, but actual Paddle price creation still goes through `payments--create_price` (Paddle is the source of truth for what's actually charged). Plan editor surfaces a warning if `price_monthly_cents` differs from the linked Paddle price.
+- Currency localization: handled by existing Paddle pricing-preview flow; admin only edits the base USD display.
+- Per-user feature overrides ("comp this account up to Operator") — not in this change; can be added later as a `user_feature_overrides` table reusing `user_has_feature`.
+
+## Files touched
+
+```text
+supabase/migrations/<ts>_plans_skus.sql        new
+src/lib/plans.functions.ts                     new
+src/lib/plans.server.ts                        new
+src/lib/entitlements.ts                        extended (hasFeature)
+src/hooks/useEntitlements.ts                   extended (features map)
+src/routes/admin.plans.tsx                     new (3-tab editor)
+src/routes/admin.tsx                           add nav link
+src/routes/pricing.tsx                         read from DB
+src/routes/subscribe.tsx                       read from DB
+src/components/admin/PlanEditorDrawer.tsx      new
+src/components/admin/FeatureMatrix.tsx         new
+src/components/admin/SkuReference.tsx          new
+src/routes/api/public/payments/webhook.ts      write plan_snapshot
+src/lib/tiers.ts                               keep as typed fallback
+```

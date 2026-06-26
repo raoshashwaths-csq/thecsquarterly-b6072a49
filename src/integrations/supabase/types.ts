@@ -1392,6 +1392,93 @@ export type Database = {
           },
         ]
       }
+      plan_feature_assignments: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          feature_id: string
+          marketing_label_override: string | null
+          numeric_value: number | null
+          plan_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          feature_id: string
+          marketing_label_override?: string | null
+          numeric_value?: number | null
+          plan_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          feature_id?: string
+          marketing_label_override?: string | null
+          numeric_value?: number | null
+          plan_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_feature_assignments_feature_id_fkey"
+            columns: ["feature_id"]
+            isOneToOne: false
+            referencedRelation: "plan_features"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_feature_assignments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_features: {
+        Row: {
+          category: string
+          code: string
+          created_at: string
+          default_value: number | null
+          description: string
+          display_order: number
+          id: string
+          is_active: boolean
+          kind: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          code: string
+          created_at?: string
+          default_value?: number | null
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          kind?: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string
+          default_value?: number | null
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          kind?: string
+          label?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       playbooks: {
         Row: {
           body: string
@@ -2017,6 +2104,84 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          band: string
+          contact_only: boolean
+          created_at: string
+          cta_kind: string
+          cta_label: string
+          designation: string
+          display_order: number
+          highlight: boolean
+          highlight_label: string | null
+          id: string
+          is_active: boolean
+          label: string
+          paddle_price_id_annual: string | null
+          paddle_price_id_monthly: string | null
+          price_annual_cents: number | null
+          price_annual_display: string | null
+          price_monthly_cents: number
+          price_monthly_display: string
+          q_cap_display: string
+          seat_cap: number
+          seat_cap_display: string
+          tagline: string
+          updated_at: string
+        }
+        Insert: {
+          band?: string
+          contact_only?: boolean
+          created_at?: string
+          cta_kind?: string
+          cta_label?: string
+          designation: string
+          display_order?: number
+          highlight?: boolean
+          highlight_label?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          paddle_price_id_annual?: string | null
+          paddle_price_id_monthly?: string | null
+          price_annual_cents?: number | null
+          price_annual_display?: string | null
+          price_monthly_cents?: number
+          price_monthly_display?: string
+          q_cap_display?: string
+          seat_cap?: number
+          seat_cap_display?: string
+          tagline?: string
+          updated_at?: string
+        }
+        Update: {
+          band?: string
+          contact_only?: boolean
+          created_at?: string
+          cta_kind?: string
+          cta_label?: string
+          designation?: string
+          display_order?: number
+          highlight?: boolean
+          highlight_label?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          paddle_price_id_annual?: string | null
+          paddle_price_id_monthly?: string | null
+          price_annual_cents?: number | null
+          price_annual_display?: string | null
+          price_monthly_cents?: number
+          price_monthly_display?: string
+          q_cap_display?: string
+          seat_cap?: number
+          seat_cap_display?: string
+          tagline?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean
@@ -2025,9 +2190,11 @@ export type Database = {
           current_period_start: string | null
           designation: string | null
           environment: string
+          grandfathered_at: string | null
           id: string
           paddle_customer_id: string | null
           paddle_subscription_id: string | null
+          plan_snapshot: Json | null
           price_id: string | null
           product_id: string | null
           status: string
@@ -2044,9 +2211,11 @@ export type Database = {
           current_period_start?: string | null
           designation?: string | null
           environment?: string
+          grandfathered_at?: string | null
           id?: string
           paddle_customer_id?: string | null
           paddle_subscription_id?: string | null
+          plan_snapshot?: Json | null
           price_id?: string | null
           product_id?: string | null
           status?: string
@@ -2063,9 +2232,11 @@ export type Database = {
           current_period_start?: string | null
           designation?: string | null
           environment?: string
+          grandfathered_at?: string | null
           id?: string
           paddle_customer_id?: string | null
           paddle_subscription_id?: string | null
+          plan_snapshot?: Json | null
           price_id?: string | null
           product_id?: string | null
           status?: string
@@ -2566,6 +2737,14 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      user_feature_value: {
+        Args: { _code: string; _user_id: string }
+        Returns: number
+      }
+      user_has_feature: {
+        Args: { _code: string; _user_id: string }
+        Returns: boolean
       }
     }
     Enums: {
