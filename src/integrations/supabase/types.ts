@@ -951,6 +951,7 @@ export type Database = {
           source_title: string | null
           source_type: string
           topic_tags: string[]
+          translation_reviewed: boolean
           tree_relevance: string[]
           updated_at: string
         }
@@ -968,6 +969,7 @@ export type Database = {
           source_title?: string | null
           source_type?: string
           topic_tags?: string[]
+          translation_reviewed?: boolean
           tree_relevance?: string[]
           updated_at?: string
         }
@@ -985,6 +987,7 @@ export type Database = {
           source_title?: string | null
           source_type?: string
           topic_tags?: string[]
+          translation_reviewed?: boolean
           tree_relevance?: string[]
           updated_at?: string
         }
