@@ -20,6 +20,8 @@ import { ExportDialog } from "@/components/site/ExportDialog";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
+import lumiBadgeDark from "@/assets/lumi-badge-dark.jpg.asset.json";
+import lumiBadgeLight from "@/assets/lumi-badge-light.png.asset.json";
 
 export function SiteHeader() {
   const { t } = useTranslation();
@@ -65,7 +67,21 @@ export function SiteHeader() {
       )}
     >
       <nav className="max-w-7xl mx-auto px-4 md:px-6 h-16 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:items-center sm:justify-between sm:gap-3 md:gap-8">
-        <Link to="/" className="group leading-none min-w-0 sm:shrink-0">
+        <Link to="/" className="group leading-none min-w-0 sm:shrink-0 flex items-center gap-2">
+          <img
+            src={lumiBadgeDark.url}
+            alt=""
+            aria-hidden
+            draggable={false}
+            className="h-7 w-7 sm:h-8 sm:w-8 object-contain select-none shrink-0 dark:hidden"
+          />
+          <img
+            src={lumiBadgeLight.url}
+            alt=""
+            aria-hidden
+            draggable={false}
+            className="h-7 w-7 sm:h-8 sm:w-8 object-contain select-none shrink-0 hidden dark:block"
+          />
           <span className="font-display font-semibold tracking-tight leading-none text-base sm:text-xl md:text-[1.75rem] truncate sm:whitespace-nowrap block text-foreground drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
             The CS Quarterly<span
               aria-hidden
