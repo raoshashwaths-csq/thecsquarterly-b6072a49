@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouterState, Link } from "@tanstack/react-router";
+import { useRouterState, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
 import { TreeVectorList } from "@/components/site/TreeVectorList";
+import { getFutureOperatorNotification } from "@/lib/future-operator.functions";
 import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
 import { useTour } from "@/hooks/useTour";
