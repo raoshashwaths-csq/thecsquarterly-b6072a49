@@ -357,6 +357,7 @@ function OverviewTab() {
       </div>
 
       <SituationRoomLimitsCard />
+      <FutureOperatorLimitsCard />
     </div>
   );
 }
