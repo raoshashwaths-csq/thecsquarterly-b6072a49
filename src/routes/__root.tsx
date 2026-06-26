@@ -169,6 +169,13 @@ function AuthInvalidator() {
   const queryClient = useQueryClient();
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      // Only react to true identity transitions. INITIAL_SESSION fires on
+      // every mount and TOKEN_REFRESHED fires ~hourly + on tab focus —
+      // invalidating on those thrashes the router/query cache and reads
+      // as "stuck on loading" / spurious sign-outs.
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") {
+        return;
+      }
       if (event === "SIGNED_OUT") {
         queryClient.cancelQueries();
         queryClient.clear();
