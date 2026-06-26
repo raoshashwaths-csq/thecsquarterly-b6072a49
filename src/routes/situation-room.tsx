@@ -63,14 +63,26 @@ function SituationRoomPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [dispatches, setDispatches] = useState<Dispatch[]>([]);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const [reply, setReply] = useState("");
   const [composerError, setComposerError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [saveTitle, setSaveTitle] = useState("");
 
   const startFn = useServerFn(startSituation);
-  const continueFn = useServerFn(continueSituation);
   const saveFn = useServerFn(saveSituationLog);
+  const quotaFn = useServerFn(getSituationQuota);
+
+  const quotaQuery = useQuery({
+    queryKey: ["situation-quota"],
+    queryFn: () => quotaFn(),
+    enabled: !!user,
+  });
+
+  const remaining = quotaQuery.data?.remaining ?? null;
+  const quotaMax = quotaQuery.data?.max ?? null;
+  const quotaWindow = quotaQuery.data?.window ?? "month";
+  const quotaResetAt = quotaQuery.data?.resetAt ?? null;
+  const unlimited = quotaQuery.data?.unlimited ?? false;
+  const quotaReached = !unlimited && remaining !== null && remaining <= 0;
 
   const start = useMutation({
     mutationFn: async (s: string) => startFn({ data: { situation: s } }),
@@ -79,15 +91,17 @@ function SituationRoomPage() {
       setDispatches(res.dispatches);
       setMessages([{ role: "assistant", content: res.opening }]);
       trackLumiEvent("drawer.open", { surface: "situation-room", meta: { event: "situation_started" } });
+      void quotaQuery.refetch();
     },
-    onError: (e: Error) => setComposerError(e.message),
-  });
-
-  const cont = useMutation({
-    mutationFn: async (msg: string) => continueFn({ data: { sessionId: sessionId!, message: msg } }),
-    onSuccess: (res, msg) => {
-      setMessages((m) => [...m, { role: "user", content: msg }, { role: "assistant", content: res.reply }]);
-      setReply("");
+    onError: (e: Error) => {
+      if (e.message === "SITUATION_QUOTA_EXCEEDED") {
+        setComposerError("You've used all your Situation Room runs for this period. Try again after the next reset, or upgrade for more headroom.");
+        void quotaQuery.refetch();
+      } else if (e.message === "Q_MONTHLY_CAP_REACHED") {
+        setComposerError("You've hit your monthly Lumi cap. Upgrade your plan for more runs.");
+      } else {
+        setComposerError(e.message);
+      }
     },
   });
 
@@ -106,6 +120,10 @@ function SituationRoomPage() {
   function onSubmitSituation(e: React.FormEvent) {
     e.preventDefault();
     setComposerError(null);
+    if (quotaReached) {
+      setComposerError("You've used all your Situation Room runs for this period.");
+      return;
+    }
     if (situation.trim().length < 20) {
       setComposerError("Give Lumi a few more details — at least 20 characters.");
       return;
@@ -118,7 +136,6 @@ function SituationRoomPage() {
     setSessionId(null);
     setDispatches([]);
     setMessages([]);
-    setReply("");
     setSaved(false);
     setSaveTitle("");
   }
