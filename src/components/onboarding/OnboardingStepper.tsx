@@ -47,27 +47,42 @@ type FormState = {
   company_arr_range: string;
   challenges: string[];
   difficult_account: string;
+  // Step 6 — Future Operator (Practitioner+ only)
+  future_team_state: string;
+  core_commitments: string[];
+  current_focus_account: string;
 };
 
 export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss }: Props) {
   const submit = useServerFn(finishOnboarding);
+  const saveFutureOperator = useServerFn(saveFutureOperatorOnboarding);
+  const { dRank } = useEntitlements();
+  const isPractitionerPlus = dRank >= 1;
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [commitmentDraft, setCommitmentDraft] = useState("");
   const [form, setForm] = useState<FormState>({
     persona: initialPersona ?? "",
     acv_band: "",
     company_arr_range: "",
     challenges: [],
     difficult_account: "",
+    future_team_state: "",
+    core_commitments: [],
+    current_focus_account: "",
   });
 
-  const total = 5;
+  const total = isPractitionerPlus ? 6 : 5;
   const canNext = useMemo(() => {
     if (step === 0) return !!form.persona;
     if (step === 1) return !!form.acv_band;
     if (step === 2) return !!form.company_arr_range;
     if (step === 3) return form.challenges.length >= 1 && form.challenges.length <= 3;
-    return true; // step 4 is optional
+    if (step === 4) return true; // optional
+    if (step === 5) {
+      return form.future_team_state.trim().length >= 5 && form.core_commitments.length >= 1;
+    }
+    return true;
   }, [step, form]);
 
   const handleSubmit = async () => {
@@ -82,6 +97,25 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
           difficult_account: form.difficult_account.trim(),
         },
       });
+      if (isPractitionerPlus && form.future_team_state.trim() && form.core_commitments.length > 0) {
+        try {
+          const tz =
+            typeof Intl !== "undefined" && Intl.DateTimeFormat
+              ? Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+              : "UTC";
+          await saveFutureOperator({
+            data: {
+              future_team_state: form.future_team_state.trim(),
+              core_commitments: form.core_commitments,
+              current_focus_account: form.current_focus_account.trim(),
+              timezone: tz,
+            },
+          });
+        } catch (foErr) {
+          // Soft-fail: profile is saved; FO seed can be retried from /account/quests.
+          console.warn("Future Operator save failed", foErr);
+        }
+      }
       toast.success("Lumi has your context. Ask anything.");
       onComplete();
     } catch (err) {
