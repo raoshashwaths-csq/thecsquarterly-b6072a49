@@ -82,8 +82,17 @@ function CSFactorsPageInner() {
   }, []);
 
 
+  // Gate non-CSFactors users (visitors + below-Practitioner) into a marketing
+  // landing page that showcases the three stages. Practitioner+ proceeds to
+  // the live command center.
+  if (!authLoading && !user) {
+    return <CSFactorsLanding mode="visitor" />;
+  }
   if (!authLoading && !entLoading && user) {
     const rank = { reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6 } as const;
+    if (rank[designation] < rank.practitioner) {
+      return <CSFactorsLanding mode="below-tier" />;
+    }
     if (rank[designation] < rank.operator) {
       return (
         <TierGateOverlay
