@@ -6,6 +6,7 @@ import { getNode, breadcrumbFor } from "@/lib/q-trees";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { QMark } from "@/components/site/QMark";
+import { LumiFeedbackBar } from "@/components/agent/LumiFeedbackBar";
 
 export const Route = createFileRoute("/q/response/$runId")({
   head: () => ({
