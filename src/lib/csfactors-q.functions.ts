@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { assertQUnderCap } from "./q-usage.functions";
+import { recallMemoryFor, recordMemoryFor, renderMemoryBlock } from "./lumi-memory.functions";
 
 
 
@@ -277,6 +278,10 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       `Accounts updated in last 14 days: ${updatedRecently}.`,
     ].join("\n");
 
+    // Semantic memory — empty for free tier.
+    const memories = await recallMemoryFor(context.userId, data.question, 6);
+    const memoryBlock = renderMemoryBlock(memories);
+
     const system = [
       "You are Lumi, the analyst inside The CS Quarterly's CSFactors command center.",
       "Audience: a VP/Director of Customer Success looking at their own book of business.",
@@ -284,17 +289,16 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       "Cite account names verbatim. Use $ and commas for ARR. Use ISO dates (YYYY-MM-DD) when present.",
       "Be tight: 2–6 short paragraphs or a compact table/bullet list. McKinsey register. No emoji, no hype, no hedging.",
       "Each account record includes: identity & ownership, ARR, health, renewal timing, stakeholders, recent timeline events (including cta.raised / cta.completed and field edits), open/overdue/recently-completed CTAs with their top open items, and contracts with renewal dates.",
+      memoryBlock,
       "PORTFOLIO METRICS:",
       metricsBlock,
       `Today: ${new Date().toISOString().slice(0, 10)}.`,
       "",
       "PORTFOLIO JSON:",
       portfolioJson,
-    ].join("\n");
-
-
-
-
+    ]
+      .filter(Boolean)
+      .join("\n");
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -324,6 +328,46 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       witty: false,
       zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 4000) },
     });
+
+    // Extract 0-2 durable memories from this CSFactors exchange.
+    if (reply) {
+      try {
+        const extractRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-lite",
+            response_format: { type: "json_object" },
+            messages: [
+              {
+                role: "system",
+                content:
+                  "Extract 0-2 durable facts about the operator's portfolio situation, specific accounts they're navigating, or operating preferences worth remembering. Return JSON: {\"memories\":[{\"memory_type\":\"situation|account|preference\",\"content\":\"...\"}]}. Empty array if nothing notable.",
+              },
+              { role: "user", content: `Operator asked: ${data.question}\n\nLumi answered: ${reply.slice(0, 2000)}` },
+            ],
+          }),
+        });
+        if (extractRes.ok) {
+          const ejson = (await extractRes.json()) as { choices?: Array<{ message?: { content?: string } }> };
+          const parsed = JSON.parse(ejson.choices?.[0]?.message?.content ?? "{}") as {
+            memories?: Array<{ memory_type?: string; content?: string }>;
+          };
+          const rows = (parsed.memories ?? [])
+            .filter(
+              (m): m is { memory_type: "situation" | "account" | "preference"; content: string } =>
+                typeof m.content === "string" &&
+                m.content.length > 0 &&
+                (m.memory_type === "situation" || m.memory_type === "account" || m.memory_type === "preference"),
+            )
+            .slice(0, 2)
+            .map((m) => ({ ...m, source: "csfactors_lumi" as const }));
+          if (rows.length) await recordMemoryFor(context.userId, rows);
+        }
+      } catch {
+        // best-effort; never fail the user-facing reply
+      }
+    }
 
     return {
       reply,

@@ -18,6 +18,8 @@ import {
   getMyPaddleSubscription,
 } from "@/lib/paddle.functions";
 import { getPaddleEnvironment } from "@/lib/paddle";
+import { MemorySettings } from "@/components/account/MemorySettings";
+import { LumiMemoryNudge } from "@/components/site/LumiMemoryNudge";
 
 
 
@@ -156,6 +158,12 @@ function AccountPage() {
       <main className="flex-1 max-w-5xl mx-auto px-6 py-16 w-full">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">Members</div>
         <h1 className="font-display text-5xl tracking-tight mb-10">Your account</h1>
+
+        {user && (
+          <div className="mb-8">
+            <LumiMemoryNudge />
+          </div>
+        )}
 
         {isRecruiterOrLead && <OperatorTools group={group} variant="account" />}
 
@@ -329,6 +337,8 @@ function AccountPage() {
             >
               <div className="text-xs text-muted-foreground">Available to Enterprise and Strategic Partner.</div>
             </SectionCard>
+
+            <MemorySettings />
 
             {me.data.isAdmin && (
               <SectionCard
