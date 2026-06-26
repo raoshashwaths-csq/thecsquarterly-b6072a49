@@ -757,14 +757,52 @@ function SkuTab({
     return out;
   }, [features]);
 
+  const exportSku = useServerFn(adminExportSkuCsv);
+  const exportAssign = useServerFn(adminExportAssignmentsCsv);
+
+  async function download(fn: () => Promise<{ filename: string; csv: string }>) {
+    try {
+      const { filename, csv } = await fn();
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success(`Downloaded ${filename}`);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
   return (
     <div className="space-y-8">
-      <div className="p-4 border border-border bg-muted/20">
-        <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-2">SKU catalog</div>
-        <p className="text-sm text-foreground/70">
-          The canonical list of feature SKUs. Each row is a single toggleable capability the admin can include in any tier. Use the codes (e.g. <code className="font-mono text-xs">feature.csfactors.personal</code>) when adding gates in the codebase: <code className="font-mono text-xs">hasFeature("feature.csfactors.personal")</code>.
-        </p>
+      <div className="p-4 border border-border bg-muted/20 flex flex-wrap justify-between items-start gap-3">
+        <div>
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-2">SKU catalog</div>
+          <p className="text-sm text-foreground/70 max-w-3xl">
+            The canonical list of feature SKUs. Each row is a single toggleable capability the admin can include in any tier. Use the codes (e.g. <code className="font-mono text-xs">feature.csfactors.personal</code>) when adding gates in the codebase: <code className="font-mono text-xs">hasFeature("feature.csfactors.personal")</code>.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => download(() => exportSku())}
+            className="font-mono text-xs uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40"
+          >
+            Export SKU CSV
+          </button>
+          <button
+            onClick={() => download(() => exportAssign())}
+            className="font-mono text-xs uppercase tracking-[0.25em] border border-accent text-accent px-3 py-2 hover:bg-accent hover:text-accent-foreground"
+          >
+            Export assignments CSV
+          </button>
+        </div>
       </div>
+
 
       {Object.entries(grouped).map(([cat, list]) => (
         <section key={cat}>
