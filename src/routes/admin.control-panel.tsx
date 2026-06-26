@@ -482,6 +482,157 @@ function SituationRoomLimitsCard() {
   );
 }
 
+function FutureOperatorLimitsCard() {
+  const getSettings = useServerFn(getFutureOperatorSettings);
+  const updateSettings = useServerFn(updateFutureOperatorSettings);
+  const getMetrics = useServerFn(getFutureOperatorMetrics);
+  const qc = useQueryClient();
+
+  const settingsQ = useQuery({
+    queryKey: ["fo-settings"],
+    queryFn: () => getSettings(),
+    staleTime: 60_000,
+  });
+  const metricsQ = useQuery({
+    queryKey: ["fo-metrics"],
+    queryFn: () => getMetrics(),
+    staleTime: 60_000,
+  });
+
+  const [daily, setDaily] = useState<string>("");
+  const [drift, setDrift] = useState<string>("");
+  const [reflection, setReflection] = useState<string>("");
+  const [globalCap, setGlobalCap] = useState<string>("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (settingsQ.data) {
+      setDaily(String(settingsQ.data.daily_quest_calls_per_user_per_day));
+      setDrift(String(settingsQ.data.drift_signals_per_user_per_day));
+      setReflection(String(settingsQ.data.reflection_calls_per_user_per_day));
+      setGlobalCap(String(settingsQ.data.monthly_global_cap));
+    }
+  }, [settingsQ.data]);
+
+  async function onSave() {
+    const d = Number(daily), dr = Number(drift), r = Number(reflection), g = Number(globalCap);
+    if (![d, dr, r, g].every(Number.isFinite)) {
+      toast.error("All limits must be numbers");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateSettings({
+        data: {
+          daily_quest_calls_per_user_per_day: Math.floor(d),
+          drift_signals_per_user_per_day: Math.floor(dr),
+          reflection_calls_per_user_per_day: Math.floor(r),
+          monthly_global_cap: Math.floor(g),
+        },
+      });
+      toast.success("Future Operator limits updated");
+      await qc.invalidateQueries({ queryKey: ["fo-settings"] });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="mt-6 rounded-md border border-border bg-card p-4">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="font-display text-lg leading-none">Future Operator limits</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Per-user daily caps for the Lumi Future Operator persona. Metered against a separate admin budget — never decrements subscriber Lumi quota.
+          </p>
+        </div>
+        <Badge variant="outline" className="text-xs uppercase tracking-[0.2em]">Guardrail · Practitioner+</Badge>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+        <div>
+          <label className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1.5 block">
+            Daily quests / user / day
+          </label>
+          <Input
+            type="number" min={0} max={10} value={daily}
+            onChange={(e) => setDaily(e.target.value)}
+            disabled={settingsQ.isLoading || saving}
+          />
+        </div>
+        <div>
+          <label className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1.5 block">
+            Drift signals / user / day
+          </label>
+          <Input
+            type="number" min={0} max={10} value={drift}
+            onChange={(e) => setDrift(e.target.value)}
+            disabled={settingsQ.isLoading || saving}
+          />
+        </div>
+        <div>
+          <label className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1.5 block">
+            Reflections / user / day
+          </label>
+          <Input
+            type="number" min={0} max={20} value={reflection}
+            onChange={(e) => setReflection(e.target.value)}
+            disabled={settingsQ.isLoading || saving}
+          />
+        </div>
+        <div>
+          <label className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1.5 block">
+            Monthly global cap
+          </label>
+          <Input
+            type="number" min={0} max={1_000_000} value={globalCap}
+            onChange={(e) => setGlobalCap(e.target.value)}
+            disabled={settingsQ.isLoading || saving}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end mb-4">
+        <Button onClick={onSave} disabled={saving || settingsQ.isLoading}>
+          {saving ? "Saving…" : "Save limits"}
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded border border-border bg-background/40 p-3">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+            Delivered (30d)
+          </div>
+          <div className="text-2xl font-display mt-1 tabular-nums">
+            {metricsQ.isLoading ? "—" : fmtNum(metricsQ.data?.delivered30d ?? 0)}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">Notifications sent across all users.</p>
+        </div>
+        <div className="rounded border border-border bg-background/40 p-3">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+            Delivered (MTD)
+          </div>
+          <div className="text-2xl font-display mt-1 tabular-nums">
+            {metricsQ.isLoading ? "—" : fmtNum(metricsQ.data?.deliveredMTD ?? 0)}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">Counts against global cap.</p>
+        </div>
+        <div className="rounded border border-border bg-background/40 p-3">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+            Budget blocks (30d)
+          </div>
+          <div className="text-2xl font-display mt-1 tabular-nums">
+            {metricsQ.isLoading ? "—" : fmtNum(metricsQ.data?.budgetBlocked30d ?? 0)}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">Generation calls blocked by the caps above.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DiagnosticsTab() {
   const fn = useServerFn(getAgentObservability);
   const txFn = useServerFn(getQRunTranscript);
