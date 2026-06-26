@@ -84,6 +84,7 @@ import { Route as ApiPublicHooksTranslateKnowledgeRouteImport } from './routes/a
 import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
 import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
+import { Route as ApiPublicHooksDiscoverRegionalRouteImport } from './routes/api/public/hooks/discover-regional'
 import { Route as ApiPublicHooksCurateHighRatedRouteImport } from './routes/api/public/hooks/curate-high-rated'
 import { Route as ApiPublicHooksAnalyzeInteractionsRouteImport } from './routes/api/public/hooks/analyze-interactions'
 
@@ -479,6 +480,12 @@ const ApiPublicHooksIngestArticlesRoute =
     path: '/api/public/hooks/ingest-articles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDiscoverRegionalRoute =
+  ApiPublicHooksDiscoverRegionalRouteImport.update({
+    id: '/api/public/hooks/discover-regional',
+    path: '/api/public/hooks/discover-regional',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksCurateHighRatedRoute =
   ApiPublicHooksCurateHighRatedRouteImport.update({
     id: '/api/public/hooks/curate-high-rated',
@@ -560,6 +567,7 @@ export interface FileRoutesByFullPath {
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
+  '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -635,6 +643,7 @@ export interface FileRoutesByTo {
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
+  '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -715,6 +724,7 @@ export interface FileRoutesById {
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
+  '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -796,6 +806,7 @@ export interface FileRouteTypes {
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/curate-high-rated'
+    | '/api/public/hooks/discover-regional'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -871,6 +882,7 @@ export interface FileRouteTypes {
     | '/diagnostics/ai-readiness'
     | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/curate-high-rated'
+    | '/api/public/hooks/discover-regional'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -950,6 +962,7 @@ export interface FileRouteTypes {
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/curate-high-rated'
+    | '/api/public/hooks/discover-regional'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -1012,6 +1025,7 @@ export interface RootRouteChildren {
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
   ApiPublicHooksAnalyzeInteractionsRoute: typeof ApiPublicHooksAnalyzeInteractionsRoute
   ApiPublicHooksCurateHighRatedRoute: typeof ApiPublicHooksCurateHighRatedRoute
+  ApiPublicHooksDiscoverRegionalRoute: typeof ApiPublicHooksDiscoverRegionalRoute
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
   ApiPublicHooksPullExternalIntelRoute: typeof ApiPublicHooksPullExternalIntelRoute
   ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -1551,6 +1565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/discover-regional': {
+      id: '/api/public/hooks/discover-regional'
+      path: '/api/public/hooks/discover-regional'
+      fullPath: '/api/public/hooks/discover-regional'
+      preLoaderRoute: typeof ApiPublicHooksDiscoverRegionalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/curate-high-rated': {
       id: '/api/public/hooks/curate-high-rated'
       path: '/api/public/hooks/curate-high-rated'
@@ -1713,6 +1734,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksAnalyzeInteractionsRoute:
     ApiPublicHooksAnalyzeInteractionsRoute,
   ApiPublicHooksCurateHighRatedRoute: ApiPublicHooksCurateHighRatedRoute,
+  ApiPublicHooksDiscoverRegionalRoute: ApiPublicHooksDiscoverRegionalRoute,
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
   ApiPublicHooksPullExternalIntelRoute: ApiPublicHooksPullExternalIntelRoute,
   ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
