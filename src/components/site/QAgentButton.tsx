@@ -321,8 +321,30 @@ export function QAgentButton() {
               </button>
             </div>
 
+            {/* Future Operator seeded turn — reflection prompt routed via ?seed=<id> */}
+            {seeded && (
+              <div className="mb-5 border-l-2 border-secondary-accent pl-4 py-1 animate-fade-up">
+                <div className="font-mono uppercase tracking-widest text-[10px] text-secondary-accent mb-2">
+                  Future Operator · Reflection
+                </div>
+                <div className="font-body text-[15px] text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                  {seeded.message}
+                </div>
+                {seeded.subtext ? (
+                  <p className="mt-2 text-xs text-foreground/60 leading-relaxed">{seeded.subtext}</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setSeeded(null)}
+                  className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-accent"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
             {/* Contextual Lumi action grid — empty conversation state. */}
-            {!answer && !panel && (
+            {!answer && !panel && !seeded && (
               <div className="mb-5">
                 <LumiDrawerActions
                   pageContext={pageContext}
