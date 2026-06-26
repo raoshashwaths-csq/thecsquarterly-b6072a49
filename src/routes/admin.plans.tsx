@@ -17,6 +17,13 @@ import {
   adminBulkSetAssignments,
   adminGrandfatherCounts,
   adminResnapshotAll,
+  adminListAuditLog,
+  adminExportSkuCsv,
+  adminExportAssignmentsCsv,
+  adminGetDraft,
+  adminSaveDraft,
+  adminDiscardDraft,
+  adminPublishDraft,
   type PublicPlan,
   type PublicFeature,
   type PublicAssignment,
@@ -29,7 +36,7 @@ export const Route = createFileRoute("/admin/plans")({
   component: AdminPlansPage,
 });
 
-type Tab = "plans" | "matrix" | "sku";
+type Tab = "plans" | "matrix" | "sku" | "drafts" | "audit";
 
 function AdminPlansPage() {
   const { user } = useAuth();
