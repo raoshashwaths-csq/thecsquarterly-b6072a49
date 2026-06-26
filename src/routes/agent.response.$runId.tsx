@@ -13,6 +13,7 @@ import { RunAccountTagger } from "@/components/agent/RunAccountTagger";
 import { QMark } from "@/components/site/QMark";
 import { Switch } from "@/components/ui/switch";
 import { SharedRunGate, isRunUnlocked } from "@/components/site/SharedRunGate";
+import { LumiFeedbackBar } from "@/components/agent/LumiFeedbackBar";
 
 export const Route = createFileRoute("/agent/response/$runId")({
   head: () => ({
