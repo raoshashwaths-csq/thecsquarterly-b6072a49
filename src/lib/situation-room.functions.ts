@@ -156,6 +156,7 @@ export const startSituation = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured.");
+    await assertSituationQuota(context.userId);
     await assertQUnderCap(context.userId);
 
     const situation = data.situation;
