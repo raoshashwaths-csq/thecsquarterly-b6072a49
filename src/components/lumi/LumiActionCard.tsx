@@ -105,9 +105,9 @@ export function LumiActionCard({
       <p className="mt-1.5 font-serif text-[12px] leading-[1.5] text-foreground/70">
         {action.description}
       </p>
-      {(action.isNew || action.tier === "vanguard") && (
+      {action.isNew && (
         <div className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em] text-foreground/55">
-          {action.isNew ? "New" : "Vanguard"}
+          New
         </div>
       )}
       {isLocked && (
