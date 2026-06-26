@@ -113,6 +113,7 @@ export function RunAccountTagger({
       } else {
         toast.success(`Tagged to ${r.accountName ?? "account"}`);
       }
+    } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not tag run");
     } finally {
       setSaving(false);
