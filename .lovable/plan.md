@@ -1,39 +1,74 @@
-# CSFactors Widget Mockup Sheets
 
-Generate static mockup images only — no code changes. One composite sheet per widget, each showing 6 states laid out as a 3×2 grid (columns = Empty / Loading / Populated, rows = Dark / Light).
+# Tier-Personalised Copy: Plan
 
-## Visual rules locked across every sheet
+## Goal
+Every feature card, paywall, and gated CTA should read its copy from a single tier-aware config so a signed-in Practitioner never sees "Unlocks at Practitioner", an Operator never sees "Upgrade to Operator", etc. Copy and logic only — no design, schema, or component-rename changes.
 
-- **Corner radius:** 12px on all cards, panels, modals, drawers, badges, inputs
-- **Buttons:** pill-shaped (fully rounded) for primary/secondary CTAs; 12px for icon buttons
-- **Colors:** existing brand tokens only — Dark Navy `#1a1a1a` / midnight slate bg, Cream parchment for light, Gold accent (`#e0c58f`), Oxblood/crimson, Emerald, Teal
-- **Typography:** Cormorant/Newsreader display, JetBrains Mono eyebrows, Source Serif body — matching current site
-- **Hairline borders, paper grain background, mono eyebrow labels** stay intact
-- **State conventions:** Empty = illustrated zero-state with rounded CTA; Loading = skeleton blocks with the same 12px radius shimmer; Populated = real-feeling data
+## What already exists (use as-is)
+- `src/hooks/useSubscriptionTier.ts` — returns `{ tier, designation, dRank, isLoggedIn, canAccess* }`. Will be the single source of truth.
+- `src/hooks/useEntitlements.ts` + `src/lib/entitlements.functions.ts` — server-side derivation from `subscriptions.designation`. Already invalidated on `onAuthStateChange` in `src/routes/__root.tsx`.
+- `src/lib/tiers.ts` — canonical 8-state designation vocabulary (`visitor` + `reader`, `practitioner`, `operator`, `team`, `scale`, `enterprise`, `strategic_partner`). TIER_COPY will key off this.
+- `src/components/site/PaywallOverlay.tsx` + `TierGateOverlay.tsx` — already tier-aware shells; will be re-pointed at TIER_COPY instead of inline strings.
 
-## Widgets covered (10 composite sheets)
+## What to create
+1. **`src/lib/tierCopy.ts`** — central `TIER_COPY` registry. Shape:
+   ```ts
+   type FeatureKey =
+     | "csfactors" | "codex" | "lumi" | "ebrBuilder" | "expansionEngine"
+     | "meetingIntel" | "reckoningLedger" | "operatorAnalytics"
+     | "benchmarks" | "teamDashboard" | "apiAccess" | "community" | ...;
+   type TierCopy = {
+     state: "locked" | "unlocked" | "limited" | "owned";
+     eyebrow: string;        // "PRACTITIONER" / "INCLUDED IN YOUR PLAN" / etc.
+     headline: string;       // card title override (optional)
+     body: string;           // explanatory line
+     cta: { label: string; to: string; kind: "upgrade" | "open" | "manage" };
+     showLock: boolean;
+   };
+   export const TIER_COPY: Record<FeatureKey, Record<Designation | "visitor", TierCopy>>;
+   ```
+   One entry per (feature × designation) — eight columns including visitor. Authoring covers all 8 so no fallback drift.
 
-1. **KPI Strip** — NRR / GRR / Logo Churn / Portfolio Health four-card row with accent rails
-2. **Burning Three** — at-risk account cards with avatar, ARR, days-to-renewal, escalation tag
-3. **Reckoning Ledger** — timeline rail with timestamped entries (escalation, health, insight)
-4. **Risk Heatmap** — 5×5 Impact × Likelihood grid with dot magnitude
-5. **Trend Chart** — NRR/Health/Adoption/Risk multi-metric line chart with 30/90/180D toggle
-6. **Accounts Grid** — 32-column matrix preview with sticky name/UCC, sentiment chips, sort
-7. **Action Centre Panel** — task queue cards with priority, owner, due date
-8. **Tagged Lumi Runs** — tagged AI assistant run cards with status pills
-9. **Account Drawer** — right-side slide-over with stakeholder map, contract, timeline
-10. **Workspace Pane** — full-screen workspace overlay with multi-panel layout
+2. **`src/hooks/useTierCopy.ts`** — thin selector:
+   ```ts
+   const { designation, isLoggedIn } = useSubscriptionTier();
+   return TIER_COPY[featureKey][isLoggedIn ? designation : "visitor"];
+   ```
+   Returns a stable object; no extra network calls.
 
-## Output
+## What to extend
+- **`useSubscriptionTier.ts`** — verify it already exposes everything `useTierCopy` needs. Expected: no changes. If a field is missing for a specific card, add it without renaming existing fields.
+- **`PaywallOverlay.tsx`** — replace inline `copyFor(...)` switch with a `useTierCopy(gate)` read; keep component API identical.
+- **`TierGateOverlay.tsx`** — accept an optional `featureKey` prop; when provided, pull copy from `useTierCopy`. Existing prop-driven callers keep working.
 
-- 10 PNGs at 1600×1200 each, saved to `/mnt/documents/csfactors-mockups/`
-- One overview contact sheet stitching all 10 widget thumbnails together for quick scanning
-- Each sheet labeled with widget name + state grid headers
+## Sweep targets (replace static copy with `useTierCopy`)
+Inline gated copy lives in these files (from grep + dependency scan):
 
-## Method
+Routes: `index.tsx`, `csfactors.tsx`, `csfactors.360.tsx`, `codex.index.tsx`, `insights.$slug.tsx`, `account.index.tsx`, `account.api.tsx`, `account.executive.analytics.tsx`, `account.analytics.{nrr-waterfall,retention-funnel,stakeholder-radar,team-leaderboard}.tsx`, `agent.framework.tsx`, `diagnostics.ai-readiness.survey.tsx`, `diagnostics.champion-dependency.tsx`, `pricing.tsx`, `admin.tsx`.
 
-Use the `imagegen` tool (premium tier for legible UI text) with detailed prompts referencing the exact widget content, the locked design system tokens, and the 3×2 state grid layout. Inspect every generated sheet for clipped text / overlapping cards / wrong colors before delivering; regenerate any that fail QA.
+Components: `SiteHeader.tsx`, `PaywallOverlay.tsx`, `TierGateOverlay.tsx`, `ArticleSignalRow.tsx`, `csfactors/threeSixty/{TeamLeaderboardView,StakeholderRadarView,RetentionFunnelView,NrrWaterfallView}.tsx`.
 
-## Not included
+Locale string: `src/locales/en/common.json:135` ("Unlock at Operator tier →") becomes a TIER_COPY entry, not a translation literal.
 
-No code edits, no design token changes, no new components. Pure visual reference material to validate the 12px-rounded direction before any implementation.
+## What NOT to touch
+- `subscriptions` / `profiles` / `user_roles` schema — `subscription_tier` column will NOT be added; designation lives where it already lives.
+- `src/integrations/supabase/*` (auto-gen).
+- Any colour token, font, spacing, animation, or component name.
+- Realtime: per your decision, no new `postgres_changes` channel. Tier already refreshes on `onAuthStateChange` via query invalidation in `__root.tsx`.
+
+## Conflicts already resolved with you
+- Briefing said `users.subscription_tier`; reality is `subscriptions.designation`. Plan uses the existing `useSubscriptionTier` hook so call-sites never read columns directly.
+- Briefing said 6 tiers; reality is 8. TIER_COPY will cover all 8 (visitor, reader, practitioner, operator, team, scale, enterprise, strategic_partner) per your answer.
+- "free" in your briefing == `reader` in code. `useSubscriptionTier.tier` already exposes the `"free"` alias for back-compat; TIER_COPY keys on `designation` (canonical) to avoid drift.
+
+## Validation
+After sweep:
+1. Visual smoke test at `/`, `/csfactors`, `/codex`, `/account`, `/insights/*`, `/diagnostics/*` as each persona (visitor → strategic_partner) — paid users see no upgrade prompts on features they own.
+2. `tsgo` typecheck.
+3. Grep for the original 7 strings + common phrasings (`unlock`, `upgrade to`, `requires `, `subscribe to`) — every remaining hit is intentional (pricing page, marketing copy) or routed through TIER_COPY.
+
+## Out of scope (will not be done this session)
+- New tiers, new features, new gates.
+- Paddle webhook plumbing changes.
+- Server-side authorization changes — `requireSupabaseAuth` + `assertAtLeast` stay as-is; this is UI copy only.
+- Translations of the new copy (English only; i18n keys can be added later).
