@@ -80,6 +80,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.retention-ledger.ticker'
 import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
 
 const VanguardRoute = VanguardRouteImport.update({
   id: '/vanguard',
@@ -449,6 +450,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksIngestArticlesRoute =
+  ApiPublicHooksIngestArticlesRouteImport.update({
+    id: '/api/public/hooks/ingest-articles',
+    path: '/api/public/hooks/ingest-articles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -516,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
+  '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -585,6 +593,7 @@ export interface FileRoutesByTo {
   '/account/analytics': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
+  '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -659,6 +668,7 @@ export interface FileRoutesById {
   '/account/analytics/': typeof AccountAnalyticsIndexRoute
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
+  '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -734,6 +744,7 @@ export interface FileRouteTypes {
     | '/account/analytics/'
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
+    | '/api/public/hooks/ingest-articles'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -803,6 +814,7 @@ export interface FileRouteTypes {
     | '/account/analytics'
     | '/csfactors/maps'
     | '/diagnostics/ai-readiness'
+    | '/api/public/hooks/ingest-articles'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -876,6 +888,7 @@ export interface FileRouteTypes {
     | '/account/analytics/'
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
+    | '/api/public/hooks/ingest-articles'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -932,6 +945,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   QResponseRunIdRoute: typeof QResponseRunIdRoute
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
+  ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
   ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
@@ -1439,6 +1453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/ingest-articles': {
+      id: '/api/public/hooks/ingest-articles'
+      path: '/api/public/hooks/ingest-articles'
+      fullPath: '/api/public/hooks/ingest-articles'
+      preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1584,6 +1605,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   QResponseRunIdRoute: QResponseRunIdRoute,
   AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
+  ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
   ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
