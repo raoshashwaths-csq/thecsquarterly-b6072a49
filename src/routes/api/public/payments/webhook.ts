@@ -114,7 +114,7 @@ async function handleSubscriptionUpsert(data: SubscriptionData, env: PaddleEnv) 
 
   const { error } = await getSupabase()
     .from("subscriptions")
-    .upsert(row, { onConflict: "paddle_subscription_id" });
+    .upsert(row as never, { onConflict: "paddle_subscription_id" });
   if (error) console.error("[paddle webhook] upsert error", error);
 }
 
