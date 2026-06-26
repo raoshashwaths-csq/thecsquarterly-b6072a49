@@ -697,3 +697,73 @@ export const schedulePost = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+// =============== Situation Room limits ===============
+
+const SR_KEY = "situation_room.limits";
+type SRWindow = "day" | "week" | "month";
+
+const SituationLimitsInput = z.object({
+  max_prompts: z.number().int().min(1).max(100),
+  window: z.enum(["day", "week", "month"]),
+});
+
+export const getSituationRoomSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data } = await supabaseAdmin
+      .from("app_settings").select("value, updated_at").eq("key", SR_KEY).maybeSingle();
+    const raw = (data as { value?: { max_prompts?: number; window?: SRWindow } } | null)?.value;
+    return {
+      max_prompts: typeof raw?.max_prompts === "number" ? raw.max_prompts : 5,
+      window: (raw?.window ?? "month") as SRWindow,
+      updated_at: (data as { updated_at?: string } | null)?.updated_at ?? null,
+    };
+  });
+
+export const updateSituationRoomSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SituationLimitsInput.parse(d))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const value = { max_prompts: data.max_prompts, window: data.window };
+    const { error } = await supabaseAdmin
+      .from("app_settings")
+      .upsert(
+        { key: SR_KEY, value: value as never, updated_at: new Date().toISOString(), updated_by: context.userId },
+        { onConflict: "key" },
+      );
+    if (error) throw new Error(error.message);
+    await supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: context.userId,
+      action: "situation_room.update_limits",
+      target_table: "app_settings",
+      target_id: SR_KEY,
+      details: value as never,
+    });
+    return { ok: true, ...value };
+  });
+
+export const getSituationRoomMetrics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
+    const [extraRes, quotaRes] = await Promise.all([
+      supabaseAdmin
+        .from("lumi_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event", "situation.extra_attempt_blocked")
+        .gte("created_at", since),
+      supabaseAdmin
+        .from("lumi_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event", "situation.quota_blocked")
+        .gte("created_at", since),
+    ]);
+    return {
+      extraAttemptsBlocked30d: extraRes.count ?? 0,
+      quotaBlocks30d: quotaRes.count ?? 0,
+    };
+  });

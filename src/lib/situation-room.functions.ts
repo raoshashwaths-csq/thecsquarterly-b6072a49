@@ -8,6 +8,90 @@ const EMBED_MODEL = "openai/text-embedding-3-small";
 const EMBED_DIM = 1536;
 const CHAT_MODEL = "google/gemini-2.5-flash";
 
+// ---------------------------------------------------------------------------
+// Situation Room per-user quota (admin-configurable via app_settings)
+// ---------------------------------------------------------------------------
+
+type SituationWindow = "day" | "week" | "month";
+type SituationLimits = { max_prompts: number; window: SituationWindow };
+
+const DEFAULT_LIMITS: SituationLimits = { max_prompts: 5, window: "month" };
+
+function windowBounds(window: SituationWindow): { startIso: string; resetIso: string } {
+  const now = new Date();
+  if (window === "day") {
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const reset = new Date(start.getTime() + 86_400_000);
+    return { startIso: start.toISOString(), resetIso: reset.toISOString() };
+  }
+  if (window === "week") {
+    // ISO week, Monday 00:00 UTC
+    const day = now.getUTCDay(); // 0..6, Sun=0
+    const diff = (day + 6) % 7; // days since Monday
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - diff));
+    const reset = new Date(start.getTime() + 7 * 86_400_000);
+    return { startIso: start.toISOString(), resetIso: reset.toISOString() };
+  }
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const reset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  return { startIso: start.toISOString(), resetIso: reset.toISOString() };
+}
+
+async function loadSituationLimits(): Promise<SituationLimits> {
+  const { data } = await supabaseAdmin
+    .from("app_settings")
+    .select("value")
+    .eq("key", "situation_room.limits")
+    .maybeSingle();
+  const raw = (data as { value?: Partial<SituationLimits> } | null)?.value;
+  const max = Number(raw?.max_prompts);
+  const win = raw?.window;
+  return {
+    max_prompts: Number.isFinite(max) && max > 0 ? Math.floor(max) : DEFAULT_LIMITS.max_prompts,
+    window: win === "day" || win === "week" || win === "month" ? win : DEFAULT_LIMITS.window,
+  };
+}
+
+async function isAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabaseAdmin
+    .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+  return !!data;
+}
+
+async function logLumiEvent(userId: string, event: string, meta: Record<string, unknown>): Promise<void> {
+  try {
+    await supabaseAdmin.from("lumi_events").insert({ user_id: userId, event, meta: meta as never });
+  } catch {
+    /* metrics are best-effort */
+  }
+}
+
+async function countSituationsInWindow(userId: string, startIso: string): Promise<number> {
+  const { count } = await supabaseAdmin
+    .from("situation_sessions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startIso);
+  return count ?? 0;
+}
+
+async function assertSituationQuota(userId: string): Promise<void> {
+  if (await isAdmin(userId)) return;
+  const limits = await loadSituationLimits();
+  const { startIso } = windowBounds(limits.window);
+  const used = await countSituationsInWindow(userId, startIso);
+  if (used >= limits.max_prompts) {
+    await logLumiEvent(userId, "situation.quota_blocked", {
+      used,
+      max: limits.max_prompts,
+      window: limits.window,
+    });
+    throw new Error("SITUATION_QUOTA_EXCEEDED");
+  }
+}
+
+
+
 type Dispatch = {
   id: string;
   slug: string;
@@ -72,6 +156,7 @@ export const startSituation = createServerFn({ method: "POST" })
   .handler(async ({ context, data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured.");
+    await assertSituationQuota(context.userId);
     await assertQUnderCap(context.userId);
 
     const situation = data.situation;
@@ -190,17 +275,22 @@ const ContinueInput = z.object({
   message: z.string().trim().min(1).max(2000),
 });
 
+/**
+ * The Situation Room is one-shot by design: a single Lumi read per situation.
+ * Any extra message on a Situation Room session is rejected here and logged
+ * for monitoring. Other Lumi flows that share this table (dispatch debriefs,
+ * tagged with title "Debrief: …") keep their conversational behavior.
+ */
 export const continueSituation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ContinueInput.parse(d))
   .handler(async ({ context, data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured.");
-    await assertQUnderCap(context.userId);
 
     const { data: session, error } = await (context.supabase as unknown as { from: (t: string) => any })
       .from("situation_sessions")
-      .select("id, situation, dispatches, messages")
+      .select("id, situation, dispatches, messages, title")
       .eq("id", data.sessionId)
       .maybeSingle();
     if (error || !session) throw new Error("Situation not found.");
@@ -209,21 +299,34 @@ export const continueSituation = createServerFn({ method: "POST" })
       situation: string;
       dispatches: Dispatch[];
       messages: ChatMsg[];
+      title: string | null;
     };
+
+    // One-shot Situation Room: anything that's not a Debrief is locked.
+    const isDebrief = typeof row.title === "string" && row.title.startsWith("Debrief:");
+    if (!isDebrief) {
+      await logLumiEvent(context.userId, "situation.extra_attempt_blocked", {
+        sessionId: data.sessionId,
+        messagePreview: data.message.slice(0, 200),
+      });
+      throw new Error("SITUATION_SESSION_LOCKED");
+    }
+
+    await assertQUnderCap(context.userId);
 
     const dispatchContext = (row.dispatches ?? [])
       .map((d, i) => `[${i + 1}] "${d.title}" — framework: ${d.framework}\nExcerpt: ${d.excerpt}`)
       .join("\n\n");
 
     const system = [
-      "You are Lumi, the CS analyst inside The CS Quarterly's Situation Room.",
-      "You are coaching an operator through a real, high-stakes live situation.",
-      "Stay grounded in the original situation and the retrieved dispatches below.",
+      "You are Lumi, the CS analyst inside The CS Quarterly.",
+      "You are coaching an operator through a dispatch debrief.",
+      "Stay grounded in the original brief and the retrieved dispatches below.",
       "Cite dispatch titles when you draw on them. Ask one focused follow-up at a time before prescribing actions.",
       "When the operator has given you enough to act, prescribe a numbered next-step plan (3-5 steps), each with a clear owner and timing.",
       "Tone: McKinsey register, tight prose. No emoji, no hedging.",
       "",
-      "ORIGINAL SITUATION:",
+      "ORIGINAL BRIEF:",
       row.situation,
       "",
       "RETRIEVED DISPATCHES:",
@@ -251,9 +354,38 @@ export const continueSituation = createServerFn({ method: "POST" })
       zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 8000) },
     });
 
-
     return { reply };
   });
+
+
+export const getSituationQuota = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const admin = await isAdmin(context.userId);
+    const limits = await loadSituationLimits();
+    const { startIso, resetIso } = windowBounds(limits.window);
+    if (admin) {
+      return {
+        used: 0,
+        max: null as number | null,
+        remaining: null as number | null,
+        window: limits.window,
+        resetAt: resetIso,
+        unlimited: true,
+      };
+    }
+    const used = await countSituationsInWindow(context.userId, startIso);
+    const remaining = Math.max(0, limits.max_prompts - used);
+    return {
+      used,
+      max: limits.max_prompts,
+      remaining,
+      window: limits.window,
+      resetAt: resetIso,
+      unlimited: false,
+    };
+  });
+
 
 const SaveInput = z.object({
   sessionId: z.string().uuid(),

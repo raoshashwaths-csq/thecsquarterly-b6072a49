@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Mic, Save, Send, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowLeft, Mic, Save, Sparkles, ChevronRight, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useElevenLabsSpeechInput } from "@/hooks/useElevenLabsSpeechInput";
 import { LumiMark } from "@/components/site/LumiMark";
@@ -11,9 +11,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
   startSituation,
-  continueSituation,
   saveSituationLog,
   listSituationSessions,
+  getSituationQuota,
 } from "@/lib/situation-room.functions";
 import { listMyQRuns, listMyTaggedLumiRuns } from "@/lib/q-agent.functions";
 import { getNode, getTree } from "@/lib/q-trees";
@@ -63,14 +63,26 @@ function SituationRoomPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [dispatches, setDispatches] = useState<Dispatch[]>([]);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const [reply, setReply] = useState("");
   const [composerError, setComposerError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [saveTitle, setSaveTitle] = useState("");
 
   const startFn = useServerFn(startSituation);
-  const continueFn = useServerFn(continueSituation);
   const saveFn = useServerFn(saveSituationLog);
+  const quotaFn = useServerFn(getSituationQuota);
+
+  const quotaQuery = useQuery({
+    queryKey: ["situation-quota"],
+    queryFn: () => quotaFn(),
+    enabled: !!user,
+  });
+
+  const remaining = quotaQuery.data?.remaining ?? null;
+  const quotaMax = quotaQuery.data?.max ?? null;
+  const quotaWindow = quotaQuery.data?.window ?? "month";
+  const quotaResetAt = quotaQuery.data?.resetAt ?? null;
+  const unlimited = quotaQuery.data?.unlimited ?? false;
+  const quotaReached = !unlimited && remaining !== null && remaining <= 0;
 
   const start = useMutation({
     mutationFn: async (s: string) => startFn({ data: { situation: s } }),
@@ -79,15 +91,17 @@ function SituationRoomPage() {
       setDispatches(res.dispatches);
       setMessages([{ role: "assistant", content: res.opening }]);
       trackLumiEvent("drawer.open", { surface: "situation-room", meta: { event: "situation_started" } });
+      void quotaQuery.refetch();
     },
-    onError: (e: Error) => setComposerError(e.message),
-  });
-
-  const cont = useMutation({
-    mutationFn: async (msg: string) => continueFn({ data: { sessionId: sessionId!, message: msg } }),
-    onSuccess: (res, msg) => {
-      setMessages((m) => [...m, { role: "user", content: msg }, { role: "assistant", content: res.reply }]);
-      setReply("");
+    onError: (e: Error) => {
+      if (e.message === "SITUATION_QUOTA_EXCEEDED") {
+        setComposerError("You've used all your Situation Room runs for this period. Try again after the next reset, or upgrade for more headroom.");
+        void quotaQuery.refetch();
+      } else if (e.message === "Q_MONTHLY_CAP_REACHED") {
+        setComposerError("You've hit your monthly Lumi cap. Upgrade your plan for more runs.");
+      } else {
+        setComposerError(e.message);
+      }
     },
   });
 
@@ -106,6 +120,10 @@ function SituationRoomPage() {
   function onSubmitSituation(e: React.FormEvent) {
     e.preventDefault();
     setComposerError(null);
+    if (quotaReached) {
+      setComposerError("You've used all your Situation Room runs for this period.");
+      return;
+    }
     if (situation.trim().length < 20) {
       setComposerError("Give Lumi a few more details — at least 20 characters.");
       return;
@@ -118,7 +136,6 @@ function SituationRoomPage() {
     setSessionId(null);
     setDispatches([]);
     setMessages([]);
-    setReply("");
     setSaved(false);
     setSaveTitle("");
   }
@@ -148,20 +165,50 @@ function SituationRoomPage() {
 
         {!sessionId ? (
           <form onSubmit={onSubmitSituation} className="space-y-4">
+            {user ? (
+              <div className="flex items-center justify-between gap-3 border border-border bg-card/60 px-4 py-2.5">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Situation Room quota
+                </div>
+                <div className="font-mono text-xs text-foreground/80">
+                  {unlimited
+                    ? "Unlimited (admin)"
+                    : quotaQuery.isLoading || remaining === null
+                    ? "…"
+                    : (
+                      <span>
+                        <span className={quotaReached ? "text-destructive" : "text-accent"}>
+                          {remaining}
+                        </span>
+                        <span className="text-muted-foreground"> of {quotaMax} left</span>
+                        {quotaResetAt ? (
+                          <span className="text-muted-foreground">
+                            {" · resets "}
+                            {new Date(quotaResetAt).toLocaleDateString(undefined, {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                        ) : null}
+                      </span>
+                    )}
+                </div>
+              </div>
+            ) : null}
             <div className="relative">
               <Textarea
                 value={situation}
                 onChange={(e) => setSituation(e.target.value)}
                 placeholder={EXAMPLE_SITUATION}
                 rows={8}
-                disabled={!user || start.isPending}
+                disabled={!user || start.isPending || quotaReached}
                 className="min-h-[200px] text-base leading-relaxed font-serif resize-y bg-card border-border focus-visible:ring-accent"
               />
               <button
                 type="button"
                 onClick={() => speech.toggle()}
-                disabled={!user}
-                className="absolute bottom-3 right-3 inline-flex items-center justify-center h-9 w-9 rounded-full border border-border bg-background hover:border-accent hover:text-accent transition-colors"
+                disabled={!user || quotaReached}
+                className="absolute bottom-3 right-3 inline-flex items-center justify-center h-9 w-9 rounded-full border border-border bg-background hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
                 aria-label={speech.recording ? "Stop dictation" : "Dictate"}
               >
                 {speech.recording ? <span className="h-3 w-3 bg-accent" /> : <Mic className="h-4 w-4" />}
@@ -179,6 +226,25 @@ function SituationRoomPage() {
                   Sign in →
                 </Link>
               </div>
+            ) : quotaReached ? (
+              <div className="border border-destructive/40 bg-destructive/5 p-5">
+                <div className="flex items-start gap-3">
+                  <Lock className="h-4 w-4 mt-0.5 text-destructive" />
+                  <div className="flex-1">
+                    <div className="eyebrow text-destructive mb-1">Quota reached</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      You've used all {quotaMax} Situation Room runs this {quotaWindow}. Your quota
+                      resets on {quotaResetAt ? new Date(quotaResetAt).toLocaleDateString() : "the next cycle"}.
+                    </p>
+                    <Link
+                      to="/pricing"
+                      className="inline-block mt-3 font-mono text-xs uppercase tracking-widest text-accent border-b border-accent pb-0.5"
+                    >
+                      See plans for more runs →
+                    </Link>
+                  </div>
+                </div>
+              </div>
             ) : (
               <Button
                 type="submit"
@@ -195,10 +261,6 @@ function SituationRoomPage() {
             situation={situation}
             dispatches={dispatches}
             messages={messages}
-            reply={reply}
-            setReply={setReply}
-            onSend={() => cont.mutate(reply.trim())}
-            sending={cont.isPending}
             saved={saved}
             saveTitle={saveTitle}
             setSaveTitle={setSaveTitle}
@@ -218,10 +280,6 @@ function SituationActive(props: {
   situation: string;
   dispatches: Dispatch[];
   messages: ChatMsg[];
-  reply: string;
-  setReply: (s: string) => void;
-  onSend: () => void;
-  sending: boolean;
   saved: boolean;
   saveTitle: string;
   setSaveTitle: (s: string) => void;
@@ -229,7 +287,7 @@ function SituationActive(props: {
   onReset: () => void;
 }) {
   const {
-    situation, dispatches, messages, reply, setReply, onSend, sending,
+    situation, dispatches, messages,
     saved, saveTitle, setSaveTitle, onSave, onReset,
   } = props;
 
@@ -288,10 +346,21 @@ function SituationActive(props: {
               </div>
             ))}
         </div>
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-3">
-          One situation, one read. Start a new situation to ask Lumi something else.
-        </p>
       </section>
+
+      <section className="border border-accent/30 bg-accent/5 px-5 py-4">
+        <div className="flex items-start gap-3">
+          <Sparkles className="h-4 w-4 mt-0.5 text-accent" />
+          <div className="flex-1">
+            <div className="eyebrow text-accent mb-1">Situation complete</div>
+            <p className="text-sm text-foreground/80 leading-relaxed">
+              One read per situation. Save this thread, or start a new situation when you're ready —
+              Lumi gives every problem its own focused brief.
+            </p>
+          </div>
+        </div>
+      </section>
+
 
 
       <section className="border-t border-border pt-6 flex flex-wrap items-center gap-3">
