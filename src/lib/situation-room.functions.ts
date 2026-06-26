@@ -60,7 +60,7 @@ async function isAdmin(userId: string): Promise<boolean> {
 
 async function logLumiEvent(userId: string, event: string, meta: Record<string, unknown>): Promise<void> {
   try {
-    await supabaseAdmin.from("lumi_events").insert({ user_id: userId, event, meta });
+    await supabaseAdmin.from("lumi_events").insert({ user_id: userId, event, meta: meta as never });
   } catch {
     /* metrics are best-effort */
   }
