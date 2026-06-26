@@ -159,7 +159,7 @@ function FutureOperatorQuestsPage() {
           eyebrow="No quests yet"
           title="Your first three quests arrive tomorrow morning."
           description="The Future Operator generates a new set every day at 07:30 in your timezone."
-        />
+        ><></></SectionCard>
       ) : (
         <ul className="space-y-4">
           {quests.map((q) => (
