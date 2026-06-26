@@ -11,18 +11,21 @@ type Props = {
 };
 
 /**
- * Scroll-locked alternating-fade reveal that ends in a staggered composite.
+ * Three-stage reveal that resolves into a horizontal scroll carousel.
  *
- * Behaviour (desktop + fine pointer + no reduced-motion):
- *  - phase 1: stage 1 visible from mount (no blank state)
- *  - phase 2: stage 2 fades in from the RIGHT
- *  - phase 3: stage 3 fades in from the LEFT
- *  - phase 4: composite — all three mocks staggered, captions listed beside
- *  - phase 5: lock released, composite stays, page continues
+ * Desktop + fine pointer + no reduced-motion:
+ *  - phase 1: stage 01 fades in from LEFT
+ *  - phase 2: stage 02 fades in from RIGHT (01 stays)
+ *  - phase 3: stage 03 fades in from LEFT (01 + 02 stay) — all three now
+ *             form the carousel row; scroll lock releases.
  *
- * Lock engages via IntersectionObserver when ≥ 80% of section is in view.
- * Safety net releases body overflow after 6s in case wheel events are
- * swallowed. Esc / ArrowUp at phase 1 / focusin all release immediately.
+ * Scroll lock engages when ≥75% of the section is in view via
+ * IntersectionObserver, with a 6s safety net so the page is never wedged.
+ * Wheel / arrow / page-down / space / touch all advance one phase.
+ * Esc, ArrowUp at phase 1, and focusin release immediately.
+ *
+ * Mobile / reduced-motion: the carousel is the default — no lock, no
+ * entrance gating, all three cards present from mount.
  */
 export function StageRevealSection({ stages }: Props) {
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -56,8 +59,8 @@ export function StageRevealSection({ stages }: Props) {
     let locked = false;
     let lastTick = 0;
     let safety: ReturnType<typeof setTimeout> | null = null;
-    const ADVANCE_MS = 380;
-    const TOTAL_PHASES = 4;
+    const ADVANCE_MS = 420;
+    const TOTAL_PHASES = 3;
 
     const setP = (next: number) => {
       phaseRef.current = next;
@@ -80,7 +83,6 @@ export function StageRevealSection({ stages }: Props) {
       if (phaseRef.current >= TOTAL_PHASES) return;
       locked = true;
       document.body.style.overflow = "hidden";
-      // Safety net — never wedge the page
       safety = setTimeout(() => release(), 6000);
     };
 
@@ -92,21 +94,14 @@ export function StageRevealSection({ stages }: Props) {
         if (phaseRef.current < TOTAL_PHASES) {
           setP(phaseRef.current + 1);
           if (phaseRef.current >= TOTAL_PHASES) {
-            setTimeout(() => {
-              setP(TOTAL_PHASES + 1);
-              release();
-            }, 500);
+            setTimeout(() => release(), 450);
           }
         } else {
-          setP(TOTAL_PHASES + 1);
           release();
         }
       } else {
-        if (phaseRef.current <= 1) {
-          release();
-        } else {
-          setP(phaseRef.current - 1);
-        }
+        if (phaseRef.current <= 1) release();
+        else setP(phaseRef.current - 1);
       }
     };
 
@@ -131,7 +126,7 @@ export function StageRevealSection({ stages }: Props) {
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setP(TOTAL_PHASES + 1);
+        setP(TOTAL_PHASES);
         release();
         return;
       }
@@ -150,14 +145,14 @@ export function StageRevealSection({ stages }: Props) {
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.75) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
             engage();
           } else if (!entry.isIntersecting) {
             release();
           }
         }
       },
-      { threshold: [0, 0.5, 0.75, 0.9] },
+      { threshold: [0, 0.4, 0.6, 0.85] },
     );
     io.observe(el);
 
@@ -178,29 +173,23 @@ export function StageRevealSection({ stages }: Props) {
     };
   }, [isDesktop, reduced]);
 
-  // Mobile / reduced-motion: simple stacked vertical reveal
+  // ── Mobile / reduced-motion: just the carousel, no gating ────────────
   if (reduced || !isDesktop) {
     return (
-      <section ref={sectionRef} className="max-w-7xl w-full mx-auto px-6 py-14 md:py-20">
-        <div className="space-y-16">
-          {stages.map((s, i) => (
-            <div
-              key={s.label}
-              className={`grid md:grid-cols-2 gap-10 items-center animate-fade-up ${
-                i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""
-              }`}
-            >
-              <div>{s.caption}</div>
-              <div>{s.mock}</div>
-            </div>
-          ))}
+      <section
+        ref={sectionRef}
+        className="w-full py-14 md:py-20"
+        aria-label="The three stages of the platform"
+      >
+        <div className="max-w-7xl w-full mx-auto px-6">
+          <StageHeader />
+          <StageCarousel stages={stages} visible={[true, true, true]} />
         </div>
       </section>
     );
   }
 
-  const isComposite = phase >= 4;
-  const visible = (i: number) => phase >= i + 1;
+  const visible: [boolean, boolean, boolean] = [phase >= 1, phase >= 2, phase >= 3];
 
   return (
     <section
@@ -209,72 +198,76 @@ export function StageRevealSection({ stages }: Props) {
       aria-label="The three stages of the platform"
     >
       <div className="max-w-7xl w-full mx-auto px-6">
-        {!isComposite ? (
-          <div className="relative min-h-[560px] md:min-h-[600px]">
-            {stages.map((s, i) => {
-              const fromLeft = i % 2 === 0;
-              const show = visible(i);
-              const isCurrent = i === phase - 1;
-              return (
-                <div
-                  key={s.label}
-                  className={`absolute inset-0 grid md:grid-cols-2 gap-10 items-center transition-all duration-[500ms] ease-out ${
-                    show
-                      ? `opacity-100 translate-x-0 ${isCurrent ? "" : "opacity-40 scale-[0.96]"}`
-                      : `opacity-0 ${fromLeft ? "-translate-x-8" : "translate-x-8"}`
-                  }`}
-                  style={{ zIndex: 10 + i + (isCurrent ? 5 : 0) }}
-                  aria-hidden={!show}
-                >
-                  <div className={fromLeft ? "" : "md:order-2"}>{s.caption}</div>
-                  <div className={fromLeft ? "" : "md:order-1"}>{s.mock}</div>
-                </div>
-              );
-            })}
-            <div className="absolute -bottom-2 left-0 right-0 flex justify-center gap-2 pointer-events-none">
-              {[1, 2, 3, 4].map((n) => (
-                <span
-                  key={n}
-                  className={`h-1 w-8 transition-colors ${
-                    phase >= n ? "bg-accent" : "bg-foreground/15"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-10 items-center animate-fade-up">
-            <div className="relative h-[420px] md:h-[480px]">
-              {stages.map((s, i) => (
-                <div
-                  key={s.label}
-                  className="absolute inset-0 transition-all duration-700 ease-out"
-                  style={{
-                    transform: `translate(${(i - 1) * 28}px, ${(i - 1) * 22}px) rotate(${(i - 1) * 4}deg) scale(${0.86 + i * 0.04})`,
-                    zIndex: i + 1,
-                  }}
-                >
-                  <div className="h-full">{s.mock}</div>
-                </div>
-              ))}
-            </div>
-            <ol className="space-y-6">
-              {stages.map((s, i) => (
-                <li
-                  key={s.label}
-                  className="flex gap-4 border-l-2 border-accent/40 pl-4 animate-fade-up"
-                  style={{ animationDelay: `${i * 120}ms` }}
-                >
-                  <span className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent min-w-[3.5ch] pt-1">
-                    0{i + 1}
-                  </span>
-                  <div className="text-sm md:text-base">{s.caption}</div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
+        <StageHeader />
+        <StageCarousel stages={stages} visible={visible} />
+
+        {/* Progress dots */}
+        <div className="mt-8 flex justify-center gap-2" aria-hidden>
+          {[1, 2, 3].map((n) => (
+            <span
+              key={n}
+              className={`h-1 w-10 transition-colors duration-300 ${
+                phase >= n ? "bg-accent" : "bg-foreground/15"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
+  );
+}
+
+function StageHeader() {
+  return (
+    <div className="mb-10 md:mb-14 max-w-2xl">
+      <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-secondary-accent mb-4 font-semibold">
+        The three stages
+      </div>
+      <h2 className="font-display text-3xl md:text-4xl lg:text-5xl leading-[1.05] tracking-tight text-balance">
+        One platform. Three operators. The same retention engine.
+      </h2>
+    </div>
+  );
+}
+
+function StageCarousel({
+  stages,
+  visible,
+}: {
+  stages: [StageItem, StageItem, StageItem];
+  visible: [boolean, boolean, boolean];
+}) {
+  return (
+    <div
+      className="-mx-6 px-6 overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      role="region"
+      aria-label="Stages carousel"
+      tabIndex={0}
+    >
+      <ul className="flex gap-6 md:gap-8 pb-2">
+        {stages.map((s, i) => {
+          const show = visible[i];
+          const fromLeft = i % 2 === 0; // 0,2 from left ; 1 from right
+          return (
+            <li
+              key={s.label}
+              className={`snap-start shrink-0 w-[88vw] sm:w-[460px] md:w-[520px] lg:w-[560px] transition-all duration-[600ms] ease-out ${
+                show
+                  ? "opacity-100 translate-x-0"
+                  : `opacity-0 ${fromLeft ? "-translate-x-10" : "translate-x-10"}`
+              }`}
+              aria-hidden={!show}
+            >
+              <article className="flex flex-col h-full bg-card border border-border overflow-hidden card-lift">
+                <div className="border-b border-border bg-background/40 p-4">
+                  {s.mock}
+                </div>
+                <div className="p-6 md:p-8">{s.caption}</div>
+              </article>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
