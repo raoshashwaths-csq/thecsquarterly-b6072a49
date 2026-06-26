@@ -22,6 +22,7 @@ import {
   getQAdminStats, listQRunsAdmin, listQEntitlementsAdmin,
 } from "@/lib/admin.functions";
 import { exportDataset, importArticles, listAuditLog } from "@/lib/admin-ops.functions";
+import { backfillEmbeddings } from "@/lib/embeddings.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 
 export const Route = createFileRoute("/admin")({
@@ -347,6 +348,35 @@ function ExportButton({ dataset, label = "Export CSV" }: { dataset: ExportDatase
   );
 }
 
+function BackfillEmbeddingsButton() {
+  const run = useServerFn(backfillEmbeddings);
+  const [busy, setBusy] = useState(false);
+  const onClick = async () => {
+    if (!confirm("Generate embeddings for all published articles missing one? This may take a minute.")) return;
+    try {
+      setBusy(true);
+      const res = await run({ data: { limit: 200 } });
+      toast.success(`Embedded ${res.embedded} of ${res.total}${res.failed ? ` · ${res.failed} failed` : ""}.`);
+      if (res.errors?.length) console.warn("Embedding errors:", res.errors);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      onClick={onClick}
+      disabled={busy}
+      className="inline-flex items-center gap-2 px-3 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40 transition-colors disabled:opacity-50"
+      title="Generate semantic-search embeddings for all published posts missing one"
+    >
+      <Sparkles className="h-3.5 w-3.5" />
+      {busy ? "Embedding…" : "Embed all"}
+    </button>
+  );
+}
+
 function SectionHeader({ title, dataset }: { title: string; dataset?: ExportDataset }) {
   return (
     <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -487,7 +517,7 @@ function PostsAdmin() {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Articles</h2><ExportButton dataset="posts" /></div>
+        <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Articles</h2><ExportButton dataset="posts" /><BackfillEmbeddingsButton /></div>
         <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-foreground/90 transition-colors">+ New article</button>
       </div>
       <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto bg-background">

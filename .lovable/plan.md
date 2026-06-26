@@ -1,39 +1,68 @@
-## Lumi Contextual Bubble & Drawer Action Panel
 
-Adds a cycling speech bubble above the existing global Lumi FAB (`QAgentButton`) and a contextual action grid inside its drawer's empty state. Both read from a single page-keyed registry so future Lumi actions are one-file additions.
+# Plan — Semantic search on dispatches (backend only)
 
-### New files
+The project already has the infrastructure in place: `posts.embedding` is `vector(3072)`, and `public.match_posts(_query vector, _k int, _section text)` returns ranked posts. We will **keep that** and only add the missing pieces.
 
-- `src/config/lumiPageActions.ts` — registry per PRD: `LumiAction` type (+ explicit `description` field for cards), `PageContext` union, and the full initial dataset for `dispatch`, `home`, `codex`, `codex-item`, `ai-readiness`, `benchmarks`, `pricing`, `account`, `vanguard`, `series`, `default`.
-- `src/hooks/useLumiPageContext.ts` — derives `PageContext` from `useRouterState({ select: s => s.location.pathname })`. Section-detail routes (`/vanguard/...`, `/retention-protocol/...`, `/outcome-forum/...`) map to `dispatch`; series detection is wired as a TODO hook input (`seriesSlug?: string`) so a route can opt-in later without breaking the default.
-- `src/components/lumi/LumiBubble.tsx` — fixed-position bubble anchored to FAB. State: `index`, `isExiting`, `isVisible`. Effects: 3s mount delay; 5s interval with 300ms crossfade; scroll listener (hide on upward scroll, show again past 300px downward); session dismiss via `sessionStorage('lumi_bubble_dismissed_session')`; suppress if any Lumi message sent this session (read `sessionStorage('lumi_messaged')`, set by `QAgentButton` on send). Click bubble → `onOpen(prompt)`. Hidden while drawer `open=true` (prop from `QAgentButton`). Respects `prefers-reduced-motion` (static first message, no progress bar). `aria-live="polite"` wrapper updates only on index change.
-- `src/components/lumi/LumiActionCard.tsx` — shared card. Renders Tabler icon (`<i className={`ti ${icon}`} />`), label, derived description (uses `action.description` directly from registry), optional tier/new badge, locked overlay (semi-transparent wash + `ti-lock`) when `isLocked`. `role="button"`, keyboard handlers, `aria-disabled` when locked.
-- `src/components/lumi/LumiDrawerActions.tsx` — grid (2-col ≥280px drawer, 1-col below) with eyebrow "WHAT CAN I HELP YOU WITH?". Calls `onActionSelect(prompt)` which sets input + auto-submits; locked + free tier → `navigate({ to: '/pricing', search: { highlight: 'vanguard' } })`. Fades out (200ms) when `messagesCount > 0`.
+No UI work except a single admin backfill button. No changes to existing routes, schemas, or components.
 
-### Edits
+## Step-by-step (each step verified before the next)
 
-- `src/components/site/QAgentButton.tsx`
-  - Import `useLumiPageContext`, `LumiBubble`, `LumiDrawerActions`, `lumiPageActions`, `useEntitlements` (for tier).
-  - Render `<LumiBubble pageContext={ctx} drawerOpen={open} onOpen={(prompt) => { setQuery(prompt); setOpen(true); /* auto-submit via existing handler */ }} />` as a sibling of the FAB, hidden when `open`.
-  - Inside the `<Sheet>` body, when the conversation/answer state is empty (no `answer`, no in-flight query), render `<LumiDrawerActions pageContext={ctx} userTier={tier} onActionSelect={...} />` above the chat input; fade out once a message is sent.
-  - On message submit, set `sessionStorage('lumi_messaged','true')` so the bubble suppresses for the rest of the session.
-  - No changes to FAB position, drawer header, chat input, streaming, history, focus trap, or z-index. Bubble z-index sits below the Sheet.
-- `src/styles.css`
-  - Append `@keyframes lumi-bubble-enter` and `.lumi-bubble` / tail (`::before` fill + `::after` border) using `--color-secondary-accent` and `--color-background-secondary`.
-  - Append progress-bar utility and `@media (prefers-reduced-motion: reduce)` overrides.
-  - All tokens come from existing `:root` — no new colors.
+### Step 1 — Confirm pgvector + column + index (read-only check)
+- `pgvector` is already enabled (the column compiles).
+- Verify `posts.embedding vector(3072)` exists and that an HNSW/IVF index is present. If no index exists, add one in Step 2; otherwise skip.
 
-### Out of scope (per PRD "What NOT to change")
+### Step 2 — Ensure ANN index (migration, only if missing)
+If no index on `posts.embedding`, add:
 
-- CSFactors `AskLumiDrawer` is untouched — this PRD is the global site Lumi only.
-- No edits to existing Lumi conversation, streaming, tone toggle, FAB visual, or auth.
+```sql
+CREATE INDEX IF NOT EXISTS posts_embedding_idx
+  ON public.posts USING hnsw (embedding vector_cosine_ops);
+```
 
-### Verification
+(HNSW matches what Lovable's pgvector guidance recommends and works with 3072-dim Gemini vectors. No schema change to `posts`.)
 
-- Manual walkthrough of each route in the verification checklist via the preview.
-- Playwright snapshot on `/insights/<slug>` confirming bubble appears at 3s, cycles, dismisses on click; drawer opens with the action grid populated; first send hides the grid.
-- `tsgo --noEmit`.
+### Step 3 — `embedPost` server function
+New file: `src/lib/embeddings.functions.ts`
 
-### Open questions before build
+- `createServerFn({ method: "POST" })` + `requireSupabaseAuth` + admin role check (`has_role(userId,'admin')`).
+- Fetches the post (id, title, subtitle, excerpt, body, category, section) via the admin client loaded inside the handler.
+- Builds the text-to-embed (title weighted x2, strip markdown, slice body to ~6000 chars).
+- Calls **Lovable AI Gateway** `/v1/embeddings` with `model: "google/gemini-embedding-001"` (3072 dims, matches existing column). Uses `LOVABLE_API_KEY` (already provisioned — no new secret).
+- Writes `embedding` back to `public.posts`.
 
-None blocking — PRD is specific. I'll use `useEntitlements` for the free/vanguard split (matches existing tier checks in the codebase) and the Tabler icon font that's already loaded for `ti-*` classes referenced in the PRD; if it's not currently bundled I'll add the CDN `<link>` in `__root.tsx` head.
+Verification: invoke once for an existing published post via `stack_modern--invoke-server-function`, then `SELECT id, embedding IS NOT NULL FROM posts WHERE id = ...`.
+
+### Step 4 — `searchPostsBySimilarity` server function
+Same file. Public-readable (no auth required — it only returns already-public published posts).
+
+- Embeds the query string via Lovable AI Gateway (same model).
+- Calls existing `match_posts(_query, _k, _section)` RPC via the server publishable client.
+- Returns `{ id, slug, title, similarity }[]`.
+
+Verification: invoke with a sample query, confirm ranked results > 0.
+
+### Step 5 — Auto-embed on publish
+`src/lib/posts.functions.ts` already owns post writes. After a successful upsert where the saved row has `published = true`, fire-and-await `embedPost({ postId })` inside the same handler (admin gate already enforced by that fn). Failures are logged but do not roll back the publish.
+
+Verification: edit any published post in /admin, confirm `embedding` column updates (timestamp changes / value present).
+
+### Step 6 — Backfill server function + admin button
+- Server fn `backfillEmbeddings` (admin-gated): selects published posts with `embedding IS NULL`, loops with 200ms delay, calls `embedPost` for each, returns `{ embedded, failed }`.
+- UI: add one small button + status text to `src/routes/admin.tsx` (or the existing admin content panel — whichever already hosts admin tools). Calls the server fn via `useServerFn` + `useMutation`. No other layout/UI changes.
+
+Verification: click the button on /admin, confirm the count returned and that `SELECT count(*) FROM posts WHERE published AND embedding IS NULL` drops to 0.
+
+## What I will NOT do
+- Will not create `vector(1536)` / OpenAI path — your answer was "keep existing 3072 / Gemini".
+- Will not add an `OPENAI_API_KEY` secret. Lovable AI Gateway uses the already-provisioned `LOVABLE_API_KEY`.
+- Will not modify any existing route, post schema column, post editor UI, or `match_posts` function signature.
+- Will not return `embedding` in any standard SELECT — only `match_posts` exposes it (already the case).
+
+## Technical notes
+- Files created: `src/lib/embeddings.functions.ts`.
+- Files edited: `src/lib/posts.functions.ts` (auto-embed hook), `src/routes/admin.tsx` (one backfill button), possibly one migration (HNSW index, only if missing).
+- No edits to `src/integrations/supabase/*`, `routeTree.gen.ts`, `.env`.
+- Embedding model: `google/gemini-embedding-001` (3072 dims) via `https://ai.gateway.lovable.dev/v1/embeddings`, header `Authorization: Bearer ${LOVABLE_API_KEY}` (OpenAI-compatible endpoint).
+- Admin gating uses existing `has_role(userId, 'admin')` RPC.
+
+I'll stop after each step's verification before moving to the next.
