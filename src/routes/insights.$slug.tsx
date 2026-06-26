@@ -18,6 +18,7 @@ import { ArticleSignalRow } from "@/components/site/ArticleSignalRow";
 import { ResumeReadingBanner } from "@/components/site/ResumeReadingBanner";
 import { RelatedIntelligencePanel } from "@/components/site/RelatedIntelligencePanel";
 import { getPost } from "@/lib/posts.functions";
+import { LumiDebriefCard } from "@/components/lumi/LumiDebriefCard";
 
 const postQuery = (slug: string) =>
   queryOptions({
