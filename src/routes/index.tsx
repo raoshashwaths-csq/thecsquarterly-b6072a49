@@ -375,6 +375,73 @@ function HomePage() {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Tier-aware hero card. Visual layout is identical to the original static
+// cards — only the badge, headline, body and CTA strings come from the
+// centralized tierCopyConfig via useTierCopy. When the user signs in or
+// upgrades, the registry returns different copy for the same featureId and
+// the card re-renders automatically.
+// ─────────────────────────────────────────────────────────────────────────────
+type AccentClass = "accent" | "secondary-accent";
+
+function TierAwareHeroCard({
+  featureId,
+  to,
+  dataTour,
+  ariaLabel,
+  accentClass,
+  icon,
+  hint,
+  fallbackTitle,
+  fallbackBody,
+  fallbackCta,
+}: {
+  featureId: import("@/config/tierCopyConfig").FeatureId;
+  to: string;
+  dataTour?: string;
+  ariaLabel: string;
+  accentClass: AccentClass;
+  icon: React.ReactNode;
+  hint?: string;
+  fallbackTitle: string;
+  fallbackBody: string;
+  fallbackCta: string;
+}) {
+  const copy = useTierCopy(featureId);
+  const isAccent = accentClass === "accent";
+  const borderColor = isAccent ? "hover:border-accent border-l-accent" : "hover:border-secondary-accent border-l-secondary-accent";
+  const iconBg = isAccent ? "bg-accent text-accent-foreground" : "bg-secondary-accent text-background";
+  const ctaColor = isAccent ? "text-accent border-accent/40 group-hover:border-accent" : "text-secondary-accent border-secondary-accent/40 group-hover:border-secondary-accent";
+  return (
+    <Link
+      to={to}
+      data-tour={dataTour}
+      className={`group relative flex flex-col h-full bg-card border border-border ${borderColor} border-l-4 transition-colors p-6 md:p-7 card-lift`}
+      aria-label={ariaLabel}
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <span
+          aria-hidden
+          className={`flex h-10 w-10 shrink-0 items-center justify-center ${iconBg} rounded-sm shadow-sm group-hover:scale-105 transition-transform`}
+        >
+          {icon}
+        </span>
+        <TierBadge label={copy.badge} variant={copy.badgeVariant} showLock={copy.lockIcon} />
+      </div>
+      <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
+        {copy.headline ?? fallbackTitle}
+      </h3>
+      <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
+        {copy.body ?? fallbackBody}
+      </p>
+      <span className={`inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] ${ctaColor} border-b pb-1 self-start`}>
+        {copy.cta ?? fallbackCta}
+      </span>
+      {hint && <QHint>{hint}</QHint>}
+    </Link>
+  );
+}
+
 function ClosingCTA() {
   const { t } = useTranslation();
   const { user } = useAuth();
