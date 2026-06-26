@@ -273,54 +273,26 @@ function SituationActive(props: {
 
       <section>
         <div className="eyebrow text-secondary-accent mb-4 inline-flex items-center gap-2">
-          <LumiMark variant="emblem" className="h-3.5 w-3.5" /> Coaching conversation
+          <LumiMark variant="emblem" className="h-3.5 w-3.5" /> Lumi's read
         </div>
         <div className="border border-border bg-card divide-y divide-border">
-          {messages.map((m, i) => (
-            <div key={i} className={`p-5 ${m.role === "assistant" ? "bg-background/40" : ""}`}>
-              <div className="eyebrow text-muted-foreground mb-2">
-                {m.role === "assistant" ? "Lumi" : "You"}
+          {messages
+            .filter((m) => m.role === "assistant")
+            .slice(0, 1)
+            .map((m, i) => (
+              <div key={i} className="p-5 bg-background/40">
+                <div className="eyebrow text-muted-foreground mb-2">Lumi</div>
+                <div className="prose prose-sm dark:prose-invert max-w-none font-serif leading-relaxed whitespace-pre-wrap">
+                  {m.content}
+                </div>
               </div>
-              <div className="prose prose-sm dark:prose-invert max-w-none font-serif leading-relaxed whitespace-pre-wrap">
-                {m.content}
-              </div>
-            </div>
-          ))}
-          {sending ? (
-            <div className="p-5">
-              <div className="eyebrow text-muted-foreground mb-2">Lumi</div>
-              <div className="text-sm text-foreground/60 italic">Thinking…</div>
-            </div>
-          ) : null}
+            ))}
         </div>
-
-        <div className="mt-4 flex gap-3">
-          <Textarea
-            value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            placeholder="Reply to Lumi…"
-            rows={3}
-            disabled={sending}
-            className="flex-1 bg-card border-border focus-visible:ring-accent"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && reply.trim()) {
-                e.preventDefault();
-                onSend();
-              }
-            }}
-          />
-          <Button
-            onClick={onSend}
-            disabled={sending || !reply.trim()}
-            className="lumi-cta self-end inline-flex items-center gap-2"
-          >
-            <Send className="h-4 w-4" /> Send
-          </Button>
-        </div>
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-2">
-          Cmd/Ctrl + Enter to send
+        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-3">
+          One situation, one read. Start a new situation to ask Lumi something else.
         </p>
       </section>
+
 
       <section className="border-t border-border pt-6 flex flex-wrap items-center gap-3">
         {!saved ? (
