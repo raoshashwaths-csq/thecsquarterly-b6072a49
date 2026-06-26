@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { TrendingDown, GitMerge, Radar, Trophy, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/account/analytics/")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "Analytics — The CS Quarterly" },

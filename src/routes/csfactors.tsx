@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -29,6 +30,7 @@ import { TierGateOverlay } from "@/components/site/TierGateOverlay";
 import { listAccounts, type CSAccount } from "@/lib/csfactors.functions";
 
 export const Route = createFileRoute("/csfactors")({
+  pendingComponent: LumiRouteLoader,
   head: () => ({
     meta: [
       { title: "CSFactors — Revenue Operations Command Center" },
