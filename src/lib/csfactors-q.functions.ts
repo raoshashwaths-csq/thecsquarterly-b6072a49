@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { assertQUnderCap } from "./q-usage.functions";
+import { recallMemoryFor, recordMemoryFor, renderMemoryBlock } from "./lumi-memory.functions";
 
 
 
