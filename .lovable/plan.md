@@ -1,146 +1,76 @@
 
-# Operator Profile + Lumi Memory
+## 1. Where the Stage 01 / 02 / 03 stack lives
 
-Two coordinated features. Onboarding seeds memory on day one; memory then accumulates and is retrieved before every Lumi reply.
+Today the three "Stage" cards (`StickyScrollSection` at `src/routes/index.tsx:193`) render directly under the hero for everyone. Change to tier-aware placement:
 
----
+| Viewer | Placement |
+|---|---|
+| Visitor (logged out) | Under the headline, above editorial (current slot) |
+| Free Reader (logged in, free tier) | Under the headline, above editorial (current slot) |
+| Practitioner+ (any paid tier, logged in) | Bottom of page, **below Operator Toolkit**, above ClosingCTA |
 
-## 1. Operator Onboarding (every signed-in user, first login only)
+Implementation: read `useSubscriptionTier()` and gate which slot renders the new `StageRevealSection`. Only one instance mounts per render.
 
-**UX — stepper card**
+## 2. New scroll-locked reveal — `StageRevealSection`
 
-A 5-step modal (`OnboardingStepper.tsx`) that opens on the first authenticated render when `profiles.onboarded_at IS NULL`. One question per screen, Lumi badge in the top-left corner, dark editorial theme, progress dots, Back / Next, Esc + "Finish later" both allowed (sets a `dismissed_at` so it doesn't reopen the same session but reopens next login until completed).
+Replaces `StickyScrollSection` for this surface only (`StickyScrollSection` itself stays for any other caller). New component at `src/components/home/StageRevealSection.tsx`.
 
-Steps:
+Behaviour, in order:
 
-1. **Role** — confirm/refine the persona picked at signup. Single-select from `PERSONA_OPTIONS`. Pre-selected from `profiles.persona`.
-2. **ACV band** — single-select: `<$10k`, `$10k–$50k`, `$50k–$250k`, `$250k–$1M`, `$1M+`, `Mixed`.
-3. **Company ARR range** — single-select: `<$5M`, `$5–20M`, `$20–100M`, `$100M–$1B`, `$1B+`.
-4. **Biggest current challenges** — multi-select (1–3): `churn_risk`, `expansion_motion`, `stakeholder_coverage`, `team_capability`, `ai_readiness`.
-5. **One difficult account** — free text, single line, 280 char max, optional but encouraged. Placeholder: "e.g. Mid-market SaaS renewal, sponsor just left, 60 days to close."
+1. **Pin / scroll lock.** When the section's top hits the viewport top, page scroll is captured (CSS `overscroll-behavior: contain` + a wheel/touch handler that advances an internal `phase` 0→4 instead of scrolling the page). On touch devices, swipe up advances; swipe down at phase 0 releases the lock back to the page.
+2. **Phase 1 — Stage 01** fades in from the **left** (translate-x −24px → 0, opacity 0 → 1, 450ms ease-out). Caption sits to the right of the mock.
+3. **Phase 2 — Stage 02** fades in from the **right** (translate-x +24px → 0). Stage 01 stays on screen, slightly shrunk and offset up-left.
+4. **Phase 3 — Stage 03** fades in from the **left**. Stages 01 + 02 continue shrinking and offsetting to make room.
+5. **Phase 4 — Composite.** All three mock images converge into a single staggered stack (each rotated −4°/0°/+4°, offset by ~32px, z-index 1/2/3) centred in the panel; the three captions render as a vertical list immediately to the right of the stack, each caption aligned with its image's vertical centre by a hairline connector.
+6. **Unlock.** Once phase 4 settles (≈400ms after entry), the wheel/touch handler releases and normal scroll resumes — the next scroll tick scrolls the page down into the editorial band.
 
-On finish: write all answers to `profiles` columns + seed `lumi_memory` rows (one `situation` row from the free text, one `preference` row summarising challenges, one `account` row from the free text). Set `onboarded_at = now()`. Toast: "Lumi has your context. Ask anything."
+Implementation notes:
+- Use `IntersectionObserver` to know when the section is pinned, and a single `useRef<number>` for `phase`. `requestAnimationFrame` throttles wheel deltas; one wheel "burst" = one phase advance (debounced 350ms).
+- Honour `prefers-reduced-motion`: skip the lock entirely, render all three stages stacked with no transform animations, no scroll capture.
+- Honour keyboard: ArrowDown / PageDown / Space advance phase; Esc releases the lock.
+- Honour focus: if any focusable element inside the section receives focus via Tab, release the lock so keyboard users are never trapped.
+- Mobile (<768px): collapse to a vertical 3-card list with a simple alternating `animate-fade-up` per card — no scroll lock on touch, only desktop pointer.
 
-**Trigger** — a small `useOnboardingGate()` hook in `__root.tsx` (client-only) that opens the dialog when `user && !onboarded_at && !dismissed_at_this_session`. No route change.
+## 3. Editorial section — bring up and seed from Lumi context
 
----
+**Position.** Today the section order after the hero is: StickyScrollSection → SectionsFillGrid → Featured/Sidebar → Recent grid → OperatorTools. New order:
 
-## 2. Lumi Memory (Practitioner+ only)
+- **Visitor / Free:** Hero → `StageRevealSection` → **Featured + Sidebar (lifted)** → SectionsFillGrid → Recent grid → OperatorTools → ClosingCTA.
+- **Paid logged-in:** Hero → **Featured + Sidebar (lifted)** → SectionsFillGrid → Recent grid → OperatorTools → `StageRevealSection` → ClosingCTA.
 
-**Schema** — new migration adds:
+The Featured + Sidebar block also gets visual prominence: drop the `[animation-delay:400ms]`, increase top spacing, and promote the featured headline to `text-5xl md:text-7xl` to match hero weight; sidebar pull-quote stays.
 
-```text
-extension: vector
+**Lumi-seeded editorial cards.** The Recent grid (`rest.slice(0, 4)` from `listPosts`) currently uses pure recency. For logged-in users with Lumi memory, seed the order from their context:
 
-profiles (additive)
-  acv_band            text
-  company_arr_range   text
-  challenges          text[]
-  difficult_account   text
-  onboarded_at        timestamptz
+- New server fn `getLumiSeededFeed({ limit })` in `src/lib/posts.functions.ts`:
+  - Auth-gated (`requireSupabaseAuth`). Returns `Post[]` ordered by relevance.
+  - Step 1: fetch the user's `lumi_memory` rows (`memory_type in ('situation','preference','account')`, top 8 by `last_seen_at`).
+  - Step 2: build a query string by concatenating their `content` + `profiles.challenges` + `profiles.persona`.
+  - Step 3: embed via the same `embedText()` helper used by Lumi Memory; run `match_posts()` SQL function (new — mirror of `match_lumi_memory` but on `posts.embedding`) to return top N by cosine similarity over a pre-computed `posts.embedding vector(1536)` column.
+  - Fallback: if any step fails or memory is empty, return `listPosts()` recency order. Free Readers always get recency (no memory). Visitors hit the existing public `listPosts` path.
+- New migration: add `embedding vector(1536)` column on `posts`, HNSW index, and a one-shot backfill that embeds existing posts (title + excerpt + first 800 chars body). New posts get embedded on insert via a trigger calling a tiny edge-side embed step (or on first read if column null — lazy backfill keeps the migration simple).
+- Wire the home loader to call `getLumiSeededFeed` when `user` is present, else `listPosts`. Each card shows a faint mono eyebrow `"Surfaced for you"` when the result came from Lumi seeding (server fn returns a `source: 'lumi' | 'recency'` flag per row).
 
-lumi_memory
-  id           uuid pk
-  user_id      uuid fk → auth.users (cascade)
-  memory_type  text check in ('situation','preference','account','framework','reading')
-  content      text not null            -- short natural-language fact
-  source       text                     -- 'onboarding' | 'lumi_chat' | 'dispatch_read' | 'codex_view' | 'manual'
-  source_ref   text                     -- post slug, account id, q_runs id, etc.
-  embedding    vector(3072)             -- google/gemini-embedding-001 default
-  created_at   timestamptz default now()
-  last_seen_at timestamptz default now()
-  pinned       boolean default false
-```
-
-Grants: `authenticated` full CRUD on own rows; `service_role` all. RLS: `user_id = auth.uid()`. HNSW index on `embedding vector_cosine_ops`. Index on `(user_id, created_at desc)`.
-
-**Tier gate** — writes to `lumi_memory` are no-ops for users below Practitioner (checked server-side via existing tier helpers). Onboarding seed rows are still written for everyone (cheap, useful if they upgrade later).
-
-**Embeddings**
-
-- Server fn `embedText(text)` — internal helper that POSTs to `https://ai.gateway.lovable.dev/v1/embeddings` with `google/gemini-embedding-001`, returns the 3072-dim vector. Keyed off `LOVABLE_API_KEY`. Used only inside `*.functions.ts` handlers.
-- Writes: every `lumi_memory` insert embeds the `content` field synchronously. Skip writes >2k chars (truncate to 2000).
-- Reads: `match_lumi_memory(query_embedding, user_id, k)` SQL function — `security definer`, scopes by `user_id`, returns top `k` (default 6) by cosine distance plus all `pinned=true` rows.
-
-**Retrieval contract** (`src/lib/lumi-memory.functions.ts`)
-
-```text
-recallMemory({ query, limit }) → { items: Memory[], usedFallback: boolean }
-recordMemory({ type, content, source, source_ref })
-listMemory()  // account settings page
-updateMemory({ id, content, pinned })
-deleteMemory({ id })
-```
-
-`recallMemory` embeds the query, calls the SQL function, falls back to recency if embedding fails. Tier-gated — returns empty for non-Practitioners.
-
-**Wiring into Lumi**
-
-Update `askCSFactorsQ` and the global `askLumi` server fn (under `src/lib/`):
-
-1. Before calling the model, `await recallMemory({ query: data.question, limit: 6 })`.
-2. Prepend the items as a `MEMORY` block in the system prompt:
-   ```text
-   PRIOR CONTEXT (things this operator has told you or you've observed):
-   - [situation, 2026-06-12] Renewal with mid-market SaaS sponsor lost…
-   - [preference] Focuses on expansion motion and stakeholder coverage…
-   ```
-3. After the response, `recordMemory` extracts 0–2 new facts via a cheap follow-up call: "Return JSON array of 0–2 durable facts about this operator's situation/preferences/accounts worth remembering for next time. No PII unless they shared it. Empty array if nothing notable." Insert non-empty results.
-4. Bump `last_seen_at` on any memories cited.
-
-**Read-tracking memory** — light: when a logged-in Practitioner+ reads a dispatch (existing read tracker, or a new one-time effect on `/insights/$slug` and `/codex/$slug`), insert a `reading` memory with `content = "Read: <title>"` and `source_ref = slug` (debounced per-slug per-day, no embedding write — too noisy; store with `embedding = NULL` and exclude from semantic retrieval, only used for the "you read X recently" surfacing case).
-
-**Periodic surfacing** — `LumiMemoryNudge` component on the dashboard / `/account`: picks one `situation` memory older than 14 days and shows "You mentioned [content] X weeks ago — how did it go?" with Resolved / Still open / Dismiss buttons. Updates `last_seen_at` and (on Resolved) deletes.
-
----
-
-## 3. Account settings — Memory management (GDPR)
-
-New section in `/account` → "Lumi Memory":
-
-- List all rows grouped by `memory_type`, newest first.
-- Each row: content, type chip, source chip, pin toggle, edit (inline), delete.
-- "Delete all memory" destructive button (confirm dialog, calls a bulk delete server fn).
-- Empty-state copy for users below Practitioner: "Lumi Memory is a Practitioner feature. Upgrade to give Lumi long-term context." with upgrade CTA.
-
----
+The lifted Featured post stays the editor's pick (newest), not Lumi-seeded — only the Recent grid + SectionsFillGrid reorders. This keeps the editorial voice intact.
 
 ## 4. Files
 
-**New**
-- `supabase/migrations/<ts>_lumi_memory.sql` — extension, columns, table, grants, RLS, indexes, `match_lumi_memory` SQL function.
-- `src/components/onboarding/OnboardingStepper.tsx`
-- `src/components/onboarding/OnboardingStep1Role.tsx` … `Step5Account.tsx` (or one file with sub-steps — TBD during build)
-- `src/hooks/useOnboardingGate.ts`
-- `src/lib/lumi-memory.functions.ts` — recall, record, list, update, delete + internal `embedText`.
-- `src/lib/onboarding.functions.ts` — `finishOnboarding({ persona, acv_band, arr_range, challenges, difficult_account })` (single transactional write).
-- `src/components/account/MemorySettings.tsx`
-- `src/components/site/LumiMemoryNudge.tsx`
+- New: `src/components/home/StageRevealSection.tsx`
+- New: `src/lib/posts.functions.ts` — add `getLumiSeededFeed`
+- New: `supabase/migrations/<ts>_posts_embeddings.sql` — `vector(1536)` + HNSW + `match_posts()` + lazy backfill helper
+- Edited: `src/routes/index.tsx` — tier-gated placement, lift editorial band, swap to `StageRevealSection`, call seeded feed for logged-in users
+- Edited: `src/lib/lumi-memory.functions.ts` — export `embedText` (already internal) so `posts.functions.ts` can reuse it
 
-**Edited**
-- `src/routes/__root.tsx` — mount `useOnboardingGate()`.
-- `src/lib/csfactors-q.functions.ts` — recall + record around the model call.
-- Global Lumi server fn (existing site-wide `askLumi`) — same recall + record wiring.
-- `src/routes/account.tsx` — add the Memory section.
-- `src/integrations/supabase/types.ts` — regenerated automatically.
+## 5. Out of scope
 
----
+- Re-embedding on every post edit (lazy backfill only; full reindex stays a manual admin task).
+- Changing `StickyScrollSection` consumers elsewhere in the app.
+- Changing the Featured post selection logic.
 
-## 5. Out of scope (for this turn)
+## 6. Acceptance
 
-- Streaming the onboarding answers through a fake Lumi chat thread (deferred per your choice of stepper UI).
-- Re-embedding existing `q_runs` / past reading history (only new activity from the moment this ships forward).
-- Cross-device memory export / import.
-
----
-
-## Acceptance checks
-
-- Brand-new signup → onboarding appears on first dashboard load; finishing writes 5 profile fields + 3 seed memory rows; never reopens.
-- Existing user with `onboarded_at IS NULL` → same flow on next login.
-- Free user: onboarding works; `recordMemory` is a no-op; `recallMemory` returns empty; Lumi system prompt has no MEMORY block.
-- Practitioner+ user: every Lumi answer includes a MEMORY block; `lumi_memory` grows after each meaningful question.
-- `/account → Lumi Memory` lists, edits, pins, deletes; "Delete all" wipes the table for that user.
-- 14-day-old situation memory surfaces a nudge on the account/dashboard once and respects Resolved/Dismiss.
-- RLS: signed-in user A cannot read user B's memory rows via the Data API.
-- `tsgo --noEmit` clean. No new color tokens. No edits to managed Supabase client files.
+- Logged-out: stages appear directly under hero with the new alternating-fade scroll-locked reveal, ending in the staggered composite; one extra scroll tick continues into the lifted Featured band.
+- Free Reader logged in: same placement as logged-out; Recent grid falls back to recency.
+- Practitioner+ logged in: hero flows straight into the lifted Featured band; stages appear at the bottom under Operator Toolkit; Recent grid shows "Surfaced for you" eyebrows on Lumi-seeded items.
+- Reduced motion and keyboard users are never trapped in the scroll lock.
+- `tsgo --noEmit` clean; no edits to `routeTree.gen.ts` or any auto-generated Supabase file.

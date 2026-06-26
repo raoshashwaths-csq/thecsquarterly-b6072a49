@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LayoutGrid, Compass } from "lucide-react";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -9,7 +10,7 @@ import { ResumeRunPrompt } from "@/components/agent/ResumeRunPrompt";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
-import { StickyScrollSection } from "@/components/shared/StickyScrollSection";
+import { StageRevealSection } from "@/components/home/StageRevealSection";
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,7 +18,7 @@ import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import { useTierCopy } from "@/hooks/useTierCopy";
 import { TierBadge } from "@/components/site/TierBadge";
 
-import { listPosts } from "@/lib/posts.functions";
+import { listPosts, getLumiSeededFeed, type Post } from "@/lib/posts.functions";
 
 
 
@@ -65,9 +66,27 @@ function HomePage() {
   const { t } = useTranslation();
   const { data: posts } = useSuspenseQuery(postsQuery);
   const featured = posts[0];
-  const rest = posts.slice(1, 5);
   const { group, isRecruiterOrLead } = usePersona();
   const { user } = useAuth();
+  const sub = useSubscriptionTier();
+
+  // Lumi-seeded recent feed (signed-in only; falls back to recency).
+  const seededFn = useServerFn(getLumiSeededFeed);
+  const seededQ = useQuery({
+    queryKey: ["home-seeded-feed", user?.id ?? "anon"],
+    queryFn: () => seededFn({ data: { limit: 5 } }),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+  const seededPosts = (seededQ.data?.posts ?? []) as Array<Post & { seeded: boolean }>;
+  const isLumiSeeded = seededQ.data?.source === "lumi";
+  const restRecency = posts.slice(1, 5);
+  const rest: Array<Post & { seeded?: boolean }> = user && seededPosts.length
+    ? seededPosts.filter((p) => p.slug !== featured?.slug).slice(0, 4)
+    : restRecency;
+
+  // Stages render under hero for visitors/free, at the bottom for paid users.
+  const stagesAtBottom = !sub.loading && sub.canAccessCSFactors;
 
   // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
   // server render; swap to the viewer's local day-of-week after mount.
@@ -190,91 +209,14 @@ function HomePage() {
         </div>
       </header>
 
-      <StickyScrollSection
-        stages={[
-          {
-            label: "The CSM",
-            left: (
-              <div className="max-w-xl">
-                <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                  Stage 01 / Practitioner
-                </div>
-                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                  For the practitioner managing thirty accounts.
-                </h2>
-                <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                  A personal command centre for the CSM in the trenches. Triage the burning three before standup, surface the renewals that need a real conversation, and keep every account note in one operator-grade canvas.
-                </p>
-                <StageCta featureId="csfactors" label="Start free →" />
+      {/* Stage 01 / 02 / 03 — visitor + free users see it directly under the
+          hero with the new scroll-locked reveal. Paid logged-in users get it
+          at the bottom of the page (rendered further down). */}
+      {!stagesAtBottom && <HomeStages />}
 
-              </div>
-            ),
-            right: <StageMock variant="pulse" />,
-          },
-          {
-            label: "The Leader",
-            left: (
-              <div className="max-w-xl">
-                <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                  Stage 02 / Operator · Team
-                </div>
-                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                  For the VP carrying the NRR number.
-                </h2>
-                <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                  Roll every CSM's book into a single 360° portfolio. Watch NRR move in real time, see which segments are bleeding gross retention, and act before the QBR turns into a post-mortem.
-                </p>
-                <StageCta featureId="csfactors" label="See the platform →" />
-              </div>
-            ),
-            right: <StageMock variant="threeSixty" />,
-          },
-          {
-            label: "The Enterprise",
-            left: (
-              <div className="max-w-xl">
-                <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                  Stage 03 / Scale · Enterprise
-                </div>
-                <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                  For the CCO presenting to the board on Monday.
-                </h2>
-                <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                  A risk register, capacity model and renewal waterfall the board will actually read. Export the slide, defend the number, and walk out with the next quarter already mapped.
-                </p>
-                <Link
-                  to="/pricing"
-                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-                >
-                  View enterprise →
-                </Link>
-              </div>
-            ),
-            right: <StageMock variant="risk" />,
-          },
-        ]}
-      />
-
-      {/* Editorial — sections rail + featured share one band */}
-      <section className="max-w-7xl w-full mx-auto px-6 py-14 md:py-16 animate-fade-up [animation-delay:300ms]">
-        <div className="flex items-end justify-between mb-8">
-          <div className="font-mono text-xs uppercase tracking-widest text-foreground font-semibold">
-            {t("home.editorial.eyebrow")}
-          </div>
-          <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
-            {t("home.sections.count", { count: SECTIONS.length })}
-          </div>
-        </div>
-        <SectionsFillGrid />
-      </section>
-
-
-      {/* Recruiter / leader: tools surface BEFORE the editorial */}
-      {isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
-
-      {/* Featured + Sidebar */}
+      {/* Featured + Sidebar — LIFTED for visibility */}
       {featured && (
-        <main className="max-w-7xl w-full mx-auto px-6 py-14 md:py-16 animate-fade-up [animation-delay:400ms]">
+        <main className="max-w-7xl w-full mx-auto px-6 pt-10 pb-14 md:pt-14 md:pb-16 animate-fade-up">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16">
             <div className="lg:col-span-7">
               <div className="mb-6 font-mono text-xs text-accent font-medium">
@@ -284,7 +226,7 @@ function HomePage() {
                 })}
               </div>
               <Link to="/insights/$slug" params={{ slug: featured.slug }} className="block group">
-                <h2 className="font-display text-4xl md:text-6xl mb-6 leading-[1.1] tracking-tight transition-all">
+                <h2 className="font-display text-5xl md:text-7xl mb-6 leading-[1.02] tracking-tight transition-all text-balance">
                   {featured.title}
                 </h2>
               </Link>
@@ -321,11 +263,34 @@ function HomePage() {
         </main>
       )}
 
-      {/* Recent grid */}
+      {/* Editorial — sections rail */}
+      <section className="max-w-7xl w-full mx-auto px-6 py-14 md:py-16 animate-fade-up">
+        <div className="flex items-end justify-between mb-8">
+          <div className="font-mono text-xs uppercase tracking-widest text-foreground font-semibold">
+            {t("home.editorial.eyebrow")}
+          </div>
+          <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
+            {t("home.sections.count", { count: SECTIONS.length })}
+          </div>
+        </div>
+        <SectionsFillGrid />
+      </section>
+
+      {/* Recruiter / leader: tools surface BEFORE the editorial */}
+      {isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
+
+      {/* Recent grid — Lumi-seeded for signed-in users with memory context */}
       {rest.length > 0 && (
         <section className="max-w-7xl w-full mx-auto px-6 pt-2 pb-14 md:pb-16">
           <div className="flex justify-between items-end mb-10">
-            <h2 className="font-display text-4xl">{t("home.recent.title")}</h2>
+            <div>
+              <h2 className="font-display text-4xl">{t("home.recent.title")}</h2>
+              {isLumiSeeded && (
+                <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mt-2">
+                  Surfaced for you · Lumi context
+                </div>
+              )}
+            </div>
             <Link
               to="/insights"
               className="font-mono text-xs uppercase tracking-widest border-b border-foreground pb-1 hover:text-accent hover:border-accent"
@@ -343,7 +308,10 @@ function HomePage() {
               >
                 <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   <span>{p.category}</span>
-                  <span>{p.read_minutes} min</span>
+                  <span className="flex items-center gap-3">
+                    {p.seeded && <span className="text-accent">Surfaced for you</span>}
+                    <span>{p.read_minutes} min</span>
+                  </span>
                 </div>
                 <h3 className="font-display text-2xl md:text-3xl mb-3 leading-tight transition-all">
                   {p.title}
@@ -358,6 +326,10 @@ function HomePage() {
       {/* Operator / unknown: tools surface AFTER the editorial */}
       {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
+      {/* Paid logged-in users see the three Stages here at the bottom,
+          below the Operator Toolkit, above the closing CTA. */}
+      {stagesAtBottom && <HomeStages />}
+
       <ClosingCTA />
 
       <SiteFooter />
@@ -365,6 +337,77 @@ function HomePage() {
     </div>
   );
 }
+
+// Stage 01/02/03 block — one definition rendered in either the top slot
+// (visitor / free) or the bottom slot (paid logged-in) by HomePage above.
+function HomeStages() {
+  return (
+    <StageRevealSection
+      stages={[
+        {
+          label: "The CSM",
+          caption: (
+            <div className="max-w-xl">
+              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
+                Stage 01 / Practitioner
+              </div>
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
+                For the practitioner managing thirty accounts.
+              </h2>
+              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
+                A personal command centre for the CSM in the trenches. Triage the burning three before standup, surface the renewals that need a real conversation, and keep every account note in one operator-grade canvas.
+              </p>
+              <StageCta featureId="csfactors" label="Start free →" />
+            </div>
+          ),
+          mock: <StageMock variant="pulse" />,
+        },
+        {
+          label: "The Leader",
+          caption: (
+            <div className="max-w-xl">
+              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
+                Stage 02 / Operator · Team
+              </div>
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
+                For the VP carrying the NRR number.
+              </h2>
+              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
+                Roll every CSM's book into a single 360° portfolio. Watch NRR move in real time, see which segments are bleeding gross retention, and act before the QBR turns into a post-mortem.
+              </p>
+              <StageCta featureId="csfactors" label="See the platform →" />
+            </div>
+          ),
+          mock: <StageMock variant="threeSixty" />,
+        },
+        {
+          label: "The Enterprise",
+          caption: (
+            <div className="max-w-xl">
+              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
+                Stage 03 / Scale · Enterprise
+              </div>
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
+                For the CCO presenting to the board on Monday.
+              </h2>
+              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
+                A risk register, capacity model and renewal waterfall the board will actually read. Export the slide, defend the number, and walk out with the next quarter already mapped.
+              </p>
+              <Link
+                to="/pricing"
+                className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+              >
+                View enterprise →
+              </Link>
+            </div>
+          ),
+          mock: <StageMock variant="risk" />,
+        },
+      ]}
+    />
+  );
+}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tier-aware hero card. Visual layout is identical to the original static
