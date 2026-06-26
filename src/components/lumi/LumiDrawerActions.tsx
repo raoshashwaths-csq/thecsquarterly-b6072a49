@@ -24,10 +24,16 @@ export function LumiDrawerActions({
       }`}
       aria-hidden={!visible}
     >
-      <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-foreground/55 mb-3">
-        What can I help you with?
+      <div className="flex items-baseline justify-between mb-3">
+        <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-foreground/55">
+          What can I help you with?
+        </div>
+        <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-foreground/45">
+          Each ask uses 1 Lumi run
+        </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2">
+
         {actions.map((action) => {
           const locked = action.tier === "vanguard" && !isVanguard;
           return (

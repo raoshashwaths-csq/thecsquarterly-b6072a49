@@ -340,6 +340,13 @@ export function QAgentButton() {
                 <div className="font-body text-[15px] text-foreground/85 leading-relaxed whitespace-pre-wrap">
                   {answer}
                 </div>
+                <button
+                  type="button"
+                  onClick={() => { setAnswer(null); setQuery(""); }}
+                  className="mt-4 inline-flex items-center gap-1.5 px-3 py-2 border border-border font-mono text-[10px] uppercase tracking-[0.25em] hover:border-accent hover:text-accent transition-colors"
+                >
+                  ← Ask another
+                </button>
               </div>
             )}
 

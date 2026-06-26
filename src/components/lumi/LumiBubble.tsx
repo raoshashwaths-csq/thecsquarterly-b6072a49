@@ -86,7 +86,7 @@ export function LumiBubble({
 
   return (
     <div
-      className="lumi-bubble fixed z-30 bottom-[88px] right-5 md:bottom-[112px] md:right-8 w-[220px] max-w-[calc(100vw-48px)]"
+      className="lumi-bubble fixed z-30 bottom-[140px] right-5 md:bottom-[180px] md:right-8 w-[220px] max-w-[calc(100vw-48px)]"
       role="status"
       aria-live="polite"
     >
