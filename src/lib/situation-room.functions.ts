@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { assertQUnderCap } from "./q-usage.functions";
+import { getLumiKnowledgeContext } from "./lumi-knowledge.functions";
 
 const EMBED_MODEL = "openai/text-embedding-3-small";
 const EMBED_DIM = 1536;
