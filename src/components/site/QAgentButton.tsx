@@ -60,6 +60,7 @@ export function QAgentButton() {
   const [unlimited, setUnlimited] = useState(false);
   const [gateModal, setGateModal] = useState(false);
   const [panel, setPanel] = useState<"tips" | "glossary" | null>(null);
+  const [seeded, setSeeded] = useState<{ id: string; message: string; subtext: string | null } | null>(null);
 
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
