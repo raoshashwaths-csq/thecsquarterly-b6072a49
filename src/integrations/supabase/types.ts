@@ -884,6 +884,8 @@ export type Database = {
           id: string
           knowledge_record_id: string | null
           note: string | null
+          processed: boolean
+          processed_at: string | null
           rating: string
           run_id: string | null
           user_id: string | null
@@ -893,6 +895,8 @@ export type Database = {
           id?: string
           knowledge_record_id?: string | null
           note?: string | null
+          processed?: boolean
+          processed_at?: string | null
           rating: string
           run_id?: string | null
           user_id?: string | null
@@ -902,6 +906,8 @@ export type Database = {
           id?: string
           knowledge_record_id?: string | null
           note?: string | null
+          processed?: boolean
+          processed_at?: string | null
           rating?: string
           run_id?: string | null
           user_id?: string | null
@@ -2247,6 +2253,7 @@ export type Database = {
           errors: Json
           id: string
           notice: string | null
+          output: Json | null
           records_created: number
           run_at: string
           status: string
@@ -2257,6 +2264,7 @@ export type Database = {
           errors?: Json
           id?: string
           notice?: string | null
+          output?: Json | null
           records_created?: number
           run_at?: string
           status?: string
@@ -2267,6 +2275,7 @@ export type Database = {
           errors?: Json
           id?: string
           notice?: string | null
+          output?: Json | null
           records_created?: number
           run_at?: string
           status?: string
