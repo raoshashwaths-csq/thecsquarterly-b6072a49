@@ -19,6 +19,7 @@ import { ResumeReadingBanner } from "@/components/site/ResumeReadingBanner";
 import { RelatedIntelligencePanel } from "@/components/site/RelatedIntelligencePanel";
 import { getPost } from "@/lib/posts.functions";
 import { LumiDebriefCard } from "@/components/lumi/LumiDebriefCard";
+import { DispatchReactionCard } from "@/components/lumi/DispatchReactionCard";
 
 const postQuery = (slug: string) =>
   queryOptions({
@@ -402,6 +403,8 @@ function PostPage() {
               </ol>
             </section>
           )}
+
+          <DispatchReactionCard postId={post.id} slug={slug} />
 
           <RelatedIntelligencePanel slug={slug} />
         </>
