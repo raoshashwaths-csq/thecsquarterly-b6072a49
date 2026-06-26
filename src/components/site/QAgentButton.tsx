@@ -261,7 +261,7 @@ export function QAgentButton() {
 
 
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) setSeeded(null); }}>
         <SheetContent
           side="right"
           className="w-full sm:max-w-[460px] md:max-w-[42vw] bg-background border-l border-border p-0 overflow-y-auto"
