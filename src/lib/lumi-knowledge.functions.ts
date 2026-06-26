@@ -135,7 +135,7 @@ export async function buildLumiSystemPrompt(
   // LAYER 2 — live benchmarks
   const { data: benchmarks } = await supabaseAdmin
     .from("benchmark_drops_latest")
-    .select("metric, segment, value, p25, p50, p75, sample_size, period")
+    .select("metric, segment, value, p25, p50, p75, period")
     .limit(12);
 
   const benchmarkLines = (benchmarks ?? [])
@@ -143,8 +143,7 @@ export async function buildLumiSystemPrompt(
     .map((b) => {
       const seg = b.segment ? ` (${b.segment})` : "";
       const pct = b.p75 != null ? `, p75: ${b.p75}` : "";
-      const n = b.sample_size != null ? `, n=${b.sample_size}` : "";
-      return `${b.metric}${seg}: ${b.value}${pct}${n}`;
+      return `${b.metric}${seg}: ${b.value}${pct}`;
     })
     .join("\n");
 
