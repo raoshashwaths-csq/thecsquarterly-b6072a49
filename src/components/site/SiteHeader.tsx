@@ -141,6 +141,8 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <ThemeToggle />
 
+          {user && <NotificationBell />}
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
