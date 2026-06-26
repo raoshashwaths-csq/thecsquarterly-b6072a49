@@ -49,6 +49,40 @@ export function AccountDrawer({
     setDraft(account);
   }, [account?.id]);
 
+  // Latest inferred sentiment from a tagged Lumi run, so the operator can see
+  // why the CSM Sentiment chip moved (and how recently).
+  const { data: lastInferred } = useQuery({
+    queryKey: ["sentiment-inferred", account?.id ?? ""],
+    enabled: !!account?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("cs_account_events")
+        .select("payload, occurred_at")
+        .eq("account_id", account!.id)
+        .eq("kind", "sentiment.inferred")
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!data) return null;
+      const row = data as unknown as {
+        payload: {
+          label?: "Positive" | "Neutral" | "Critical";
+          source?: "lexicon" | "ai";
+          confidence?: "low" | "med" | "high";
+          rationale?: string;
+        };
+        occurred_at: string;
+      };
+      return {
+        label: row.payload?.label ?? null,
+        source: row.payload?.source ?? null,
+        confidence: row.payload?.confidence ?? null,
+        rationale: row.payload?.rationale ?? null,
+        at: row.occurred_at,
+      };
+    },
+  });
+
   if (!draft || !account) return null;
   const acc = account;
 
