@@ -72,6 +72,9 @@ export function QAgentButton() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const tour = useTour();
+  const pageContext = useLumiPageContext();
+  const { rank: tierRank } = useEntitlements();
+  const isVanguard = tierRank >= 1;
   const speech = useElevenLabsSpeechInput({
     onTranscript: (text) => {
       setQuery((current) => (current ? `${current} ${text}` : text));
