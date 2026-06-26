@@ -109,83 +109,162 @@ function ResponsePage() {
             </div>
           )}
 
-          {run && (
-            <>
-              <div className="mb-10">
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
-                  <QMark periodClassName="text-foreground" /> Response · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
-                </div>
-                <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3 break-words">
-                  {node?.label ?? "Decision"}<span className="text-accent">.</span>
-                </h1>
-                <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55 break-words">
-                  {crumb.join(" › ")}
-                </div>
-              </div>
+          {run && (() => {
+            // Distinguish canvas-shape runs (3 zones) from chat-shape runs.
+            // Chat-shape sources persist the full reply in zones.executable
+            // and leave diagnosis/playbook empty. We surface them as a
+            // transcript so the operator sees question + answer in full.
+            const CHAT_SOURCES: Record<string, { eyebrow: string; titleFallback: string }> = {
+              "chat:askq": { eyebrow: "Lumi · Drawer chat", titleFallback: "Lumi conversation" },
+              "csfactors-ask": { eyebrow: "Lumi · CSFactors", titleFallback: "Portfolio question" },
+              "situation-room": { eyebrow: "Lumi · Situation Room", titleFallback: "Situation thread" },
+              "dispatch-debrief": { eyebrow: "Lumi · Dispatch debrief", titleFallback: "Dispatch debrief" },
+              "dispatch-disagree": { eyebrow: "Lumi · Pushback", titleFallback: "Dispatch pushback" },
+              "WORKSPACE_SUMMARY": { eyebrow: "Lumi · Workspace briefing", titleFallback: "Workspace briefing" },
+            };
+            const chatMeta = CHAT_SOURCES[run.node_id];
+            const isChatShape =
+              !!chatMeta ||
+              run.node_id.startsWith("chat:") ||
+              (!run.zones.diagnosis?.trim() && !run.zones.playbook?.trim() && !!run.zones.executable?.trim());
+            const question =
+              (typeof run.context?.question === "string" && run.context.question) ||
+              (typeof run.context?.situation === "string" && run.context.situation) ||
+              (typeof run.context?.message === "string" && run.context.message) ||
+              "";
+            const reply = run.zones.executable ?? "";
+            const headline = node?.label ?? chatMeta?.titleFallback ?? "Lumi run";
+            const eyebrow = chatMeta?.eyebrow ?? "Lumi · Response";
 
-              {run.isOwner && (
-                <div className="flex flex-wrap items-center justify-between gap-4 border border-border rounded-md px-5 py-4 mb-10">
-                  <div className="min-w-0">
-                    <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/70">Share link</div>
-                    <div className="text-xs text-foreground/55 mt-0.5">
-                      {run.shared ? "Anyone with the link can read this response." : "Only you can see this response."}
+            return (
+              <>
+                <div className="mb-10">
+                  <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
+                    {eyebrow} · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
+                  </div>
+                  <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3 break-words">
+                    {headline}<span className="text-accent">.</span>
+                  </h1>
+                  {!isChatShape && crumb.length > 0 && (
+                    <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55 break-words">
+                      {crumb.join(" › ")}
+                    </div>
+                  )}
+                </div>
+
+                {run.isOwner && (
+                  <div className="flex flex-wrap items-center justify-between gap-4 border border-border rounded-md px-5 py-4 mb-10">
+                    <div className="min-w-0">
+                      <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/70">Share link</div>
+                      <div className="text-xs text-foreground/55 mt-0.5">
+                        {run.shared ? "Anyone with the link can read this response." : "Only you can see this response."}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Switch checked={run.shared} onCheckedChange={toggleShared} aria-label="Toggle public sharing" disabled={sharing} />
+                      {run.shared && (
+                        <button
+                          onClick={copyLink}
+                          className="font-mono text-xs uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
+                        >
+                          Copy link
+                        </button>
+                      )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Switch checked={run.shared} onCheckedChange={toggleShared} aria-label="Toggle public sharing" disabled={sharing} />
-                    {run.shared && (
-                      <button
-                        onClick={copyLink}
-                        className="font-mono text-xs uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
-                      >
-                        Copy link
-                      </button>
+                )}
+
+                {isChatShape ? (
+                  <>
+                    {question && (
+                      <section className="border-t border-border pt-8 pb-6">
+                        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
+                          You asked
+                        </div>
+                        <p className="font-body text-[15px] md:text-base leading-[1.7] text-foreground/85 whitespace-pre-wrap break-words italic">
+                          {question}
+                        </p>
+                      </section>
                     )}
-                  </div>
+                    <section className="border-t border-border pt-8 pb-10">
+                      <div className="flex items-baseline justify-between mb-5">
+                        <div>
+                          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-1">
+                            Lumi replied
+                          </div>
+                          <h2 className="font-display text-2xl md:text-3xl tracking-tight">Full response</h2>
+                        </div>
+                        {reply && (
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(reply); toast.success("Copied to clipboard"); }}
+                            className="font-mono text-xs uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <div className="font-body text-[15px] md:text-base leading-[1.7] text-foreground/85 whitespace-pre-wrap break-words">
+                        {reply || "(This run was logged before Lumi started persisting transcripts. Newer runs will show the full reply here.)"}
+                      </div>
+                    </section>
+                    {run.node_id === "situation-room" && typeof run.context?.sessionId === "string" && (
+                      <div className="mt-6">
+                        <Link
+                          to="/situation-room"
+                          className="font-mono text-xs uppercase tracking-[0.25em] underline underline-offset-4 hover:text-accent"
+                        >
+                          Open in Situation Room →
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {run.isOwner || !!user || isRunUnlocked(run.id) ? (
+                      <>
+                        <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+                        <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+                        <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                      </>
+                    ) : (
+                      <SharedRunGate runId={run.id}>
+                        <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+                        <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+                        <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                      </SharedRunGate>
+                    )}
+
+                    {run.isOwner && node && (
+                      <RunAccountTagger
+                        runId={run.id}
+                        treeId={node.treeId}
+                        initialAccountId={run.account_id}
+                        initialStakeholder={run.tagged_stakeholder}
+                        isOwner={run.isOwner}
+                      />
+                    )}
+                  </>
+                )}
+
+
+                <div className="flex flex-wrap gap-3 pt-10 border-t border-border mt-12">
+                  <button
+                    onClick={() => navigate({ to: "/agent/framework" })}
+                    className="px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.25em] hover:bg-accent transition-colors"
+                  >
+                    New decision
+                  </button>
+                  <Link
+                    to="/agent/framework"
+                    className="px-6 py-3 border border-border font-mono text-xs uppercase tracking-[0.25em] hover:border-foreground transition-colors"
+                  >
+                    Back to canvas
+                  </Link>
                 </div>
-              )}
+              </>
+            );
+          })()}
 
-              {run.isOwner || !!user || isRunUnlocked(run.id) ? (
-                <>
-                  <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
-                  <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
-                  <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
-                </>
-              ) : (
-                <SharedRunGate runId={run.id}>
-                  <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
-                  <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
-                  <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
-                </SharedRunGate>
-              )}
-
-              {run.isOwner && node && (
-                <RunAccountTagger
-                  runId={run.id}
-                  treeId={node.treeId}
-                  initialAccountId={run.account_id}
-                  initialStakeholder={run.tagged_stakeholder}
-                  isOwner={run.isOwner}
-                />
-              )}
-
-
-              <div className="flex flex-wrap gap-3 pt-10 border-t border-border mt-12">
-                <button
-                  onClick={() => navigate({ to: "/agent/framework" })}
-                  className="px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-[0.25em] hover:bg-accent transition-colors"
-                >
-                  New decision
-                </button>
-                <Link
-                  to="/agent/framework"
-                  className="px-6 py-3 border border-border font-mono text-xs uppercase tracking-[0.25em] hover:border-foreground transition-colors"
-                >
-                  Back to canvas
-                </Link>
-              </div>
-            </>
-          )}
         </div>
       </main>
       <SiteFooter />
