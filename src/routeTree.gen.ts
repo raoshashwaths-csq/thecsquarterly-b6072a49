@@ -80,6 +80,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.retention-ledger.ticker'
 import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksTranslateKnowledgeRouteImport } from './routes/api/public/hooks/translate-knowledge'
 import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
 import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
@@ -454,6 +455,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksTranslateKnowledgeRoute =
+  ApiPublicHooksTranslateKnowledgeRouteImport.update({
+    id: '/api/public/hooks/translate-knowledge',
+    path: '/api/public/hooks/translate-knowledge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRefreshBenchmarksRoute =
   ApiPublicHooksRefreshBenchmarksRouteImport.update({
     id: '/api/public/hooks/refresh-benchmarks',
@@ -556,6 +563,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
+  '/api/public/hooks/translate-knowledge': typeof ApiPublicHooksTranslateKnowledgeRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -630,6 +638,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
+  '/api/public/hooks/translate-knowledge': typeof ApiPublicHooksTranslateKnowledgeRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -709,6 +718,7 @@ export interface FileRoutesById {
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
+  '/api/public/hooks/translate-knowledge': typeof ApiPublicHooksTranslateKnowledgeRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/v1/benchmarks/nrr': typeof ApiV1BenchmarksNrrRoute
   '/api/v1/retention-ledger/ticker': typeof ApiV1RetentionLedgerTickerRoute
@@ -789,6 +799,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
+    | '/api/public/hooks/translate-knowledge'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -863,6 +874,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
+    | '/api/public/hooks/translate-knowledge'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -941,6 +953,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
+    | '/api/public/hooks/translate-knowledge'
     | '/api/public/payments/webhook'
     | '/api/v1/benchmarks/nrr'
     | '/api/v1/retention-ledger/ticker'
@@ -1002,6 +1015,7 @@ export interface RootRouteChildren {
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
   ApiPublicHooksPullExternalIntelRoute: typeof ApiPublicHooksPullExternalIntelRoute
   ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
+  ApiPublicHooksTranslateKnowledgeRoute: typeof ApiPublicHooksTranslateKnowledgeRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiV1BenchmarksNrrRoute: typeof ApiV1BenchmarksNrrRoute
   ApiV1RetentionLedgerTickerRoute: typeof ApiV1RetentionLedgerTickerRoute
@@ -1509,6 +1523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/translate-knowledge': {
+      id: '/api/public/hooks/translate-knowledge'
+      path: '/api/public/hooks/translate-knowledge'
+      fullPath: '/api/public/hooks/translate-knowledge'
+      preLoaderRoute: typeof ApiPublicHooksTranslateKnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/refresh-benchmarks': {
       id: '/api/public/hooks/refresh-benchmarks'
       path: '/api/public/hooks/refresh-benchmarks'
@@ -1695,6 +1716,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
   ApiPublicHooksPullExternalIntelRoute: ApiPublicHooksPullExternalIntelRoute,
   ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
+  ApiPublicHooksTranslateKnowledgeRoute: ApiPublicHooksTranslateKnowledgeRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiV1BenchmarksNrrRoute: ApiV1BenchmarksNrrRoute,
   ApiV1RetentionLedgerTickerRoute: ApiV1RetentionLedgerTickerRoute,
