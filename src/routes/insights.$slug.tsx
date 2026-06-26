@@ -18,6 +18,7 @@ import { ArticleSignalRow } from "@/components/site/ArticleSignalRow";
 import { ResumeReadingBanner } from "@/components/site/ResumeReadingBanner";
 import { RelatedIntelligencePanel } from "@/components/site/RelatedIntelligencePanel";
 import { getPost } from "@/lib/posts.functions";
+import { LumiDebriefCard } from "@/components/lumi/LumiDebriefCard";
 
 const postQuery = (slug: string) =>
   queryOptions({
@@ -453,6 +454,11 @@ function PostPage() {
       </div>
 
       <SiteFooter />
+
+      {/* Lumi Debrief — triggers at 90% scroll, once per slug per session. */}
+      {!post.locked || sub.tier !== "free" ? (
+        <LumiDebriefCard postId={post.id} slug={slug} title={post.title} progress={progress} />
+      ) : null}
     </div>
   );
 }

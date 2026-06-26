@@ -793,6 +793,14 @@
   animation: lumi-bubble-progress 5000ms linear forwards;
 }
 
+@keyframes lumi-debrief-slide-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lumi-debrief-slide-in {
+  animation: lumi-debrief-slide-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
 /* Tail: outer triangle (border) + inner triangle (fill) */
 .lumi-bubble-tail,
 .lumi-bubble-tail-fill {
