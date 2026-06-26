@@ -66,9 +66,27 @@ function HomePage() {
   const { t } = useTranslation();
   const { data: posts } = useSuspenseQuery(postsQuery);
   const featured = posts[0];
-  const rest = posts.slice(1, 5);
   const { group, isRecruiterOrLead } = usePersona();
   const { user } = useAuth();
+  const sub = useSubscriptionTier();
+
+  // Lumi-seeded recent feed (signed-in only; falls back to recency).
+  const seededFn = useServerFn(getLumiSeededFeed);
+  const seededQ = useQuery({
+    queryKey: ["home-seeded-feed", user?.id ?? "anon"],
+    queryFn: () => seededFn({ data: { limit: 5 } }),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+  const seededPosts = (seededQ.data?.posts ?? []) as Array<Post & { seeded: boolean }>;
+  const isLumiSeeded = seededQ.data?.source === "lumi";
+  const restRecency = posts.slice(1, 5);
+  const rest: Array<Post & { seeded?: boolean }> = user && seededPosts.length
+    ? seededPosts.filter((p) => p.slug !== featured?.slug).slice(0, 4)
+    : restRecency;
+
+  // Stages render under hero for visitors/free, at the bottom for paid users.
+  const stagesAtBottom = !sub.loading && sub.canAccessCSFactors;
 
   // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
   // server render; swap to the viewer's local day-of-week after mount.
