@@ -311,7 +311,8 @@ export const getSharedMap = createServerFn({ method: "POST" })
     // Explicit column list — never return customer_email or other sensitive
     // owner-only fields to share-link viewers.
     const SHARED_MAP_COLUMNS =
-      "id, title, account_name, status, start_date, target_go_live, actual_go_live, time_to_value_days, health_score, share_enabled, share_token, last_customer_view, created_at, updated_at";
+      "id, title, account_id, account_name, csm_name, status, contract_start_date, target_value_date, completed_at, benchmark_ttv_days, actual_ttv_days, share_enabled, share_token, last_customer_view, lumi_generated, account_tier, account_industry, created_at, updated_at";
+
     const { data: map } = await supabaseAdmin
       .from("maps")
       .select(SHARED_MAP_COLUMNS)
