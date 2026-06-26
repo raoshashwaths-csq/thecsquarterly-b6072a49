@@ -109,15 +109,16 @@ export const askQ = createServerFn({ method: "POST" })
     await context.supabase.from("q_runs").insert({
       user_id: context.userId,
       node_id: "chat:askq",
-      context: { question: data.question.slice(0, 500) },
+      context: { question: data.question.slice(0, 2000) },
       witty: data.witty,
-      zones: { diagnosis: "", playbook: "", executable: "" },
+      zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 8000) },
       tokens_in: tokensIn,
       tokens_out: tokensOut,
       latency_ms: latencyMs,
       cost_micros: costMicros,
       model: Q_MODEL,
     });
+
 
     // Fire-and-forget: extract durable memories from this exchange.
     if (reply) {

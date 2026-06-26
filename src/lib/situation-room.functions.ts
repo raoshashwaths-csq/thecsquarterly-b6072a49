@@ -172,10 +172,11 @@ export const startSituation = createServerFn({ method: "POST" })
     await supabaseAdmin.from("q_runs").insert({
       user_id: context.userId,
       node_id: "situation-room",
-      context: { situation: situation.slice(0, 200) },
+      context: { situation: situation.slice(0, 2000), sessionId: (inserted as { id: string }).id },
       witty: false,
-      zones: { diagnosis: "", playbook: "", executable: opening.slice(0, 4000) },
+      zones: { diagnosis: "", playbook: "", executable: opening.slice(0, 8000) },
     });
+
 
     return {
       sessionId: (inserted as { id: string }).id,
@@ -245,10 +246,11 @@ export const continueSituation = createServerFn({ method: "POST" })
     await supabaseAdmin.from("q_runs").insert({
       user_id: context.userId,
       node_id: "situation-room",
-      context: { sessionId: data.sessionId, message: data.message.slice(0, 200) },
+      context: { sessionId: data.sessionId, message: data.message.slice(0, 2000) },
       witty: false,
-      zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 4000) },
+      zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 8000) },
     });
+
 
     return { reply };
   });

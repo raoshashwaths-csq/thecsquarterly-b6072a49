@@ -35,7 +35,18 @@ import {
 } from "@/lib/workspace.functions";
 import { getTree, NODES, type TreeId } from "@/lib/q-trees";
 
+const CHAT_RUN_LABELS: Record<string, { heading: string; breadcrumb: string }> = {
+  "chat:askq": { heading: "Lumi · Drawer chat", breadcrumb: "Site · Ask Lumi" },
+  "csfactors-ask": { heading: "Lumi · CSFactors", breadcrumb: "CSFactors · Ask Lumi" },
+  "situation-room": { heading: "Lumi · Situation Room", breadcrumb: "Situation Room" },
+  "dispatch-debrief": { heading: "Lumi · Dispatch debrief", breadcrumb: "Articles · Debrief" },
+  "dispatch-disagree": { heading: "Lumi · Dispatch pushback", breadcrumb: "Articles · Pushback" },
+  WORKSPACE_SUMMARY: { heading: "Lumi · Workspace briefing", breadcrumb: "Workspace" },
+};
+
 function resolveRun(nodeId: string) {
+  if (CHAT_RUN_LABELS[nodeId]) return CHAT_RUN_LABELS[nodeId];
+  if (nodeId.startsWith("chat:")) return { heading: "Lumi · Conversation", breadcrumb: "Lumi" };
   const treeId = nodeId.split("-")[0] as TreeId;
   const tree = getTree(treeId);
   const path: string[] = [];
@@ -45,8 +56,9 @@ function resolveRun(nodeId: string) {
     const parentId: string = cur.parentId;
     cur = NODES.find((n) => n.id === parentId);
   }
-  return { heading: tree?.title ?? "Scenario", breadcrumb: path.join(" · ") };
+  return { heading: tree?.title ?? "Lumi run", breadcrumb: path.join(" · ") };
 }
+
 
 function pickContextLine(ctx: Record<string, unknown>): string | null {
   const keys = ["one_sentence_context", "context", "summary", "prompt_context"];

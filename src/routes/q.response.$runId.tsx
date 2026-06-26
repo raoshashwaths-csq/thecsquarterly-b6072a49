@@ -74,32 +74,84 @@ function PublicResponsePage() {
             </div>
           )}
 
-          {run && (
-            <>
-              <div className="mb-10">
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
-                  <QMark periodClassName="text-foreground" /> Response · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
+          {run && (() => {
+            const CHAT_SOURCES: Record<string, { eyebrow: string; titleFallback: string }> = {
+              "chat:askq": { eyebrow: "Lumi · Drawer chat", titleFallback: "Lumi conversation" },
+              "csfactors-ask": { eyebrow: "Lumi · CSFactors", titleFallback: "Portfolio question" },
+              "situation-room": { eyebrow: "Lumi · Situation Room", titleFallback: "Situation thread" },
+              "dispatch-debrief": { eyebrow: "Lumi · Dispatch debrief", titleFallback: "Dispatch debrief" },
+              "dispatch-disagree": { eyebrow: "Lumi · Pushback", titleFallback: "Dispatch pushback" },
+              "WORKSPACE_SUMMARY": { eyebrow: "Lumi · Workspace briefing", titleFallback: "Workspace briefing" },
+            };
+            const chatMeta = CHAT_SOURCES[run.node_id];
+            const isChatShape =
+              !!chatMeta ||
+              run.node_id.startsWith("chat:") ||
+              (!run.zones.diagnosis?.trim() && !run.zones.playbook?.trim() && !!run.zones.executable?.trim());
+            const question =
+              (typeof run.context?.question === "string" && run.context.question) ||
+              (typeof run.context?.situation === "string" && run.context.situation) ||
+              (typeof run.context?.message === "string" && run.context.message) ||
+              "";
+            const reply = run.zones.executable ?? "";
+            const headline = node?.label ?? chatMeta?.titleFallback ?? "Lumi run";
+            const eyebrow = chatMeta?.eyebrow ?? "Lumi · Response";
+            return (
+              <>
+                <div className="mb-10">
+                  <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-3">
+                    {eyebrow} · {run.witty ? "Witty" : "Analytical"} · {new Date(run.created_at).toLocaleString()}
+                  </div>
+                  <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3 break-words">
+                    {headline}
+                    <span className="text-accent">.</span>
+                  </h1>
+                  {!isChatShape && crumb.length > 0 && (
+                    <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55 break-words">
+                      {crumb.join(" › ")}
+                    </div>
+                  )}
                 </div>
-                <h1 className="font-display text-4xl md:text-5xl leading-[0.95] tracking-tight text-balance mb-3 break-words">
-                  {node?.label ?? "Decision"}
-                  <span className="text-accent">.</span>
-                </h1>
-                <div className="font-mono text-xs uppercase tracking-[0.25em] text-foreground/55 break-words">
-                  {crumb.join(" › ")}
+
+                <div className="bg-accent/5 border border-accent/20 rounded-md px-5 py-4 mb-10">
+                  <p className="font-body text-sm text-foreground/75">
+                    Shared by the operator. <a href="/agent/framework" className="underline hover:text-accent">Run your own decision</a> with the Operator Canvas.
+                  </p>
                 </div>
-              </div>
 
-              <div className="bg-accent/5 border border-accent/20 rounded-md px-5 py-4 mb-10">
-                <p className="font-body text-sm text-foreground/75">
-                  Shared by the operator. <a href="/agent/framework" className="underline hover:text-accent">Run your own decision</a> with the Operator Canvas.
-                </p>
-              </div>
+                {isChatShape ? (
+                  <>
+                    {question && (
+                      <section className="border-t border-border pt-8 pb-6">
+                        <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-2">
+                          They asked
+                        </div>
+                        <p className="font-body text-[15px] md:text-base leading-[1.7] text-foreground/85 whitespace-pre-wrap break-words italic">
+                          {question}
+                        </p>
+                      </section>
+                    )}
+                    <section className="border-t border-border pt-8 pb-10">
+                      <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-1">
+                        Lumi replied
+                      </div>
+                      <h2 className="font-display text-2xl md:text-3xl tracking-tight mb-5">Full response</h2>
+                      <div className="font-body text-[15px] md:text-base leading-[1.7] text-foreground/85 whitespace-pre-wrap break-words">
+                        {reply || "(No reply persisted.)"}
+                      </div>
+                    </section>
+                  </>
+                ) : (
+                  <>
+                    <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
+                    <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
+                    <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
+                  </>
+                )}
+              </>
+            );
+          })()}
 
-              <Zone label="Diagnosis" index="01" tone="primary" body={run.zones.diagnosis} />
-              <Zone label="Playbook" index="02" tone="secondary" body={run.zones.playbook} />
-              <Zone label="Executable" index="03" tone="accent" body={run.zones.executable} copyable />
-            </>
-          )}
         </div>
       </main>
       <SiteFooter />
