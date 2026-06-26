@@ -404,25 +404,33 @@ function LumiArchive() {
             {allRuns.slice(0, 9).map((r) => {
               const node = getNode(r.node_id);
               const tree = node ? getTree(node.treeId) : null;
+              const chatLabel =
+                r.node_id === "chat:askq" ? { source: "Lumi · Drawer", label: "Drawer conversation" } :
+                r.node_id === "csfactors-ask" ? { source: "CSFactors", label: "Portfolio question" } :
+                r.node_id === "situation-room" ? { source: "Situation Room", label: "Situation thread" } :
+                r.node_id === "dispatch-debrief" ? { source: "Dispatch debrief", label: "Dispatch debrief" } :
+                r.node_id === "dispatch-disagree" ? { source: "Dispatch pushback", label: "Dispatch pushback" } :
+                r.node_id.startsWith("chat:") ? { source: "Lumi", label: "Conversation" } :
+                null;
               return (
                 <Link
                   key={r.id}
-                  to="/q/response/$runId"
+                  to="/agent/response/$runId"
                   params={{ runId: r.id }}
                   className="group relative border border-border bg-card p-4 hover:border-accent hover:shadow-lg hover:-translate-y-0.5 transition-all overflow-hidden"
                 >
                   <div className="eyebrow text-muted-foreground mb-2">
-                    {tree?.title ?? "Lumi"}
+                    {chatLabel?.source ?? tree?.title ?? "Lumi"}
                   </div>
                   <div className="font-display text-base leading-tight mb-2 line-clamp-2 group-hover:text-accent transition-colors">
-                    {node?.label ?? r.node_id}
+                    {node?.label ?? chatLabel?.label ?? r.node_id}
                   </div>
                   <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                     {new Date(r.created_at).toLocaleDateString()}
                   </div>
                   <div className="max-h-0 group-hover:max-h-32 overflow-hidden transition-[max-height] duration-300 ease-out">
                     <p className="text-xs text-foreground/70 mt-3 leading-relaxed line-clamp-4">
-                      {"Open this run to see Lumi's diagnosis, playbook, and executable steps."}
+                      {"Open this run to see Lumi's full response."}
                     </p>
                   </div>
                 </Link>
@@ -431,6 +439,7 @@ function LumiArchive() {
           </div>
         </div>
       ) : null}
+
 
       {tagged && tagged.length ? (
         <div>
