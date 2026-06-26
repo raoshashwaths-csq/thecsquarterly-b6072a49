@@ -280,10 +280,6 @@ function SituationActive(props: {
   situation: string;
   dispatches: Dispatch[];
   messages: ChatMsg[];
-  reply: string;
-  setReply: (s: string) => void;
-  onSend: () => void;
-  sending: boolean;
   saved: boolean;
   saveTitle: string;
   setSaveTitle: (s: string) => void;
@@ -291,7 +287,7 @@ function SituationActive(props: {
   onReset: () => void;
 }) {
   const {
-    situation, dispatches, messages, reply, setReply, onSend, sending,
+    situation, dispatches, messages,
     saved, saveTitle, setSaveTitle, onSave, onReset,
   } = props;
 
