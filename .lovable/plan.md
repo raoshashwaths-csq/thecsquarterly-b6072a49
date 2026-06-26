@@ -1,58 +1,70 @@
-## Scope
+## Goal
 
-Three changes, all visual/structural:
+1. Remove the Stage 01/02/03 reveal entirely from the homepage (`/`).
+2. Show it on `/csfactors` only for visitors and signed-in users who don't have CSFactors access (currently: below Operator).
+3. Restore `StageRevealSection` to the original sticky-scroll-container behavior we had before today's carousel rewrite.
 
-1. **StageRevealSection** — replace the overlapping absolute-positioned stack and the staggered composite end state with a clean alternating-fade entrance that resolves into a **horizontal scroll carousel** of three cards. No stacked composite, no right-side caption list.
-2. **Tier ordering verification** — confirm Stage section + editorial render in correct order across hard refresh and client-side nav for visitor, Free Reader, and Practitioner+.
-3. **LumiRouteLoader** — remove the animated rising "bubbles" and replace with a static cluster of use-case quotes (wrapped in inverted commas), no animation under the badge.
+## 1. Homepage — remove the stages
 
-## Stage section redesign
+File: `src/routes/index.tsx`
 
-Rewrite `src/components/home/StageRevealSection.tsx`:
+- Drop the import of `StageRevealSection`.
+- Delete `stagesAtTop` / `stagesAtBottom`, both render slots (lines ~215 and ~333), the loading-state skeleton spacer, and the `HomeStages` / `StageCta` / `StageMock` helper functions plus their imports (icons, `useFeatureGate`, mock assets that are only used by them).
+- Leave the rest of the homepage (hero, editorial grid, OperatorTools, ClosingCTA, etc.) in its current order, unchanged.
 
-- **Phase model collapses to 4 steps:** phase 1 → stage 01 card slides in from LEFT; phase 2 → stage 02 slides in from RIGHT (01 stays, moves left into row); phase 3 → stage 03 slides in from LEFT (02 stays); phase 4 → all three cards settle into a **horizontal scroll carousel** row, snap-aligned, scroll-lock released.
-- **No absolute stacking.** Each card is a normal flow item from the start; opacity + translate-x drive the entrance. Cards never overlap — the absolute layering is gone.
-- **End state = carousel:** `overflow-x-auto snap-x snap-mandatory` row, each card `min-w-[clamp(320px,80vw,520px)] snap-center`, with horizontal padding so first/last cards center. Native scrollbar hidden, custom hairline indicator below.
-- **Card content unchanged** (eyebrow + headline + body + CTA + mock image inside one card). Mock is the upper third of each card; copy below.
-- **Scroll lock:** IntersectionObserver-based (kept from current file, with the 6s safety net). Lock engages at ≥75% in-view, advances on wheel/touch/key through phases 1-3, releases at phase 4. After release the page scrolls normally and the carousel is interacted with via horizontal scroll, swipe, or arrow keys when focused.
-- **Mobile / reduced-motion:** carousel is the default — three cards in a horizontally scrollable row from mount, no lock, no entrance gating.
-- **Progress dots:** 3 segments only (one per stage), accent fill as each card enters.
+## 2. CSFactors — gate non-access users to a landing page
 
-## Tier ordering verification
+File: `src/routes/csfactors.tsx`
 
-`src/routes/index.tsx` already computes `stagesAtBottom = !sub.loading && sub.canAccessCSFactors`:
-- Visitor / Free Reader → `canAccessCSFactors === false` → Stages render under hero (line 215).
-- Practitioner+ → render below `OperatorTools`, above `ClosingCTA` (line 331).
+Today the route shows `TierGateOverlay` to anyone below Operator and a sign-in nudge to anonymous users. Replace both of those branches with a single `<CSFactorsLanding />` component so visitors **and** below-tier signed-in users get the same marketing surface.
 
-Risk on hard refresh: `sub.loading` is true on first render, so `stagesAtBottom` is false → top slot renders → when entitlements resolve, `stagesAtBottom` flips true for paid users → top slot unmounts, bottom slot mounts. That's a flash, not a wrong-order bug.
+Gating rule (matches Core memory: "CSFactors gates at Practitioner+"):
 
-**Fix:** while `sub.loading` is true, render *neither* slot. Once `sub.loading === false`, render exactly one. This guarantees stable ordering across hard refresh and client-side nav. Place a small `aria-hidden` skeleton spacer in the top slot during loading so layout doesn't jump.
+- `!user` → landing
+- signed in but `rank[designation] < rank.practitioner` → landing
+- otherwise → existing command center
 
-**Verify with Playwright** (post-build): three sessions — anon, signed-in free, signed-in practitioner+ (session injected via `LOVABLE_BROWSER_SUPABASE_*`). For each:
-- Load `/` cold (hard refresh): assert Stage section in the correct slot, no second instance elsewhere.
-- Client-nav away to `/codex` and back: assert same slot, no duplicate mount.
-- Screenshot proof at each step.
+The landing page (new file `src/components/csfactors/CSFactorsLanding.tsx`) renders:
 
-## LumiRouteLoader redesign
+1. CSFactors logo + headline + sub (short editorial intro pulled from the existing route metadata).
+2. `<StageRevealSection stages={[...]} />` — same three stages content as currently defined in `HomeStages`, moved into this file.
+3. A single primary CTA row: "Start free → /pricing" for visitors, "Upgrade to Practitioner → /pricing" for below-tier signed-in users.
+4. "Back to The CS Quarterly" link (kept).  
+  
+5.Brief insight  cards into the headline feature set of the cs factors dashboard(Lumi Possibilities ,Burning Three ,Mutual Action Plan etc  beneath the stages surfaced with a afde up after stage reveal animation is completed and user scrolls further down .  
 
-Edit `src/components/site/LumiRouteLoader.tsx`:
 
-- Remove `.lumi-bubble-field` and `.lumi-bubble` markup; remove the rising animation entirely.
-- Replace with a static centered cluster: pick **3 prompts** from `getLoaderPrompts(pathname)`, render each as a single `<blockquote>`-style line wrapped in typographic quotes (`"…"`), small mono-serif treatment, stacked vertically with `space-y-3`, faint border-l accent. No transforms, no animation delays, no per-prompt motion.
-- Keep the pulsing badge and "Lumi is warming up…" label.
-- Clean up the orphan CSS for `.lumi-bubble*` in `src/styles.css` (delete the keyframes + selectors).
+Forces dark theme (already done at route level via the `useMemo` document.documentElement add). No sidebar, no workspace, no Lumi drawer — the landing renders before `LumiDrawerProvider`'s consumers are needed (move `LumiDrawerProvider` so it only wraps the authenticated command center, not the landing).
 
-## Files
+## 3. StageRevealSection — restore the original sticky scroll container
 
-- `src/components/home/StageRevealSection.tsx` — rewrite (carousel end state, no composite).
-- `src/routes/index.tsx` — gate both stage slots on `!sub.loading`; add loading skeleton.
-- `src/components/site/LumiRouteLoader.tsx` — replace bubble field with static quotes.
-- `src/styles.css` — remove `.lumi-bubble*` rules + keyframes.
+File: `src/components/home/StageRevealSection.tsx` (full rewrite back to the pre-today shape)
 
-No DB, server, or auth changes. No new dependencies.
+End-state visual restored:
+
+- Outer wrapper: `relative` section with internal scroll spacer `h-[300vh]` (3 phases × viewport).
+- Inner: `sticky top-0 h-screen` container holding a two-column grid — left = stacked stage cards layered on top of each other, right = vertical list of three captions/CTAs that highlight as their stage activates.
+- Scroll progress (via `useScroll` + `useTransform` from framer-motion, or a plain scroll listener reading `getBoundingClientRect()` against the sticky parent) maps section progress 0→1 into phases 1/2/3.
+- Cards cross-fade and translate-up `8px → 0`; previous card drops to `opacity-0` + `pointer-events-none` (stacked, not laid out side-by-side).
+- Right-side caption list: each row gets `data-active` styling (accent border-left, brighter text) when its stage is active; clicking a row jumps the page scroll to that phase's offset.
+- Progress rail: thin vertical hairline on the far left of the sticky container with 3 dots; active dot filled with `--accent`.
+- Mobile / reduced-motion fallback: render the three stages as a normal vertical stack (no sticky, no scroll lock) — same fallback we had originally.
+
+Explicitly **not** doing:
+
+- No horizontal `snap-x` carousel end state.
+- No `IntersectionObserver` scroll lock, no `document.body.style.overflow = "hidden"`, no wheel/key/touch interception, no 6s safety net.
+- No alternating left/right slide-in entrance choreography.
+
+Props stay the same: `stages: [StageItem, StageItem, StageItem]` with `label`, `caption`, `mock`, so the call site in `CSFactorsLanding.tsx` doesn't need a different shape.
+
+## Files touched
+
+- `src/routes/index.tsx` — remove stages block + helpers + imports.
+- `src/routes/csfactors.tsx` — replace TierGateOverlay + signed-out nudge with `<CSFactorsLanding />`; narrow `LumiDrawerProvider` scope.
+- `src/components/csfactors/CSFactorsLanding.tsx` — new; owns stage content + CTA.
+- `src/components/home/StageRevealSection.tsx` — rewrite to original sticky-scroll container shape.
 
 ## Out of scope
 
-- Changing the per-stage copy or mocks.
-- Changing which posts feed the Recent grid (Lumi-seeded logic stays).
-- Header / footer / hero edits.
+Per-stage copy, mocks, pricing matrix, the route's authenticated command center, and the Lumi loader / loader-prompts changes from earlier today (those stay as they are).
