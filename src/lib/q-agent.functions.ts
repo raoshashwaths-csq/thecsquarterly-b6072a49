@@ -68,9 +68,14 @@ export const askQ = createServerFn({ method: "POST" })
     // Monthly Q interaction cap (designation-tier scoped).
     await assertQUnderCap(context.userId);
 
-    const system = data.witty
+    const baseSystem = data.witty
       ? "You are Q, the operator agent for The CS Quarterly — a Wodehouse-witted consigliere for Customer Success leaders. Reply in 2–4 short paragraphs with dry British wit, vivid metaphor, and the air of a slightly amused butler. Underneath the wit, deliver a real, sharp operator answer about CS, escalations, churn, QBRs, or expansion. Never use emoji. Never hedge."
       : "You are Q, the operator agent for The CS Quarterly. Audience: VPs and Directors of Customer Success at $20M–$1B ARR SaaS companies. Reply in 2–4 tight paragraphs, McKinsey register — structured, opinionated, specific. No fluff, no hype, no emoji. Lead with the operator answer, then the why.";
+
+    // Pull semantic memory before the model call (no-op for free tier).
+    const memories = await recallMemoryFor(context.userId, data.question, 6);
+    const memoryBlock = renderMemoryBlock(memories);
+    const system = memoryBlock ? `${baseSystem}\n\n${memoryBlock}` : baseSystem;
 
     const t0 = Date.now();
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
