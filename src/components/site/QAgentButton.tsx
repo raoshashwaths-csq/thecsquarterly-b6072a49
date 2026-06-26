@@ -275,6 +275,26 @@ export function QAgentButton() {
               </button>
             </div>
 
+            {/* Contextual Lumi action grid — empty conversation state. */}
+            {!answer && !panel && (
+              <div className="mb-5">
+                <LumiDrawerActions
+                  pageContext={pageContext}
+                  isVanguard={isVanguard}
+                  visible={!answer}
+                  onActionSelect={(prompt) => {
+                    setQuery(prompt);
+                    // Auto-submit after state flush.
+                    setTimeout(() => {
+                      void handleAsk();
+                    }, 0);
+                  }}
+                />
+              </div>
+            )}
+
+
+
             {/* Search bar with rolling placeholder */}
             <form onSubmit={handleAsk} className="mb-3">
               <div className="flex items-stretch border border-border focus-within:border-foreground transition-colors bg-background">
