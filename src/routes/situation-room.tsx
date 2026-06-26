@@ -422,7 +422,7 @@ function LumiArchive() {
                   </div>
                   <div className="max-h-0 group-hover:max-h-32 overflow-hidden transition-[max-height] duration-300 ease-out">
                     <p className="text-xs text-foreground/70 mt-3 leading-relaxed line-clamp-4">
-                      {node?.description ?? "Open this run to see Lumi's diagnosis, playbook, and executable steps."}
+                      {"Open this run to see Lumi's diagnosis, playbook, and executable steps."}
                     </p>
                   </div>
                 </Link>
@@ -454,7 +454,7 @@ function LumiArchive() {
                   </div>
                   <div className="max-h-0 group-hover:max-h-32 overflow-hidden transition-[max-height] duration-300 ease-out">
                     <p className="text-xs text-foreground/70 mt-3 leading-relaxed line-clamp-4">
-                      {node?.description ?? "Open the run to revisit Lumi's analysis on this account."}
+                      {"Open the run to revisit Lumi's analysis on this account."}
                     </p>
                   </div>
                 </Link>
