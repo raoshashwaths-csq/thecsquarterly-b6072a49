@@ -746,6 +746,126 @@ export type Database = {
         }
         Relationships: []
       }
+      future_operator_notifications: {
+        Row: {
+          acted_on_at: string | null
+          action_label: string | null
+          action_route: string | null
+          delivered_at: string
+          dismissed_at: string | null
+          id: string
+          message: string
+          quest_completed: boolean
+          quest_id: string | null
+          read_at: string | null
+          subtext: string | null
+          trigger_context: Json | null
+          trigger_type: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          acted_on_at?: string | null
+          action_label?: string | null
+          action_route?: string | null
+          delivered_at?: string
+          dismissed_at?: string | null
+          id?: string
+          message: string
+          quest_completed?: boolean
+          quest_id?: string | null
+          read_at?: string | null
+          subtext?: string | null
+          trigger_context?: Json | null
+          trigger_type?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          acted_on_at?: string | null
+          action_label?: string | null
+          action_route?: string | null
+          delivered_at?: string
+          dismissed_at?: string | null
+          id?: string
+          message?: string
+          quest_completed?: boolean
+          quest_id?: string | null
+          read_at?: string | null
+          subtext?: string | null
+          trigger_context?: Json | null
+          trigger_type?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      future_operator_profiles: {
+        Row: {
+          active_quests: Json
+          core_commitments: string[]
+          created_at: string
+          current_biggest_risk: string | null
+          current_focus_account: string | null
+          future_acv_band: string | null
+          future_nrr_target: string | null
+          future_team_state: string | null
+          id: string
+          last_checkin_at: string | null
+          last_quest_generated_at: string | null
+          next_drift_signal_at: string | null
+          notification_window_end: string
+          notification_window_start: string
+          paused_until: string | null
+          pending_renewal_at: string | null
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_quests?: Json
+          core_commitments?: string[]
+          created_at?: string
+          current_biggest_risk?: string | null
+          current_focus_account?: string | null
+          future_acv_band?: string | null
+          future_nrr_target?: string | null
+          future_team_state?: string | null
+          id?: string
+          last_checkin_at?: string | null
+          last_quest_generated_at?: string | null
+          next_drift_signal_at?: string | null
+          notification_window_end?: string
+          notification_window_start?: string
+          paused_until?: string | null
+          pending_renewal_at?: string | null
+          timezone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_quests?: Json
+          core_commitments?: string[]
+          created_at?: string
+          current_biggest_risk?: string | null
+          current_focus_account?: string | null
+          future_acv_band?: string | null
+          future_nrr_target?: string | null
+          future_team_state?: string | null
+          id?: string
+          last_checkin_at?: string | null
+          last_quest_generated_at?: string | null
+          next_drift_signal_at?: string | null
+          notification_window_end?: string
+          notification_window_start?: string
+          paused_until?: string | null
+          pending_renewal_at?: string | null
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       job_listings: {
         Row: {
           apply_url: string | null
