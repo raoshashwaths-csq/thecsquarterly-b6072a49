@@ -107,8 +107,12 @@ export function RunAccountTagger({
         },
       });
       setSaved(true);
-      toast.success(`Tagged to ${r.accountName ?? "account"}`);
-    } catch (err) {
+      if (r.sentiment) {
+        setLastSentiment(r.sentiment);
+        toast.success(`Tagged to ${r.accountName ?? "account"} · sentiment ${r.sentiment.label}`);
+      } else {
+        toast.success(`Tagged to ${r.accountName ?? "account"}`);
+      }
       toast.error(err instanceof Error ? err.message : "Could not tag run");
     } finally {
       setSaving(false);
