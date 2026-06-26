@@ -1125,3 +1125,129 @@ function AuditLogAdmin() {
     </div>
   );
 }
+
+function ReaderSignalsAdmin() {
+  const fetchAgg = useServerFn(listReactionAggregates);
+  const q = useQuery({
+    queryKey: ["admin-reader-signals"],
+    queryFn: () => fetchAgg({ data: { sinceDays: 30, limit: 50 } }),
+  });
+  const rows = q.data?.rows ?? [];
+  const threads = q.data?.disagreeThreads ?? [];
+  const totals = rows.reduce(
+    (acc, r) => ({
+      total: acc.total + r.total,
+      applied: acc.applied + r.applied,
+      language: acc.language + r.language,
+      confirmed: acc.confirmed + r.confirmed,
+      disagree: acc.disagree + r.disagree,
+    }),
+    { total: 0, applied: 0, language: 0, confirmed: 0, disagree: 0 },
+  );
+  const pct = (n: number) => (totals.total ? Math.round((n / totals.total) * 100) : 0);
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Editorial calibration</div>
+        <h2 className="font-display text-4xl mb-3">Reader Signals</h2>
+        <p className="text-muted-foreground max-w-2xl leading-relaxed">
+          One tap per reader per dispatch. Use disagree-rate to surface theses worth revisiting; the pushback threads below are saved Lumi conversations.
+        </p>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <StatCard label="Signals (30d)" value={totals.total} />
+        <StatCard label="Applied" value={pct(totals.applied) + "%"} hint={totals.applied + " signals"} />
+        <StatCard label="Language" value={pct(totals.language) + "%"} hint={totals.language + " signals"} />
+        <StatCard label="Confirmed" value={pct(totals.confirmed) + "%"} hint={totals.confirmed + " signals"} />
+        <StatCard label="Disagree" value={pct(totals.disagree) + "%"} hint={totals.disagree + " signals"} />
+      </div>
+
+      <div className="border border-border">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            Per-dispatch breakdown · last 30 days
+          </div>
+          <button onClick={() => q.refetch()} className="px-3 py-1 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40">
+            Refresh
+          </button>
+        </div>
+        {q.isLoading ? (
+          <div className="p-6 text-sm text-muted-foreground">Loading…</div>
+        ) : rows.length === 0 ? (
+          <div className="p-6 text-sm text-muted-foreground">No signals yet.</div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left">
+                <th className="px-4 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">Dispatch</th>
+                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Total</th>
+                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Applied</th>
+                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Language</th>
+                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Confirmed</th>
+                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Disagree</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows
+                .slice()
+                .sort((a, b) => (b.disagree / Math.max(b.total, 1)) - (a.disagree / Math.max(a.total, 1)))
+                .map((r) => {
+                  const p = (n: number) => (r.total ? Math.round((n / r.total) * 100) : 0);
+                  return (
+                    <tr key={r.post_id} className="border-b border-border/60 hover:bg-muted/20">
+                      <td className="px-4 py-2">
+                        <Link to="/insights/$slug" params={{ slug: r.slug }} className="hover:text-accent underline-offset-2 hover:underline">
+                          {r.title}
+                        </Link>
+                        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{r.section}</div>
+                      </td>
+                      <td className="px-3 py-2 text-right font-mono text-xs">{r.total}</td>
+                      <td className="px-3 py-2 text-right font-mono text-xs">{p(r.applied)}%</td>
+                      <td className="px-3 py-2 text-right font-mono text-xs">{p(r.language)}%</td>
+                      <td className="px-3 py-2 text-right font-mono text-xs">{p(r.confirmed)}%</td>
+                      <td className="px-3 py-2 text-right font-mono text-xs">
+                        <span className={p(r.disagree) >= 25 ? "text-accent" : ""}>{p(r.disagree)}%</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div className="border border-border">
+        <div className="px-4 py-3 border-b border-border font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
+          Recent pushback threads
+        </div>
+        {threads.length === 0 ? (
+          <div className="p-6 text-sm text-muted-foreground">No disagreement threads yet.</div>
+        ) : (
+          <ul className="divide-y divide-border">
+            {threads.map((t) => (
+              <li key={t.id} className="px-4 py-3 text-sm flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="truncate">
+                    <span className="text-muted-foreground">Pushback on </span>
+                    {t.postSlug ? (
+                      <Link to="/insights/$slug" params={{ slug: t.postSlug }} className="hover:text-accent underline-offset-2 hover:underline">
+                        {t.postTitle || t.title}
+                      </Link>
+                    ) : (
+                      <span>{t.postTitle || t.title}</span>
+                    )}
+                  </div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {new Date(t.createdAt).toLocaleString()}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
