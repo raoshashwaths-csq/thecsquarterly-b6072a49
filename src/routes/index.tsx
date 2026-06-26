@@ -224,12 +224,7 @@ function HomePage() {
                 <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
                   Roll every CSM's book into a single 360° portfolio. Watch NRR move in real time, see which segments are bleeding gross retention, and act before the QBR turns into a post-mortem.
                 </p>
-                <Link
-                  to="/csfactors/360"
-                  className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-                >
-                  See the platform →
-                </Link>
+                <StageCta featureId="csfactors" label="See the platform →" />
               </div>
             ),
             right: <StageMock variant="threeSixty" />,
