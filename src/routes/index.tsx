@@ -10,7 +10,7 @@ import { ResumeRunPrompt } from "@/components/agent/ResumeRunPrompt";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
-import { StageRevealSection } from "@/components/home/StageRevealSection";
+
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
@@ -85,11 +85,6 @@ function HomePage() {
     ? seededPosts.filter((p) => p.slug !== featured?.slug).slice(0, 4)
     : restRecency;
 
-  // Stages render under hero for visitors/free, at the bottom for paid users.
-  // While entitlements are still resolving, render NEITHER slot to keep order
-  // stable across hard refresh (no flash + re-mount when tier flips).
-  const stagesAtTop = !sub.loading && !sub.canAccessCSFactors;
-  const stagesAtBottom = !sub.loading && sub.canAccessCSFactors;
 
   // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
   // server render; swap to the viewer's local day-of-week after mount.
@@ -212,11 +207,8 @@ function HomePage() {
         </div>
       </header>
 
-      {/* Stage 01 / 02 / 03 — visitor + free users see it directly under the
-          hero with the new scroll-locked carousel reveal. Paid logged-in
-          users get it at the bottom of the page (rendered further down).
-          Neither slot renders while tier is loading. */}
-      {stagesAtTop && <HomeStages />}
+
+
 
       {/* Featured + Sidebar — LIFTED for visibility */}
       {featured && (
@@ -330,10 +322,6 @@ function HomePage() {
       {/* Operator / unknown: tools surface AFTER the editorial */}
       {!isRecruiterOrLead && <OperatorTools group={group} variant="home" />}
 
-      {/* Paid logged-in users see the three Stages here at the bottom,
-          below the Operator Toolkit, above the closing CTA. */}
-      {stagesAtBottom && <HomeStages />}
-
       <ClosingCTA />
 
       <SiteFooter />
@@ -342,75 +330,7 @@ function HomePage() {
   );
 }
 
-// Stage 01/02/03 block — one definition rendered in either the top slot
-// (visitor / free) or the bottom slot (paid logged-in) by HomePage above.
-function HomeStages() {
-  return (
-    <StageRevealSection
-      stages={[
-        {
-          label: "The CSM",
-          caption: (
-            <div className="max-w-xl">
-              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                Stage 01 / Practitioner
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                For the practitioner managing thirty accounts.
-              </h2>
-              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                A personal command centre for the CSM in the trenches. Triage the burning three before standup, surface the renewals that need a real conversation, and keep every account note in one operator-grade canvas.
-              </p>
-              <StageCta featureId="csfactors" label="Start free →" />
-            </div>
-          ),
-          mock: <StageMock variant="pulse" />,
-        },
-        {
-          label: "The Leader",
-          caption: (
-            <div className="max-w-xl">
-              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                Stage 02 / Operator · Team
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                For the VP carrying the NRR number.
-              </h2>
-              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                Roll every CSM's book into a single 360° portfolio. Watch NRR move in real time, see which segments are bleeding gross retention, and act before the QBR turns into a post-mortem.
-              </p>
-              <StageCta featureId="csfactors" label="See the platform →" />
-            </div>
-          ),
-          mock: <StageMock variant="threeSixty" />,
-        },
-        {
-          label: "The Enterprise",
-          caption: (
-            <div className="max-w-xl">
-              <div className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent mb-6">
-                Stage 03 / Scale · Enterprise
-              </div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-6 text-balance">
-                For the CCO presenting to the board on Monday.
-              </h2>
-              <p className="text-lg text-foreground/75 leading-relaxed mb-8 text-pretty">
-                A risk register, capacity model and renewal waterfall the board will actually read. Export the slide, defend the number, and walk out with the next quarter already mapped.
-              </p>
-              <Link
-                to="/pricing"
-                className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-              >
-                View enterprise →
-              </Link>
-            </div>
-          ),
-          mock: <StageMock variant="risk" />,
-        },
-      ]}
-    />
-  );
-}
+
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -480,27 +400,6 @@ function TierAwareHeroCard({
   );
 }
 
-// Stage CTA — keeps the editorial label (e.g. "Start free →") but routes
-// to the right destination based on the viewer's tier. Visitors land on
-// /login, free/reader users on /pricing (upgrade), entitled users on the
-// feature itself. Drives off the same CTA_ROUTES table as the hero cards.
-function StageCta({
-  featureId,
-  label,
-}: {
-  featureId: import("@/config/tierCopyConfig").FeatureId;
-  label: string;
-}) {
-  const copy = useTierCopy(featureId);
-  return (
-    <Link
-      to={copy.ctaHref as never}
-      className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
-    >
-      {label}
-    </Link>
-  );
-}
 
 function ClosingCTA() {
   const { t } = useTranslation();
@@ -558,104 +457,6 @@ function ClosingCTA() {
   );
 }
 
-function StageMock({ variant }: { variant: "pulse" | "threeSixty" | "risk" }) {
-  return (
-    <div className="w-full max-w-full md:max-w-3xl mx-auto bg-card border border-border shadow-2xl overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-background/50">
-        <div className="flex gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
-          <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
-          <span className="w-2.5 h-2.5 rounded-full bg-foreground/15" />
-        </div>
-        <div className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">
-          {variant === "pulse" ? "csfactors / pulse" : variant === "threeSixty" ? "csfactors / 360" : "csfactors / risk-register"}
-        </div>
-        <span className="w-8" />
-      </div>
-      <div className="p-5 space-y-4">
-        {variant === "pulse" && (
-          <>
-            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">The Burning Three</div>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: "Acme Corp", v: "82%", c: "bg-destructive/15 text-destructive" },
-                { label: "Globex", v: "61%", c: "bg-amber-500/15 text-amber-600 dark:text-amber-400" },
-                { label: "Initech", v: "44%", c: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" },
-              ].map((m) => (
-                <div key={m.label} className="p-3 border border-border bg-background/40">
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground mb-1.5">{m.label}</div>
-                  <div className={`text-lg font-display ${m.c} px-1.5 py-0.5 inline-block`}>{m.v}</div>
-                </div>
-              ))}
-            </div>
-            <div className="h-px bg-border" />
-            <div className="space-y-2">
-              {["Q3 renewal · 14 days", "Champion change · Northwind", "Expansion signal · Soylent"].map((r) => (
-                <div key={r} className="flex items-center justify-between text-xs">
-                  <span className="text-foreground/75">{r}</span>
-                  <span className="font-mono text-[10px] text-accent">open →</span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        {variant === "threeSixty" && (
-          <>
-            <div className="flex items-baseline justify-between">
-              <div>
-                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Net Revenue Retention</div>
-                <div className="font-display text-4xl text-accent mt-1">118.4%</div>
-              </div>
-              <div className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400">▲ 3.2pts QoQ</div>
-            </div>
-            <div className="flex items-end gap-1.5 h-24">
-              {[40, 55, 48, 62, 71, 65, 78, 84, 76, 88, 92, 95].map((h, i) => (
-                <div key={i} className="flex-1 bg-accent/70" style={{ height: `${h}%` }} />
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border">
-              {[
-                { l: "Gross Ret.", v: "94.1%" },
-                { l: "Expansion", v: "+$2.1M" },
-                { l: "Churn $", v: "-$340K" },
-              ].map((s) => (
-                <div key={s.l}>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{s.l}</div>
-                  <div className="font-display text-lg">{s.v}</div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-        {variant === "risk" && (
-          <>
-            <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">Risk Register · Board Export</div>
-            <div className="space-y-2">
-              {[
-                { a: "Stark Industries", arr: "$1.8M", sev: "Critical", c: "bg-destructive text-destructive-foreground" },
-                { a: "Wayne Enterprises", arr: "$1.2M", sev: "High", c: "bg-amber-500 text-background" },
-                { a: "Pied Piper", arr: "$840K", sev: "High", c: "bg-amber-500 text-background" },
-                { a: "Hooli", arr: "$620K", sev: "Watch", c: "bg-foreground/20 text-foreground" },
-              ].map((r) => (
-                <div key={r.a} className="flex items-center justify-between px-3 py-2 border border-border bg-background/40">
-                  <div>
-                    <div className="text-sm font-medium">{r.a}</div>
-                    <div className="font-mono text-[10px] text-muted-foreground">{r.arr} ARR</div>
-                  </div>
-                  <span className={`font-mono text-[9px] uppercase tracking-widest px-2 py-1 ${r.c}`}>{r.sev}</span>
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center justify-between pt-2 border-t border-border">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Total at risk</div>
-              <div className="font-display text-xl text-accent">$4.46M</div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tier-aware strip — rendered immediately below the hero. Switches content
