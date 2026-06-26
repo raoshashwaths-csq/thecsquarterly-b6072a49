@@ -164,35 +164,32 @@ export async function buildLumiSystemPrompt(
   // LAYER 3 — knowledge (language-aware)
   // Primary: up to 4 records in the user's language, tree-scoped.
   // Secondary: always 4 English records, tree-scoped, as baseline context.
-  const treeFilter = (q: ReturnType<typeof supabaseAdmin.from<"lumi_knowledge">>) =>
-    treeId ? q.contains("tree_relevance", [treeId]) : q;
+  const baseLangQ = supabaseAdmin
+    .from("lumi_knowledge")
+    .select("content, confidence_level")
+    .eq("is_active", true)
+    .eq("language", lang)
+    .order("created_at", { ascending: false })
+    .limit(4);
+  const langQ = treeId ? baseLangQ.contains("tree_relevance", [treeId]) : baseLangQ;
+
+  const baseEnQ = supabaseAdmin
+    .from("lumi_knowledge")
+    .select("content, confidence_level")
+    .eq("is_active", true)
+    .eq("language", "en")
+    .order("created_at", { ascending: false })
+    .limit(4);
+  const enQ = treeId ? baseEnQ.contains("tree_relevance", [treeId]) : baseEnQ;
 
   const languagePromise =
     lang !== "en"
-      ? treeFilter(
-          supabaseAdmin
-            .from("lumi_knowledge")
-            .select("content, confidence_level")
-            .eq("is_active", true)
-            .eq("language", lang)
-            .order("created_at", { ascending: false })
-            .limit(4),
-        )
+      ? langQ
       : Promise.resolve({ data: [] as Array<{ content: string; confidence_level: string | null }> });
-
-  const englishPromise = treeFilter(
-    supabaseAdmin
-      .from("lumi_knowledge")
-      .select("content, confidence_level")
-      .eq("is_active", true)
-      .eq("language", "en")
-      .order("created_at", { ascending: false })
-      .limit(4),
-  );
 
   const [{ data: languageKnowledge }, { data: englishKnowledge }] = await Promise.all([
     languagePromise,
-    englishPromise,
+    enQ,
   ]);
 
   const allKnowledge = [...(languageKnowledge ?? []), ...(englishKnowledge ?? [])];
