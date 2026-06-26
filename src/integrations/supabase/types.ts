@@ -1122,6 +1122,7 @@ export type Database = {
           category: string
           cover_image_url: string | null
           created_at: string
+          embedding: string | null
           excerpt: string
           hero_prompt: string | null
           id: string
@@ -1150,6 +1151,7 @@ export type Database = {
           category: string
           cover_image_url?: string | null
           created_at?: string
+          embedding?: string | null
           excerpt: string
           hero_prompt?: string | null
           id?: string
@@ -1178,6 +1180,7 @@ export type Database = {
           category?: string
           cover_image_url?: string | null
           created_at?: string
+          embedding?: string | null
           excerpt?: string
           hero_prompt?: string | null
           id?: string
@@ -1989,6 +1992,15 @@ export type Database = {
           similarity: number
           source: string
           source_ref: string
+        }[]
+      }
+      match_posts: {
+        Args: { _k?: number; _query: string; _section?: string }
+        Returns: {
+          id: string
+          similarity: number
+          slug: string
+          title: string
         }[]
       }
       move_to_dlq: {
