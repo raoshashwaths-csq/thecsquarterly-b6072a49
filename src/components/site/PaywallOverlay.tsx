@@ -32,7 +32,10 @@ type Copy = {
   price?: string;
 };
 
-function copyFor(gate: PaywallGate, tier: UiTier, continueAvailable: boolean): Copy {
+// TIER-AWARE — reads from tierCopyConfig via useTierCopy for the gate's feature.
+// Falls back to inline copy only for the "article" gate, which is a generic
+// reader paywall and does not map 1:1 to a feature card.
+function articleCopy(tier: UiTier, continueAvailable: boolean): Copy {
   const practitioner = getTier("practitioner");
   const practitionerPrice = practitioner?.priceMonthly ?? "$39";
 
@@ -49,18 +52,6 @@ function copyFor(gate: PaywallGate, tier: UiTier, continueAvailable: boolean): C
   }
 
   if (tier === "free") {
-    if (gate === "csfactors") {
-      return {
-        headline: "CSFactors is a Practitioner feature.",
-        subhead:
-          "Practitioner unlocks CSFactors, every Codex playbook, the full archive, and 50 Lumi sessions a month.",
-        price: `${practitionerPrice} per month. Cancel any time.`,
-        primaryLabel: `Upgrade to Practitioner (${practitionerPrice}/mo)`,
-        primaryTo: "/pricing",
-        secondaryLabel: "See plans →",
-        secondaryTo: "/pricing",
-      };
-    }
     return {
       headline: "This is a Practitioner piece.",
       subhead:
@@ -69,22 +60,7 @@ function copyFor(gate: PaywallGate, tier: UiTier, continueAvailable: boolean): C
       primaryLabel: "Upgrade to Practitioner",
       primaryTo: "/pricing",
       secondaryLabel: continueAvailable ? "Continue reading for free →" : "See plans →",
-      // secondaryTo intentionally omitted when continueAvailable — handler runs instead.
       secondaryTo: continueAvailable ? undefined : "/pricing",
-    };
-  }
-
-  // Paid tier hitting a higher-tier gate
-  if (gate === "csfactors") {
-    return {
-      headline: "CSFactors requires Practitioner.",
-      subhead:
-        "Your current plan gives you the full editorial layer. CSFactors adds the operating dashboard on top of that.",
-      price: `${practitionerPrice} per month. Cancel any time.`,
-      primaryLabel: `Upgrade to Practitioner (${practitionerPrice}/mo)`,
-      primaryTo: "/pricing",
-      secondaryLabel: "Stay on current plan",
-      secondaryTo: "/account",
     };
   }
 
