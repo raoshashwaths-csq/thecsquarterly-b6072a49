@@ -275,70 +275,50 @@ const ContinueInput = z.object({
   message: z.string().trim().min(1).max(2000),
 });
 
+/**
+ * The Situation Room is one-shot by design: a single Lumi read per situation.
+ * This endpoint exists only to reject any extra messages and record the attempt
+ * for monitoring. It never calls the AI and never spends tokens.
+ */
 export const continueSituation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ContinueInput.parse(d))
   .handler(async ({ context, data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI is not configured.");
-    await assertQUnderCap(context.userId);
-
-    const { data: session, error } = await (context.supabase as unknown as { from: (t: string) => any })
-      .from("situation_sessions")
-      .select("id, situation, dispatches, messages")
-      .eq("id", data.sessionId)
-      .maybeSingle();
-    if (error || !session) throw new Error("Situation not found.");
-
-    const row = session as unknown as {
-      situation: string;
-      dispatches: Dispatch[];
-      messages: ChatMsg[];
-    };
-
-    const dispatchContext = (row.dispatches ?? [])
-      .map((d, i) => `[${i + 1}] "${d.title}" — framework: ${d.framework}\nExcerpt: ${d.excerpt}`)
-      .join("\n\n");
-
-    const system = [
-      "You are Lumi, the CS analyst inside The CS Quarterly's Situation Room.",
-      "You are coaching an operator through a real, high-stakes live situation.",
-      "Stay grounded in the original situation and the retrieved dispatches below.",
-      "Cite dispatch titles when you draw on them. Ask one focused follow-up at a time before prescribing actions.",
-      "When the operator has given you enough to act, prescribe a numbered next-step plan (3-5 steps), each with a clear owner and timing.",
-      "Tone: McKinsey register, tight prose. No emoji, no hedging.",
-      "",
-      "ORIGINAL SITUATION:",
-      row.situation,
-      "",
-      "RETRIEVED DISPATCHES:",
-      dispatchContext || "(none)",
-    ].join("\n");
-
-    const history: ChatMsg[] = [
-      ...(row.messages ?? []),
-      { role: "user", content: data.message },
-    ];
-
-    const reply = await callChat(apiKey, system, history);
-
-    const updated = [...history, { role: "assistant" as const, content: reply }];
-    await (context.supabase as unknown as { from: (t: string) => any })
-      .from("situation_sessions")
-      .update({ messages: updated as never })
-      .eq("id", data.sessionId);
-
-    await supabaseAdmin.from("q_runs").insert({
-      user_id: context.userId,
-      node_id: "situation-room",
-      context: { sessionId: data.sessionId, message: data.message.slice(0, 2000) },
-      witty: false,
-      zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 8000) },
+    await logLumiEvent(context.userId, "situation.extra_attempt_blocked", {
+      sessionId: data.sessionId,
+      messagePreview: data.message.slice(0, 200),
     });
-
-
-    return { reply };
+    throw new Error("SITUATION_SESSION_LOCKED");
   });
+
+export const getSituationQuota = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const admin = await isAdmin(context.userId);
+    const limits = await loadSituationLimits();
+    const { startIso, resetIso } = windowBounds(limits.window);
+    if (admin) {
+      return {
+        used: 0,
+        max: null as number | null,
+        remaining: null as number | null,
+        window: limits.window,
+        resetAt: resetIso,
+        unlimited: true,
+      };
+    }
+    const used = await countSituationsInWindow(context.userId, startIso);
+    const remaining = Math.max(0, limits.max_prompts - used);
+    return {
+      used,
+      max: limits.max_prompts,
+      remaining,
+      window: limits.window,
+      resetAt: resetIso,
+      unlimited: false,
+    };
+  });
+
 
 const SaveInput = z.object({
   sessionId: z.string().uuid(),
