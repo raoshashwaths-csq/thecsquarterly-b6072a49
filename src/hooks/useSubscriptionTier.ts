@@ -28,6 +28,30 @@ export type UiTier =
   | "scale"
   | "enterprise";
 
+/**
+ * UI-facing tier names used by the tier-copy hierarchy. Mirrors the keys
+ * of the TIER_COPY registry plus `enterprise` for above-Scale states.
+ * visitor < free < reader < practitioner < operator < team < scale
+ */
+export type AccessTier =
+  | "visitor"
+  | "free"
+  | "reader"
+  | "practitioner"
+  | "operator"
+  | "team"
+  | "scale";
+
+const ACCESS_RANK: Record<AccessTier, number> = {
+  visitor: 0,
+  free: 1,
+  reader: 2,
+  practitioner: 3,
+  operator: 4,
+  team: 5,
+  scale: 6,
+};
+
 export type SubscriptionTier = {
   isLoggedIn: boolean;
   loading: boolean;
@@ -42,6 +66,13 @@ export type SubscriptionTier = {
   canAccessCommunity: boolean; // practitioner+ (was "reader+" in spec — Reader == free here)
   canAccessTeamFeatures: boolean; // team+
   upgradePromptTier: Designation;
+  /**
+   * Generic tier-gate helper. Returns true when the current user's tier sits
+   * at or above the required tier. Reader-the-designation in this codebase
+   * equals the logged-in free state, so canAccess("reader") is true for any
+   * logged-in user with no paid subscription.
+   */
+  canAccess: (requiredTier: AccessTier) => boolean;
 };
 
 function isoWeekKey(d = new Date()): string {
@@ -128,6 +159,14 @@ export function useSubscriptionTier(): SubscriptionTier {
 
   const dRank = DESIGNATION_RANK[ent.designation] ?? 0;
 
+  // Map the runtime UiTier onto the AccessTier hierarchy so canAccess() can
+  // answer questions phrased in the registry's vocabulary.
+  const accessTier: AccessTier =
+    tier === "enterprise" ? "scale" : (tier as AccessTier);
+  const currentRank = ACCESS_RANK[accessTier];
+  const canAccess = (requiredTier: AccessTier): boolean =>
+    currentRank >= ACCESS_RANK[requiredTier];
+
   return {
     isLoggedIn: !!user,
     loading,
@@ -145,5 +184,6 @@ export function useSubscriptionTier(): SubscriptionTier {
     canAccessCommunity: dRank >= DESIGNATION_RANK.practitioner,
     canAccessTeamFeatures: dRank >= DESIGNATION_RANK.team,
     upgradePromptTier: nextTier(ent.designation),
+    canAccess,
   };
 }

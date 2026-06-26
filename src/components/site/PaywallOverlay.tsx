@@ -8,7 +8,19 @@
 import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { useSubscriptionTier, type UiTier } from "@/hooks/useSubscriptionTier";
+import { useTierCopy } from "@/hooks/useTierCopy";
 import { getTier } from "@/lib/tiers";
+
+function routeForGate(gate: "codex" | "csfactors" | "lumi"): string {
+  switch (gate) {
+    case "codex":
+      return "/codex";
+    case "csfactors":
+      return "/csfactors";
+    case "lumi":
+      return "/agent/framework";
+  }
+}
 
 export type PaywallGate = "article" | "codex" | "csfactors" | "lumi";
 
@@ -32,7 +44,10 @@ type Copy = {
   price?: string;
 };
 
-function copyFor(gate: PaywallGate, tier: UiTier, continueAvailable: boolean): Copy {
+// TIER-AWARE — reads from tierCopyConfig via useTierCopy for the gate's feature.
+// Falls back to inline copy only for the "article" gate, which is a generic
+// reader paywall and does not map 1:1 to a feature card.
+function articleCopy(tier: UiTier, continueAvailable: boolean): Copy {
   const practitioner = getTier("practitioner");
   const practitionerPrice = practitioner?.priceMonthly ?? "$39";
 
@@ -49,18 +64,6 @@ function copyFor(gate: PaywallGate, tier: UiTier, continueAvailable: boolean): C
   }
 
   if (tier === "free") {
-    if (gate === "csfactors") {
-      return {
-        headline: "CSFactors is a Practitioner feature.",
-        subhead:
-          "Practitioner unlocks CSFactors, every Codex playbook, the full archive, and 50 Lumi sessions a month.",
-        price: `${practitionerPrice} per month. Cancel any time.`,
-        primaryLabel: `Upgrade to Practitioner (${practitionerPrice}/mo)`,
-        primaryTo: "/pricing",
-        secondaryLabel: "See plans →",
-        secondaryTo: "/pricing",
-      };
-    }
     return {
       headline: "This is a Practitioner piece.",
       subhead:
@@ -69,22 +72,7 @@ function copyFor(gate: PaywallGate, tier: UiTier, continueAvailable: boolean): C
       primaryLabel: "Upgrade to Practitioner",
       primaryTo: "/pricing",
       secondaryLabel: continueAvailable ? "Continue reading for free →" : "See plans →",
-      // secondaryTo intentionally omitted when continueAvailable — handler runs instead.
       secondaryTo: continueAvailable ? undefined : "/pricing",
-    };
-  }
-
-  // Paid tier hitting a higher-tier gate
-  if (gate === "csfactors") {
-    return {
-      headline: "CSFactors requires Practitioner.",
-      subhead:
-        "Your current plan gives you the full editorial layer. CSFactors adds the operating dashboard on top of that.",
-      price: `${practitionerPrice} per month. Cancel any time.`,
-      primaryLabel: `Upgrade to Practitioner (${practitionerPrice}/mo)`,
-      primaryTo: "/pricing",
-      secondaryLabel: "Stay on current plan",
-      secondaryTo: "/account",
     };
   }
 
@@ -96,12 +84,36 @@ function copyFor(gate: PaywallGate, tier: UiTier, continueAvailable: boolean): C
   };
 }
 
+const GATE_TO_FEATURE = {
+  codex: "codex-library",
+  csfactors: "csfactors",
+  lumi: "lumi",
+} as const;
+
 export function PaywallOverlay({ gate, tier: tierOverride, onContinueFree, continueAvailable }: Props) {
   const sub = useSubscriptionTier();
   const tier = tierOverride ?? sub.tier;
   const allowContinue =
     tier === "free" && gate === "article" && !!onContinueFree && (continueAvailable ?? true);
-  const copy = copyFor(gate, tier, allowContinue);
+
+  // TIER-AWARE — pull copy from tierCopyConfig for feature gates. The hook
+  // call is unconditional; we always ask for a feature key and only use the
+  // result when the gate maps to one.
+  const featureId = gate === "article" ? "csfactors" : GATE_TO_FEATURE[gate];
+  const featureCopy = useTierCopy(featureId);
+  const practitionerPrice = getTier("practitioner")?.priceMonthly ?? "$39";
+
+  const copy: Copy = gate === "article"
+    ? articleCopy(tier, allowContinue)
+    : {
+        headline: featureCopy.headline ?? "Upgrade to continue.",
+        subhead: featureCopy.body ?? "This content sits a tier above your current plan.",
+        primaryLabel: featureCopy.cta,
+        primaryTo: featureCopy.lockIcon ? "/pricing" : routeForGate(gate),
+        secondaryLabel: featureCopy.lockIcon && sub.isLoggedIn ? "Stay on current plan" : undefined,
+        secondaryTo: featureCopy.lockIcon && sub.isLoggedIn ? "/account" : undefined,
+        price: featureCopy.lockIcon ? `${practitionerPrice} per month. Cancel any time.` : undefined,
+      };
 
   return (
     <div className="absolute inset-x-0 top-0 z-20 flex justify-center pt-12 pb-20 pointer-events-none">
