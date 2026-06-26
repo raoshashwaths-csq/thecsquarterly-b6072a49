@@ -69,6 +69,34 @@ export const getFutureOperatorProfile = createServerFn({ method: "GET" })
   });
 
 // ---------------------------------------------------------------------------
+// getFutureOperatorNotification — single row by id (RLS-scoped to caller)
+// Used by the Lumi drawer ?seed=<id> reader.
+// ---------------------------------------------------------------------------
+const SeedInput = z.object({ id: z.string().uuid() });
+
+export const getFutureOperatorNotification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SeedInput.parse(d))
+  .handler(async ({ context, data }) => {
+    const { data: row } = await context.supabase
+      .from("future_operator_notifications")
+      .select("id, type, message, subtext, action_label, action_route, delivered_at, read_at")
+      .eq("id", data.id)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!row) return { notification: null };
+    // Auto-mark read on open.
+    if (!(row as { read_at: string | null }).read_at) {
+      await context.supabase
+        .from("future_operator_notifications")
+        .update({ read_at: new Date().toISOString() } as never)
+        .eq("id", data.id)
+        .eq("user_id", context.userId);
+    }
+    return { notification: row };
+  });
+
+// ---------------------------------------------------------------------------
 // saveFutureOperatorOnboarding
 // ---------------------------------------------------------------------------
 const OnboardingInput = z.object({

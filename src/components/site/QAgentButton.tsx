@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouterState, Link } from "@tanstack/react-router";
+import { useRouterState, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { getMonthlyQUsage } from "@/lib/q-usage.functions";
 import { globalSearch, type SearchHit } from "@/lib/discovery.functions";
 import { NODES } from "@/lib/q-trees";
 import { TreeVectorList } from "@/components/site/TreeVectorList";
+import { getFutureOperatorNotification } from "@/lib/future-operator.functions";
 import { detectFrictionKeywords } from "@/lib/sentiment.keywords";
 import { useAuth } from "@/hooks/useAuth";
 import { useTour } from "@/hooks/useTour";
@@ -59,6 +60,7 @@ export function QAgentButton() {
   const [unlimited, setUnlimited] = useState(false);
   const [gateModal, setGateModal] = useState(false);
   const [panel, setPanel] = useState<"tips" | "glossary" | null>(null);
+  const [seeded, setSeeded] = useState<{ id: string; message: string; subtext: string | null } | null>(null);
 
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -68,7 +70,10 @@ export function QAgentButton() {
   const fetchEntitlement = useServerFn(getQEntitlement);
   const fetchUsage = useServerFn(getMonthlyQUsage);
   const runUniversal = useServerFn(globalSearch);
+  const fetchSeed = useServerFn(getFutureOperatorNotification);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const search = useRouterState({ select: (s) => s.location.search as Record<string, unknown> });
+  const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const tour = useTour();
@@ -91,6 +96,43 @@ export function QAgentButton() {
       if (draft) setQuery(draft);
     } catch { /* */ }
   }, []);
+
+  // Future Operator notification seed reader. Reflection prompts route here
+  // via `?lumi=open&seed=<notificationId>`. We open the drawer, load the
+  // notification (auto-marking it read), and pre-pend it as the first turn.
+  // Then we strip the params so a refresh doesn't re-open.
+  const seedId = typeof search?.seed === "string" ? (search.seed as string) : null;
+  const wantsOpen = search?.lumi === "open";
+  useEffect(() => {
+    if (!seedId || !wantsOpen || !user) return;
+    let cancelled = false;
+    setOpen(true);
+    fetchSeed({ data: { id: seedId } })
+      .then((r) => {
+        if (cancelled) return;
+        if (r.notification) {
+          const n = r.notification as { id: string; message: string; subtext: string | null };
+          setSeeded({ id: n.id, message: n.message, subtext: n.subtext });
+          trackLumiEvent("drawer.open", { surface: "site", briefingShown: true, messageCount: 1 });
+        }
+      })
+      .catch(() => { /* silent */ })
+      .finally(() => {
+        if (cancelled) return;
+        // Strip the seed/lumi params so refresh doesn't replay.
+        navigate({
+          to: ".",
+          search: (prev: Record<string, unknown>) => {
+            const next = { ...prev };
+            delete next.lumi;
+            delete next.seed;
+            return next;
+          },
+          replace: true,
+        });
+      });
+    return () => { cancelled = true; };
+  }, [seedId, wantsOpen, user, fetchSeed, navigate]);
 
   // Persist draft as user types (resilience layer).
   useEffect(() => {
@@ -219,7 +261,7 @@ export function QAgentButton() {
 
 
 
-      <Sheet open={open} onOpenChange={setOpen}>
+      <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) setSeeded(null); }}>
         <SheetContent
           side="right"
           className="w-full sm:max-w-[460px] md:max-w-[42vw] bg-background border-l border-border p-0 overflow-y-auto"
@@ -279,8 +321,30 @@ export function QAgentButton() {
               </button>
             </div>
 
+            {/* Future Operator seeded turn — reflection prompt routed via ?seed=<id> */}
+            {seeded && (
+              <div className="mb-5 border-l-2 border-secondary-accent pl-4 py-1 animate-fade-up">
+                <div className="font-mono uppercase tracking-widest text-[10px] text-secondary-accent mb-2">
+                  Future Operator · Reflection
+                </div>
+                <div className="font-body text-[15px] text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                  {seeded.message}
+                </div>
+                {seeded.subtext ? (
+                  <p className="mt-2 text-xs text-foreground/60 leading-relaxed">{seeded.subtext}</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setSeeded(null)}
+                  className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-accent"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
+
             {/* Contextual Lumi action grid — empty conversation state. */}
-            {!answer && !panel && (
+            {!answer && !panel && !seeded && (
               <div className="mb-5">
                 <LumiDrawerActions
                   pageContext={pageContext}

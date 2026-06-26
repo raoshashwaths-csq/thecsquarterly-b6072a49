@@ -767,3 +767,96 @@ export const getSituationRoomMetrics = createServerFn({ method: "GET" })
       quotaBlocks30d: quotaRes.count ?? 0,
     };
   });
+
+// =============== Future Operator limits ===============
+
+const FO_KEY = "future_operator.limits";
+
+type FoLimits = {
+  daily_quest_calls_per_user_per_day: number;
+  drift_signals_per_user_per_day: number;
+  reflection_calls_per_user_per_day: number;
+  monthly_global_cap: number;
+};
+
+const FO_DEFAULTS: FoLimits = {
+  daily_quest_calls_per_user_per_day: 1,
+  drift_signals_per_user_per_day: 2,
+  reflection_calls_per_user_per_day: 4,
+  monthly_global_cap: 5000,
+};
+
+const FoLimitsInput = z.object({
+  daily_quest_calls_per_user_per_day: z.number().int().min(0).max(10),
+  drift_signals_per_user_per_day: z.number().int().min(0).max(10),
+  reflection_calls_per_user_per_day: z.number().int().min(0).max(20),
+  monthly_global_cap: z.number().int().min(0).max(1_000_000),
+});
+
+export const getFutureOperatorSettings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data } = await supabaseAdmin
+      .from("app_settings").select("value, updated_at").eq("key", FO_KEY).maybeSingle();
+    const raw = (data as { value?: Partial<FoLimits> } | null)?.value ?? {};
+    return {
+      ...FO_DEFAULTS,
+      ...raw,
+      updated_at: (data as { updated_at?: string } | null)?.updated_at ?? null,
+    };
+  });
+
+export const updateFutureOperatorSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => FoLimitsInput.parse(d))
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.userId);
+    const value: FoLimits = data;
+    const { error } = await supabaseAdmin
+      .from("app_settings")
+      .upsert(
+        { key: FO_KEY, value: value as never, updated_at: new Date().toISOString(), updated_by: context.userId },
+        { onConflict: "key" },
+      );
+    if (error) throw new Error(error.message);
+    await supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: context.userId,
+      action: "future_operator.update_limits",
+      target_table: "app_settings",
+      target_id: FO_KEY,
+      details: value as never,
+    });
+    return { ok: true, ...value };
+  });
+
+export const getFutureOperatorMetrics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
+    const startOfMonth = new Date();
+    startOfMonth.setUTCDate(1);
+    startOfMonth.setUTCHours(0, 0, 0, 0);
+
+    const [blockedRes, deliveredRes, monthRes] = await Promise.all([
+      supabaseAdmin
+        .from("lumi_events")
+        .select("id", { count: "exact", head: true })
+        .eq("event", "future_operator.budget_blocked")
+        .gte("created_at", since),
+      supabaseAdmin
+        .from("future_operator_notifications")
+        .select("id", { count: "exact", head: true })
+        .gte("delivered_at", since),
+      supabaseAdmin
+        .from("future_operator_notifications")
+        .select("id", { count: "exact", head: true })
+        .gte("delivered_at", startOfMonth.toISOString()),
+    ]);
+    return {
+      budgetBlocked30d: blockedRes.count ?? 0,
+      delivered30d: deliveredRes.count ?? 0,
+      deliveredMTD: monthRes.count ?? 0,
+    };
+  });
