@@ -1,70 +1,71 @@
-## Goal
+# Lumi Situation Room
 
-1. Remove the Stage 01/02/03 reveal entirely from the homepage (`/`).
-2. Show it on `/csfactors` only for visitors and signed-in users who don't have CSFactors access (currently: below Operator).
-3. Restore `StageRevealSection` to the original sticky-scroll-container behavior we had before today's carousel rewrite.
+A new high-stakes coaching surface where a reader pastes their live situation, Lumi retrieves the 3 most relevant past dispatches via semantic search, and walks them through a decision framework in conversation. Saves to workspace as a "Situation log."
 
-## 1. Homepage — remove the stages
+The `posts.embedding` column and `match_posts(query_embedding, k, section)` RPC already exist — we reuse them.
 
-File: `src/routes/index.tsx`
+## Where it lives
 
-- Drop the import of `StageRevealSection`.
-- Delete `stagesAtTop` / `stagesAtBottom`, both render slots (lines ~215 and ~333), the loading-state skeleton spacer, and the `HomeStages` / `StageCta` / `StageMock` helper functions plus their imports (icons, `useFeatureGate`, mock assets that are only used by them).
-- Leave the rest of the homepage (hero, editorial grid, OperatorTools, ClosingCTA, etc.) in its current order, unchanged.
+- New route: `/situation-room` (top-level, requires sign-in — render inline "Sign in to use Lumi Situation Room" CTA for visitors per the public/auth-route pattern; gated by Practitioner+ designation like the rest of Lumi Q for full conversation, with a 1-free-situation preview for Free Readers).PLace a card linking to it on the canvas page .Place all LUmi runs and playbooks in the situation room as well in a neat organised manner with expanding card on mouseover 
+- Entry points: header CTA inside the avatar dropdown ("Open Situation Room"), a card on `/account`, and a prominent link on the homepage hero under the existing primary CTA.
+- Reuses `LumiMark`, `.lumi-cta`, shared dashboard primitives, and the existing speech-to-text hook so the input box supports dictation.
 
-## 2. CSFactors — gate non-access users to a landing page
+## Page layout
 
-File: `src/routes/csfactors.tsx`
+Single-column editorial layout, dark midnight-slate (consistent with Lumi surfaces):
 
-Today the route shows `TierGateOverlay` to anyone below Operator and a sign-in nudge to anonymous users. Replace both of those branches with a single `<CSFactorsLanding />` component so visitors **and** below-tier signed-in users get the same marketing surface.
+1. Eyebrow + display H1: "Lumi Situation Room." Subtitle: one line on what it does.
+2. Large composer (textarea + mic button via `useElevenLabsSpeechInput`) — placeholder is the example silent-account scenario. Submit = "Find the dispatch."
+3. After submit:
+  - **Retrieved dispatches strip** — 3 `SectionCard`s side-by-side, each showing dispatch title, section eyebrow, similarity %, the extracted framework name, and a "Read full dispatch" link.
+  - **Applicable benchmark callout** — when the situation matches a benchmark category (renewal-window, champion-loss, expansion, onboarding), surface the relevant `benchmark_drops` row inline.
+  - **Coaching conversation** — `AskLumiDrawer`-style message list rendered inline (not a drawer here). Lumi opens with a diagnosis + named framework reference, then asks follow-up questions one at a time. User replies stream back. Markdown rendering, `message.parts`, optimistic user message, typing indicator.
+4. Sticky footer bar: "Save to workspace as Situation log" + "Start new situation."
 
-Gating rule (matches Core memory: "CSFactors gates at Practitioner+"):
+## Backend
 
-- `!user` → landing
-- signed in but `rank[designation] < rank.practitioner` → landing
-- otherwise → existing command center
+New `src/lib/situation-room.functions.ts` (client-safe path), all `requireSupabaseAuth` + `assertQUnderCap`:
 
-The landing page (new file `src/components/csfactors/CSFactorsLanding.tsx`) renders:
+- `retrieveSituationContext({ situation })` — server fn:
+  1. Embed `situation` via Lovable AI Gateway `/v1/embeddings` with `google/gemini-embedding-001` (column is `vector(3072)` — verify and resize migration if mismatched; the existing `match_posts` signature accepts `vector`).
+  2. Call `match_posts(query_embedding, 3, null)`.
+  3. For each hit, pull the post row (title, slug, section, excerpt, framework metadata) and have the model extract a 1-line framework name + 2-line "what this dispatch says about your situation" using `generateText` with structured `Output`.
+  4. Pick best-matching benchmark from `benchmark_drops` (by section + keyword heuristic on the situation text).
+  5. Return `{ dispatches: [...], benchmark, openingMessage }`.
+- `continueSituation({ situationId, history, message })` — server fn that streams via the existing chat pattern (we already have `askCSFactorsQ`; add a parallel `askSituationRoom` that uses the situation + retrieved dispatches as system context instead of CSFactors portfolio context). Reuses `assertQUnderCap` so it draws from the same monthly Lumi quota.
+- `saveSituationLog({ situationId, title })` — writes a row to `user_workspace_items` with `kind = 'situation_log'`, payload = `{ situation, dispatches, transcript }`. Cap already enforced by `enforce_workspace_cap`.
 
-1. CSFactors logo + headline + sub (short editorial intro pulled from the existing route metadata).
-2. `<StageRevealSection stages={[...]} />` — same three stages content as currently defined in `HomeStages`, moved into this file.
-3. A single primary CTA row: "Start free → /pricing" for visitors, "Upgrade to Practitioner → /pricing" for below-tier signed-in users.
-4. "Back to The CS Quarterly" link (kept).  
-  
-5.Brief insight  cards into the headline feature set of the cs factors dashboard(Lumi Possibilities ,Burning Three ,Mutual Action Plan etc  beneath the stages surfaced with a afde up after stage reveal animation is completed and user scrolls further down .  
+## Data
 
+- Reuse `posts.embedding` + `match_posts` RPC — no schema changes for retrieval.
+- New table `situation_sessions` (per-user transient log so refreshes don't lose state):
+  - columns: `id uuid pk`, `user_id uuid fk auth.users`, `situation text`, `dispatches jsonb`, `messages jsonb default '[]'`, `created_at timestamptz default now()`, `saved_to_workspace boolean default false`.
+  - RLS: `auth.uid() = user_id` for all of select/insert/update/delete.
+  - GRANTs: `SELECT, INSERT, UPDATE, DELETE` to `authenticated`, `ALL` to `service_role`.
+- Backfill: one-off migration / admin function to embed any `posts` rows still missing `embedding`. Use the same Lovable AI Gateway model. Re-run on publish via a trigger or just a manual admin button (out of scope for v1 — assume existing posts are embedded; surface a one-line "embed missing posts" button in `/admin/control-panel` for operator use).
 
-Forces dark theme (already done at route level via the `useMemo` document.documentElement add). No sidebar, no workspace, no Lumi drawer — the landing renders before `LumiDrawerProvider`'s consumers are needed (move `LumiDrawerProvider` so it only wraps the authenticated command center, not the landing).
+## Files
 
-## 3. StageRevealSection — restore the original sticky scroll container
+- New: `src/routes/situation-room.tsx`, `src/components/situation-room/SituationComposer.tsx`, `RetrievedDispatches.tsx`, `SituationChat.tsx`, `BenchmarkCallout.tsx`.
+- New: `src/lib/situation-room.functions.ts`, `src/lib/situation-room.server.ts` (embedding + retrieval helpers).
+- New API server route: `src/routes/api/situation-room/chat.ts` for the streaming conversation (AI SDK `useChat` with `DefaultChatTransport`).
+- Migration: `situation_sessions` table + GRANTs + RLS.
+- Edit: `src/components/site/SiteHeader.tsx` (avatar dropdown entry), `src/routes/index.tsx` (hero secondary CTA), `src/routes/account.index.tsx` (Situation Room card listing saved logs).
+- Edit: `src/lib/lumi-analytics.ts` — new event types `situation_started`, `situation_retrieved`, `situation_saved`.
 
-File: `src/components/home/StageRevealSection.tsx` (full rewrite back to the pre-today shape)
+## Gating
 
-End-state visual restored:
+- Visitor: sees marketing copy + composer is disabled with inline "Sign in to use Situation Room."
+- Free Reader: 1 free situation/month (tracked via `lumi_events`).
+- Practitioner+: unlimited within their monthly Lumi Q cap (shared with existing Lumi surfaces).
 
-- Outer wrapper: `relative` section with internal scroll spacer `h-[300vh]` (3 phases × viewport).
-- Inner: `sticky top-0 h-screen` container holding a two-column grid — left = stacked stage cards layered on top of each other, right = vertical list of three captions/CTAs that highlight as their stage activates.
-- Scroll progress (via `useScroll` + `useTransform` from framer-motion, or a plain scroll listener reading `getBoundingClientRect()` against the sticky parent) maps section progress 0→1 into phases 1/2/3.
-- Cards cross-fade and translate-up `8px → 0`; previous card drops to `opacity-0` + `pointer-events-none` (stacked, not laid out side-by-side).
-- Right-side caption list: each row gets `data-active` styling (accent border-left, brighter text) when its stage is active; clicking a row jumps the page scroll to that phase's offset.
-- Progress rail: thin vertical hairline on the far left of the sticky container with 3 dots; active dot filled with `--accent`.
-- Mobile / reduced-motion fallback: render the three stages as a normal vertical stack (no sticky, no scroll lock) — same fallback we had originally.
+## SEO
 
-Explicitly **not** doing:
+- Unique `head()`: title "Lumi Situation Room — The CS Quarterly", description on real-time renewal/escalation coaching, distinct og tags. No `og:image` for v1.
 
-- No horizontal `snap-x` carousel end state.
-- No `IntersectionObserver` scroll lock, no `document.body.style.overflow = "hidden"`, no wheel/key/touch interception, no 6s safety net.
-- No alternating left/right slide-in entrance choreography.
+## Out of scope (v1)
 
-Props stay the same: `stages: [StageItem, StageItem, StageItem]` with `label`, `caption`, `mock`, so the call site in `CSFactorsLanding.tsx` doesn't need a different shape.
-
-## Files touched
-
-- `src/routes/index.tsx` — remove stages block + helpers + imports.
-- `src/routes/csfactors.tsx` — replace TierGateOverlay + signed-out nudge with `<CSFactorsLanding />`; narrow `LumiDrawerProvider` scope.
-- `src/components/csfactors/CSFactorsLanding.tsx` — new; owns stage content + CTA.
-- `src/components/home/StageRevealSection.tsx` — rewrite to original sticky-scroll container shape.
-
-## Out of scope
-
-Per-stage copy, mocks, pricing matrix, the route's authenticated command center, and the Lumi loader / loader-prompts changes from earlier today (those stay as they are).
+- Multi-turn citation linking back to specific paragraphs in dispatches.
+- Auto-detecting situation category to filter `match_posts(section)`.
+- Shareable situation logs (saved logs are private-only).
+- Voice output (TTS) — input dictation only.
