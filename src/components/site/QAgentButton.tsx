@@ -155,13 +155,11 @@ export function QAgentButton() {
   const gated = !user || (trialUsed && !unlimited) || capped;
   const needsSignIn = !user;
 
-  const handleAsk = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!query.trim() || loading) return;
+  const submitQuestion = async (question: string) => {
+    if (!question.trim() || loading) return;
     if (gated) { if (!user) setGateModal(true); return; }
-    // Friction keyword detection — flag for end-of-day check-in.
     if (user && typeof window !== "undefined") {
-      const kws = detectFrictionKeywords(query);
+      const kws = detectFrictionKeywords(question);
       if (kws.length > 0) {
         try { sessionStorage.setItem(FLAG_KEY, `${new Date().toISOString().slice(0,10)}|${kws.join(",")}`); } catch { /* */ }
       }
@@ -170,7 +168,7 @@ export function QAgentButton() {
     setAnswer(null);
     try {
       try { sessionStorage.setItem("lumi_messaged", "1"); } catch { /* */ }
-      const { reply } = await ask({ data: { question: query, witty: false } });
+      const { reply } = await ask({ data: { question, witty: false } });
       setAnswer(reply);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* */ }
       usage.refetch();
@@ -185,6 +183,12 @@ export function QAgentButton() {
       setLoading(false);
     }
   };
+
+  const handleAsk = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    await submitQuestion(query);
+  };
+
 
   if (pathname.startsWith("/admin") || pathname.startsWith("/csfactors")) return null;
 
