@@ -4,8 +4,53 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { getNode, breadcrumbFor, getTree } from "./q-trees";
 import { assertQUnderCap } from "./q-usage.functions";
 import { computeCostMicros } from "./q-pricing";
+import { recallMemoryFor, recordMemoryFor, renderMemoryBlock } from "./lumi-memory.functions";
 
 const Q_MODEL = "google/gemini-2.5-flash";
+
+async function extractMemoriesFromExchange(
+  apiKey: string,
+  question: string,
+  reply: string,
+): Promise<Array<{ memory_type: "situation" | "preference" | "account" | "framework"; content: string }>> {
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "Extract 0-2 durable facts about the operator's situation, preferences, accounts, or frameworks worth remembering for next time. No PII unless the operator stated it. Skip if nothing notable. Return JSON: {\"memories\":[{\"memory_type\":\"situation|preference|account|framework\",\"content\":\"...\"}]}",
+          },
+          { role: "user", content: `Operator asked: ${question}\n\nLumi answered: ${reply.slice(0, 2000)}` },
+        ],
+      }),
+    });
+    if (!res.ok) return [];
+    const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const raw = json.choices?.[0]?.message?.content ?? "{}";
+    const parsed = JSON.parse(raw) as {
+      memories?: Array<{ memory_type?: string; content?: string }>;
+    };
+    return (parsed.memories ?? [])
+      .filter(
+        (m): m is { memory_type: "situation" | "preference" | "account" | "framework"; content: string } =>
+          typeof m.content === "string" &&
+          m.content.length > 0 &&
+          (m.memory_type === "situation" ||
+            m.memory_type === "preference" ||
+            m.memory_type === "account" ||
+            m.memory_type === "framework"),
+      )
+      .slice(0, 2);
+  } catch {
+    return [];
+  }
+}
 
 
 export const askQ = createServerFn({ method: "POST" })
