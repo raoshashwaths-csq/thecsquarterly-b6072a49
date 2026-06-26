@@ -76,7 +76,9 @@ export const askQ = createServerFn({ method: "POST" })
     // Pull semantic memory before the model call (no-op for free tier).
     const memories = await recallMemoryFor(context.userId, data.question, 6);
     const memoryBlock = renderMemoryBlock(memories);
-    const system = memoryBlock ? `${baseSystem}\n\n${memoryBlock}` : baseSystem;
+    // Layer 3: portfolio-wide knowledge injection (distinct from Layer 3.5 per-user lumi_memory above).
+    const knowledge = await getLumiKnowledgeContext({ query: data.question });
+    const system = [baseSystem, memoryBlock, knowledge.block].filter(Boolean).join("\n\n");
 
     const t0 = Date.now();
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
