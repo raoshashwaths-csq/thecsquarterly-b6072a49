@@ -400,3 +400,171 @@ export const listAllPlaybooksAdmin = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return data ?? [];
   });
+
+// ───────────────────────────────────────────────────────────────────────────
+// Lumi-seeded editorial feed
+//
+// For signed-in users with Lumi Memory, rank the recent post list by semantic
+// similarity to their stored context (memories + profile challenges + persona).
+// Lazy-embeds any unembedded recent posts so the index self-heals over time.
+// Falls back to pure recency when memory is empty, embedding fails, or the
+// caller is below Practitioner.
+// ───────────────────────────────────────────────────────────────────────────
+
+const SEED_EMBED_MODEL = "openai/text-embedding-3-small";
+const SEED_EMBED_DIM = 1536;
+
+async function embedSeedText(text: string): Promise<number[] | null> {
+  const apiKey = process.env.LOVABLE_API_KEY;
+  if (!apiKey) return null;
+  const input = text.trim().slice(0, 4000);
+  if (!input) return null;
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Lovable-API-Key": apiKey },
+      body: JSON.stringify({ model: SEED_EMBED_MODEL, input, dimensions: SEED_EMBED_DIM }),
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { data?: Array<{ embedding?: number[] }> };
+    const v = json.data?.[0]?.embedding;
+    return Array.isArray(v) && v.length === SEED_EMBED_DIM ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+async function lazyBackfillPostEmbeddings(limit = 12): Promise<void> {
+  const { data: rows } = await supabaseAdmin
+    .from("posts")
+    .select("id, title, excerpt, body")
+    .eq("published", true)
+    .is("embedding", null)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+  if (!rows?.length) return;
+  for (const r of rows) {
+    const text = [r.title, r.excerpt, (r.body ?? "").slice(0, 800)]
+      .filter(Boolean)
+      .join("\n\n");
+    const vec = await embedSeedText(text);
+    if (!vec) continue;
+    await supabaseAdmin
+      .from("posts")
+      .update({ embedding: vec as never })
+      .eq("id", r.id);
+  }
+}
+
+export const getLumiSeededFeed = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ limit: z.number().int().min(1).max(20).default(8) }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const limit = data.limit;
+
+    // 1. Pull user context: memories + profile signals
+    const [{ data: memories }, { data: profile }] = await Promise.all([
+      supabaseAdmin
+        .from("lumi_memory")
+        .select("content, memory_type, last_seen_at, created_at")
+        .eq("user_id", userId)
+        .in("memory_type", ["situation", "preference", "account", "framework"])
+        .order("pinned", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(12),
+      supabaseAdmin
+        .from("profiles")
+        .select("persona, challenges, difficult_account")
+        .eq("id", userId)
+        .maybeSingle(),
+    ]);
+
+    const memText = (memories ?? []).map((m) => m.content).join("\n");
+    const profileText = [
+      profile?.persona,
+      Array.isArray(profile?.challenges) ? (profile?.challenges as string[]).join(", ") : null,
+      (profile as { difficult_account?: string } | null)?.difficult_account,
+    ]
+      .filter(Boolean)
+      .join("\n");
+    const queryText = [memText, profileText].filter(Boolean).join("\n").trim();
+
+    // Entitlement check (uses existing helper)
+    const entitled = await isVanguardEntitled(userId);
+
+    if (!queryText) {
+      // No context → plain recency
+      const { data: rows } = await supabaseAdmin
+        .from("posts")
+        .select(SELECT_COLS)
+        .eq("published", true)
+        .lte("published_at", new Date().toISOString())
+        .order("published_at", { ascending: false })
+        .limit(limit);
+      return {
+        source: "recency" as const,
+        posts: (rows ?? []).map((p) => ({
+          ...gatePremiumBody(p as Post, entitled),
+          seeded: false,
+        })) as Array<Post & { seeded: boolean }>,
+      };
+    }
+
+    // 2. Lazy backfill recent posts that lack embeddings (best-effort)
+    await lazyBackfillPostEmbeddings(8).catch(() => {});
+
+    // 3. Embed the query and ask match_posts for top matches
+    const vec = await embedSeedText(queryText);
+    let seededSlugs: string[] = [];
+    if (vec) {
+      const { data: matches } = await (supabaseAdmin.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: Array<{ slug: string; similarity: number }> | null }>)(
+        "match_posts",
+        { _query: vec as unknown as number[], _k: limit, _section: null },
+      );
+      seededSlugs = (matches ?? []).map((m) => m.slug);
+    }
+
+    // 4. Fetch full posts (seeded first, then fill remainder with recency)
+    const seededSet = new Set(seededSlugs);
+    const [{ data: seededRows }, { data: recencyRows }] = await Promise.all([
+      seededSlugs.length
+        ? supabaseAdmin
+            .from("posts")
+            .select(SELECT_COLS)
+            .in("slug", seededSlugs)
+            .eq("published", true)
+            .lte("published_at", new Date().toISOString())
+        : Promise.resolve({ data: [] as unknown[] }),
+      supabaseAdmin
+        .from("posts")
+        .select(SELECT_COLS)
+        .eq("published", true)
+        .lte("published_at", new Date().toISOString())
+        .order("published_at", { ascending: false })
+        .limit(limit * 2),
+    ]);
+
+    const seededById = new Map<string, Post>();
+    for (const r of (seededRows ?? []) as Post[]) seededById.set(r.slug, r);
+    // Preserve match_posts ordering
+    const orderedSeeded = seededSlugs
+      .map((s) => seededById.get(s))
+      .filter((p): p is Post => !!p);
+
+    const remainder = ((recencyRows ?? []) as Post[]).filter((p) => !seededSet.has(p.slug));
+    const combined = [...orderedSeeded, ...remainder].slice(0, limit);
+
+    return {
+      source: orderedSeeded.length ? ("lumi" as const) : ("recency" as const),
+      posts: combined.map((p) => ({
+        ...gatePremiumBody(p, entitled),
+        seeded: seededSet.has(p.slug),
+      })) as Array<Post & { seeded: boolean }>,
+    };
+  });
