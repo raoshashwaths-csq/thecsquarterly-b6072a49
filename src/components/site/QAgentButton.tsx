@@ -27,6 +27,11 @@ import { FeatureGlossary } from "@/components/enablement/FeatureGlossary";
 import { RouteTipsList } from "@/components/enablement/RouteTipsList";
 import { PlaybookTour } from "@/components/enablement/PlaybookTour";
 import { trackLumiEvent } from "@/lib/lumi-analytics";
+import { useLumiPageContext } from "@/hooks/useLumiPageContext";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { LumiBubble } from "@/components/lumi/LumiBubble";
+import { LumiDrawerActions } from "@/components/lumi/LumiDrawerActions";
+import type { LumiAction } from "@/config/lumiPageActions";
 
 const TRIAL_KEY = "q.trial.used";
 const DRAFT_KEY = "q.draft.global";
