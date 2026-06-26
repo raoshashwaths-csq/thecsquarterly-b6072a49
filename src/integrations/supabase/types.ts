@@ -2424,6 +2424,51 @@ export type Database = {
         }
         Relationships: []
       }
+      job_listings_public: {
+        Row: {
+          apply_url: string | null
+          click_count: number | null
+          created_at: string | null
+          description: string | null
+          employer_name: string | null
+          featured: boolean | null
+          id: string | null
+          job_title: string | null
+          package_tier: number | null
+          pinned: boolean | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          apply_url?: string | null
+          click_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          employer_name?: string | null
+          featured?: boolean | null
+          id?: string | null
+          job_title?: string | null
+          package_tier?: number | null
+          pinned?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          apply_url?: string | null
+          click_count?: number | null
+          created_at?: string | null
+          description?: string | null
+          employer_name?: string | null
+          featured?: boolean | null
+          id?: string | null
+          job_title?: string | null
+          package_tier?: number | null
+          pinned?: boolean | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_post_reaction_aggregates: {
