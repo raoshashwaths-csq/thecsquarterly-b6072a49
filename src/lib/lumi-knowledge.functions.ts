@@ -85,12 +85,13 @@ export async function getLumiKnowledgeContext(opts: {
     .join("\n");
 
   const benchmarkLines = (benchmarks ?? [])
-    .map((b: { metric: string; segment: string | null; value: number; p25: number | null; p50: number | null; p75: number | null; period: string }) => {
+    .filter((b) => b.metric != null && b.value != null)
+    .map((b) => {
       const seg = b.segment ? ` (${b.segment})` : "";
-      const pct = [b.p25, b.p50, b.p75].every((x) => x != null)
+      const pct = b.p25 != null && b.p50 != null && b.p75 != null
         ? ` — p25 ${b.p25}, p50 ${b.p50}, p75 ${b.p75}`
         : "";
-      return `- ${b.metric}${seg} ${b.period}: ${b.value}${pct}`;
+      return `- ${b.metric}${seg} ${b.period ?? ""}: ${b.value}${pct}`;
     })
     .join("\n");
 
