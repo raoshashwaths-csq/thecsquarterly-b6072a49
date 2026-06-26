@@ -277,19 +277,86 @@ const ContinueInput = z.object({
 
 /**
  * The Situation Room is one-shot by design: a single Lumi read per situation.
- * This endpoint exists only to reject any extra messages and record the attempt
- * for monitoring. It never calls the AI and never spends tokens.
+ * Any extra message on a Situation Room session is rejected here and logged
+ * for monitoring. Other Lumi flows that share this table (dispatch debriefs,
+ * tagged with title "Debrief: …") keep their conversational behavior.
  */
 export const continueSituation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ContinueInput.parse(d))
   .handler(async ({ context, data }) => {
-    await logLumiEvent(context.userId, "situation.extra_attempt_blocked", {
-      sessionId: data.sessionId,
-      messagePreview: data.message.slice(0, 200),
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("AI is not configured.");
+
+    const { data: session, error } = await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
+      .select("id, situation, dispatches, messages, title")
+      .eq("id", data.sessionId)
+      .maybeSingle();
+    if (error || !session) throw new Error("Situation not found.");
+
+    const row = session as unknown as {
+      situation: string;
+      dispatches: Dispatch[];
+      messages: ChatMsg[];
+      title: string | null;
+    };
+
+    // One-shot Situation Room: anything that's not a Debrief is locked.
+    const isDebrief = typeof row.title === "string" && row.title.startsWith("Debrief:");
+    if (!isDebrief) {
+      await logLumiEvent(context.userId, "situation.extra_attempt_blocked", {
+        sessionId: data.sessionId,
+        messagePreview: data.message.slice(0, 200),
+      });
+      throw new Error("SITUATION_SESSION_LOCKED");
+    }
+
+    await assertQUnderCap(context.userId);
+
+    const dispatchContext = (row.dispatches ?? [])
+      .map((d, i) => `[${i + 1}] "${d.title}" — framework: ${d.framework}\nExcerpt: ${d.excerpt}`)
+      .join("\n\n");
+
+    const system = [
+      "You are Lumi, the CS analyst inside The CS Quarterly.",
+      "You are coaching an operator through a dispatch debrief.",
+      "Stay grounded in the original brief and the retrieved dispatches below.",
+      "Cite dispatch titles when you draw on them. Ask one focused follow-up at a time before prescribing actions.",
+      "When the operator has given you enough to act, prescribe a numbered next-step plan (3-5 steps), each with a clear owner and timing.",
+      "Tone: McKinsey register, tight prose. No emoji, no hedging.",
+      "",
+      "ORIGINAL BRIEF:",
+      row.situation,
+      "",
+      "RETRIEVED DISPATCHES:",
+      dispatchContext || "(none)",
+    ].join("\n");
+
+    const history: ChatMsg[] = [
+      ...(row.messages ?? []),
+      { role: "user", content: data.message },
+    ];
+
+    const reply = await callChat(apiKey, system, history);
+
+    const updated = [...history, { role: "assistant" as const, content: reply }];
+    await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
+      .update({ messages: updated as never })
+      .eq("id", data.sessionId);
+
+    await supabaseAdmin.from("q_runs").insert({
+      user_id: context.userId,
+      node_id: "situation-room",
+      context: { sessionId: data.sessionId, message: data.message.slice(0, 2000) },
+      witty: false,
+      zones: { diagnosis: "", playbook: "", executable: reply.slice(0, 8000) },
     });
-    throw new Error("SITUATION_SESSION_LOCKED");
+
+    return { reply };
   });
+
 
 export const getSituationQuota = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
