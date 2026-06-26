@@ -20,6 +20,7 @@ import { ExportDialog } from "@/components/site/ExportDialog";
 import { useSmartNav } from "@/hooks/useSmartNav";
 import { cn } from "@/lib/utils";
 import { Search, LayoutGrid, Compass } from "lucide-react";
+import { NotificationBell } from "@/components/site/NotificationBell";
 
 export function SiteHeader() {
   const { t } = useTranslation();
@@ -140,6 +141,8 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <ThemeToggle />
 
+          {user && <NotificationBell />}
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -169,6 +172,11 @@ export function SiteHeader() {
                 <DropdownMenuItem asChild>
                   <Link to="/account/workspace" className="font-mono text-xs uppercase tracking-widest">
                     {t("menu.yourWorkspace")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/account/quests" className="font-mono text-xs uppercase tracking-widest">
+                    {t("menu.futureOperator")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem

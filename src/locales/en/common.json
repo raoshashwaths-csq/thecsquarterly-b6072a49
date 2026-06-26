@@ -12,6 +12,7 @@
   },
   "menu": {
     "yourWorkspace": "Your Workspace",
+    "futureOperator": "Future Operator",
     "account": "Account",
     "admin": "Admin",
     "roiCalculator": "ROI Calculator",

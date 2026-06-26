@@ -1,85 +1,136 @@
-# Situation Room: one-shot guard, quotas, admin controls, metrics
+## Future Operator — implementation plan
 
-## What changes (user-visible)
+Builds the PRD as a Lumi persona (not a new agent), gated at Practitioner+, with a separate admin-controlled budget. New `/account/quests` route, header bell, and reflection prompts that open the Lumi drawer with a seeded first message.
 
-1. The Situation Room returns **exactly one read per situation**. The reply box is already gone; we add a clear "Situation complete" state with a "Start new situation" CTA.
-2. The form shows a chip like **"3 of 5 situations left this month"** before the user hits submit, and a friendly block screen when they hit zero.
-3. Admins get a new "Situation Room" card on the Control Panel → Overview tab to set:
-   - **Max prompts per user** (integer)
-   - **Reset window** (day / week / month)
-4. The server rejects any second message on a session, and any new situation past the user's quota. Both rejections are logged so we can monitor and tune.
+---
 
-## Server-side guard (the core fix)
+### 1. Data model (one migration)
 
-`src/lib/situation-room.functions.ts`
+`supabase/migrations/<ts>_future_operator.sql`:
 
-- `continueSituation` is converted into a hard-reject endpoint. It always throws `SITUATION_SESSION_LOCKED` and writes a `lumi_events` row with `event_type = 'situation.extra_attempt_blocked'`, `meta = { sessionId }`. No AI call, no token spend. (We keep the export to avoid breaking imports, but the route no longer calls it.)
-- `startSituation` calls a new `assertSituationQuota(userId)` helper before any AI work:
-  - Reads the admin-configured `max_prompts` and `window` from `app_settings`.
-  - Counts the user's `situation_sessions` rows where `created_at >= windowStart`.
-  - If `used >= max_prompts`, logs `situation.quota_blocked` to `lumi_events` and throws `SITUATION_QUOTA_EXCEEDED`.
-- New server fn `getSituationQuota` returns `{ used, max, window, remaining, resetAt }` for the UI chip.
+- `future_operator_profiles` — keyed by `user_id uuid references auth.users(id) on delete cascade`, unique. Fields per PRD plus:
+  - `pending_renewal_at timestamptz` (replaces loose `pending_renewal text` so the 14-day drift check is deterministic)
+  - `timezone text default 'UTC'`, `notification_window_start time default '08:00'`, `notification_window_end time default '21:00'`
+  - `paused_until timestamptz` (subscriber-controlled mute)
+  - `check (array_length(core_commitments, 1) between 1 and 3)`
+- `future_operator_notifications` — per PRD, plus `idx_fo_notifications_user_unread`.
+- GRANTs in the same migration (project rule):
+  ```
+  grant select, update on public.future_operator_notifications to authenticated;
+  grant select, insert, update on public.future_operator_profiles to authenticated;
+  grant all on both tables to service_role;
+  ```
+- Enable RLS, then:
+  - `future_operator_profiles`: `for all to authenticated using (user_id = auth.uid())`.
+  - `future_operator_notifications`: SELECT + UPDATE `using (user_id = auth.uid())`. No INSERT policy — server-only via `supabaseAdmin`.
+- `app_settings` row: `key='future_operator.limits'`, `value={"daily_quest_calls_per_user_per_day":1,"drift_signals_per_user_per_day":2,"reflection_calls_per_user_per_day":4,"monthly_global_cap":null}`.
+- No `last_active_at` column added — reuse `lumi_memory.last_seen_at` + `q_usage` activity for inactivity detection.
 
-## Admin settings storage
+### 2. Tier gate — Practitioner+
 
-New migration `situation_room_settings`:
+- New helper `canUseFutureOperator(designation)` in `src/lib/tiers.ts` → `true` for `practitioner | operator | team | scale | enterprise | strategic_partner`.
+- Every server fn and the `/account/quests` route call `useEntitlements()` / server-side `has_role`-style check before doing work; lower tiers see an upsell card.
 
-```text
-table public.app_settings
-  key   text primary key
-  value jsonb not null
-  updated_at timestamptz default now()
-  updated_by uuid references auth.users(id)
-```
+### 3. Lumi persona, not a new agent
 
-- GRANTs: `service_role` full; no anon, no authenticated direct access.
-- RLS enabled; no policies needed because all reads/writes go through admin-gated server functions using `supabaseAdmin`.
-- Seed row: `key = 'situation_room.limits'`, `value = { "max_prompts": 5, "window": "month" }`.
+- All generation uses the Lovable AI Gateway (`ai.gateway.lovable.dev`, `LOVABLE_API_KEY`) — same shape as `lumi-knowledge.functions.ts`. Models:
+  - Quests + drift signals: `google/gemini-2.5-flash`.
+  - Intro message + reflection prompts: `google/gemini-2.5-pro`.
+- New `src/lib/future-operator-voice.ts` exports `FUTURE_OPERATOR_VOICE_RULES` (the PRD's voice block). Every prompt = `LUMI_BASE_VOICE` + `FUTURE_OPERATOR_VOICE_RULES` + the specific task instructions, so the Lumi voice owns the persona.
+- UI uses `<LumiMark />` (gold variant) as the "Future Operator" avatar — no new mark asset, no new agent name in chrome.
 
-New server fns in `src/lib/control-panel.functions.ts`:
-- `getSituationRoomSettings` (admin only): returns the current limits.
-- `updateSituationRoomSettings` (admin only): validates `max_prompts` (1–100) and `window` (`day` | `week` | `month`), upserts the row, writes an `admin_audit_log` entry.
+### 4. Server functions — `src/lib/future-operator.functions.ts`
 
-## Admin UI
+All use `createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(...).handler(...)` and read user state via `context.supabase` (RLS-scoped):
 
-`src/routes/admin.control-panel.tsx` → OverviewTab gets a new `SituationRoomLimitsCard`:
-- Number input for max prompts.
-- Select for window (Daily / Weekly / Monthly).
-- Save button → calls `updateSituationRoomSettings`, toast on success.
-- Small footnote: "Applies to new situations only. Already-running sessions are unaffected."
+- `getFutureOperatorProfile()` — returns row or null.
+- `saveFutureOperatorOnboarding({ future_team_state, core_commitments[], current_focus_account, timezone })` — upserts profile, kicks intro message generation.
+- `getQuests()` — returns today's `active_quests` + today's notifications.
+- `completeQuest({ questId })` — flips `completed:true`, creates a `reflection-prompt` notification using that quest's `lumi_followup`. If all 3 done, creates a "Future Operator completion" notification.
+- `listNotifications({ limit })` / `markNotificationRead({ id })` / `markAllRead()` / `actOnNotification({ id })`.
+- `pauseFutureOperator({ days })` / `resumeFutureOperator()`.
 
-## End-user UI
+Service-role-only helpers in `src/lib/future-operator.server.ts` (loaded inside handlers / hook routes):
 
-`src/routes/situation-room.tsx`
+- `generateDailyQuestsFor(userId)`
+- `generateDriftSignalFor(userId, triggerType, triggerContext)`
+- `generateReflectionPromptFor(userId, triggerEvent, triggerContext)`
+- `generateIntroMessageFor(userId)`
+- `assertFutureOperatorBudget(userId, kind)` — reads `app_settings.future_operator.limits`, counts today's notifications by `type`, throws on exceed and writes a `lumi_events` row (`future_operator.budget_blocked`). This is the SEPARATE admin budget — never decrements `q_usage`.
 
-- Before the textarea: small `QuotaChip` reading `getSituationQuota`. Shows `"3 of 5 left · resets Aug 1"` or `"Unlimited"` for admins.
-- If `remaining === 0`, the submit button becomes a disabled "Quota reached" state with a one-line explanation and a link to `/pricing` for upgrade.
-- `SituationActive` (post-response panel) gets a new bottom strip:
-  - Eyebrow "Situation complete"
-  - Copy: "One read per situation. Save this thread, or start a new situation when you're ready."
-  - Existing "Start new situation" button stays as the primary CTA.
-- Remove the unused `continueSituation`, `reply`, `setReply`, `cont` plumbing (already-dead code from the last change).
+### 5. n8n webhook endpoints
 
-## Metrics
+Under `src/routes/api/public/hooks/`, HMAC-verified with new secret `FUTURE_OPERATOR_WEBHOOK_SECRET` (mirrors existing hooks like `analyze-interactions.ts`):
 
-Two new event types in the existing `lumi_events` table (no schema change — it's already a free-form `event_type` + `meta`):
-- `situation.extra_attempt_blocked` — written from the rejected `continueSituation`.
-- `situation.quota_blocked` — written from `assertSituationQuota` when a user hits the cap.
+- `generate-daily-quests.ts` — body `{ batch_timezone }`. Fan-out: every Practitioner+ user with a profile, `paused_until` null, `last_quest_generated_at < today`. Calls `generateDailyQuestsFor` per user.
+- `check-drift-signals.ts` — runs every 24h. Per user: enforce per-day cap + notification window + `paused_until` + 24h spacing, evaluate the 5 PRD trigger conditions (inactivity, quest drift, missed Monday check-in, `pending_renewal_at <= now()+14d`, Lumi drift), call `generateDriftSignalFor` when matched, else bump `next_drift_signal_at` by random 6–28h.
+- `dispatch-read.ts` — called from the dispatch page when scroll depth ≥ 90%. Calls `generateReflectionPromptFor(userId, 'dispatch_read', { slug })`.
 
-Diagnostics tab gets a small "Situation Room guardrails" tile:
-- `Blocked retries (30d)` and `Quota blocks (30d)` counters, sourced from a new admin `getSituationRoomMetrics` server fn aggregating `lumi_events`.
+### 6. Onboarding extension
 
-## Technical notes
+`src/lib/onboarding.functions.ts` already handles the 5-question flow. Add a follow-on step rendered after `finishOnboarding` returns, ONLY for Practitioner+ users:
 
-- All new server fns use `requireSupabaseAuth`; admin endpoints check `has_role(uid, 'admin')` server-side before touching `supabaseAdmin`.
-- Window math is UTC-bucketed: `day` = start of UTC day, `week` = ISO Monday 00:00 UTC, `month` = first of UTC month. Same convention as `q-usage.functions.ts`.
-- We do **not** raise the AI cap. The new quota is stricter (or equal) and applies only to Situation Room starts.
-- No client-side mutation of `app_settings`; only the admin server fns can write.
-- Defaults if the settings row is missing: `max_prompts = 5`, `window = month`.
+- New component `src/components/onboarding/FutureOperatorStep.tsx` — three sequential questions per PRD, typing UI, dark background, `<LumiMark variant="gold" />`. On submit calls `saveFutureOperatorOnboarding`. Intro message is generated server-side and the next route render shows it as a full-screen modal once, then it lives in the notification panel.
 
-## Verification checklist
+### 7. New surface: `/account/quests`
 
-1. As a non-admin user, start a situation, then call `continueSituation` directly — must throw `SITUATION_SESSION_LOCKED` and produce one `lumi_events` row.
-2. Set max=2/window=day in admin UI, then start 3 situations as the same user — third call throws `SITUATION_QUOTA_EXCEEDED`, the UI chip reads `0 of 2 left · resets tomorrow`, submit is disabled.
-3. Diagnostics tile increments after both kinds of blocks.
-4. Reload `/situation-room` — only the initial Lumi read renders, no reply textarea, "Situation complete" state visible.
+- New route file `src/routes/account.quests.tsx` (sibling of existing `account.workspace.tsx`, `account.api.tsx` — flat dotted convention, generated route id `/account/quests`).
+- `head()` with route-specific title/description.
+- `loader` calls `context.queryClient.ensureQueryData(questsQueryOptions())`; component uses `useSuspenseQuery`.
+- Renders:
+  - Top: "Today's quests" — 3 `MetricCard`-styled cards (project dashboard kit) per PRD layout (label, instruction, commitment + estimated minutes, "Mark complete" button using `--accent`). Completed state with gold check + "Open Lumi debrief" secondary CTA.
+  - Below: Future Operator commitments, focus account, paused state with "Pause for 7 days / Resume" controls.
+- Tier gate: lower tiers see an upsell card instead of quests.
+
+### 8. Header — link in avatar dropdown + bell
+
+`src/components/site/SiteHeader.tsx`:
+
+- Add a new `DropdownMenuItem` linking to `/account/quests` inside the existing avatar dropdown (positioned right under "Your Workspace"). Label: `t("menu.futureOperator")` → "Future Operator" (mono uppercase, matches surrounding items).
+- New `NotificationBell` component placed to the left of the avatar (logged-in only, Practitioner+ only):
+  - Bell icon (lucide `Bell`), unread-count badge in `--secondary-accent` (gold).
+  - Click opens a `Popover` panel (max-h 480, scrollable) per PRD spec — gold left border for unread, mono eyebrow label for type, serif body, gold text-link CTA.
+  - CTAs navigate to `/account/quests`, `/account?lumi=open&seed=<notificationId>`, etc.
+  - Logged-out users get nothing; sub-Practitioner users see the bell with a one-line "Upgrade for Future Operator" empty state (no upsell pressure in the chrome).
+
+### 9. Reflection prompts → Lumi drawer (not Situation Room)
+
+- The Lumi drawer (`?lumi=open` is already used elsewhere — confirmed during exploration of CSFactors Q wiring) gains a `seed` query param: `?lumi=open&seed=<notificationId>`.
+- On open, the drawer fetches the notification, pre-pends its `message` as the first Lumi turn ("Future Operator persona"), and the user replies inline. This does NOT call `startSituation` and does NOT touch the Situation Room one-shot lock or its quota.
+- Each reflection-prompt notification stores `action_route: '/?lumi=open&seed=<id>'` (or the user's current route + `?lumi=open&seed=<id>` when generated from an in-product event).
+
+### 10. Admin control panel
+
+Extend `src/lib/control-panel.functions.ts` and `src/routes/admin.control-panel.tsx` Overview tab:
+
+- New `FutureOperatorLimitsCard`: inputs for `daily_quest_calls_per_user_per_day`, `drift_signals_per_user_per_day`, `reflection_calls_per_user_per_day`, optional `monthly_global_cap`. Server fns `getFutureOperatorSettings` / `updateFutureOperatorSettings` (admin-gated, `admin_audit_log` entry on write).
+- Diagnostics tab gains a "Future Operator" tile: 30-day counters for notifications by type, budget blocks, paused-user count — from `lumi_events` + the notifications table.
+
+### 11. Voice rules constant (`src/lib/future-operator-voice.ts`)
+
+Exports the PRD voice block verbatim. Concatenated into every Future Operator prompt. Also enforces: under 80 / 60 / 40 words (drift / quest instruction / reflection), first person, at least one piece of user-specific context referenced (account name, commitment, metric, or situation) — the constant includes the explicit "if it could have been sent to anyone, it fails" line.
+
+### 12. Verification (mirrors PRD checklist + project-specific items)
+
+1. Migration applies; GRANTs present; RLS denies cross-user reads (verified via `supabase--read_query` with `set role authenticated`).
+2. Onboarding extension appears only for Practitioner+; on Reader/free, the 6th step is skipped.
+3. Intro message renders as a full-screen modal once, then persists in the notification panel.
+4. n8n hook with valid HMAC populates `active_quests`; with bad HMAC returns 401.
+5. `/account/quests` renders 3 quest cards; marking complete creates a reflection notification and the "Open Lumi debrief" CTA opens the Lumi drawer pre-seeded with `lumi_followup`.
+6. Drift checker honours per-day cap, notification window, `paused_until`, and 4h spacing; `next_drift_signal_at` is randomised.
+7. Bell shows correct unread count, gold left border on unread items, max-h 480, scrollable.
+8. Pause/resume from `/account/quests` suppresses generation across all three workflows.
+9. Future Operator generation does NOT decrement `q_usage`; admin budget block writes `future_operator.budget_blocked` to `lumi_events`.
+10. Reflection-prompt CTAs never navigate to `/situation-room`.
+11. Every generated message contains at least one user-specific token (account name, commitment, metric, or situation) — spot-check via prompt logging in dev.
+
+---
+
+### Technical notes
+
+- Server fns live under `src/lib/`, never `src/server/` (project rule).
+- All AI calls go through `ai.gateway.lovable.dev` with `LOVABLE_API_KEY`. No Anthropic SDK, no direct `api.anthropic.com`.
+- Service-role client (`supabaseAdmin`) is imported only inside handler bodies, never at module scope of route files or `*.functions.ts`.
+- Avatar dropdown link uses TanStack `<Link to="/account/quests">` — never `<a href>`.
+- New route file is `src/routes/account.quests.tsx` with `createFileRoute("/account/quests")`.
+- Secret to add via `secrets--add_secret`: `FUTURE_OPERATOR_WEBHOOK_SECRET`.
