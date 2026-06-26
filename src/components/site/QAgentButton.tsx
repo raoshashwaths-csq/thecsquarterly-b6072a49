@@ -27,6 +27,11 @@ import { FeatureGlossary } from "@/components/enablement/FeatureGlossary";
 import { RouteTipsList } from "@/components/enablement/RouteTipsList";
 import { PlaybookTour } from "@/components/enablement/PlaybookTour";
 import { trackLumiEvent } from "@/lib/lumi-analytics";
+import { useLumiPageContext } from "@/hooks/useLumiPageContext";
+import { useEntitlements } from "@/hooks/useEntitlements";
+import { LumiBubble } from "@/components/lumi/LumiBubble";
+import { LumiDrawerActions } from "@/components/lumi/LumiDrawerActions";
+import type { LumiAction } from "@/config/lumiPageActions";
 
 const TRIAL_KEY = "q.trial.used";
 const DRAFT_KEY = "q.draft.global";
@@ -67,6 +72,9 @@ export function QAgentButton() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const tour = useTour();
+  const pageContext = useLumiPageContext();
+  const { rank: tierRank } = useEntitlements();
+  const isVanguard = tierRank >= 1;
   const speech = useElevenLabsSpeechInput({
     onTranscript: (text) => {
       setQuery((current) => (current ? `${current} ${text}` : text));
@@ -147,13 +155,11 @@ export function QAgentButton() {
   const gated = !user || (trialUsed && !unlimited) || capped;
   const needsSignIn = !user;
 
-  const handleAsk = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!query.trim() || loading) return;
+  const submitQuestion = async (question: string) => {
+    if (!question.trim() || loading) return;
     if (gated) { if (!user) setGateModal(true); return; }
-    // Friction keyword detection — flag for end-of-day check-in.
     if (user && typeof window !== "undefined") {
-      const kws = detectFrictionKeywords(query);
+      const kws = detectFrictionKeywords(question);
       if (kws.length > 0) {
         try { sessionStorage.setItem(FLAG_KEY, `${new Date().toISOString().slice(0,10)}|${kws.join(",")}`); } catch { /* */ }
       }
@@ -161,7 +167,8 @@ export function QAgentButton() {
     setLoading(true);
     setAnswer(null);
     try {
-      const { reply } = await ask({ data: { question: query, witty: false } });
+      try { sessionStorage.setItem("lumi_messaged", "1"); } catch { /* */ }
+      const { reply } = await ask({ data: { question, witty: false } });
       setAnswer(reply);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* */ }
       usage.refetch();
@@ -177,6 +184,12 @@ export function QAgentButton() {
     }
   };
 
+  const handleAsk = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    await submitQuestion(query);
+  };
+
+
   if (pathname.startsWith("/admin") || pathname.startsWith("/csfactors")) return null;
 
 
@@ -191,6 +204,18 @@ export function QAgentButton() {
         className="fixed bottom-5 right-5 md:bottom-8 md:right-8 z-40"
         label="Meet Lumi, the CS operator agent"
       />
+
+      <LumiBubble
+        pageContext={pageContext}
+        drawerOpen={open}
+        onOpen={(action: LumiAction) => {
+          setQuery(action.prompt);
+          setOpen(true);
+          trackLumiEvent("drawer.open", { surface: "site", briefingShown: false, messageCount: 0 });
+        }}
+      />
+
+
 
 
 
@@ -253,6 +278,23 @@ export function QAgentButton() {
                 Glossary
               </button>
             </div>
+
+            {/* Contextual Lumi action grid — empty conversation state. */}
+            {!answer && !panel && (
+              <div className="mb-5">
+                <LumiDrawerActions
+                  pageContext={pageContext}
+                  isVanguard={isVanguard}
+                  visible={!answer}
+                  onActionSelect={(prompt) => {
+                    setQuery(prompt);
+                    void submitQuestion(prompt);
+                  }}
+                />
+              </div>
+            )}
+
+
 
             {/* Search bar with rolling placeholder */}
             <form onSubmit={handleAsk} className="mb-3">

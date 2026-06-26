@@ -1,71 +1,39 @@
-# Lumi Situation Room
+## Lumi Contextual Bubble & Drawer Action Panel
 
-A new high-stakes coaching surface where a reader pastes their live situation, Lumi retrieves the 3 most relevant past dispatches via semantic search, and walks them through a decision framework in conversation. Saves to workspace as a "Situation log."
+Adds a cycling speech bubble above the existing global Lumi FAB (`QAgentButton`) and a contextual action grid inside its drawer's empty state. Both read from a single page-keyed registry so future Lumi actions are one-file additions.
 
-The `posts.embedding` column and `match_posts(query_embedding, k, section)` RPC already exist — we reuse them.
+### New files
 
-## Where it lives
+- `src/config/lumiPageActions.ts` — registry per PRD: `LumiAction` type (+ explicit `description` field for cards), `PageContext` union, and the full initial dataset for `dispatch`, `home`, `codex`, `codex-item`, `ai-readiness`, `benchmarks`, `pricing`, `account`, `vanguard`, `series`, `default`.
+- `src/hooks/useLumiPageContext.ts` — derives `PageContext` from `useRouterState({ select: s => s.location.pathname })`. Section-detail routes (`/vanguard/...`, `/retention-protocol/...`, `/outcome-forum/...`) map to `dispatch`; series detection is wired as a TODO hook input (`seriesSlug?: string`) so a route can opt-in later without breaking the default.
+- `src/components/lumi/LumiBubble.tsx` — fixed-position bubble anchored to FAB. State: `index`, `isExiting`, `isVisible`. Effects: 3s mount delay; 5s interval with 300ms crossfade; scroll listener (hide on upward scroll, show again past 300px downward); session dismiss via `sessionStorage('lumi_bubble_dismissed_session')`; suppress if any Lumi message sent this session (read `sessionStorage('lumi_messaged')`, set by `QAgentButton` on send). Click bubble → `onOpen(prompt)`. Hidden while drawer `open=true` (prop from `QAgentButton`). Respects `prefers-reduced-motion` (static first message, no progress bar). `aria-live="polite"` wrapper updates only on index change.
+- `src/components/lumi/LumiActionCard.tsx` — shared card. Renders Tabler icon (`<i className={`ti ${icon}`} />`), label, derived description (uses `action.description` directly from registry), optional tier/new badge, locked overlay (semi-transparent wash + `ti-lock`) when `isLocked`. `role="button"`, keyboard handlers, `aria-disabled` when locked.
+- `src/components/lumi/LumiDrawerActions.tsx` — grid (2-col ≥280px drawer, 1-col below) with eyebrow "WHAT CAN I HELP YOU WITH?". Calls `onActionSelect(prompt)` which sets input + auto-submits; locked + free tier → `navigate({ to: '/pricing', search: { highlight: 'vanguard' } })`. Fades out (200ms) when `messagesCount > 0`.
 
-- New route: `/situation-room` (top-level, requires sign-in — render inline "Sign in to use Lumi Situation Room" CTA for visitors per the public/auth-route pattern; gated by Practitioner+ designation like the rest of Lumi Q for full conversation, with a 1-free-situation preview for Free Readers).PLace a card linking to it on the canvas page .Place all LUmi runs and playbooks in the situation room as well in a neat organised manner with expanding card on mouseover 
-- Entry points: header CTA inside the avatar dropdown ("Open Situation Room"), a card on `/account`, and a prominent link on the homepage hero under the existing primary CTA.
-- Reuses `LumiMark`, `.lumi-cta`, shared dashboard primitives, and the existing speech-to-text hook so the input box supports dictation.
+### Edits
 
-## Page layout
+- `src/components/site/QAgentButton.tsx`
+  - Import `useLumiPageContext`, `LumiBubble`, `LumiDrawerActions`, `lumiPageActions`, `useEntitlements` (for tier).
+  - Render `<LumiBubble pageContext={ctx} drawerOpen={open} onOpen={(prompt) => { setQuery(prompt); setOpen(true); /* auto-submit via existing handler */ }} />` as a sibling of the FAB, hidden when `open`.
+  - Inside the `<Sheet>` body, when the conversation/answer state is empty (no `answer`, no in-flight query), render `<LumiDrawerActions pageContext={ctx} userTier={tier} onActionSelect={...} />` above the chat input; fade out once a message is sent.
+  - On message submit, set `sessionStorage('lumi_messaged','true')` so the bubble suppresses for the rest of the session.
+  - No changes to FAB position, drawer header, chat input, streaming, history, focus trap, or z-index. Bubble z-index sits below the Sheet.
+- `src/styles.css`
+  - Append `@keyframes lumi-bubble-enter` and `.lumi-bubble` / tail (`::before` fill + `::after` border) using `--color-secondary-accent` and `--color-background-secondary`.
+  - Append progress-bar utility and `@media (prefers-reduced-motion: reduce)` overrides.
+  - All tokens come from existing `:root` — no new colors.
 
-Single-column editorial layout, dark midnight-slate (consistent with Lumi surfaces):
+### Out of scope (per PRD "What NOT to change")
 
-1. Eyebrow + display H1: "Lumi Situation Room." Subtitle: one line on what it does.
-2. Large composer (textarea + mic button via `useElevenLabsSpeechInput`) — placeholder is the example silent-account scenario. Submit = "Find the dispatch."
-3. After submit:
-  - **Retrieved dispatches strip** — 3 `SectionCard`s side-by-side, each showing dispatch title, section eyebrow, similarity %, the extracted framework name, and a "Read full dispatch" link.
-  - **Applicable benchmark callout** — when the situation matches a benchmark category (renewal-window, champion-loss, expansion, onboarding), surface the relevant `benchmark_drops` row inline.
-  - **Coaching conversation** — `AskLumiDrawer`-style message list rendered inline (not a drawer here). Lumi opens with a diagnosis + named framework reference, then asks follow-up questions one at a time. User replies stream back. Markdown rendering, `message.parts`, optimistic user message, typing indicator.
-4. Sticky footer bar: "Save to workspace as Situation log" + "Start new situation."
+- CSFactors `AskLumiDrawer` is untouched — this PRD is the global site Lumi only.
+- No edits to existing Lumi conversation, streaming, tone toggle, FAB visual, or auth.
 
-## Backend
+### Verification
 
-New `src/lib/situation-room.functions.ts` (client-safe path), all `requireSupabaseAuth` + `assertQUnderCap`:
+- Manual walkthrough of each route in the verification checklist via the preview.
+- Playwright snapshot on `/insights/<slug>` confirming bubble appears at 3s, cycles, dismisses on click; drawer opens with the action grid populated; first send hides the grid.
+- `tsgo --noEmit`.
 
-- `retrieveSituationContext({ situation })` — server fn:
-  1. Embed `situation` via Lovable AI Gateway `/v1/embeddings` with `google/gemini-embedding-001` (column is `vector(3072)` — verify and resize migration if mismatched; the existing `match_posts` signature accepts `vector`).
-  2. Call `match_posts(query_embedding, 3, null)`.
-  3. For each hit, pull the post row (title, slug, section, excerpt, framework metadata) and have the model extract a 1-line framework name + 2-line "what this dispatch says about your situation" using `generateText` with structured `Output`.
-  4. Pick best-matching benchmark from `benchmark_drops` (by section + keyword heuristic on the situation text).
-  5. Return `{ dispatches: [...], benchmark, openingMessage }`.
-- `continueSituation({ situationId, history, message })` — server fn that streams via the existing chat pattern (we already have `askCSFactorsQ`; add a parallel `askSituationRoom` that uses the situation + retrieved dispatches as system context instead of CSFactors portfolio context). Reuses `assertQUnderCap` so it draws from the same monthly Lumi quota.
-- `saveSituationLog({ situationId, title })` — writes a row to `user_workspace_items` with `kind = 'situation_log'`, payload = `{ situation, dispatches, transcript }`. Cap already enforced by `enforce_workspace_cap`.
+### Open questions before build
 
-## Data
-
-- Reuse `posts.embedding` + `match_posts` RPC — no schema changes for retrieval.
-- New table `situation_sessions` (per-user transient log so refreshes don't lose state):
-  - columns: `id uuid pk`, `user_id uuid fk auth.users`, `situation text`, `dispatches jsonb`, `messages jsonb default '[]'`, `created_at timestamptz default now()`, `saved_to_workspace boolean default false`.
-  - RLS: `auth.uid() = user_id` for all of select/insert/update/delete.
-  - GRANTs: `SELECT, INSERT, UPDATE, DELETE` to `authenticated`, `ALL` to `service_role`.
-- Backfill: one-off migration / admin function to embed any `posts` rows still missing `embedding`. Use the same Lovable AI Gateway model. Re-run on publish via a trigger or just a manual admin button (out of scope for v1 — assume existing posts are embedded; surface a one-line "embed missing posts" button in `/admin/control-panel` for operator use).
-
-## Files
-
-- New: `src/routes/situation-room.tsx`, `src/components/situation-room/SituationComposer.tsx`, `RetrievedDispatches.tsx`, `SituationChat.tsx`, `BenchmarkCallout.tsx`.
-- New: `src/lib/situation-room.functions.ts`, `src/lib/situation-room.server.ts` (embedding + retrieval helpers).
-- New API server route: `src/routes/api/situation-room/chat.ts` for the streaming conversation (AI SDK `useChat` with `DefaultChatTransport`).
-- Migration: `situation_sessions` table + GRANTs + RLS.
-- Edit: `src/components/site/SiteHeader.tsx` (avatar dropdown entry), `src/routes/index.tsx` (hero secondary CTA), `src/routes/account.index.tsx` (Situation Room card listing saved logs).
-- Edit: `src/lib/lumi-analytics.ts` — new event types `situation_started`, `situation_retrieved`, `situation_saved`.
-
-## Gating
-
-- Visitor: sees marketing copy + composer is disabled with inline "Sign in to use Situation Room."
-- Free Reader: 1 free situation/month (tracked via `lumi_events`).
-- Practitioner+: unlimited within their monthly Lumi Q cap (shared with existing Lumi surfaces).
-
-## SEO
-
-- Unique `head()`: title "Lumi Situation Room — The CS Quarterly", description on real-time renewal/escalation coaching, distinct og tags. No `og:image` for v1.
-
-## Out of scope (v1)
-
-- Multi-turn citation linking back to specific paragraphs in dispatches.
-- Auto-detecting situation category to filter `match_posts(section)`.
-- Shareable situation logs (saved logs are private-only).
-- Voice output (TTS) — input dictation only.
+None blocking — PRD is specific. I'll use `useEntitlements` for the free/vanguard split (matches existing tier checks in the codebase) and the Tabler icon font that's already loaded for `ti-*` classes referenced in the PRD; if it's not currently bundled I'll add the CDN `<link>` in `__root.tsx` head.
