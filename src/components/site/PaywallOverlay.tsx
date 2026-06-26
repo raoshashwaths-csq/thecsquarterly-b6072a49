@@ -8,7 +8,19 @@
 import { Link } from "@tanstack/react-router";
 import { Lock } from "lucide-react";
 import { useSubscriptionTier, type UiTier } from "@/hooks/useSubscriptionTier";
+import { useTierCopy } from "@/hooks/useTierCopy";
 import { getTier } from "@/lib/tiers";
+
+function routeForGate(gate: "codex" | "csfactors" | "lumi"): string {
+  switch (gate) {
+    case "codex":
+      return "/codex";
+    case "csfactors":
+      return "/csfactors";
+    case "lumi":
+      return "/agent/framework";
+  }
+}
 
 export type PaywallGate = "article" | "codex" | "csfactors" | "lumi";
 
