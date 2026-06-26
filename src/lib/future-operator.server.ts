@@ -120,7 +120,7 @@ export async function assertFutureOperatorBudget(
   if ((count ?? 0) >= cap) {
     await supabaseAdmin.from("lumi_events").insert({
       user_id: userId,
-      event_type: "future_operator.budget_blocked",
+      event: "future_operator.budget_blocked",
       meta: { kind, cap, used: count ?? 0 },
     } as never);
     throw new Error(`future_operator_budget_exceeded:${kind}`);
