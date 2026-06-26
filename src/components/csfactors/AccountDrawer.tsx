@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose,
 } from "@/components/ui/sheet";
@@ -47,6 +48,40 @@ export function AccountDrawer({
   useEffect(() => {
     setDraft(account);
   }, [account?.id]);
+
+  // Latest inferred sentiment from a tagged Lumi run, so the operator can see
+  // why the CSM Sentiment chip moved (and how recently).
+  const { data: lastInferred } = useQuery({
+    queryKey: ["sentiment-inferred", account?.id ?? ""],
+    enabled: !!account?.id,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("cs_account_events")
+        .select("payload, occurred_at")
+        .eq("account_id", account!.id)
+        .eq("kind", "sentiment.inferred")
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!data) return null;
+      const row = data as unknown as {
+        payload: {
+          label?: "Positive" | "Neutral" | "Critical";
+          source?: "lexicon" | "ai";
+          confidence?: "low" | "med" | "high";
+          rationale?: string;
+        };
+        occurred_at: string;
+      };
+      return {
+        label: row.payload?.label ?? null,
+        source: row.payload?.source ?? null,
+        confidence: row.payload?.confidence ?? null,
+        rationale: row.payload?.rationale ?? null,
+        at: row.occurred_at,
+      };
+    },
+  });
 
   if (!draft || !account) return null;
   const acc = account;
@@ -165,6 +200,26 @@ export function AccountDrawer({
                   onSave={(v) => save({ qbr_status: v as CSAccount["qbr_status"] })}
                 />
               </Grid>
+              {lastInferred?.label && (
+                <p className="mt-3 text-xs font-mono text-foreground/55">
+                  Last inferred from a tagged Lumi run:{" "}
+                  <span
+                    className={
+                      lastInferred.label === "Critical"
+                        ? "text-destructive"
+                        : lastInferred.label === "Positive"
+                          ? "text-emerald-500"
+                          : "text-foreground/70"
+                    }
+                  >
+                    {lastInferred.label}
+                  </span>
+                  {lastInferred.source ? ` · ${lastInferred.source}` : ""}
+                  {lastInferred.confidence ? ` · ${lastInferred.confidence}` : ""}
+                  {" · "}
+                  {new Date(lastInferred.at).toISOString().slice(0, 10)}
+                </p>
+              )}
             </Section>
 
             <Section value="lifecycle" title="Lifecycle">

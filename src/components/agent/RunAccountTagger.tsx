@@ -61,6 +61,11 @@ export function RunAccountTagger({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<boolean>(Boolean(initialAccountId));
   const [loading, setLoading] = useState(true);
+  const [lastSentiment, setLastSentiment] = useState<{
+    label: "Positive" | "Neutral" | "Critical";
+    source: "lexicon" | "ai";
+    confidence: "low" | "med" | "high";
+  } | null>(null);
 
   const stakeholderOptions = useMemo(() => suggestionsForTree(treeId), [treeId]);
 
@@ -102,7 +107,12 @@ export function RunAccountTagger({
         },
       });
       setSaved(true);
-      toast.success(`Tagged to ${r.accountName ?? "account"}`);
+      if (r.sentiment) {
+        setLastSentiment(r.sentiment);
+        toast.success(`Tagged to ${r.accountName ?? "account"} · sentiment ${r.sentiment.label}`);
+      } else {
+        toast.success(`Tagged to ${r.accountName ?? "account"}`);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not tag run");
     } finally {
@@ -171,6 +181,27 @@ export function RunAccountTagger({
       <p className="text-sm text-foreground/70 mb-4">
         Pin this run to an account on your CSFactors dashboard. It will show up on the account timeline so the next time you open the card, your reasoning travels with it.
       </p>
+      {lastSentiment && (
+        <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-mono uppercase tracking-[0.22em] text-foreground/55">
+            Sentiment inferred
+          </span>
+          <span
+            className={`font-mono uppercase tracking-[0.2em] px-2 py-0.5 border ${
+              lastSentiment.label === "Critical"
+                ? "border-destructive/60 text-destructive bg-destructive/10"
+                : lastSentiment.label === "Positive"
+                  ? "border-emerald-500/60 text-emerald-500 bg-emerald-500/10"
+                  : "border-border text-foreground/70 bg-muted"
+            }`}
+          >
+            {lastSentiment.label}
+          </span>
+          <span className="font-mono uppercase tracking-[0.2em] text-foreground/50">
+            · {lastSentiment.source} · {lastSentiment.confidence}
+          </span>
+        </div>
+      )}
       <div className="grid md:grid-cols-2 gap-3">
         <label className="block">
           <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-foreground/60">Account</span>
