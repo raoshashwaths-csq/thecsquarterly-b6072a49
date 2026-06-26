@@ -510,7 +510,7 @@ export const adminSaveDraft = createServerFn({ method: "POST" })
     };
     const { error } = await supabaseAdmin.from("app_settings").upsert({
       key: "pricing.draft",
-      value: payload as unknown as Record<string, unknown>,
+      value: JSON.parse(JSON.stringify(payload)),
       updated_by: context.userId,
       updated_at: new Date().toISOString(),
     });
