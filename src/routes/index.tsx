@@ -414,7 +414,7 @@ function TierAwareHeroCard({
   const ctaColor = isAccent ? "text-accent border-accent/40 group-hover:border-accent" : "text-secondary-accent border-secondary-accent/40 group-hover:border-secondary-accent";
   return (
     <Link
-      to={to}
+      to={(copy.ctaHref ?? to) as never}
       data-tour={dataTour}
       className={`group relative flex flex-col h-full bg-card border border-border ${borderColor} border-l-4 transition-colors p-6 md:p-7 card-lift`}
       aria-label={ariaLabel}
