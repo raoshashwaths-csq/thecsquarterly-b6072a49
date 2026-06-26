@@ -175,34 +175,18 @@ function HomePage() {
             </span>
           </Link>
 
-          {/* Decision Canvas */}
-          <Link
+          {/* Decision Canvas — lumi feature */}
+          <TierAwareHeroCard
+            featureId="lumi"
             to="/agent/framework"
-            data-tour="canvas-icon"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 card-lift"
-            aria-label="Open Decision Canvas"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                aria-hidden
-                className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm group-hover:scale-105 transition-transform"
-              >
-                <Compass size={18} strokeWidth={2.5} />
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent font-semibold">
-                {t("home.canvas.eyebrow")}
-              </span>
-            </div>
-            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
-              {t("home.canvas.title")}
-            </h3>
-            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
-              {t("home.canvas.body")}
-            </p>
-            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-1 self-start">
-              {t("home.canvas.cta")}
-            </span>
-          </Link>
+            dataTour="canvas-icon"
+            ariaLabel="Open Decision Canvas"
+            accentClass="accent"
+            icon={<Compass size={18} strokeWidth={2.5} />}
+            fallbackTitle={t("home.canvas.title")}
+            fallbackBody={t("home.canvas.body")}
+            fallbackCta={t("home.canvas.cta")}
+          />
         </div>
       </header>
 
