@@ -126,13 +126,23 @@ const LUMI_BASE_VOICE = [
   "Lead with the operator answer, then the why. Reference benchmarks where they sharpen the call.",
 ].join("\n");
 
+const LANGUAGE_NAME: Record<string, string> = {
+  ar: "Arabic",
+  id: "Bahasa Indonesia",
+  vi: "Vietnamese",
+  th: "Thai",
+  en: "English",
+};
+
 export async function buildLumiSystemPrompt(
   treeId: string | null | undefined,
   userTier: string | null | undefined,
+  userLanguage: string = "en",
 ): Promise<string> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const lang = (userLanguage || "en").toLowerCase();
 
-  // LAYER 2 — live benchmarks
+  // LAYER 2 — live benchmarks (language-neutral)
   const { data: benchmarks } = await supabaseAdmin
     .from("benchmark_drops_latest")
     .select("metric, segment, value, p25, p50, p75, period")
@@ -151,40 +161,84 @@ export async function buildLumiSystemPrompt(
     ? `CURRENT RETENTION LEDGER DATA (live, updated weekly):\n${benchmarkLines}`
     : "";
 
-  // LAYER 3 — knowledge records
-  const treeSpecificQuery = supabaseAdmin
+  // LAYER 3 — knowledge (language-aware)
+  // Primary: up to 4 records in the user's language, tree-scoped.
+  // Secondary: always 4 English records, tree-scoped, as baseline context.
+  const baseLangQ = supabaseAdmin
     .from("lumi_knowledge")
     .select("content, confidence_level")
     .eq("is_active", true)
+    .eq("language", lang)
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(4);
+  const langQ = treeId ? baseLangQ.contains("tree_relevance", [treeId]) : baseLangQ;
 
-  const treeSpecificPromise = treeId
-    ? treeSpecificQuery.contains("tree_relevance", [treeId])
-    : Promise.resolve({ data: [] as Array<{ content: string; confidence_level: string | null }> });
+  const baseEnQ = supabaseAdmin
+    .from("lumi_knowledge")
+    .select("content, confidence_level")
+    .eq("is_active", true)
+    .eq("language", "en")
+    .order("created_at", { ascending: false })
+    .limit(4);
+  const enQ = treeId ? baseEnQ.contains("tree_relevance", [treeId]) : baseEnQ;
 
-  const [{ data: treeSpecific }, { data: general }] = await Promise.all([
-    treeSpecificPromise,
-    supabaseAdmin
-      .from("lumi_knowledge")
-      .select("content, confidence_level")
-      .eq("is_active", true)
-      .eq("content_type", "benchmark_data")
-      .order("created_at", { ascending: false })
-      .limit(3),
+  const languagePromise =
+    lang !== "en"
+      ? langQ
+      : Promise.resolve({ data: [] as Array<{ content: string; confidence_level: string | null }> });
+
+  const [{ data: languageKnowledge }, { data: englishKnowledge }] = await Promise.all([
+    languagePromise,
+    enQ,
   ]);
 
-  const allKnowledge = [...(treeSpecific ?? []), ...(general ?? [])];
+  const allKnowledge = [...(languageKnowledge ?? []), ...(englishKnowledge ?? [])];
   const KNOWLEDGE_CONTEXT = allKnowledge.length
     ? `CURRENT INTELLIGENCE (from The CS Quarterly research):\n${allKnowledge
         .map((k) => `• ${k.content}`)
         .join("\n")}`
     : "";
 
+  // LAYER 4 — language directive (only when non-English)
+  let LANGUAGE_DIRECTIVE = "";
+  if (lang !== "en") {
+    const languageName = LANGUAGE_NAME[lang] ?? lang.toUpperCase();
+
+    const { data: glossaryRows } = await supabaseAdmin
+      .from("translation_glossary")
+      .select("term, protection_type, fixed_translations");
+
+    const neverTranslate: string[] = [];
+    const fixedPairs: string[] = [];
+    for (const g of (glossaryRows ?? []) as Array<{
+      term: string;
+      protection_type: string | null;
+      fixed_translations: Record<string, string> | null;
+    }>) {
+      if (g.protection_type === "never_translate") neverTranslate.push(g.term);
+      const t = g.fixed_translations?.[lang];
+      if (typeof t === "string" && t.trim()) fixedPairs.push(`"${g.term}" → "${t}"`);
+    }
+
+    LANGUAGE_DIRECTIVE = [
+      `RESPONSE LANGUAGE: Generate your ENTIRE response in ${languageName}. Maintain the same directness, benchmark-grounded confidence, and editorial voice as the English version.`,
+      neverTranslate.length
+        ? `NEVER TRANSLATE (keep in English): ${neverTranslate.join(", ")}`
+        : "",
+      fixedPairs.length
+        ? `FIXED TRANSLATIONS FOR THIS LANGUAGE:\n${fixedPairs.map((p) => `  - ${p}`).join("\n")}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+  }
+
   // userTier reserved for future gating (paid tiers may unlock deeper benchmark slices).
   void userTier;
 
-  return [LUMI_BASE_VOICE, BENCHMARK_CONTEXT, KNOWLEDGE_CONTEXT].filter(Boolean).join("\n\n");
+  return [LUMI_BASE_VOICE, BENCHMARK_CONTEXT, KNOWLEDGE_CONTEXT, LANGUAGE_DIRECTIVE]
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 // ---------------------------------------------------------------------------
