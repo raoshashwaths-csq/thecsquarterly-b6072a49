@@ -926,6 +926,7 @@ export type Database = {
       }
       lumi_knowledge: {
         Row: {
+          confidence_level: string | null
           content: string
           content_type: string
           created_at: string
@@ -936,11 +937,13 @@ export type Database = {
           source_record_id: string | null
           source_slug: string | null
           source_title: string | null
+          source_type: string
           topic_tags: string[]
           tree_relevance: string[]
           updated_at: string
         }
         Insert: {
+          confidence_level?: string | null
           content: string
           content_type: string
           created_at?: string
@@ -951,11 +954,13 @@ export type Database = {
           source_record_id?: string | null
           source_slug?: string | null
           source_title?: string | null
+          source_type?: string
           topic_tags?: string[]
           tree_relevance?: string[]
           updated_at?: string
         }
         Update: {
+          confidence_level?: string | null
           content?: string
           content_type?: string
           created_at?: string
@@ -966,6 +971,7 @@ export type Database = {
           source_record_id?: string | null
           source_slug?: string | null
           source_title?: string | null
+          source_type?: string
           topic_tags?: string[]
           tree_relevance?: string[]
           updated_at?: string
@@ -2226,6 +2232,36 @@ export type Database = {
           title?: string
           url?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      workflow_runs: {
+        Row: {
+          articles_processed: number
+          errors: Json
+          id: string
+          records_created: number
+          run_at: string
+          status: string
+          workflow: string
+        }
+        Insert: {
+          articles_processed?: number
+          errors?: Json
+          id?: string
+          records_created?: number
+          run_at?: string
+          status?: string
+          workflow: string
+        }
+        Update: {
+          articles_processed?: number
+          errors?: Json
+          id?: string
+          records_created?: number
+          run_at?: string
+          status?: string
+          workflow?: string
         }
         Relationships: []
       }
