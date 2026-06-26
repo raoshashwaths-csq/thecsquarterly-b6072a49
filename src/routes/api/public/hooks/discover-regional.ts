@@ -404,11 +404,11 @@ export const Route = createFileRoute("/api/public/hooks/discover-regional")({
         await supabaseAdmin.from("workflow_runs").insert({
           workflow: "regional_discovery",
           status: failures.length ? "partial" : "ok",
-          stats: {
-            queries: QUERIES.length,
-            ...counts,
-            failures: failures.length,
-          },
+          records_created:
+            counts.ar + counts.id + counts.vi + counts.th + counts.en_regional + counts.en_backtrans,
+          articles_processed: QUERIES.length,
+          output: { queries: QUERIES.length, ...counts, failures: failures.length },
+          errors: failures.length ? failures : null,
           notice: failures.length ? JSON.stringify(failures).slice(0, 4000) : null,
         });
 
