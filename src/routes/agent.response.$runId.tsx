@@ -235,6 +235,10 @@ function ResponsePage() {
                       </SharedRunGate>
                     )}
 
+                    {run.isOwner && <LumiFeedbackBar runId={run.id} />}
+
+
+
                     {run.isOwner && node && (
                       <RunAccountTagger
                         runId={run.id}
