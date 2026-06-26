@@ -201,6 +201,18 @@ export function QAgentButton() {
         label="Meet Lumi, the CS operator agent"
       />
 
+      <LumiBubble
+        pageContext={pageContext}
+        drawerOpen={open}
+        onOpen={(action: LumiAction) => {
+          setQuery(action.prompt);
+          setOpen(true);
+          trackLumiEvent("drawer.open", { surface: "site", briefingShown: false, messageCount: 0 });
+        }}
+      />
+
+
+
 
 
       <Sheet open={open} onOpenChange={setOpen}>
