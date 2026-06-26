@@ -84,6 +84,7 @@ import { Route as ApiPublicHooksTranslateKnowledgeRouteImport } from './routes/a
 import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
 import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
+import { Route as ApiPublicHooksFlagTranslationsRouteImport } from './routes/api/public/hooks/flag-translations'
 import { Route as ApiPublicHooksDiscoverRegionalRouteImport } from './routes/api/public/hooks/discover-regional'
 import { Route as ApiPublicHooksCurateHighRatedRouteImport } from './routes/api/public/hooks/curate-high-rated'
 import { Route as ApiPublicHooksAnalyzeInteractionsRouteImport } from './routes/api/public/hooks/analyze-interactions'
@@ -480,6 +481,12 @@ const ApiPublicHooksIngestArticlesRoute =
     path: '/api/public/hooks/ingest-articles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksFlagTranslationsRoute =
+  ApiPublicHooksFlagTranslationsRouteImport.update({
+    id: '/api/public/hooks/flag-translations',
+    path: '/api/public/hooks/flag-translations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDiscoverRegionalRoute =
   ApiPublicHooksDiscoverRegionalRouteImport.update({
     id: '/api/public/hooks/discover-regional',
@@ -568,6 +575,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
+  '/api/public/hooks/flag-translations': typeof ApiPublicHooksFlagTranslationsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -644,6 +652,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
+  '/api/public/hooks/flag-translations': typeof ApiPublicHooksFlagTranslationsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -725,6 +734,7 @@ export interface FileRoutesById {
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
+  '/api/public/hooks/flag-translations': typeof ApiPublicHooksFlagTranslationsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -807,6 +817,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/discover-regional'
+    | '/api/public/hooks/flag-translations'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -883,6 +894,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/discover-regional'
+    | '/api/public/hooks/flag-translations'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -963,6 +975,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/analyze-interactions'
     | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/discover-regional'
+    | '/api/public/hooks/flag-translations'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -1026,6 +1039,7 @@ export interface RootRouteChildren {
   ApiPublicHooksAnalyzeInteractionsRoute: typeof ApiPublicHooksAnalyzeInteractionsRoute
   ApiPublicHooksCurateHighRatedRoute: typeof ApiPublicHooksCurateHighRatedRoute
   ApiPublicHooksDiscoverRegionalRoute: typeof ApiPublicHooksDiscoverRegionalRoute
+  ApiPublicHooksFlagTranslationsRoute: typeof ApiPublicHooksFlagTranslationsRoute
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
   ApiPublicHooksPullExternalIntelRoute: typeof ApiPublicHooksPullExternalIntelRoute
   ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -1565,6 +1579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/flag-translations': {
+      id: '/api/public/hooks/flag-translations'
+      path: '/api/public/hooks/flag-translations'
+      fullPath: '/api/public/hooks/flag-translations'
+      preLoaderRoute: typeof ApiPublicHooksFlagTranslationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/discover-regional': {
       id: '/api/public/hooks/discover-regional'
       path: '/api/public/hooks/discover-regional'
@@ -1735,6 +1756,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksAnalyzeInteractionsRoute,
   ApiPublicHooksCurateHighRatedRoute: ApiPublicHooksCurateHighRatedRoute,
   ApiPublicHooksDiscoverRegionalRoute: ApiPublicHooksDiscoverRegionalRoute,
+  ApiPublicHooksFlagTranslationsRoute: ApiPublicHooksFlagTranslationsRoute,
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
   ApiPublicHooksPullExternalIntelRoute: ApiPublicHooksPullExternalIntelRoute,
   ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
