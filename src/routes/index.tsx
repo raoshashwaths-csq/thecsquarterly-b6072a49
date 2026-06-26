@@ -14,6 +14,8 @@ import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { useTierCopy } from "@/hooks/useTierCopy";
+import { TierBadge } from "@/components/site/TierBadge";
 
 import { listPosts } from "@/lib/posts.functions";
 
