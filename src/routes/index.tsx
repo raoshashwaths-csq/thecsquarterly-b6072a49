@@ -86,6 +86,9 @@ function HomePage() {
     : restRecency;
 
   // Stages render under hero for visitors/free, at the bottom for paid users.
+  // While entitlements are still resolving, render NEITHER slot to keep order
+  // stable across hard refresh (no flash + re-mount when tier flips).
+  const stagesAtTop = !sub.loading && !sub.canAccessCSFactors;
   const stagesAtBottom = !sub.loading && sub.canAccessCSFactors;
 
   // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
@@ -210,9 +213,10 @@ function HomePage() {
       </header>
 
       {/* Stage 01 / 02 / 03 — visitor + free users see it directly under the
-          hero with the new scroll-locked reveal. Paid logged-in users get it
-          at the bottom of the page (rendered further down). */}
-      {!stagesAtBottom && <HomeStages />}
+          hero with the new scroll-locked carousel reveal. Paid logged-in
+          users get it at the bottom of the page (rendered further down).
+          Neither slot renders while tier is loading. */}
+      {stagesAtTop && <HomeStages />}
 
       {/* Featured + Sidebar — LIFTED for visibility */}
       {featured && (
