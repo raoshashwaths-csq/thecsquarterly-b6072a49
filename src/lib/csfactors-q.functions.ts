@@ -282,6 +282,14 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
     const memories = await recallMemoryFor(context.userId, data.question, 6);
     const memoryBlock = renderMemoryBlock(memories);
 
+    // Live external research via Perplexity — only when the operator asks
+    // something that needs current industry/benchmark grounding (vs. their
+    // own portfolio). Best-effort, fails silent if key/api unavailable.
+    const { shouldUseLiveResearch, fetchLiveResearch } = await import("./perplexity.server");
+    const live = shouldUseLiveResearch(data.question)
+      ? await fetchLiveResearch(data.question)
+      : { block: "", citations: [] as string[], answer: "" };
+
     const system = [
       "You are Lumi, the analyst inside The CS Quarterly's CSFactors command center.",
       "Audience: a VP/Director of Customer Success looking at their own book of business.",
@@ -290,6 +298,7 @@ export const askCSFactorsQ = createServerFn({ method: "POST" })
       "Be tight: 2–6 short paragraphs or a compact table/bullet list. McKinsey register. No emoji, no hype, no hedging.",
       "Each account record includes: identity & ownership, ARR, health, renewal timing, stakeholders, recent timeline events (including cta.raised / cta.completed and field edits), open/overdue/recently-completed CTAs with their top open items, and contracts with renewal dates.",
       memoryBlock,
+      live.block,
       "PORTFOLIO METRICS:",
       metricsBlock,
       `Today: ${new Date().toISOString().slice(0, 10)}.`,
