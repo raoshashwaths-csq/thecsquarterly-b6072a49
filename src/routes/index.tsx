@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LayoutGrid, Compass } from "lucide-react";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useTranslation } from "react-i18next";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -9,7 +10,7 @@ import { ResumeRunPrompt } from "@/components/agent/ResumeRunPrompt";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
-import { StickyScrollSection } from "@/components/shared/StickyScrollSection";
+import { StageRevealSection } from "@/components/home/StageRevealSection";
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,7 +18,7 @@ import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import { useTierCopy } from "@/hooks/useTierCopy";
 import { TierBadge } from "@/components/site/TierBadge";
 
-import { listPosts } from "@/lib/posts.functions";
+import { listPosts, getLumiSeededFeed, type Post } from "@/lib/posts.functions";
 
 
 
