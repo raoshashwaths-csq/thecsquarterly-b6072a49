@@ -83,6 +83,7 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
 import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
+import { Route as ApiPublicHooksCurateHighRatedRouteImport } from './routes/api/public/hooks/curate-high-rated'
 import { Route as ApiPublicHooksAnalyzeInteractionsRouteImport } from './routes/api/public/hooks/analyze-interactions'
 
 const VanguardRoute = VanguardRouteImport.update({
@@ -471,6 +472,12 @@ const ApiPublicHooksIngestArticlesRoute =
     path: '/api/public/hooks/ingest-articles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCurateHighRatedRoute =
+  ApiPublicHooksCurateHighRatedRouteImport.update({
+    id: '/api/public/hooks/curate-high-rated',
+    path: '/api/public/hooks/curate-high-rated',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksAnalyzeInteractionsRoute =
   ApiPublicHooksAnalyzeInteractionsRouteImport.update({
     id: '/api/public/hooks/analyze-interactions',
@@ -545,6 +552,7 @@ export interface FileRoutesByFullPath {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
+  '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -618,6 +626,7 @@ export interface FileRoutesByTo {
   '/csfactors/maps': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
+  '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -696,6 +705,7 @@ export interface FileRoutesById {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
+  '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -775,6 +785,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/analyze-interactions'
+    | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -848,6 +859,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps'
     | '/diagnostics/ai-readiness'
     | '/api/public/hooks/analyze-interactions'
+    | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -925,6 +937,7 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/analyze-interactions'
+    | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -985,6 +998,7 @@ export interface RootRouteChildren {
   QResponseRunIdRoute: typeof QResponseRunIdRoute
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
   ApiPublicHooksAnalyzeInteractionsRoute: typeof ApiPublicHooksAnalyzeInteractionsRoute
+  ApiPublicHooksCurateHighRatedRoute: typeof ApiPublicHooksCurateHighRatedRoute
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
   ApiPublicHooksPullExternalIntelRoute: typeof ApiPublicHooksPullExternalIntelRoute
   ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -1516,6 +1530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/curate-high-rated': {
+      id: '/api/public/hooks/curate-high-rated'
+      path: '/api/public/hooks/curate-high-rated'
+      fullPath: '/api/public/hooks/curate-high-rated'
+      preLoaderRoute: typeof ApiPublicHooksCurateHighRatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/analyze-interactions': {
       id: '/api/public/hooks/analyze-interactions'
       path: '/api/public/hooks/analyze-interactions'
@@ -1670,6 +1691,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
   ApiPublicHooksAnalyzeInteractionsRoute:
     ApiPublicHooksAnalyzeInteractionsRoute,
+  ApiPublicHooksCurateHighRatedRoute: ApiPublicHooksCurateHighRatedRoute,
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
   ApiPublicHooksPullExternalIntelRoute: ApiPublicHooksPullExternalIntelRoute,
   ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
