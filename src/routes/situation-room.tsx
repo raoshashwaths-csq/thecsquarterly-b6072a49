@@ -381,12 +381,11 @@ function PastSessionsStrip() {
 function LumiArchive() {
   const runsFn = useServerFn(listMyQRuns);
   const taggedFn = useServerFn(listMyTaggedLumiRuns);
-  const { data: runs } = useQuery({ queryKey: ["my-q-runs"], queryFn: () => runsFn() });
-  const { data: tagged } = useQuery({ queryKey: ["my-tagged-runs"], queryFn: () => taggedFn() });
+  const { data: runsResp } = useQuery({ queryKey: ["my-q-runs"], queryFn: () => runsFn() });
+  const { data: taggedResp } = useQuery({ queryKey: ["my-tagged-runs"], queryFn: () => taggedFn() });
 
-  const allRuns = [
-    ...((runs ?? []) as Array<{ id: string; node_id: string; created_at: string }>),
-  ];
+  const allRuns = (runsResp?.runs ?? []) as Array<{ id: string; node_id: string; created_at: string }>;
+  const tagged = (taggedResp?.runs ?? []) as Array<{ id: string; nodeId: string; accountName: string | null; taggedAt: string | null }>;
 
   return (
     <section className="mt-16 border-t border-border pt-10 space-y-10">
