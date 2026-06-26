@@ -264,6 +264,8 @@ export const startSituation = createServerFn({ method: "POST" })
       context: { situation: situation.slice(0, 2000), sessionId: (inserted as { id: string }).id },
       witty: false,
       zones: { diagnosis: "", playbook: "", executable: opening.slice(0, 8000) },
+      knowledge_records_injected: knowledge.recordCount,
+      query_text: situation.slice(0, 4000),
     });
 
 
