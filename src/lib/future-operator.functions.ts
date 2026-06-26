@@ -13,26 +13,14 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { DESIGNATION_RANK, tierToDesignation, type Designation } from "@/lib/entitlements";
 
-async function userDesignation(
-  supabase: Awaited<ReturnType<typeof import("@/integrations/supabase/auth-middleware")["requireSupabaseAuth"]>["context"]>["supabase"] extends infer T ? T : never,
-  userId: string,
-): Promise<Designation> {
-  const { data: isAdmin } = await (supabase as { rpc: (n: string, a: Record<string, unknown>) => Promise<{ data: boolean | null }> }).rpc("has_role", {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function userDesignation(supabase: any, userId: string): Promise<Designation> {
+  const { data: isAdmin } = await supabase.rpc("has_role", {
     _user_id: userId,
     _role: "admin",
   });
   if (isAdmin) return "strategic_partner";
-  const { data: sub } = await (supabase as {
-    from: (t: string) => {
-      select: (c: string) => {
-        eq: (k: string, v: string) => {
-          eq: (k: string, v: string) => {
-            maybeSingle: () => Promise<{ data: { tier: string | null; designation: string | null } | null }>;
-          };
-        };
-      };
-    };
-  })
+  const { data: sub } = await supabase
     .from("subscriptions")
     .select("tier, designation")
     .eq("user_id", userId)

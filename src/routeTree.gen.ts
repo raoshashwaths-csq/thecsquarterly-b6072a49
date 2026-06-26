@@ -55,6 +55,7 @@ import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
 import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
+import { Route as AccountQuestsRouteImport } from './routes/account.quests'
 import { Route as AccountApiRouteImport } from './routes/account.api'
 import { Route as DiagnosticsAiReadinessIndexRouteImport } from './routes/diagnostics.ai-readiness.index'
 import { Route as CsfactorsMapsIndexRouteImport } from './routes/csfactors.maps.index'
@@ -84,9 +85,12 @@ import { Route as ApiPublicHooksTranslateKnowledgeRouteImport } from './routes/a
 import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
 import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
 import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
+import { Route as ApiPublicHooksGenerateDailyQuestsRouteImport } from './routes/api/public/hooks/generate-daily-quests'
 import { Route as ApiPublicHooksFlagTranslationsRouteImport } from './routes/api/public/hooks/flag-translations'
+import { Route as ApiPublicHooksDispatchReadRouteImport } from './routes/api/public/hooks/dispatch-read'
 import { Route as ApiPublicHooksDiscoverRegionalRouteImport } from './routes/api/public/hooks/discover-regional'
 import { Route as ApiPublicHooksCurateHighRatedRouteImport } from './routes/api/public/hooks/curate-high-rated'
+import { Route as ApiPublicHooksCheckDriftSignalsRouteImport } from './routes/api/public/hooks/check-drift-signals'
 import { Route as ApiPublicHooksAnalyzeInteractionsRouteImport } from './routes/api/public/hooks/analyze-interactions'
 
 const VanguardRoute = VanguardRouteImport.update({
@@ -320,6 +324,11 @@ const AccountWorkspaceRoute = AccountWorkspaceRouteImport.update({
   path: '/account/workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountQuestsRoute = AccountQuestsRouteImport.update({
+  id: '/account/quests',
+  path: '/account/quests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountApiRoute = AccountApiRouteImport.update({
   id: '/account/api',
   path: '/account/api',
@@ -481,10 +490,22 @@ const ApiPublicHooksIngestArticlesRoute =
     path: '/api/public/hooks/ingest-articles',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksGenerateDailyQuestsRoute =
+  ApiPublicHooksGenerateDailyQuestsRouteImport.update({
+    id: '/api/public/hooks/generate-daily-quests',
+    path: '/api/public/hooks/generate-daily-quests',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksFlagTranslationsRoute =
   ApiPublicHooksFlagTranslationsRouteImport.update({
     id: '/api/public/hooks/flag-translations',
     path: '/api/public/hooks/flag-translations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksDispatchReadRoute =
+  ApiPublicHooksDispatchReadRouteImport.update({
+    id: '/api/public/hooks/dispatch-read',
+    path: '/api/public/hooks/dispatch-read',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksDiscoverRegionalRoute =
@@ -497,6 +518,12 @@ const ApiPublicHooksCurateHighRatedRoute =
   ApiPublicHooksCurateHighRatedRouteImport.update({
     id: '/api/public/hooks/curate-high-rated',
     path: '/api/public/hooks/curate-high-rated',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksCheckDriftSignalsRoute =
+  ApiPublicHooksCheckDriftSignalsRouteImport.update({
+    id: '/api/public/hooks/check-drift-signals',
+    path: '/api/public/hooks/check-drift-signals',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksAnalyzeInteractionsRoute =
@@ -533,6 +560,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/account/api': typeof AccountApiRoute
+  '/account/quests': typeof AccountQuestsRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -573,9 +601,12 @@ export interface FileRoutesByFullPath {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
+  '/api/public/hooks/check-drift-signals': typeof ApiPublicHooksCheckDriftSignalsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
+  '/api/public/hooks/dispatch-read': typeof ApiPublicHooksDispatchReadRoute
   '/api/public/hooks/flag-translations': typeof ApiPublicHooksFlagTranslationsRoute
+  '/api/public/hooks/generate-daily-quests': typeof ApiPublicHooksGenerateDailyQuestsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -611,6 +642,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/account/api': typeof AccountApiRoute
+  '/account/quests': typeof AccountQuestsRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -650,9 +682,12 @@ export interface FileRoutesByTo {
   '/csfactors/maps': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
+  '/api/public/hooks/check-drift-signals': typeof ApiPublicHooksCheckDriftSignalsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
+  '/api/public/hooks/dispatch-read': typeof ApiPublicHooksDispatchReadRoute
   '/api/public/hooks/flag-translations': typeof ApiPublicHooksFlagTranslationsRoute
+  '/api/public/hooks/generate-daily-quests': typeof ApiPublicHooksGenerateDailyQuestsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -692,6 +727,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/vanguard': typeof VanguardRoute
   '/account/api': typeof AccountApiRoute
+  '/account/quests': typeof AccountQuestsRoute
   '/account/workspace': typeof AccountWorkspaceRoute
   '/admin/control-panel': typeof AdminControlPanelRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -732,9 +768,12 @@ export interface FileRoutesById {
   '/csfactors/maps/': typeof CsfactorsMapsIndexRoute
   '/diagnostics/ai-readiness/': typeof DiagnosticsAiReadinessIndexRoute
   '/api/public/hooks/analyze-interactions': typeof ApiPublicHooksAnalyzeInteractionsRoute
+  '/api/public/hooks/check-drift-signals': typeof ApiPublicHooksCheckDriftSignalsRoute
   '/api/public/hooks/curate-high-rated': typeof ApiPublicHooksCurateHighRatedRoute
   '/api/public/hooks/discover-regional': typeof ApiPublicHooksDiscoverRegionalRoute
+  '/api/public/hooks/dispatch-read': typeof ApiPublicHooksDispatchReadRoute
   '/api/public/hooks/flag-translations': typeof ApiPublicHooksFlagTranslationsRoute
+  '/api/public/hooks/generate-daily-quests': typeof ApiPublicHooksGenerateDailyQuestsRoute
   '/api/public/hooks/ingest-articles': typeof ApiPublicHooksIngestArticlesRoute
   '/api/public/hooks/pull-external-intel': typeof ApiPublicHooksPullExternalIntelRoute
   '/api/public/hooks/refresh-benchmarks': typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -775,6 +814,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/vanguard'
     | '/account/api'
+    | '/account/quests'
     | '/account/workspace'
     | '/admin/control-panel'
     | '/admin/payments'
@@ -815,9 +855,12 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/analyze-interactions'
+    | '/api/public/hooks/check-drift-signals'
     | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/discover-regional'
+    | '/api/public/hooks/dispatch-read'
     | '/api/public/hooks/flag-translations'
+    | '/api/public/hooks/generate-daily-quests'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -853,6 +896,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/vanguard'
     | '/account/api'
+    | '/account/quests'
     | '/account/workspace'
     | '/admin/control-panel'
     | '/admin/payments'
@@ -892,9 +936,12 @@ export interface FileRouteTypes {
     | '/csfactors/maps'
     | '/diagnostics/ai-readiness'
     | '/api/public/hooks/analyze-interactions'
+    | '/api/public/hooks/check-drift-signals'
     | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/discover-regional'
+    | '/api/public/hooks/dispatch-read'
     | '/api/public/hooks/flag-translations'
+    | '/api/public/hooks/generate-daily-quests'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -933,6 +980,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/vanguard'
     | '/account/api'
+    | '/account/quests'
     | '/account/workspace'
     | '/admin/control-panel'
     | '/admin/payments'
@@ -973,9 +1021,12 @@ export interface FileRouteTypes {
     | '/csfactors/maps/'
     | '/diagnostics/ai-readiness/'
     | '/api/public/hooks/analyze-interactions'
+    | '/api/public/hooks/check-drift-signals'
     | '/api/public/hooks/curate-high-rated'
     | '/api/public/hooks/discover-regional'
+    | '/api/public/hooks/dispatch-read'
     | '/api/public/hooks/flag-translations'
+    | '/api/public/hooks/generate-daily-quests'
     | '/api/public/hooks/ingest-articles'
     | '/api/public/hooks/pull-external-intel'
     | '/api/public/hooks/refresh-benchmarks'
@@ -1015,6 +1066,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VanguardRoute: typeof VanguardRoute
   AccountApiRoute: typeof AccountApiRoute
+  AccountQuestsRoute: typeof AccountQuestsRoute
   AccountWorkspaceRoute: typeof AccountWorkspaceRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -1037,9 +1089,12 @@ export interface RootRouteChildren {
   QResponseRunIdRoute: typeof QResponseRunIdRoute
   AccountAnalyticsIndexRoute: typeof AccountAnalyticsIndexRoute
   ApiPublicHooksAnalyzeInteractionsRoute: typeof ApiPublicHooksAnalyzeInteractionsRoute
+  ApiPublicHooksCheckDriftSignalsRoute: typeof ApiPublicHooksCheckDriftSignalsRoute
   ApiPublicHooksCurateHighRatedRoute: typeof ApiPublicHooksCurateHighRatedRoute
   ApiPublicHooksDiscoverRegionalRoute: typeof ApiPublicHooksDiscoverRegionalRoute
+  ApiPublicHooksDispatchReadRoute: typeof ApiPublicHooksDispatchReadRoute
   ApiPublicHooksFlagTranslationsRoute: typeof ApiPublicHooksFlagTranslationsRoute
+  ApiPublicHooksGenerateDailyQuestsRoute: typeof ApiPublicHooksGenerateDailyQuestsRoute
   ApiPublicHooksIngestArticlesRoute: typeof ApiPublicHooksIngestArticlesRoute
   ApiPublicHooksPullExternalIntelRoute: typeof ApiPublicHooksPullExternalIntelRoute
   ApiPublicHooksRefreshBenchmarksRoute: typeof ApiPublicHooksRefreshBenchmarksRoute
@@ -1376,6 +1431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountWorkspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/quests': {
+      id: '/account/quests'
+      path: '/account/quests'
+      fullPath: '/account/quests'
+      preLoaderRoute: typeof AccountQuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account/api': {
       id: '/account/api'
       path: '/account/api'
@@ -1579,11 +1641,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/generate-daily-quests': {
+      id: '/api/public/hooks/generate-daily-quests'
+      path: '/api/public/hooks/generate-daily-quests'
+      fullPath: '/api/public/hooks/generate-daily-quests'
+      preLoaderRoute: typeof ApiPublicHooksGenerateDailyQuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/flag-translations': {
       id: '/api/public/hooks/flag-translations'
       path: '/api/public/hooks/flag-translations'
       fullPath: '/api/public/hooks/flag-translations'
       preLoaderRoute: typeof ApiPublicHooksFlagTranslationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/dispatch-read': {
+      id: '/api/public/hooks/dispatch-read'
+      path: '/api/public/hooks/dispatch-read'
+      fullPath: '/api/public/hooks/dispatch-read'
+      preLoaderRoute: typeof ApiPublicHooksDispatchReadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/discover-regional': {
@@ -1598,6 +1674,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/hooks/curate-high-rated'
       fullPath: '/api/public/hooks/curate-high-rated'
       preLoaderRoute: typeof ApiPublicHooksCurateHighRatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/check-drift-signals': {
+      id: '/api/public/hooks/check-drift-signals'
+      path: '/api/public/hooks/check-drift-signals'
+      fullPath: '/api/public/hooks/check-drift-signals'
+      preLoaderRoute: typeof ApiPublicHooksCheckDriftSignalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/analyze-interactions': {
@@ -1731,6 +1814,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VanguardRoute: VanguardRoute,
   AccountApiRoute: AccountApiRoute,
+  AccountQuestsRoute: AccountQuestsRoute,
   AccountWorkspaceRoute: AccountWorkspaceRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
@@ -1754,9 +1838,13 @@ const rootRouteChildren: RootRouteChildren = {
   AccountAnalyticsIndexRoute: AccountAnalyticsIndexRoute,
   ApiPublicHooksAnalyzeInteractionsRoute:
     ApiPublicHooksAnalyzeInteractionsRoute,
+  ApiPublicHooksCheckDriftSignalsRoute: ApiPublicHooksCheckDriftSignalsRoute,
   ApiPublicHooksCurateHighRatedRoute: ApiPublicHooksCurateHighRatedRoute,
   ApiPublicHooksDiscoverRegionalRoute: ApiPublicHooksDiscoverRegionalRoute,
+  ApiPublicHooksDispatchReadRoute: ApiPublicHooksDispatchReadRoute,
   ApiPublicHooksFlagTranslationsRoute: ApiPublicHooksFlagTranslationsRoute,
+  ApiPublicHooksGenerateDailyQuestsRoute:
+    ApiPublicHooksGenerateDailyQuestsRoute,
   ApiPublicHooksIngestArticlesRoute: ApiPublicHooksIngestArticlesRoute,
   ApiPublicHooksPullExternalIntelRoute: ApiPublicHooksPullExternalIntelRoute,
   ApiPublicHooksRefreshBenchmarksRoute: ApiPublicHooksRefreshBenchmarksRoute,
