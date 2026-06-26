@@ -1113,6 +1113,51 @@ export type Database = {
         }
         Relationships: []
       }
+      post_reactions: {
+        Row: {
+          created_at: string
+          disagree_session_id: string | null
+          id: string
+          post_id: string
+          reaction: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          disagree_session_id?: string | null
+          id?: string
+          post_id: string
+          reaction: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          disagree_session_id?: string | null
+          id?: string
+          post_id?: string
+          reaction?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_reactions_disagree_session_id_fkey"
+            columns: ["disagree_session_id"]
+            isOneToOne: false
+            referencedRelation: "situation_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_reactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author: string
@@ -1997,6 +2042,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_post_reaction_aggregates: {
+        Args: { _limit?: number; _since?: string }
+        Returns: {
+          applied: number
+          confirmed: number
+          disagree: number
+          language: number
+          latest_at: string
+          post_id: string
+          section: string
+          slug: string
+          title: string
+          total: number
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -2005,6 +2065,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      get_post_reaction_stats: { Args: { _post_id: string }; Returns: Json }
       has_active_subscription: {
         Args: { check_env?: string; user_uuid: string }
         Returns: boolean

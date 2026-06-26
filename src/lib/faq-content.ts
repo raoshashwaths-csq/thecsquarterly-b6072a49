@@ -75,6 +75,9 @@ const EN_SECTIONS: FaqSection[] = [
       { slug: "run-quotas", q: "How many Lumi runs do I get?", a: "Practitioner includes 50 runs/month, Operator 100, Team 500, Scale 2000, Enterprise 5000. Runs reset on your billing date and do not roll over." },
       { slug: "share-run", q: "Can I share a Lumi run with someone outside the site?", a: "Yes. Every run has a public share link. Anonymous viewers can read up to the 50% scroll point. To unlock the rest, they share their email and instantly get free Reader access — they can keep reading the run and explore the public side of the site." },
       { slug: "voice", q: "Can I speak to Lumi instead of typing?", a: "Yes. Lumi supports voice input on both the global agent button and the CSFactors drawer, powered by ElevenLabs speech-to-text. Tap the mic, dictate, tap to stop." },
+      { slug: "lumi-debrief", q: "What is the Lumi Debrief?", a: "When you scroll to ~90% of a dispatch, Lumi slides in with a debrief card. The opening question is generated from the dispatch's '1 actionable' (the third pillar of our 3-2-1 model), and your conversation is saved to your Situation Room automatically. Free readers get one debrief per month; paid tiers count it as one Lumi run from your monthly pool." },
+      { slug: "dispatch-reactions", q: "What are dispatch reactions?", a: "At the end of every dispatch, you tap one of four reactions: 'Changed how I'll approach an account this week', 'Gave me language I didn't have', 'Confirmed something I already believed', or 'I disagree with the thesis.' One signal per reader per article. Results are shown to all readers (e.g. '61% of operators said this changed their approach this week') and feed the editorial dashboard." },
+      { slug: "pushback-thread", q: "What happens when I tap 'I disagree with the thesis'?", a: "Lumi opens an inline pushback thread asking where the thesis breaks for you. The conversation is saved to your Situation Room and the editorial team uses these threads — anonymously — to calibrate future dispatches. The disagree reaction itself is free; follow-up turns in the thread count as Lumi runs like any other conversation." },
     ],
   },
   {
@@ -119,6 +122,8 @@ const EN_SECTIONS: FaqSection[] = [
       { slug: "two-voice", q: "What's the Two-Voice System?", a: "Every premium essay is written in two parallel registers: Analytical (structured, McKinsey-tone) and Witty (narrative, Wodehouse-tone). Toggle inline. Same argument, same facts, two reading experiences." },
       { slug: "3-2-1", q: "What's the 3-2-1 model?", a: "Our editorial spine: every new article delivers three facts, two insights, and one actionable. No filler, no recap, no \"5 things\" listicles." },
       { slug: "guest", q: "Can I submit a guest piece?", a: "We don't accept unsolicited submissions but we do commission operator essays for The Outcome Forum. Pitch via the contact link in the footer." },
+      { slug: "reader-signals", q: "How does the editorial team use reader signals?", a: "Every dispatch ends with one structured question — 'What did this change for you?' — and four reactions. The admin Reader Signals dashboard surfaces per-dispatch breakdowns and a disagree-rate, plus the full pushback threads readers start with Lumi. Theses with high disagree-rates get revisited; the strongest counter-arguments often seed the next dispatch." },
+      { slug: "aggregate-readout", q: "What does '61% of operators said this changed their approach' mean?", a: "It's the live aggregate of reader reactions on that specific dispatch. Updated as new readers signal in. One signal per reader per article — readers may change their choice but it never double-counts." },
     ],
   },
   {
@@ -131,6 +136,8 @@ const EN_SECTIONS: FaqSection[] = [
       { slug: "cancel", q: "How do I cancel or change plan?", a: "Account → Billing. Changes take effect at the end of your current billing cycle. No retention dark patterns." },
       { slug: "team-pricing", q: "Do you offer team or enterprise pricing?", a: "Yes — Team, Scale, and Enterprise tiers include seat pools, shared workspaces, and admin controls. Contact us via the footer for Enterprise quotes." },
       { slug: "refunds", q: "Do you offer refunds?", a: "Within 14 days of your first paid charge, full refund, no questions. After that, billing is non-refundable but you can cancel anytime to stop future charges." },
+      { slug: "debrief-quota", q: "Does the Lumi Debrief count toward my monthly Lumi limit?", a: "Free readers get one debrief per month, standalone — it doesn't touch any other quota because there isn't one. Paid tiers (Practitioner and above) count each debrief as one Lumi run from your monthly pool, the same as any other Lumi conversation." },
+      { slug: "reactions-cost", q: "Do dispatch reactions or pushback threads cost a Lumi run?", a: "Tapping one of the four reactions is always free. If you choose 'I disagree with the thesis,' Lumi opens a pushback thread — the opening question is free; subsequent turns in that thread count as Lumi runs from your monthly pool, the same as any other conversation." },
     ],
   },
   {

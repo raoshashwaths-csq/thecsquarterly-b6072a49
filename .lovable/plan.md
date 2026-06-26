@@ -1,62 +1,76 @@
-# Lumi Debrief — post-read conversation trigger
+## Dispatch Reactions ("What did this change for you?")
 
-## Behavior
+End-of-article single-signal reaction with 4 structured options, aggregate readout, admin dashboard, and Lumi pushback thread for disagreement.
 
-1. On `/insights/$slug`, when scroll-progress reaches **≥ 90%**, a card slides up from the bottom-right of the viewport with Lumi's opening question.
-2. The opener is **LLM-generated at debrief time** from the dispatch's title + excerpt + body (the "1 actionable" of the 3-2-1). It always ends in a personalising question: *"What's the one account this applies to right now?"*-shaped.
-3. Reader types a reply → continues as a normal Lumi coaching thread inside the card (expandable to a side drawer for longer chats).
-4. The conversation is **saved as a `situation_sessions` row** (source = dispatch debrief, linked to the post) — appears in Situation Room list + `/account` workspace.
-5. **Quota**:
-   - Free tier: 1 debrief per calendar month. After that, the card shows a paywall nudge instead of opening.
-   - Paid tiers: each debrief counts as **1 Lumi run** against the monthly pool (enforced via existing `assertQUnderCap` + `q_runs` insert).
-6. Triggers **once per slug per session** (dismissible; reappears next visit only if not yet completed for that slug).
+### New table: `post_reactions`
 
-## Files
+```text
+id uuid pk
+post_id uuid → posts(id) on delete cascade
+user_id uuid → auth.users(id) on delete cascade
+reaction text check in ('applied','language','confirmed','disagree')
+disagree_session_id uuid null  -- situation_sessions row when reaction='disagree'
+created_at timestamptz default now()
+unique(post_id, user_id)        -- one signal per reader per article
+```
 
-**New**
-- `src/components/lumi/LumiDebriefCard.tsx` — sliding card UI, opener state, mini-chat thread, paywall fallback. Uses existing `LumiMark` + `.lumi-cta` styling.
-- `src/hooks/useDebriefTrigger.ts` — scroll-progress watcher (consumes the existing `progress` already tracked in `insights.$slug.tsx`), per-slug "already triggered" session-storage guard, reduced-motion respect.
-- `src/lib/dispatch-debrief.functions.ts` — two server functions:
-  - `startDispatchDebrief({ postId })` — enforces quota, generates opener via Lovable AI Gateway, creates `situation_sessions` row tagged `source: "dispatch-debrief"` with `post_id` in dispatches JSON, logs `q_runs` row `node_id='dispatch-debrief'`, returns `{ sessionId, opening, remainingThisMonth }`.
-  - `getDebriefQuota()` — returns `{ used, limit, tier, blocked }` for the current month (used by the card to render the right CTA before starting).
+- RLS: authenticated users SELECT/INSERT/UPDATE their own rows; admins SELECT all; service_role ALL. Standard GRANTs on `public`.
+- RPC `get_post_reaction_stats(_post_id uuid)` returning `{ total, counts: { applied, language, confirmed, disagree }, top_label, top_pct }` — security definer, callable by `anon` + `authenticated` for the public signal readout. No PII.
 
-**Edited**
-- `src/routes/insights.$slug.tsx` — render `<LumiDebriefCard postId={post.id} slug={post.slug} progress={progress} />` near the end of the article container. No layout/copy changes elsewhere.
-- `src/lib/situation-room.functions.ts` — extend `continueSituation` to accept dispatch-debrief sessions (already shape-compatible; just verify the system prompt branch when `dispatches[0].source === 'dispatch-debrief'`).
+### New server fns — `src/lib/post-reactions.functions.ts`
 
-**No schema change.** We piggyback on:
-- `situation_sessions.dispatches` (Json) — store `[{ source: "dispatch-debrief", post_id, slug, title, actionable }]`.
-- `q_runs` — `node_id = 'dispatch-debrief'`. Free quota = `count(*) where node_id='dispatch-debrief' and created_at >= date_trunc('month', now())`. Paid: reuse `assertQUnderCap`.
+- `submitPostReaction({ postId, reaction })` — `requireSupabaseAuth`. Upserts on `(post_id, user_id)` (readers may change their mind). If `reaction='disagree'` and no session exists, creates a `situation_sessions` row tagged `source: "dispatch-disagree"` with `post_id` in dispatches JSON; opener generated via Lovable AI Gateway (`google/gemini-2.5-flash`) framed as: "You disagreed with the thesis. Tell Lumi why — your pushback may shape the next dispatch." Returns `{ sessionId, stats }`. Does NOT count against `q_runs` (pushback is editorial signal, not a Lumi turn).
+- `getPostReactionStats({ postId })` — public, calls the RPC. Used for the live "61% of operators said…" line.
+- `getMyPostReaction({ postId })` — `requireSupabaseAuth`. Returns current user's choice if any.
+- `listReactionAggregates({ limit, since })` — admin only (`has_role(_, 'admin')`), returns per-post counts + top label for the admin dashboard.
 
-## Opener generation
+### UI — `src/components/lumi/DispatchReactionCard.tsx`
 
-Inside `startDispatchDebrief.handler`:
-- Pull `title, subtitle, excerpt, body` for `postId`.
-- Single Lovable AI Gateway call (`google/gemini-3-flash-preview`), JSON output:
-  ```
-  { "actionable": "<the 1 actionable from the 3-2-1, ≤140 chars>",
-    "opener": "<2 short sentences. Sentence 1 names what they just read. Sentence 2 asks one operator question that forces them to apply it to a real account/situation right now.>" }
-  ```
-- System prompt enforces McKinsey register, no emoji, no hedging. Falls back to a deterministic template (`You just read about "{title}". What's the one account this applies to right now?`) if the call fails.
+Renders below the article body (above the existing `LumiDebriefCard`). Structure:
 
-## Quota UX
+1. Eyebrow: `READER SIGNAL · ONE TAP`
+2. Prompt: "What did this change for you?"
+3. Four option buttons (radio-style, single select):
+   - "Changed how I'll approach an account this week"
+   - "Gave me language I didn't have"
+   - "Confirmed something I already believed"
+   - "I disagree with the thesis."
+4. After submit: collapses to aggregate readout — `"{top_pct}% of operators said this {top_label_phrase} this week"` + `{total} signals` (uses the public RPC; revalidates every 30s while visible).
+5. Disagree path: opens a Lumi thread inline (reuses `continueSituation` like the debrief card) seeded with the LLM-generated opener; saved to the reader's Situation Room.
+6. Signed-out users see the question + options but tapping prompts sign-in.
 
-- Free user, 0 debriefs this month → card opens normally, footer shows *"This is your free debrief for {month}."*
-- Free user, already used → card shows the dispatch title + a locked CTA: *"Debriefs reset on the 1st. Upgrade for unlimited."* Single button to `/pricing`.
-- Paid user → footer micro-line: *"Counts as 1 of your {remaining} Lumi runs this month."* Never blocks unless over cap (existing `assertQUnderCap` error surfaces inline).
+### Admin — `src/routes/admin.tsx`
 
-## Trigger rules
+New "Reader Signals" section using existing dashboard primitives (`SectionCard`, `MetricCard`, `HealthChip`):
+- Top strip: total signals (7d/30d/all), % disagree, % applied.
+- Table of recent posts (last 30d) with: title, total signals, % each reaction, top label chip, link to post. Sortable by disagree-rate (for calibration).
+- Disagree threads: link list of `situation_sessions` where `source='dispatch-disagree'` (post title + first message preview).
 
-- Only on `/insights/$slug` (not codex, not section pages).
-- Only when `progress >= 0.9`.
-- Skip if user is the visitor-gate or scroll-gate is active (avoid double-prompting unauth/paywalled users).
-- `sessionStorage` key `csq.debrief.shown.{slug}` prevents re-appearance in the same tab.
-- `prefers-reduced-motion`: card fades in instead of sliding.
-- Mobile: card becomes a bottom sheet (full-width, max-height 70vh).
+### Article integration — `src/routes/insights.$slug.tsx`
 
-## Out of scope
+Mount `<DispatchReactionCard postId={post.id} />` after the body and before `<LumiDebriefCard>`. No gating — reactions are open to all signed-in readers regardless of tier (one signal per article is not a Lumi turn).
 
-- No new analytics dashboard surface (reuse Situation Room list).
-- No edits to `src/integrations/supabase/*`, `routeTree.gen.ts`, or `.env`.
-- No changes to existing Lumi Bubble or Drawer actions.
-- No backfill of older posts — opener is generated on the fly.
+### FAQ updates — `src/lib/faq-content.ts` (English source of truth)
+
+Add Q&A entries (English block only; other locales fall back) under existing categories for everything shipped today:
+
+- **Lumi** category — add:
+  - "What is Lumi Debrief?" → describes 90% scroll trigger, opener from the dispatch's 1 actionable, saves to Situation Room, free tier gets 1/month, paid counts as 1 Lumi run.
+  - "What are dispatch reactions?" → 4 options, one per article, aggregate shown to all readers, disagree opens a Lumi thread.
+- **Editorial** category — add:
+  - "How does the editorial team use reader signals?" → admin sees aggregate per dispatch; disagree threads calibrate future topics.
+- **Account, Billing & Tiers** — add:
+  - "Does the dispatch debrief count toward my Lumi limit?" → free: 1/month standalone; paid: counts as 1 run from your pool.
+
+Keep the FAQ JSON-LD generation (`SEO_ENTRIES`) unchanged — it auto-picks the new entries.
+
+### Out of scope
+
+No new analytics events beyond the reaction row itself. No edits to `routeTree.gen.ts`, `src/integrations/supabase/*`, `.env`. No localization of the new FAQ entries (English only, existing fallback handles others). No changes to the debrief card.
+
+### Technical notes
+
+- Reaction upsert uses `onConflict: 'post_id,user_id'`.
+- Aggregate RPC is `STABLE SECURITY DEFINER` with `SET search_path = public`, exposed via `GRANT EXECUTE ... TO anon, authenticated`.
+- The disagree-thread opener prompt is fixed (no per-dispatch LLM call needed for the seed; the dispatch title/excerpt is interpolated). Keeps latency low and avoids a Gateway call on every disagree click.
+- Mobile: option buttons become a 1-col stack; aggregate readout uses the same hairline-bordered card pattern as the debrief card.
