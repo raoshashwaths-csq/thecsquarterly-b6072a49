@@ -213,9 +213,10 @@ function HomePage() {
       </header>
 
       {/* Stage 01 / 02 / 03 — visitor + free users see it directly under the
-          hero with the new scroll-locked reveal. Paid logged-in users get it
-          at the bottom of the page (rendered further down). */}
-      {!stagesAtBottom && <HomeStages />}
+          hero with the new scroll-locked carousel reveal. Paid logged-in
+          users get it at the bottom of the page (rendered further down).
+          Neither slot renders while tier is loading. */}
+      {stagesAtTop && <HomeStages />}
 
       {/* Featured + Sidebar — LIFTED for visibility */}
       {featured && (
