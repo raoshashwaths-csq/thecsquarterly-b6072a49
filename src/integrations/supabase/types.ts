@@ -794,6 +794,45 @@ export type Database = {
         }
         Relationships: []
       }
+      lumi_memory: {
+        Row: {
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          last_seen_at: string
+          memory_type: string
+          pinned: boolean
+          source: string | null
+          source_ref: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          last_seen_at?: string
+          memory_type: string
+          pinned?: boolean
+          source?: string | null
+          source_ref?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          last_seen_at?: string
+          memory_type?: string
+          pinned?: boolean
+          source?: string | null
+          source_ref?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       map_comments: {
         Row: {
           author_name: string | null
@@ -1163,31 +1202,46 @@ export type Database = {
       }
       profiles: {
         Row: {
+          acv_band: string | null
+          challenges: string[]
+          company_arr_range: string | null
           created_at: string
+          difficult_account: string | null
           display_name: string | null
           email: string | null
           id: string
           is_team_leader: boolean
+          onboarded_at: string | null
           persona: Database["public"]["Enums"]["user_persona"] | null
           seniority: string | null
           updated_at: string
         }
         Insert: {
+          acv_band?: string | null
+          challenges?: string[]
+          company_arr_range?: string | null
           created_at?: string
+          difficult_account?: string | null
           display_name?: string | null
           email?: string | null
           id: string
           is_team_leader?: boolean
+          onboarded_at?: string | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           seniority?: string | null
           updated_at?: string
         }
         Update: {
+          acv_band?: string | null
+          challenges?: string[]
+          company_arr_range?: string | null
           created_at?: string
+          difficult_account?: string | null
           display_name?: string | null
           email?: string | null
           id?: string
           is_team_leader?: boolean
+          onboarded_at?: string | null
           persona?: Database["public"]["Enums"]["user_persona"] | null
           seniority?: string | null
           updated_at?: string
@@ -1923,6 +1977,19 @@ export type Database = {
       is_team_member: {
         Args: { _team: string; _user: string }
         Returns: boolean
+      }
+      match_lumi_memory: {
+        Args: { _k?: number; _query: string; _user_id: string }
+        Returns: {
+          content: string
+          created_at: string
+          id: string
+          memory_type: string
+          pinned: boolean
+          similarity: number
+          source: string
+          source_ref: string
+        }[]
       }
       move_to_dlq: {
         Args: {
