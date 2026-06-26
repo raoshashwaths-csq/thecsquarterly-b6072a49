@@ -49,25 +49,46 @@ export function shouldUseLiveResearch(question: string): boolean {
   return RESEARCH_SIGNALS.some((re) => re.test(question));
 }
 
+export type LiveResearchStatus =
+  | "ok" // grounded answer + (likely) citations
+  | "disabled" // no PERPLEXITY_API_KEY
+  | "empty" // call succeeded but no usable content
+  | "error"; // network / non-200
+
 export type LiveResearch = {
   answer: string;
   citations: string[];
   block: string; // formatted system-prompt block, "" when nothing usable
+  status: LiveResearchStatus;
+  attempted: boolean; // true when we tried (i.e. caller deemed it research-style)
 };
 
-const EMPTY: LiveResearch = { answer: "", citations: [], block: "" };
+const FALLBACK_NOTE = [
+  "LIVE EXTERNAL RESEARCH: unavailable for this question (Perplexity returned no usable result).",
+  "Acknowledge this to the operator in one short sentence — e.g. \"I couldn't pull fresh external research on that just now\" — then answer as best you can from the operator's own portfolio data and the curated knowledge above. Do not invent benchmarks, numbers, or sources.",
+].join("\n");
+
+function emptyResult(status: LiveResearchStatus, attempted: boolean): LiveResearch {
+  return {
+    answer: "",
+    citations: [],
+    block: attempted ? FALLBACK_NOTE : "",
+    status,
+    attempted,
+  };
+}
 
 /**
- * One-shot grounded search. Best-effort: never throws, returns EMPTY on
- * missing key / network failure / empty result. Caller decides whether to
- * inject `block` into the system prompt.
+ * One-shot grounded search. Best-effort: never throws. When the call fails
+ * or returns nothing, `block` carries a fallback instruction telling Lumi to
+ * disclose the gap and fall back to portfolio context.
  */
 export async function fetchLiveResearch(
   question: string,
   opts?: { mode?: "web" | "academic"; recency?: "day" | "week" | "month" | "year" },
 ): Promise<LiveResearch> {
   const apiKey = process.env.PERPLEXITY_API_KEY;
-  if (!apiKey) return EMPTY;
+  if (!apiKey) return emptyResult("disabled", true);
 
   try {
     const res = await fetch("https://api.perplexity.ai/chat/completions", {
@@ -94,13 +115,13 @@ export async function fetchLiveResearch(
       }),
     });
 
-    if (!res.ok) return EMPTY;
+    if (!res.ok) return emptyResult("error", true);
     const j = (await res.json()) as {
       choices?: Array<{ message?: { content?: string } }>;
       citations?: string[];
     };
     const answer = j.choices?.[0]?.message?.content?.trim() ?? "";
-    if (!answer) return EMPTY;
+    if (!answer) return emptyResult("empty", true);
     const citations = Array.isArray(j.citations) ? j.citations.slice(0, 6) : [];
 
     const citeBlock = citations.length
@@ -116,8 +137,9 @@ export async function fetchLiveResearch(
       .filter(Boolean)
       .join("\n");
 
-    return { answer, citations, block };
+    return { answer, citations, block, status: "ok", attempted: true };
   } catch {
-    return EMPTY;
+    return emptyResult("error", true);
   }
 }
+
