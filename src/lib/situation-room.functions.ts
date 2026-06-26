@@ -8,6 +8,90 @@ const EMBED_MODEL = "openai/text-embedding-3-small";
 const EMBED_DIM = 1536;
 const CHAT_MODEL = "google/gemini-2.5-flash";
 
+// ---------------------------------------------------------------------------
+// Situation Room per-user quota (admin-configurable via app_settings)
+// ---------------------------------------------------------------------------
+
+type SituationWindow = "day" | "week" | "month";
+type SituationLimits = { max_prompts: number; window: SituationWindow };
+
+const DEFAULT_LIMITS: SituationLimits = { max_prompts: 5, window: "month" };
+
+function windowBounds(window: SituationWindow): { startIso: string; resetIso: string } {
+  const now = new Date();
+  if (window === "day") {
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const reset = new Date(start.getTime() + 86_400_000);
+    return { startIso: start.toISOString(), resetIso: reset.toISOString() };
+  }
+  if (window === "week") {
+    // ISO week, Monday 00:00 UTC
+    const day = now.getUTCDay(); // 0..6, Sun=0
+    const diff = (day + 6) % 7; // days since Monday
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - diff));
+    const reset = new Date(start.getTime() + 7 * 86_400_000);
+    return { startIso: start.toISOString(), resetIso: reset.toISOString() };
+  }
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const reset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+  return { startIso: start.toISOString(), resetIso: reset.toISOString() };
+}
+
+async function loadSituationLimits(): Promise<SituationLimits> {
+  const { data } = await supabaseAdmin
+    .from("app_settings")
+    .select("value")
+    .eq("key", "situation_room.limits")
+    .maybeSingle();
+  const raw = (data as { value?: Partial<SituationLimits> } | null)?.value;
+  const max = Number(raw?.max_prompts);
+  const win = raw?.window;
+  return {
+    max_prompts: Number.isFinite(max) && max > 0 ? Math.floor(max) : DEFAULT_LIMITS.max_prompts,
+    window: win === "day" || win === "week" || win === "month" ? win : DEFAULT_LIMITS.window,
+  };
+}
+
+async function isAdmin(userId: string): Promise<boolean> {
+  const { data } = await supabaseAdmin
+    .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+  return !!data;
+}
+
+async function logLumiEvent(userId: string, event: string, meta: Record<string, unknown>): Promise<void> {
+  try {
+    await supabaseAdmin.from("lumi_events").insert({ user_id: userId, event, meta });
+  } catch {
+    /* metrics are best-effort */
+  }
+}
+
+async function countSituationsInWindow(userId: string, startIso: string): Promise<number> {
+  const { count } = await supabaseAdmin
+    .from("situation_sessions")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startIso);
+  return count ?? 0;
+}
+
+async function assertSituationQuota(userId: string): Promise<void> {
+  if (await isAdmin(userId)) return;
+  const limits = await loadSituationLimits();
+  const { startIso } = windowBounds(limits.window);
+  const used = await countSituationsInWindow(userId, startIso);
+  if (used >= limits.max_prompts) {
+    await logLumiEvent(userId, "situation.quota_blocked", {
+      used,
+      max: limits.max_prompts,
+      window: limits.window,
+    });
+    throw new Error("SITUATION_QUOTA_EXCEEDED");
+  }
+}
+
+
+
 type Dispatch = {
   id: string;
   slug: string;
