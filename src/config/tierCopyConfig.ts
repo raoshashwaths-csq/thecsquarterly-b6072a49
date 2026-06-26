@@ -30,13 +30,6 @@ export type TierCopyEntry = {
   cta: string;
   ctaVariant: CtaVariant;
   lockIcon: boolean;
-  /**
-   * Tier-aware destination for the CTA. Visitors route to /login,
-   * free/reader users route to /pricing (upgrade), entitled users route
-   * directly to the feature. When omitted, the consuming component should
-   * fall back to its hard-coded `to` prop.
-   */
-  ctaHref?: string;
   /** Codex individual-playbook only — show purchase affordance. */
   purchaseVisible?: boolean;
   /** Lumi only — session-state chip text. */
