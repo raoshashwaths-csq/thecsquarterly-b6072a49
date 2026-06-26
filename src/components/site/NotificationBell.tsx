@@ -156,16 +156,16 @@ export function NotificationBell() {
                     </p>
                     {n.action_label && n.action_route && (
                       <div className="mt-2">
-                        <Link
-                          to={n.action_route as never}
+                        <a
+                          href={n.action_route}
                           className="font-mono text-[11px] uppercase tracking-widest text-secondary-accent hover:text-accent"
-                          onClick={(e) => {
+                          onClick={(e: React.MouseEvent) => {
                             e.stopPropagation();
                             void onClickItem(n);
                           }}
                         >
                           {n.action_label} →
-                        </Link>
+                        </a>
                       </div>
                     )}
                   </li>
