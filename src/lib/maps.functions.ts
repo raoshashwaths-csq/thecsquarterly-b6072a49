@@ -308,9 +308,13 @@ export const getSharedMap = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ token: z.string().min(8) }).parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Explicit column list — never return customer_email or other sensitive
+    // owner-only fields to share-link viewers.
+    const SHARED_MAP_COLUMNS =
+      "id, title, account_name, status, start_date, target_go_live, actual_go_live, time_to_value_days, health_score, share_enabled, share_token, last_customer_view, created_at, updated_at";
     const { data: map } = await supabaseAdmin
       .from("maps")
-      .select("*")
+      .select(SHARED_MAP_COLUMNS)
       .eq("share_token", data.token)
       .eq("share_enabled", true)
       .maybeSingle();
@@ -326,12 +330,13 @@ export const getSharedMap = createServerFn({ method: "POST" })
 
     return {
       ok: true as const,
-      map: map as MapRecord,
+      map: map as unknown as MapRecord,
       phases: (phases ?? []) as MapPhase[],
       milestones: (milestones ?? []) as MapMilestone[],
       comments: (comments ?? []) as MapComment[],
     };
   });
+
 
 export const addCustomerComment = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
