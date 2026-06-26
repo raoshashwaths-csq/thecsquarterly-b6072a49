@@ -159,6 +159,14 @@ export function useSubscriptionTier(): SubscriptionTier {
 
   const dRank = DESIGNATION_RANK[ent.designation] ?? 0;
 
+  // Map the runtime UiTier onto the AccessTier hierarchy so canAccess() can
+  // answer questions phrased in the registry's vocabulary.
+  const accessTier: AccessTier =
+    tier === "enterprise" ? "scale" : (tier as AccessTier);
+  const currentRank = ACCESS_RANK[accessTier];
+  const canAccess = (requiredTier: AccessTier): boolean =>
+    currentRank >= ACCESS_RANK[requiredTier];
+
   return {
     isLoggedIn: !!user,
     loading,
@@ -176,5 +184,6 @@ export function useSubscriptionTier(): SubscriptionTier {
     canAccessCommunity: dRank >= DESIGNATION_RANK.practitioner,
     canAccessTeamFeatures: dRank >= DESIGNATION_RANK.team,
     upgradePromptTier: nextTier(ent.designation),
+    canAccess,
   };
 }
