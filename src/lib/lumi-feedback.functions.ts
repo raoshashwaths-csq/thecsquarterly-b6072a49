@@ -25,31 +25,36 @@ export const submitLumiFeedback = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // One feedback row per (user, run). Upsert by (user_id, run_id).
-    const { error } = await supabaseAdmin
+    // No unique index on (user_id, run_id) — do a manual upsert so the same
+    // operator clicking YES then NOT QUITE updates the row instead of
+    // creating duplicates.
+    const { data: existing } = await supabaseAdmin
       .from("lumi_feedback")
-      .upsert(
-        {
-          user_id: context.userId,
-          run_id: data.runId,
+      .select("id")
+      .eq("user_id", context.userId)
+      .eq("run_id", data.runId)
+      .maybeSingle();
+
+    if (existing?.id) {
+      const { error } = await supabaseAdmin
+        .from("lumi_feedback")
+        .update({
           rating: data.rating,
           note: data.note ?? null,
           processed: false,
           processed_at: null,
-        },
-        { onConflict: "user_id,run_id" },
-      );
-
-    if (error) {
-      // Fallback when no unique index exists — plain insert.
-      const { error: insErr } = await supabaseAdmin.from("lumi_feedback").insert({
+        })
+        .eq("id", existing.id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabaseAdmin.from("lumi_feedback").insert({
         user_id: context.userId,
         run_id: data.runId,
         rating: data.rating,
         note: data.note ?? null,
         processed: false,
       });
-      if (insErr) throw new Error(insErr.message);
+      if (error) throw new Error(error.message);
     }
 
     return { ok: true };
