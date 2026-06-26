@@ -165,20 +165,50 @@ function SituationRoomPage() {
 
         {!sessionId ? (
           <form onSubmit={onSubmitSituation} className="space-y-4">
+            {user ? (
+              <div className="flex items-center justify-between gap-3 border border-border bg-card/60 px-4 py-2.5">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Situation Room quota
+                </div>
+                <div className="font-mono text-xs text-foreground/80">
+                  {unlimited
+                    ? "Unlimited (admin)"
+                    : quotaQuery.isLoading || remaining === null
+                    ? "…"
+                    : (
+                      <span>
+                        <span className={quotaReached ? "text-destructive" : "text-accent"}>
+                          {remaining}
+                        </span>
+                        <span className="text-muted-foreground"> of {quotaMax} left</span>
+                        {quotaResetAt ? (
+                          <span className="text-muted-foreground">
+                            {" · resets "}
+                            {new Date(quotaResetAt).toLocaleDateString(undefined, {
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                        ) : null}
+                      </span>
+                    )}
+                </div>
+              </div>
+            ) : null}
             <div className="relative">
               <Textarea
                 value={situation}
                 onChange={(e) => setSituation(e.target.value)}
                 placeholder={EXAMPLE_SITUATION}
                 rows={8}
-                disabled={!user || start.isPending}
+                disabled={!user || start.isPending || quotaReached}
                 className="min-h-[200px] text-base leading-relaxed font-serif resize-y bg-card border-border focus-visible:ring-accent"
               />
               <button
                 type="button"
                 onClick={() => speech.toggle()}
-                disabled={!user}
-                className="absolute bottom-3 right-3 inline-flex items-center justify-center h-9 w-9 rounded-full border border-border bg-background hover:border-accent hover:text-accent transition-colors"
+                disabled={!user || quotaReached}
+                className="absolute bottom-3 right-3 inline-flex items-center justify-center h-9 w-9 rounded-full border border-border bg-background hover:border-accent hover:text-accent transition-colors disabled:opacity-50"
                 aria-label={speech.recording ? "Stop dictation" : "Dictate"}
               >
                 {speech.recording ? <span className="h-3 w-3 bg-accent" /> : <Mic className="h-4 w-4" />}
@@ -196,6 +226,25 @@ function SituationRoomPage() {
                   Sign in →
                 </Link>
               </div>
+            ) : quotaReached ? (
+              <div className="border border-destructive/40 bg-destructive/5 p-5">
+                <div className="flex items-start gap-3">
+                  <Lock className="h-4 w-4 mt-0.5 text-destructive" />
+                  <div className="flex-1">
+                    <div className="eyebrow text-destructive mb-1">Quota reached</div>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      You've used all {quotaMax} Situation Room runs this {quotaWindow}. Your quota
+                      resets on {quotaResetAt ? new Date(quotaResetAt).toLocaleDateString() : "the next cycle"}.
+                    </p>
+                    <Link
+                      to="/pricing"
+                      className="inline-block mt-3 font-mono text-xs uppercase tracking-widest text-accent border-b border-accent pb-0.5"
+                    >
+                      See plans for more runs →
+                    </Link>
+                  </div>
+                </div>
+              </div>
             ) : (
               <Button
                 type="submit"
@@ -212,10 +261,6 @@ function SituationRoomPage() {
             situation={situation}
             dispatches={dispatches}
             messages={messages}
-            reply={reply}
-            setReply={setReply}
-            onSend={() => cont.mutate(reply.trim())}
-            sending={cont.isPending}
             saved={saved}
             saveTitle={saveTitle}
             setSaveTitle={setSaveTitle}
