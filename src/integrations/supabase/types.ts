@@ -126,6 +126,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          last_calculated_at: string | null
           metric: string
           notes: string | null
           p25: number | null
@@ -133,12 +134,14 @@ export type Database = {
           p75: number | null
           period: string
           published: boolean
+          sample_size: number | null
           segment: string | null
           value: number
         }
         Insert: {
           created_at?: string
           id?: string
+          last_calculated_at?: string | null
           metric: string
           notes?: string | null
           p25?: number | null
@@ -146,12 +149,14 @@ export type Database = {
           p75?: number | null
           period: string
           published?: boolean
+          sample_size?: number | null
           segment?: string | null
           value: number
         }
         Update: {
           created_at?: string
           id?: string
+          last_calculated_at?: string | null
           metric?: string
           notes?: string | null
           p25?: number | null
@@ -159,6 +164,7 @@ export type Database = {
           p75?: number | null
           period?: string
           published?: boolean
+          sample_size?: number | null
           segment?: string | null
           value?: number
         }
@@ -2240,6 +2246,7 @@ export type Database = {
           articles_processed: number
           errors: Json
           id: string
+          notice: string | null
           records_created: number
           run_at: string
           status: string
@@ -2249,6 +2256,7 @@ export type Database = {
           articles_processed?: number
           errors?: Json
           id?: string
+          notice?: string | null
           records_created?: number
           run_at?: string
           status?: string
@@ -2258,6 +2266,7 @@ export type Database = {
           articles_processed?: number
           errors?: Json
           id?: string
+          notice?: string | null
           records_created?: number
           run_at?: string
           status?: string
