@@ -7,6 +7,7 @@ import { QMark } from "@/components/site/QMark";
 import { TIERS, tierMailto, type Tier } from "@/lib/tiers";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import { DESIGNATION_RANK } from "@/lib/entitlements";
+import { usePlans } from "@/hooks/usePlans";
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -30,11 +31,12 @@ export const Route = createFileRoute("/pricing")({
   component: PricingPage,
 });
 
-const INDIVIDUAL = TIERS.filter((t) => t.band === "individual");
-const TEAM = TIERS.filter((t) => t.band === "team");
-const PARTNER = TIERS.filter((t) => t.band === "partner");
-
 function PricingPage() {
+  const { tiers } = usePlans();
+  const INDIVIDUAL = tiers.filter((t) => t.band === "individual");
+  const TEAM = tiers.filter((t) => t.band === "team");
+  const PARTNER = tiers.filter((t) => t.band === "partner");
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />

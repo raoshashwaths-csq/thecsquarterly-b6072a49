@@ -56,6 +56,44 @@ async function handleSubscriptionUpsert(data: SubscriptionData, env: PaddleEnv) 
   }
   const designation = designationFromPriceId(priceId);
 
+  // Build a snapshot of the plan's feature assignments at the moment of
+  // purchase. Grandfathers the user against future admin edits.
+  let planSnapshot: Record<string, unknown> | null = null;
+  if (designation) {
+    const supa = getSupabase();
+    const { data: planRow } = await supa
+      .from("subscription_plans")
+      .select("id, designation, label, price_monthly_cents")
+      .eq("designation", designation)
+      .maybeSingle();
+    if (planRow) {
+      const { data: assigns } = await supa
+        .from("plan_feature_assignments")
+        .select("enabled, numeric_value, feature_id, plan_features(code, kind)")
+        .eq("plan_id", (planRow as { id: string }).id);
+      const features: Record<string, { enabled: boolean; value: number | null; kind: string }> = {};
+      for (const a of (assigns ?? []) as Array<{
+        enabled: boolean;
+        numeric_value: number | null;
+        plan_features: { code: string; kind: string } | null;
+      }>) {
+        if (!a.plan_features) continue;
+        features[a.plan_features.code] = {
+          enabled: a.enabled,
+          value: a.numeric_value,
+          kind: a.plan_features.kind,
+        };
+      }
+      planSnapshot = {
+        designation: (planRow as { designation: string }).designation,
+        label: (planRow as { label: string }).label,
+        price_monthly_cents: (planRow as { price_monthly_cents: number }).price_monthly_cents,
+        snapshot_at: new Date().toISOString(),
+        features,
+      };
+    }
+  }
+
   const row = {
     user_id: userId,
     paddle_subscription_id: data.id,
@@ -63,19 +101,20 @@ async function handleSubscriptionUpsert(data: SubscriptionData, env: PaddleEnv) 
     product_id: productId,
     price_id: priceId,
     designation,
-    // Keep legacy `tier` column in sync so older readers still resolve.
     tier: designation ?? "vanguard",
     status: data.status,
     current_period_start: data.currentBillingPeriod?.startsAt ?? null,
     current_period_end: data.currentBillingPeriod?.endsAt ?? null,
     cancel_at_period_end: data.scheduledChange?.action === "cancel",
     environment: env,
+    plan_snapshot: planSnapshot,
+    grandfathered_at: planSnapshot ? new Date().toISOString() : null,
     updated_at: new Date().toISOString(),
   };
 
   const { error } = await getSupabase()
     .from("subscriptions")
-    .upsert(row, { onConflict: "paddle_subscription_id" });
+    .upsert(row as never, { onConflict: "paddle_subscription_id" });
   if (error) console.error("[paddle webhook] upsert error", error);
 }
 
