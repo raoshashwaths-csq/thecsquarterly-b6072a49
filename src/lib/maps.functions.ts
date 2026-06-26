@@ -358,13 +358,32 @@ export const addCustomerComment = createServerFn({ method: "POST" })
       .eq("share_token", data.token)
       .maybeSingle();
     if (!map || !map.share_enabled) throw new Error("Share link inactive");
+
+    // Validate milestone (if provided) belongs to this shared map to prevent
+    // cross-map comment injection via a known share token.
+    if (data.milestone_id) {
+      const { data: ms } = await supabaseAdmin
+        .from("map_milestones")
+        .select("id")
+        .eq("id", data.milestone_id)
+        .eq("map_id", map.id)
+        .maybeSingle();
+      if (!ms) throw new Error("Invalid milestone");
+    }
+
+    // Sanitize free-text author_name: strip control chars, collapse whitespace,
+    // cap length. author_type is server-forced to "customer" — never trust client.
+    const rawName = (data.author_name ?? "Customer").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
+    const authorName = (rawName.length > 0 ? rawName : "Customer").slice(0, 80);
+
     const { error } = await supabaseAdmin.from("map_comments").insert({
       map_id: map.id,
       milestone_id: data.milestone_id ?? null,
       author_type: "customer",
-      author_name: data.author_name ?? "Customer",
+      author_name: authorName,
       content: data.content,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
