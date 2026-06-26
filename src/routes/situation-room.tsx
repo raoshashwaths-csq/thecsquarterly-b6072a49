@@ -346,10 +346,21 @@ function SituationActive(props: {
               </div>
             ))}
         </div>
-        <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-3">
-          One situation, one read. Start a new situation to ask Lumi something else.
-        </p>
       </section>
+
+      <section className="border border-accent/30 bg-accent/5 px-5 py-4">
+        <div className="flex items-start gap-3">
+          <Sparkles className="h-4 w-4 mt-0.5 text-accent" />
+          <div className="flex-1">
+            <div className="eyebrow text-accent mb-1">Situation complete</div>
+            <p className="text-sm text-foreground/80 leading-relaxed">
+              One read per situation. Save this thread, or start a new situation when you're ready —
+              Lumi gives every problem its own focused brief.
+            </p>
+          </div>
+        </div>
+      </section>
+
 
 
       <section className="border-t border-border pt-6 flex flex-wrap items-center gap-3">
