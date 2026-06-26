@@ -10,7 +10,7 @@ import { ResumeRunPrompt } from "@/components/agent/ResumeRunPrompt";
 import { NewsletterInline } from "@/components/site/NewsletterInline";
 import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
-import { StageRevealSection } from "@/components/home/StageRevealSection";
+
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
