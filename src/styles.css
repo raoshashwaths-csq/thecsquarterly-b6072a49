@@ -767,3 +767,56 @@
 
 
 
+
+/* ============================================================
+   Lumi contextual speech bubble (LumiBubble.tsx)
+   ------------------------------------------------------------
+   Tokens only — --color-secondary-accent, --color-secondary,
+   --color-background, --color-border. No hardcoded colors.
+============================================================ */
+
+@keyframes lumi-bubble-enter {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes lumi-bubble-progress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+.lumi-bubble {
+  animation: lumi-bubble-enter 280ms ease-out forwards;
+}
+
+.lumi-bubble-progress {
+  animation: lumi-bubble-progress 5000ms linear forwards;
+}
+
+/* Tail: outer triangle (border) + inner triangle (fill) */
+.lumi-bubble-tail,
+.lumi-bubble-tail-fill {
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+}
+.lumi-bubble-tail {
+  bottom: -8px;
+  transform: translateX(-50%);
+  border-top: 8px solid var(--secondary-accent);
+}
+.lumi-bubble-tail-fill {
+  bottom: -6px;
+  transform: translateX(-50%);
+  border-left-width: 7px;
+  border-right-width: 7px;
+  border-top: 7px solid var(--secondary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lumi-bubble { animation: none; opacity: 1; }
+  .lumi-bubble-progress { animation: none; width: 0; }
+}
