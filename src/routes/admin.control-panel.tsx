@@ -354,13 +354,131 @@ function OverviewTab() {
           </table>
         </div>
       </div>
+
+      <SituationRoomLimitsCard />
     </div>
   );
 }
 
-// ────────────────────────────────────────────────────────────────────
-// 2. DIAGNOSTICS
-// ────────────────────────────────────────────────────────────────────
+function SituationRoomLimitsCard() {
+  const getSettings = useServerFn(getSituationRoomSettings);
+  const updateSettings = useServerFn(updateSituationRoomSettings);
+  const getMetrics = useServerFn(getSituationRoomMetrics);
+  const qc = useQueryClient();
+
+  const settingsQ = useQuery({
+    queryKey: ["sr-settings"],
+    queryFn: () => getSettings(),
+    staleTime: 60_000,
+  });
+  const metricsQ = useQuery({
+    queryKey: ["sr-metrics"],
+    queryFn: () => getMetrics(),
+    staleTime: 60_000,
+  });
+
+  const [maxPrompts, setMaxPrompts] = useState<string>("");
+  const [win, setWin] = useState<"day" | "week" | "month">("month");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (settingsQ.data) {
+      setMaxPrompts(String(settingsQ.data.max_prompts));
+      setWin(settingsQ.data.window);
+    }
+  }, [settingsQ.data]);
+
+  async function onSave() {
+    const n = Number(maxPrompts);
+    if (!Number.isFinite(n) || n < 1 || n > 100) {
+      toast.error("Max prompts must be between 1 and 100");
+      return;
+    }
+    setSaving(true);
+    try {
+      await updateSettings({ data: { max_prompts: Math.floor(n), window: win } });
+      toast.success("Situation Room limits updated");
+      await qc.invalidateQueries({ queryKey: ["sr-settings"] });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="mt-6 rounded-md border border-border bg-card p-4">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h3 className="font-display text-lg leading-none">Situation Room limits</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Per-user cap on new Situation Room runs. Applies to new situations only; running sessions are unaffected.
+          </p>
+        </div>
+        <Badge variant="outline" className="text-xs uppercase tracking-[0.2em]">Guardrail</Badge>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+        <div>
+          <label className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1.5 block">
+            Max prompts per user
+          </label>
+          <Input
+            type="number"
+            min={1}
+            max={100}
+            value={maxPrompts}
+            onChange={(e) => setMaxPrompts(e.target.value)}
+            disabled={settingsQ.isLoading || saving}
+          />
+        </div>
+        <div>
+          <label className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1.5 block">
+            Reset window
+          </label>
+          <Select value={win} onValueChange={(v) => setWin(v as "day" | "week" | "month")} disabled={saving}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Daily (UTC)</SelectItem>
+              <SelectItem value="week">Weekly (ISO Mon)</SelectItem>
+              <SelectItem value="month">Monthly (UTC)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-end">
+          <Button onClick={onSave} disabled={saving || settingsQ.isLoading} className="w-full">
+            {saving ? "Saving…" : "Save limits"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded border border-border bg-background/40 p-3">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+            Extra-attempt blocks (30d)
+          </div>
+          <div className="text-2xl font-display mt-1 tabular-nums">
+            {metricsQ.isLoading ? "—" : fmtNum(metricsQ.data?.extraAttemptsBlocked30d ?? 0)}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Users tried to keep chatting after Lumi's one read.
+          </p>
+        </div>
+        <div className="rounded border border-border bg-background/40 p-3">
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+            Quota blocks (30d)
+          </div>
+          <div className="text-2xl font-display mt-1 tabular-nums">
+            {metricsQ.isLoading ? "—" : fmtNum(metricsQ.data?.quotaBlocks30d ?? 0)}
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Users hit the per-user cap above.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DiagnosticsTab() {
   const fn = useServerFn(getAgentObservability);
