@@ -133,7 +133,7 @@ async function logAudit(
       action,
       target_table,
       target_id,
-      details,
+      details: detailsJson,
     });
   } catch (e) {
     // eslint-disable-next-line no-console
