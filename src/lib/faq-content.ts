@@ -122,6 +122,8 @@ const EN_SECTIONS: FaqSection[] = [
       { slug: "two-voice", q: "What's the Two-Voice System?", a: "Every premium essay is written in two parallel registers: Analytical (structured, McKinsey-tone) and Witty (narrative, Wodehouse-tone). Toggle inline. Same argument, same facts, two reading experiences." },
       { slug: "3-2-1", q: "What's the 3-2-1 model?", a: "Our editorial spine: every new article delivers three facts, two insights, and one actionable. No filler, no recap, no \"5 things\" listicles." },
       { slug: "guest", q: "Can I submit a guest piece?", a: "We don't accept unsolicited submissions but we do commission operator essays for The Outcome Forum. Pitch via the contact link in the footer." },
+      { slug: "reader-signals", q: "How does the editorial team use reader signals?", a: "Every dispatch ends with one structured question — 'What did this change for you?' — and four reactions. The admin Reader Signals dashboard surfaces per-dispatch breakdowns and a disagree-rate, plus the full pushback threads readers start with Lumi. Theses with high disagree-rates get revisited; the strongest counter-arguments often seed the next dispatch." },
+      { slug: "aggregate-readout", q: "What does '61% of operators said this changed their approach' mean?", a: "It's the live aggregate of reader reactions on that specific dispatch. Updated as new readers signal in. One signal per reader per article — readers may change their choice but it never double-counts." },
     ],
   },
   {
@@ -134,6 +136,8 @@ const EN_SECTIONS: FaqSection[] = [
       { slug: "cancel", q: "How do I cancel or change plan?", a: "Account → Billing. Changes take effect at the end of your current billing cycle. No retention dark patterns." },
       { slug: "team-pricing", q: "Do you offer team or enterprise pricing?", a: "Yes — Team, Scale, and Enterprise tiers include seat pools, shared workspaces, and admin controls. Contact us via the footer for Enterprise quotes." },
       { slug: "refunds", q: "Do you offer refunds?", a: "Within 14 days of your first paid charge, full refund, no questions. After that, billing is non-refundable but you can cancel anytime to stop future charges." },
+      { slug: "debrief-quota", q: "Does the Lumi Debrief count toward my monthly Lumi limit?", a: "Free readers get one debrief per month, standalone — it doesn't touch any other quota because there isn't one. Paid tiers (Practitioner and above) count each debrief as one Lumi run from your monthly pool, the same as any other Lumi conversation." },
+      { slug: "reactions-cost", q: "Do dispatch reactions or pushback threads cost a Lumi run?", a: "Tapping one of the four reactions is always free. If you choose 'I disagree with the thesis,' Lumi opens a pushback thread — the opening question is free; subsequent turns in that thread count as Lumi runs from your monthly pool, the same as any other conversation." },
     ],
   },
   {
