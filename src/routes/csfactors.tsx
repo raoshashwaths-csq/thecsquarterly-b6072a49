@@ -193,6 +193,27 @@ function CSFactorsPageInner() {
                 />
               </QErrorBoundary>
 
+              <div className="mt-8 grid md:grid-cols-3 gap-4">
+                <Link
+                  to="/situation-room"
+                  className="md:col-span-3 group border border-accent/40 bg-gradient-to-br from-accent/10 to-transparent hover:border-accent transition-colors p-6 flex items-start gap-5"
+                >
+                  <LumiMark variant="emblem" className="h-10 w-10 mt-1" />
+                  <div className="flex-1 min-w-0">
+                    <div className="eyebrow text-accent mb-1">Lumi · Situation Room</div>
+                    <h3 className="font-display text-xl tracking-tight mb-1 group-hover:text-accent transition-colors">
+                      Bring your live problem. Lumi finds the dispatch.
+                    </h3>
+                    <p className="text-sm text-foreground/70 max-w-2xl">
+                      Describe the situation in your own words. Lumi pulls the 3 most relevant past dispatches, the applicable framework, and coaches you through it.
+                    </p>
+                  </div>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-accent self-center hidden md:inline">
+                    Open →
+                  </span>
+                </Link>
+              </div>
+
               <div className="mt-8">
                 <QErrorBoundary label="Tagged Lumi Runs">
                   <TaggedLumiRunsWidget />
