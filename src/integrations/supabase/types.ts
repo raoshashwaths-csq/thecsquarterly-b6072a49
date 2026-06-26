@@ -1576,6 +1576,45 @@ export type Database = {
         }
         Relationships: []
       }
+      situation_sessions: {
+        Row: {
+          benchmark: Json | null
+          created_at: string
+          dispatches: Json
+          id: string
+          messages: Json
+          saved_to_workspace: boolean
+          situation: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          benchmark?: Json | null
+          created_at?: string
+          dispatches?: Json
+          id?: string
+          messages?: Json
+          saved_to_workspace?: boolean
+          situation: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          benchmark?: Json | null
+          created_at?: string
+          dispatches?: Json
+          id?: string
+          messages?: Json
+          saved_to_workspace?: boolean
+          situation?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
