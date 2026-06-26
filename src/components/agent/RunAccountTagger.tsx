@@ -61,6 +61,11 @@ export function RunAccountTagger({
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState<boolean>(Boolean(initialAccountId));
   const [loading, setLoading] = useState(true);
+  const [lastSentiment, setLastSentiment] = useState<{
+    label: "Positive" | "Neutral" | "Critical";
+    source: "lexicon" | "ai";
+    confidence: "low" | "med" | "high";
+  } | null>(null);
 
   const stakeholderOptions = useMemo(() => suggestionsForTree(treeId), [treeId]);
 
