@@ -78,7 +78,13 @@ export const askQ = createServerFn({ method: "POST" })
     const memoryBlock = renderMemoryBlock(memories);
     // Layer 3: portfolio-wide knowledge injection (distinct from Layer 3.5 per-user lumi_memory above).
     const knowledge = await getLumiKnowledgeContext({ query: data.question });
-    const system = [baseSystem, memoryBlock, knowledge.block].filter(Boolean).join("\n\n");
+    // Layer 4: live external research via Perplexity, only for questions that
+    // need current industry/benchmark/market grounding. Best-effort, fails silent.
+    const { shouldUseLiveResearch, fetchLiveResearch } = await import("./perplexity.server");
+    const live = shouldUseLiveResearch(data.question)
+      ? await fetchLiveResearch(data.question)
+      : { block: "", citations: [] as string[], answer: "" };
+    const system = [baseSystem, memoryBlock, knowledge.block, live.block].filter(Boolean).join("\n\n");
 
     const t0 = Date.now();
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
