@@ -853,3 +853,255 @@ function SkuTab({
     </div>
   );
 }
+
+// =================== Drafts Tab ===================
+
+function DraftsTab({ live }: { live: { plans: PublicPlan[]; features: PublicFeature[]; assignments: PublicAssignment[] } }) {
+  const qc = useQueryClient();
+  const getDraft = useServerFn(adminGetDraft);
+  const saveDraft = useServerFn(adminSaveDraft);
+  const publishDraft = useServerFn(adminPublishDraft);
+  const discardDraft = useServerFn(adminDiscardDraft);
+
+  const draftQ = useQuery({
+    queryKey: ["admin:plans:draft"],
+    queryFn: () => getDraft(),
+  });
+
+  const saveMut = useMutation({
+    mutationFn: () =>
+      saveDraft({
+        data: {
+          plans: live.plans as never,
+          features: live.features as never,
+          assignments: live.assignments as never,
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Draft saved from current live state");
+      qc.invalidateQueries({ queryKey: ["admin:plans:draft"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const publishMut = useMutation({
+    mutationFn: () => publishDraft(),
+    onSuccess: () => {
+      toast.success("Draft published to live");
+      qc.invalidateQueries({ queryKey: ["admin:plans"] });
+      qc.invalidateQueries({ queryKey: ["plans:public"] });
+      qc.invalidateQueries({ queryKey: ["admin:plans:draft"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const discardMut = useMutation({
+    mutationFn: () => discardDraft(),
+    onSuccess: () => {
+      toast.success("Draft discarded");
+      qc.invalidateQueries({ queryKey: ["admin:plans:draft"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const draft = draftQ.data?.draft ?? null;
+
+  // Compute diff vs live
+  const diff = useMemo(() => {
+    if (!draft) return null;
+    const planMap = new Map(live.plans.map((p) => [p.designation, p]));
+    const featMap = new Map(live.features.map((f) => [f.code, f]));
+    const assignMap = new Map(live.assignments.map((a) => [`${a.plan_id}:${a.feature_id}`, a]));
+    const planChanges: Array<{ designation: string; field: string; before: unknown; after: unknown }> = [];
+    for (const dp of draft.plans ?? []) {
+      const lp = planMap.get((dp as PublicPlan).designation);
+      if (!lp) {
+        planChanges.push({ designation: (dp as PublicPlan).designation, field: "(new)", before: null, after: dp });
+        continue;
+      }
+      for (const k of Object.keys(dp) as Array<keyof PublicPlan>) {
+        if (k === "id") continue;
+        if (JSON.stringify((dp as PublicPlan)[k]) !== JSON.stringify(lp[k])) {
+          planChanges.push({ designation: lp.designation, field: String(k), before: lp[k], after: (dp as PublicPlan)[k] });
+        }
+      }
+    }
+    const featChanges: Array<{ code: string; field: string }> = [];
+    for (const df of draft.features ?? []) {
+      const lf = featMap.get((df as PublicFeature).code);
+      if (!lf) {
+        featChanges.push({ code: (df as PublicFeature).code, field: "(new)" });
+        continue;
+      }
+      for (const k of Object.keys(df) as Array<keyof PublicFeature>) {
+        if (k === "id") continue;
+        if (JSON.stringify((df as PublicFeature)[k]) !== JSON.stringify(lf[k])) {
+          featChanges.push({ code: lf.code, field: String(k) });
+        }
+      }
+    }
+    let assignChanges = 0;
+    for (const da of draft.assignments ?? []) {
+      const la = assignMap.get(`${(da as PublicAssignment).plan_id}:${(da as PublicAssignment).feature_id}`);
+      if (!la || JSON.stringify(la) !== JSON.stringify(da)) assignChanges++;
+    }
+    // Also count assignments present live but missing in draft (for affected plans)
+    const draftPlanIds = new Set((draft.assignments ?? []).map((a: PublicAssignment) => a.plan_id));
+    const draftAssignKeys = new Set((draft.assignments ?? []).map((a: PublicAssignment) => `${a.plan_id}:${a.feature_id}`));
+    for (const la of live.assignments) {
+      if (draftPlanIds.has(la.plan_id) && !draftAssignKeys.has(`${la.plan_id}:${la.feature_id}`)) assignChanges++;
+    }
+    return { planChanges, featChanges, assignChanges };
+  }, [draft, live]);
+
+  return (
+    <div className="space-y-6">
+      <div className="p-4 border border-border bg-muted/20">
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-2">Draft &amp; Publish</div>
+        <p className="text-sm text-foreground/70 max-w-3xl">
+          Stage pricing &amp; feature changes here before they go live. Use <strong>Snapshot live → draft</strong> to capture the current state, edit it elsewhere, then come back and <strong>Publish</strong>. Publishing atomically applies plan/feature upserts and replaces assignments for any plan touched by the draft.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          onClick={() => saveMut.mutate()}
+          disabled={saveMut.isPending}
+          className="font-mono text-xs uppercase tracking-[0.25em] border border-border px-3 py-2 hover:bg-muted/40 disabled:opacity-50"
+        >
+          {saveMut.isPending ? "Saving…" : draft ? "Re-snapshot live → draft" : "Snapshot live → draft"}
+        </button>
+        <button
+          onClick={() => {
+            if (!draft) return;
+            if (confirm("Publish draft? Live pricing/features will be overwritten where the draft differs.")) publishMut.mutate();
+          }}
+          disabled={!draft || publishMut.isPending}
+          className="font-mono text-xs uppercase tracking-[0.25em] bg-accent text-accent-foreground px-3 py-2 hover:opacity-90 disabled:opacity-40"
+        >
+          {publishMut.isPending ? "Publishing…" : "Publish draft → live"}
+        </button>
+        <button
+          onClick={() => {
+            if (!draft) return;
+            if (confirm("Discard the current draft?")) discardMut.mutate();
+          }}
+          disabled={!draft || discardMut.isPending}
+          className="font-mono text-xs uppercase tracking-[0.25em] border border-destructive/40 text-destructive px-3 py-2 hover:bg-destructive/10 disabled:opacity-40"
+        >
+          Discard draft
+        </button>
+      </div>
+
+      {!draft && (
+        <div className="text-sm text-foreground/60 italic">
+          No draft exists. Snapshot live state to start editing safely. Direct edits in the Plans / Matrix / SKU tabs still apply immediately — drafts give you a checkpoint to revert/preview to.
+        </div>
+      )}
+
+      {draft && (
+        <div className="space-y-4">
+          <div className="text-xs font-mono uppercase tracking-widest text-foreground/60">
+            Draft saved {new Date(draft.saved_at).toLocaleString()} {draft.saved_by ? `· by ${draft.saved_by.slice(0, 8)}` : ""}
+          </div>
+          <div className="grid sm:grid-cols-3 gap-3">
+            <div className="border border-border p-3">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50">Plans diffs</div>
+              <div className="font-display text-3xl text-accent">{diff?.planChanges.length ?? 0}</div>
+            </div>
+            <div className="border border-border p-3">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50">SKU diffs</div>
+              <div className="font-display text-3xl text-accent">{diff?.featChanges.length ?? 0}</div>
+            </div>
+            <div className="border border-border p-3">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-foreground/50">Assignment diffs</div>
+              <div className="font-display text-3xl text-accent">{diff?.assignChanges ?? 0}</div>
+            </div>
+          </div>
+
+          {diff && diff.planChanges.length > 0 && (
+            <div className="border border-border">
+              <div className="bg-muted/30 px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-foreground/60">Plan changes</div>
+              <table className="w-full text-sm">
+                <tbody>
+                  {diff.planChanges.slice(0, 50).map((c, i) => (
+                    <tr key={i} className="border-b border-border/60 last:border-b-0">
+                      <td className="px-3 py-2 font-mono text-xs text-secondary-accent">{c.designation}</td>
+                      <td className="px-3 py-2 font-mono text-xs">{c.field}</td>
+                      <td className="px-3 py-2 text-xs text-foreground/60">{JSON.stringify(c.before)}</td>
+                      <td className="px-3 py-2 text-xs text-accent">→ {JSON.stringify(c.after)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =================== Audit Log Tab ===================
+
+function AuditLogTab() {
+  const list = useServerFn(adminListAuditLog);
+  const q = useQuery({
+    queryKey: ["admin:audit-log"],
+    queryFn: () => list({ data: { limit: 200 } }),
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="p-4 border border-border bg-muted/20">
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-secondary-accent mb-2">Admin audit log</div>
+        <p className="text-sm text-foreground/70">
+          Every plan, SKU, assignment, draft, export, and re-snapshot action by an admin is recorded. The most recent 200 entries are shown.
+        </p>
+      </div>
+      {q.isLoading && <div className="text-sm text-foreground/60">Loading…</div>}
+      {q.error && <div className="text-sm text-destructive">{(q.error as Error).message}</div>}
+      {q.data && (
+        <div className="border border-border overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 border-b border-border">
+              <tr>
+                {["When", "Actor", "Action", "Target", "Details"].map((h) => (
+                  <th key={h} className="text-left px-3 py-2 font-mono uppercase tracking-widest text-[10px] text-foreground/60">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {q.data.rows.length === 0 && (
+                <tr><td colSpan={5} className="px-3 py-4 text-sm text-foreground/50 italic">No entries yet.</td></tr>
+              )}
+              {q.data.rows.map((r) => (
+                <tr key={(r as { id: string }).id} className="border-b border-border/60 last:border-b-0 align-top">
+                  <td className="px-3 py-2 font-mono text-[11px] text-foreground/70 whitespace-nowrap">
+                    {new Date((r as { created_at: string }).created_at).toLocaleString()}
+                  </td>
+                  <td className="px-3 py-2 text-xs">
+                    {(r as { actor_email: string | null }).actor_email ?? <span className="text-foreground/40">—</span>}
+                  </td>
+                  <td className="px-3 py-2 font-mono text-xs text-accent">{(r as { action: string }).action}</td>
+                  <td className="px-3 py-2 font-mono text-[11px] text-foreground/60">
+                    {(r as { target_table: string | null }).target_table ?? "—"}
+                    {(r as { target_id: string | null }).target_id ? (
+                      <span className="text-foreground/40"> · {(r as { target_id: string }).target_id.slice(0, 12)}</span>
+                    ) : null}
+                  </td>
+                  <td className="px-3 py-2 text-[11px] text-foreground/60 max-w-md">
+                    <details>
+                      <summary className="cursor-pointer hover:text-foreground">view</summary>
+                      <pre className="mt-2 whitespace-pre-wrap break-all bg-muted/30 p-2 text-[10px]">
+                        {JSON.stringify((r as { details: unknown }).details, null, 2)}
+                      </pre>
+                    </details>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
