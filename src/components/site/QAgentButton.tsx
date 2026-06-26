@@ -122,7 +122,7 @@ export function QAgentButton() {
         // Strip the seed/lumi params so refresh doesn't replay.
         navigate({
           to: ".",
-          search: (prev) => {
+          search: ((prev: Record<string, unknown>) => {
             const next = { ...(prev as Record<string, unknown>) };
             delete next.lumi;
             delete next.seed;
