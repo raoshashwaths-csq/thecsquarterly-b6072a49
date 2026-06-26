@@ -843,7 +843,7 @@ export const getFutureOperatorMetrics = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("lumi_events")
         .select("id", { count: "exact", head: true })
-        .eq("event_type", "future_operator.budget_blocked")
+        .eq("event", "future_operator.budget_blocked")
         .gte("created_at", since),
       supabaseAdmin
         .from("future_operator_notifications")
