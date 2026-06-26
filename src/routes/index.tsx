@@ -433,6 +433,28 @@ function TierAwareHeroCard({
   );
 }
 
+// Stage CTA — keeps the editorial label (e.g. "Start free →") but routes
+// to the right destination based on the viewer's tier. Visitors land on
+// /login, free/reader users on /pricing (upgrade), entitled users on the
+// feature itself. Drives off the same CTA_ROUTES table as the hero cards.
+function StageCta({
+  featureId,
+  label,
+}: {
+  featureId: import("@/config/tierCopyConfig").FeatureId;
+  label: string;
+}) {
+  const copy = useTierCopy(featureId);
+  return (
+    <Link
+      to={copy.ctaHref as never}
+      className="inline-flex items-center gap-2 bg-accent text-accent-foreground font-mono text-xs uppercase tracking-[0.22em] px-5 py-3 hover:opacity-90 transition-opacity"
+    >
+      {label}
+    </Link>
+  );
+}
+
 function ClosingCTA() {
   const { t } = useTranslation();
   const { user } = useAuth();
