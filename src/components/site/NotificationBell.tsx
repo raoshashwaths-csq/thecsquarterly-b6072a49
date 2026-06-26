@@ -49,7 +49,6 @@ const TYPE_LABEL: Record<string, string> = {
 export function NotificationBell() {
   const { designation, loading } = useEntitlements();
   const eligible = DESIGNATION_RANK[designation] >= DESIGNATION_RANK.practitioner;
-  const router = useRouter();
   const queryClient = useQueryClient();
   const fetchProfile = useServerFn(getFutureOperatorProfile);
   const markRead = useServerFn(markNotificationRead);
