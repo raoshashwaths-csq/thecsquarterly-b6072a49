@@ -401,7 +401,7 @@ function TierAwareHeroCard({
   dataTour?: string;
   ariaLabel: string;
   accentClass: AccentClass;
-  icon: React.ReactNode;
+  icon: ReactNode;
   hint?: string;
   fallbackTitle: string;
   fallbackBody: string;
