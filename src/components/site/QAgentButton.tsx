@@ -169,6 +169,7 @@ export function QAgentButton() {
     setLoading(true);
     setAnswer(null);
     try {
+      try { sessionStorage.setItem("lumi_messaged", "1"); } catch { /* */ }
       const { reply } = await ask({ data: { question: query, witty: false } });
       setAnswer(reply);
       try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* */ }
