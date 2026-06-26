@@ -19,6 +19,9 @@ import { QAgentButton } from "@/components/site/QAgentButton";
 import { QErrorBoundary } from "@/components/site/QErrorBoundary";
 import { EndOfDaySentimentCheckIn } from "@/components/site/EndOfDaySentimentCheckIn";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { OnboardingStepper } from "@/components/onboarding/OnboardingStepper";
+import { useOnboardingGate } from "@/hooks/useOnboardingGate";
+import type { Persona } from "@/hooks/usePersona";
 
 const CommandPalette = lazy(() =>
   import("@/components/site/CommandPalette").then((m) => ({ default: m.CommandPalette })),
