@@ -156,8 +156,8 @@ export const startSituation = createServerFn({ method: "POST" })
     ]);
 
     // 4. Persist the session.
-    const { data: inserted, error } = await context.supabase
-      .from("situation_sessions" as never)
+    const { data: inserted, error } = await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
       .insert({
         user_id: context.userId,
         situation,
@@ -197,8 +197,8 @@ export const continueSituation = createServerFn({ method: "POST" })
     if (!apiKey) throw new Error("AI is not configured.");
     await assertQUnderCap(context.userId);
 
-    const { data: session, error } = await context.supabase
-      .from("situation_sessions" as never)
+    const { data: session, error } = await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
       .select("id, situation, dispatches, messages")
       .eq("id", data.sessionId)
       .maybeSingle();
@@ -237,8 +237,8 @@ export const continueSituation = createServerFn({ method: "POST" })
     const reply = await callChat(apiKey, system, history);
 
     const updated = [...history, { role: "assistant" as const, content: reply }];
-    await context.supabase
-      .from("situation_sessions" as never)
+    await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
       .update({ messages: updated as never })
       .eq("id", data.sessionId);
 
@@ -262,8 +262,8 @@ export const saveSituationLog = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => SaveInput.parse(d))
   .handler(async ({ context, data }) => {
-    const { error } = await context.supabase
-      .from("situation_sessions" as never)
+    const { error } = await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
       .update({ saved_to_workspace: true, title: data.title })
       .eq("id", data.sessionId);
     if (error) throw new Error(error.message);
@@ -273,8 +273,8 @@ export const saveSituationLog = createServerFn({ method: "POST" })
 export const listSituationSessions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("situation_sessions" as never)
+    const { data, error } = await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
       .select("id, situation, title, saved_to_workspace, created_at")
       .order("created_at", { ascending: false })
       .limit(20);
@@ -292,8 +292,8 @@ export const getSituationSession = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ sessionId: z.string().uuid() }).parse(d))
   .handler(async ({ context, data }) => {
-    const { data: row, error } = await context.supabase
-      .from("situation_sessions" as never)
+    const { data: row, error } = await (context.supabase as unknown as { from: (t: string) => any })
+      .from("situation_sessions")
       .select("id, situation, dispatches, messages, title, saved_to_workspace, created_at")
       .eq("id", data.sessionId)
       .maybeSingle();
