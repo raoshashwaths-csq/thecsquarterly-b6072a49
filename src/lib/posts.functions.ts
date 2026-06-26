@@ -318,8 +318,22 @@ export const upsertPost = createServerFn({ method: "POST" })
     const { published_at, ...rest } = data;
     const payload: Record<string, unknown> = { ...rest, is_premium: data.tier === "premium" };
     if (published_at && published_at.trim()) payload.published_at = published_at;
-    const { error } = await supabaseAdmin.from("posts").upsert(payload as never, { onConflict: "slug" });
+    const { data: saved, error } = await supabaseAdmin
+      .from("posts")
+      .upsert(payload as never, { onConflict: "slug" })
+      .select("id, published")
+      .single();
     if (error) throw new Error(error.message);
+
+    // Auto-embed published posts. Best-effort: never fail the publish.
+    if (saved?.published && saved?.id) {
+      try {
+        const { embedPostInternal } = await import("./embeddings.functions");
+        await embedPostInternal(saved.id);
+      } catch (e) {
+        console.error("[upsertPost] embedding failed:", (e as Error).message);
+      }
+    }
     return { ok: true };
   });
 
