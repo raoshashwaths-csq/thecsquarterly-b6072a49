@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LayoutGrid, Compass } from "lucide-react";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
@@ -14,6 +14,8 @@ import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { useTierCopy } from "@/hooks/useTierCopy";
+import { TierBadge } from "@/components/site/TierBadge";
 
 import { listPosts } from "@/lib/posts.functions";
 
@@ -111,67 +113,38 @@ function HomePage() {
         <TierStrip compact />
 
 
-        {/* Primary destination grid — four equal cards, each with a clear primary CTA */}
+        {/* Primary destination grid — four equal cards. Tier-gated cards
+            (Diagnostics, CSFactors, Decision Canvas / Lumi) pull badge,
+            headline, body and CTA from the central tierCopyConfig. */}
         <div className="mt-10 grid gap-4 md:grid-cols-2 text-left">
-          {/* AI Readiness */}
-          <Link
+          {/* AI Readiness — diagnostics feature */}
+          <TierAwareHeroCard
+            featureId="diagnostics"
             to="/diagnostics"
-            data-tour="ai-readiness-box"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-secondary-accent border-l-4 border-l-secondary-accent transition-colors p-6 md:p-7 card-lift"
-            aria-label="Take the AI Readiness Audit"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                aria-hidden
-                className="flex h-10 w-10 shrink-0 items-center justify-center bg-secondary-accent text-background rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
-              >
-                AR
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-secondary-accent font-semibold">
-                {t("home.aiCard.eyebrow")}
-              </span>
-            </div>
-            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
-              {t("home.aiCard.title")}
-            </h3>
-            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
-              {t("home.aiCard.body")}
-            </p>
-            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-secondary-accent border-b border-secondary-accent/40 group-hover:border-secondary-accent pb-1 self-start">
-              {t("home.aiCard.cta")}
-            </span>
-            <QHint>{t("home.aiCard.hint")}</QHint>
-          </Link>
+            dataTour="ai-readiness-box"
+            ariaLabel={t("home.aiCard.title")}
+            accentClass="secondary-accent"
+            icon={<span className="font-mono text-sm font-bold tracking-tight">AR</span>}
+            hint={t("home.aiCard.hint")}
+            fallbackTitle={t("home.aiCard.title")}
+            fallbackBody={t("home.aiCard.body")}
+            fallbackCta={t("home.aiCard.cta")}
+          />
 
-          {/* CSFactors Command Centre */}
-          <Link
+          {/* CSFactors Command Centre — csfactors feature */}
+          <TierAwareHeroCard
+            featureId="csfactors"
             to="/csfactors"
-            data-tour="csf-box"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 card-lift"
-            aria-label="Open CSFactors Command Centre"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                aria-hidden
-                className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm font-mono text-sm font-bold tracking-tight shadow-sm group-hover:scale-105 transition-transform"
-              >
-                CSF
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent font-semibold">
-                {t("home.csfCard.eyebrow")}
-              </span>
-            </div>
-            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
-              {t("home.csfCard.title")}
-            </h3>
-            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
-              {t("home.csfCard.body")}
-            </p>
-            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-1 self-start">
-              {t("home.csfCard.cta")}
-            </span>
-            <QHint>{t("home.csfCard.hint")}</QHint>
-          </Link>
+            dataTour="csf-box"
+            ariaLabel="Open CSFactors Command Centre"
+            accentClass="accent"
+            icon={<span className="font-mono text-sm font-bold tracking-tight">CSF</span>}
+            hint={t("home.csfCard.hint")}
+            fallbackTitle={t("home.csfCard.title")}
+            fallbackBody={t("home.csfCard.body")}
+            fallbackCta={t("home.csfCard.cta")}
+          />
+
 
           {/* Workspace */}
           <Link
@@ -202,34 +175,18 @@ function HomePage() {
             </span>
           </Link>
 
-          {/* Decision Canvas */}
-          <Link
+          {/* Decision Canvas — lumi feature */}
+          <TierAwareHeroCard
+            featureId="lumi"
             to="/agent/framework"
-            data-tour="canvas-icon"
-            className="group relative flex flex-col h-full bg-card border border-border hover:border-accent border-l-4 border-l-accent transition-colors p-6 md:p-7 card-lift"
-            aria-label="Open Decision Canvas"
-          >
-            <div className="flex items-center gap-3 mb-4">
-              <span
-                aria-hidden
-                className="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-accent-foreground rounded-sm group-hover:scale-105 transition-transform"
-              >
-                <Compass size={18} strokeWidth={2.5} />
-              </span>
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent font-semibold">
-                {t("home.canvas.eyebrow")}
-              </span>
-            </div>
-            <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
-              {t("home.canvas.title")}
-            </h3>
-            <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
-              {t("home.canvas.body")}
-            </p>
-            <span className="inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] text-accent border-b border-accent/40 group-hover:border-accent pb-1 self-start">
-              {t("home.canvas.cta")}
-            </span>
-          </Link>
+            dataTour="canvas-icon"
+            ariaLabel="Open Decision Canvas"
+            accentClass="accent"
+            icon={<Compass size={18} strokeWidth={2.5} />}
+            fallbackTitle={t("home.canvas.title")}
+            fallbackBody={t("home.canvas.body")}
+            fallbackCta={t("home.canvas.cta")}
+          />
         </div>
       </header>
 
@@ -415,6 +372,73 @@ function HomePage() {
       <SiteFooter />
       {user && <ResumeRunPrompt />}
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Tier-aware hero card. Visual layout is identical to the original static
+// cards — only the badge, headline, body and CTA strings come from the
+// centralized tierCopyConfig via useTierCopy. When the user signs in or
+// upgrades, the registry returns different copy for the same featureId and
+// the card re-renders automatically.
+// ─────────────────────────────────────────────────────────────────────────────
+type AccentClass = "accent" | "secondary-accent";
+
+function TierAwareHeroCard({
+  featureId,
+  to,
+  dataTour,
+  ariaLabel,
+  accentClass,
+  icon,
+  hint,
+  fallbackTitle,
+  fallbackBody,
+  fallbackCta,
+}: {
+  featureId: import("@/config/tierCopyConfig").FeatureId;
+  to: string;
+  dataTour?: string;
+  ariaLabel: string;
+  accentClass: AccentClass;
+  icon: ReactNode;
+  hint?: string;
+  fallbackTitle: string;
+  fallbackBody: string;
+  fallbackCta: string;
+}) {
+  const copy = useTierCopy(featureId);
+  const isAccent = accentClass === "accent";
+  const borderColor = isAccent ? "hover:border-accent border-l-accent" : "hover:border-secondary-accent border-l-secondary-accent";
+  const iconBg = isAccent ? "bg-accent text-accent-foreground" : "bg-secondary-accent text-background";
+  const ctaColor = isAccent ? "text-accent border-accent/40 group-hover:border-accent" : "text-secondary-accent border-secondary-accent/40 group-hover:border-secondary-accent";
+  return (
+    <Link
+      to={to}
+      data-tour={dataTour}
+      className={`group relative flex flex-col h-full bg-card border border-border ${borderColor} border-l-4 transition-colors p-6 md:p-7 card-lift`}
+      aria-label={ariaLabel}
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <span
+          aria-hidden
+          className={`flex h-10 w-10 shrink-0 items-center justify-center ${iconBg} rounded-sm shadow-sm group-hover:scale-105 transition-transform`}
+        >
+          {icon}
+        </span>
+        <TierBadge label={copy.badge} variant={copy.badgeVariant} showLock={copy.lockIcon} />
+      </div>
+      <h3 className="font-display text-xl md:text-2xl leading-tight mb-2">
+        {copy.headline ?? fallbackTitle}
+      </h3>
+      <p className="text-sm text-foreground/70 leading-snug mb-5 flex-1">
+        {copy.body ?? fallbackBody}
+      </p>
+      <span className={`inline-flex items-center font-mono text-xs uppercase tracking-[0.22em] ${ctaColor} border-b pb-1 self-start`}>
+        {copy.cta ?? fallbackCta}
+      </span>
+      {hint && <QHint>{hint}</QHint>}
+    </Link>
   );
 }
 
