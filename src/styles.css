@@ -869,8 +869,9 @@
 
 /* --- Flip card --- */
 .flip-card {
-  perspective: 1200px;
+  perspective: 1600px;
   position: relative;
+  transform-style: preserve-3d;
 }
 .flip-card-inner {
   position: relative;
@@ -878,6 +879,7 @@
   height: 100%;
   transition: transform 520ms var(--ease-out-expo);
   transform-style: preserve-3d;
+  will-change: transform;
 }
 .flip-card:hover .flip-card-inner,
 .flip-card:focus-within .flip-card-inner,
@@ -888,14 +890,30 @@
 .flip-back {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  /* Keep text rasterized crisply across the rotation. */
+  transform: translateZ(0);
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 .flip-back {
   position: absolute;
   inset: 0;
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0);
   display: flex;
   flex-direction: column;
 }
+/* While a flip card is being hovered/focused/flipped, suppress the tilt
+   transform on the same element so the 3D context isn't flattened mid-flip
+   (which caused the half-rendered/blurred back face). */
+.flip-card[data-tilt]:hover,
+.flip-card[data-tilt]:focus-within,
+.flip-card[data-tilt].is-flipped {
+  transform: none !important;
+}
+.flip-card[data-tilt]:hover::before,
+.flip-card[data-tilt]:focus-within::before {
+  opacity: 0;
+}
+
 /* Front stays in normal flow so the card sizes to its content. */
 
 @media (prefers-reduced-motion: reduce) {
