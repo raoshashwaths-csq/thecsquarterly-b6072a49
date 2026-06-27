@@ -94,8 +94,53 @@ export const getOnboardingStatus = createServerFn({ method: "GET" })
           difficult_account: string | null;
         }
       | null;
+
+    // Detect legacy Practitioner+ users who completed the original onboarding
+    // before the Future Operator step existed and never seeded a FO profile.
+    let needsFutureOperator = false;
+    if (row?.onboarded_at) {
+      const { data: isAdmin } = await context.supabase.rpc("has_role", {
+        _user_id: context.userId,
+        _role: "admin",
+      });
+      const { data: sub } = await context.supabase
+        .from("subscriptions")
+        .select("tier, designation")
+        .eq("user_id", context.userId)
+        .eq("status", "active")
+        .maybeSingle();
+      type Designation =
+        | "reader" | "practitioner" | "operator" | "team" | "scale" | "enterprise" | "strategic_partner";
+      const RANK: Record<Designation, number> = {
+        reader: 0, practitioner: 1, operator: 2, team: 3, scale: 4, enterprise: 5, strategic_partner: 6,
+      };
+      const tierMap: Record<string, Designation> = {
+        "vanguard": "practitioner",
+        "vanguard-individual": "practitioner",
+        "vanguard-pro": "operator",
+        "team-starter": "team",
+        "team-growth": "scale",
+        "enterprise": "enterprise",
+        "free": "reader",
+      };
+      const subRow = sub as { tier: string; designation: string | null } | null;
+      const designation: Designation = isAdmin
+        ? "strategic_partner"
+        : ((subRow?.designation as Designation | null) ??
+            (subRow ? (tierMap[subRow.tier] ?? "reader") : "reader"));
+      if (RANK[designation] >= RANK.practitioner) {
+        const { data: foProfile } = await context.supabase
+          .from("future_operator_profiles")
+          .select("user_id")
+          .eq("user_id", context.userId)
+          .maybeSingle();
+        if (!foProfile) needsFutureOperator = true;
+      }
+    }
+
     return {
       onboarded: Boolean(row?.onboarded_at),
+      needsFutureOperator,
       profile: row,
     };
   });
