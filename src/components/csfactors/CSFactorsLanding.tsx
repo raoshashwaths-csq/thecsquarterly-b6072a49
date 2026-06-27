@@ -149,8 +149,10 @@ export function CSFactorsLanding({ mode }: { mode: LandingMode }) {
           ].map((c) => (
             <div
               key={c.title}
+              data-tilt
               className="border border-border bg-card p-6 hover:border-foreground transition-colors card-lift"
             >
+
               <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-3">
                 {c.eyebrow}
               </div>
