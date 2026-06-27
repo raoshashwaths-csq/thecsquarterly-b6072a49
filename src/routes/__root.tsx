@@ -216,6 +216,7 @@ function OnboardingGateMount() {
   return (
     <OnboardingStepper
       open={gate.open}
+      mode={gate.mode}
       initialPersona={gate.initialPersona as Persona | null}
       onComplete={gate.complete}
       onDismiss={gate.dismiss}
