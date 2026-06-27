@@ -415,7 +415,7 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss,
             Finish later
           </button>
           <div className="flex gap-2">
-            {step > 0 && (
+            {step > 0 && !futureOperatorOnly && (
               <button
                 type="button"
                 onClick={() => setStep((s) => Math.max(0, s - 1))}
@@ -424,7 +424,7 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss,
                 Back
               </button>
             )}
-            {step < total - 1 ? (
+            {displayStep < total - 1 ? (
               <button
                 type="button"
                 disabled={!canNext}
@@ -436,11 +436,11 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss,
             ) : (
               <button
                 type="button"
-                disabled={submitting}
+                disabled={submitting || !canNext}
                 onClick={handleSubmit}
                 className="px-6 py-2.5 bg-accent text-background font-mono text-xs uppercase tracking-widest disabled:opacity-40"
               >
-                {submitting ? "Saving…" : "Finish onboarding"}
+                {submitting ? "Saving…" : futureOperatorOnly ? "Activate Future Operator" : "Finish onboarding"}
               </button>
             )}
           </div>
