@@ -14,6 +14,8 @@ type Props = {
   initialPersona: Persona | null;
   onComplete: () => void;
   onDismiss: () => void;
+  /** When "future-operator", skip the 5 profile steps and only collect FO context. */
+  mode?: "full" | "future-operator";
 };
 
 const ACV_BANDS = [
