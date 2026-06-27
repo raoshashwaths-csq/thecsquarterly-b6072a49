@@ -6,7 +6,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { listPlaybooks } from "@/lib/playbooks.functions";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import { useTilt } from "@/hooks/useTilt";
-import { useFlipCards } from "@/hooks/useFlipCards";
+
 
 
 const playbooksQuery = queryOptions({
