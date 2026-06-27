@@ -96,6 +96,7 @@ export function SectionsFillGrid() {
             <Link
               key={s.to}
               to={s.to}
+              data-tilt
               className="fill-card group relative block border bg-card/60 hover:bg-card p-6 pt-7 overflow-hidden"
               style={{
                 borderColor: isFilled ? "transparent" : undefined,
