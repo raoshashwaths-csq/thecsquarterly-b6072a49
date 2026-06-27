@@ -14,6 +14,8 @@ type Props = {
   initialPersona: Persona | null;
   onComplete: () => void;
   onDismiss: () => void;
+  /** When "future-operator", skip the 5 profile steps and only collect FO context. */
+  mode?: "full" | "future-operator";
 };
 
 const ACV_BANDS = [
@@ -53,12 +55,13 @@ type FormState = {
   current_focus_account: string;
 };
 
-export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss }: Props) {
+export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss, mode = "full" }: Props) {
   const submit = useServerFn(finishOnboarding);
   const saveFutureOperator = useServerFn(saveFutureOperatorOnboarding);
   const { dRank } = useEntitlements();
   const isPractitionerPlus = dRank >= 1;
-  const [step, setStep] = useState(0);
+  const futureOperatorOnly = mode === "future-operator";
+  const [step, setStep] = useState(futureOperatorOnly ? 5 : 0);
   const [submitting, setSubmitting] = useState(false);
   const [commitmentDraft, setCommitmentDraft] = useState("");
   const [form, setForm] = useState<FormState>({
@@ -72,7 +75,8 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
     current_focus_account: "",
   });
 
-  const total = isPractitionerPlus ? 6 : 5;
+  const total = futureOperatorOnly ? 1 : isPractitionerPlus ? 6 : 5;
+  const displayStep = futureOperatorOnly ? 0 : step;
   const canNext = useMemo(() => {
     if (step === 0) return !!form.persona;
     if (step === 1) return !!form.acv_band;
@@ -88,15 +92,17 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await submit({
-        data: {
-          persona: form.persona,
-          acv_band: form.acv_band,
-          company_arr_range: form.company_arr_range,
-          challenges: form.challenges,
-          difficult_account: form.difficult_account.trim(),
-        },
-      });
+      if (!futureOperatorOnly) {
+        await submit({
+          data: {
+            persona: form.persona,
+            acv_band: form.acv_band,
+            company_arr_range: form.company_arr_range,
+            challenges: form.challenges,
+            difficult_account: form.difficult_account.trim(),
+          },
+        });
+      }
       if (isPractitionerPlus && form.future_team_state.trim() && form.core_commitments.length > 0) {
         try {
           const tz =
@@ -116,7 +122,11 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
           console.warn("Future Operator save failed", foErr);
         }
       }
-      toast.success("Lumi has your context. Ask anything.");
+      toast.success(
+        futureOperatorOnly
+          ? "Future Operator activated. Lumi will start sending signals."
+          : "Lumi has your context. Ask anything.",
+      );
       onComplete();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your profile.");
@@ -136,10 +146,12 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
             </div>
             <div>
               <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent">
-                Lumi · Operator profile
+                {futureOperatorOnly ? "Lumi · Future Operator" : "Lumi · Operator profile"}
               </div>
               <div className="font-mono text-xs text-muted-foreground">
-                Step {step + 1} of {total} · ~90 seconds
+                {futureOperatorOnly
+                  ? "One step · ~60 seconds"
+                  : `Step ${step + 1} of ${total} · ~90 seconds`}
               </div>
             </div>
           </div>
@@ -148,7 +160,7 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
               <span
                 key={i}
                 className={`h-1 rounded-full transition-all ${
-                  i === step ? "w-6 bg-accent" : i < step ? "w-3 bg-secondary-accent" : "w-3 bg-border"
+                  i === displayStep ? "w-6 bg-accent" : i < displayStep ? "w-3 bg-secondary-accent" : "w-3 bg-border"
                 }`}
               />
             ))}
@@ -403,7 +415,7 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
             Finish later
           </button>
           <div className="flex gap-2">
-            {step > 0 && (
+            {step > 0 && !futureOperatorOnly && (
               <button
                 type="button"
                 onClick={() => setStep((s) => Math.max(0, s - 1))}
@@ -412,7 +424,7 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
                 Back
               </button>
             )}
-            {step < total - 1 ? (
+            {displayStep < total - 1 ? (
               <button
                 type="button"
                 disabled={!canNext}
@@ -424,11 +436,11 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
             ) : (
               <button
                 type="button"
-                disabled={submitting}
+                disabled={submitting || !canNext}
                 onClick={handleSubmit}
                 className="px-6 py-2.5 bg-accent text-background font-mono text-xs uppercase tracking-widest disabled:opacity-40"
               >
-                {submitting ? "Saving…" : "Finish onboarding"}
+                {submitting ? "Saving…" : futureOperatorOnly ? "Activate Future Operator" : "Finish onboarding"}
               </button>
             )}
           </div>
