@@ -214,7 +214,7 @@ export function PulseDashboard({
   const liveOrSeed = usingSeed ? pulseSeedAccounts : liveAccounts;
   const rows: DemoAccount[] = usingSeed
     ? DEMO
-    : liveOrSeed.slice(0, 12).map((a, i) => {
+    : liveOrSeed.map((a, i) => {
         const renewalDate = a.contract_renewal_date ? new Date(a.contract_renewal_date) : null;
         const days = renewalDate
           ? Math.round((renewalDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
