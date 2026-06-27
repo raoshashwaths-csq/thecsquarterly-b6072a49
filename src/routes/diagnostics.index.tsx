@@ -67,7 +67,7 @@ const DIAGNOSTICS: Diagnostic[] = [
 
 function DiagnosticsIndex() {
   useTilt();
-  useFlipCards();
+
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
