@@ -112,7 +112,7 @@ function HomePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <header className="max-w-7xl w-full mx-auto px-6 pt-20 md:pt-24 pb-6 text-center md:animate-fade-up" data-depth="-0.04">
+      <header className="max-w-7xl w-full mx-auto px-6 pt-20 md:pt-24 pb-6 text-center md:animate-fade-up" data-depth="0.04">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           {t("home.eyebrow")}
         </div>
