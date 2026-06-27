@@ -173,9 +173,11 @@ function HomePage() {
           <Link
             to="/account/workspace"
             data-tour="workspace-icon"
+            data-tilt
             className="group relative flex flex-col h-full bg-card border border-border hover:border-foreground border-l-4 border-l-foreground/70 transition-colors p-6 md:p-7 card-lift"
             aria-label="Open your Workspace"
           >
+
             <div className="flex items-center gap-3 mb-4">
               <span
                 aria-hidden
@@ -306,8 +308,10 @@ function HomePage() {
                 key={p.id}
                 to="/insights/$slug"
                 params={{ slug: p.slug }}
+                data-tilt
                 className="group block border-t border-border pt-6"
               >
+
                 <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   <span>{p.category}</span>
                   <span className="flex items-center gap-3">
@@ -380,6 +384,7 @@ function TierAwareHeroCard({
     <Link
       to={(copy.ctaHref ?? to) as never}
       data-tour={dataTour}
+      data-tilt
       className={`group relative flex flex-col h-full bg-card border border-border ${borderColor} border-l-4 transition-colors p-6 md:p-7 card-lift`}
       aria-label={ariaLabel}
     >
