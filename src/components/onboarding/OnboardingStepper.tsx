@@ -146,10 +146,12 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss,
             </div>
             <div>
               <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent">
-                Lumi · Operator profile
+                {futureOperatorOnly ? "Lumi · Future Operator" : "Lumi · Operator profile"}
               </div>
               <div className="font-mono text-xs text-muted-foreground">
-                Step {step + 1} of {total} · ~90 seconds
+                {futureOperatorOnly
+                  ? "One step · ~60 seconds"
+                  : `Step ${step + 1} of ${total} · ~90 seconds`}
               </div>
             </div>
           </div>
@@ -158,7 +160,7 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss,
               <span
                 key={i}
                 className={`h-1 rounded-full transition-all ${
-                  i === step ? "w-6 bg-accent" : i < step ? "w-3 bg-secondary-accent" : "w-3 bg-border"
+                  i === displayStep ? "w-6 bg-accent" : i < displayStep ? "w-3 bg-secondary-accent" : "w-3 bg-border"
                 }`}
               />
             ))}
