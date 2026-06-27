@@ -9,10 +9,12 @@ import { useTilt } from "@/hooks/useTilt";
 type LandingMode = "visitor" | "below-tier";
 
 export function CSFactorsLanding({ mode }: { mode: LandingMode }) {
+  useTilt();
   const primary =
     mode === "visitor"
       ? { to: "/login" as const, label: "Start free" }
       : { to: "/pricing" as const, label: "Upgrade to Practitioner" };
+
 
   return (
     <div className="min-h-screen bg-background">
