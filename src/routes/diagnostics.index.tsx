@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { trackDiagnosticEvent } from "@/lib/diagnostics-analytics";
 import { useTilt } from "@/hooks/useTilt";
-import { useFlipCards } from "@/hooks/useFlipCards";
+
 
 
 export const Route = createFileRoute("/diagnostics/")({
