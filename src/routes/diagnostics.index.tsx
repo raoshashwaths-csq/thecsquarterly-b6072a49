@@ -95,74 +95,46 @@ function DiagnosticsIndex() {
             <article
               key={d.slug}
               data-tilt
-              className="flip-card border border-border bg-card flex flex-col group hover:border-foreground transition-colors card-lift"
+              className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors card-lift p-8"
             >
-              <div className="flip-card-inner">
-                <div className="flip-front p-8 flex flex-col flex-1">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-4">
-                    {d.category}
-                  </div>
-                  <h2 className="font-display text-3xl mb-4 leading-tight">
-                    {d.title}
-                  </h2>
-                  <p className="text-sm text-foreground/70 text-pretty mb-8 flex-1">
-                    {d.blurb}
-                  </p>
-
-                  <div className="flex flex-wrap gap-x-8 gap-y-4 mb-8">
-                    {d.meta.map(([k, v]) => (
-                      <div key={k}>
-                        <div className="font-display text-base leading-tight">
-                          {k}
-                        </div>
-                        <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
-                          {v}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Link
-                    to={d.to}
-                    onClick={() =>
-                      trackDiagnosticEvent("diagnostic.cta_click", {
-                        slug: d.slug,
-                        surface: "diagnostics.hub",
-                      })
-                    }
-                    className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
-                  >
-                    View diagnostic →
-                  </Link>
-                </div>
-
-                <div className="flip-back p-8 bg-card border-l-4 border-l-accent">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-4">
-                    What you'll learn
-                  </div>
-                  <h3 className="font-display text-2xl mb-4 leading-tight">
-                    {d.title}
-                  </h3>
-                  <ul className="space-y-2 mb-6 flex-1">
-                    {d.meta.map(([k, v]) => (
-                      <li key={k} className="text-sm">
-                        <span className="font-display">{k}</span>
-                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground ml-2">
-                          {v}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    to={d.to}
-                    className="block w-full py-3 text-center bg-accent text-accent-foreground font-mono uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
-                  >
-                    Start now →
-                  </Link>
-                </div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent mb-4">
+                {d.category}
               </div>
+              <h2 className="font-display text-3xl mb-4 leading-tight">
+                {d.title}
+              </h2>
+              <p className="text-sm text-foreground/70 text-pretty mb-8 flex-1">
+                {d.blurb}
+              </p>
+
+              <div className="flex flex-wrap gap-x-8 gap-y-4 mb-8">
+                {d.meta.map(([k, v]) => (
+                  <div key={k}>
+                    <div className="font-display text-base leading-tight">
+                      {k}
+                    </div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1">
+                      {v}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                to={d.to}
+                onClick={() =>
+                  trackDiagnosticEvent("diagnostic.cta_click", {
+                    slug: d.slug,
+                    surface: "diagnostics.hub",
+                  })
+                }
+                className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
+              >
+                View diagnostic →
+              </Link>
             </article>
           ))}
+
 
         </div>
 
