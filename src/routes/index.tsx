@@ -308,8 +308,10 @@ function HomePage() {
                 key={p.id}
                 to="/insights/$slug"
                 params={{ slug: p.slug }}
+                data-tilt
                 className="group block border-t border-border pt-6"
               >
+
                 <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                   <span>{p.category}</span>
                   <span className="flex items-center gap-3">
