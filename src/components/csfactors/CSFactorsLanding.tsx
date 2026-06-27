@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { StageRevealSection } from "@/components/home/StageRevealSection";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
+import { useTilt } from "@/hooks/useTilt";
+
 
 type LandingMode = "visitor" | "below-tier";
 
