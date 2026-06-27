@@ -214,7 +214,7 @@ export function PulseDashboard({
   const liveOrSeed = usingSeed ? pulseSeedAccounts : liveAccounts;
   const rows: DemoAccount[] = usingSeed
     ? DEMO
-    : liveOrSeed.slice(0, 12).map((a, i) => {
+    : liveOrSeed.map((a, i) => {
         const renewalDate = a.contract_renewal_date ? new Date(a.contract_renewal_date) : null;
         const days = renewalDate
           ? Math.round((renewalDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000))
@@ -564,15 +564,25 @@ function AccountsView({
   const totalARR = rows.reduce((s, r) => s + r.arr, 0);
   return (
     <section className="pt-7 pb-12">
-      <div className="flex items-end justify-between mb-5">
+      <div className="flex items-end justify-between mb-5 gap-4">
         <div>
           <Eyebrow>Active Client Ledger</Eyebrow>
           <div className="mt-2 text-foreground/65 text-sm">
             {rows.length} accounts · {fmtUSD(totalARR)} aggregate ARR footprint
           </div>
         </div>
+        {rows.length > 12 && (
+          <a
+            href="#accounts"
+            className="font-mono text-[11px] uppercase tracking-[0.22em] text-accent border-b border-accent/40 hover:border-accent pb-0.5 shrink-0"
+          >
+            View all →
+          </a>
+        )}
       </div>
-      <AccountsTable rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
+      <div className={rows.length > 12 ? "max-h-[640px] overflow-y-auto pr-1" : ""}>
+        <AccountsTable rows={rows} matchLive={matchLive} onRowClick={onRowClick} />
+      </div>
     </section>
   );
 }

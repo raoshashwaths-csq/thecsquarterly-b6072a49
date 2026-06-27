@@ -1,74 +1,32 @@
-## Status today
+## Why the lists disagree
 
-`tagQRunToAccount` (src/lib/q-agent.functions.ts:424) only writes a `lumi.run.tagged` timeline event. It never reads the run's question/answer and never touches `cs_accounts.csm_sentiment` or `cs_stakeholders.sentiment`. The lexicon scorer in `src/lib/sentiment.score.ts` is used only by `recordDailySentiment` for the operator's own daily journal. Result: tagging a Lumi run has zero effect on the account or stakeholder sentiment surfaces.
+They're reading the same table (`cs_accounts`, RLS-scoped to you), so the data is consistent. The mismatch is purely a UI cap on the CSFactors home dashboard.
 
-## What we'll build
+- **Lumi run tagging dropdown** (`src/components/agent/RunAccountTagger.tsx`) calls `listMyAccountsForTagging` → returns up to 200 of your accounts ordered by name. That's why Beetel, Laerdal, sportzinteractive and everything else appear.
+- **CSFactors Pulse dashboard** (`src/components/csfactors/pulse/PulseDashboard.tsx`, line ~217) does `liveOrSeed.slice(0, 12)` — it deliberately renders only the top 12 accounts by ARR in the "command center" rows. Anything past row 12 is hidden, which is why your full book never appears on the dashboard.
 
-### 1. Hybrid sentiment engine (server-only)
+So nothing is missing in the database — the dashboard is just truncated.
 
-New `src/lib/lumi-sentiment.server.ts`:
+## Plan
 
-- `inferLumiRunSentiment({ question, reply, priorAccount, priorStakeholder })`
-  - **Layer A (lexicon)** — run `scoreSentiment()` on `question + "\n" + reply`; map score to `Positive | Neutral | Critical` with a deadband (`score >= 2` → Positive, `<= -2` → Critical, else Neutral).
-  - **Layer B (AI tiebreaker)** — call Lovable AI `google/gemini-2.5-flash-lite` with `response_format: json_object` ONLY when:
-    - lexicon = Neutral but absolute score ≥ 1 (borderline), OR
-    - lexicon result disagrees with `priorAccount` (e.g. lexicon Positive vs prior Critical), OR
-    - reply length < 200 chars (too thin for lexicon).
-  - Returns `{ label, confidence: 'low'|'med'|'high', rationale, source: 'lexicon'|'ai' }`. Best-effort; if AI fails, fall back to lexicon.
+Lift the Pulse cap so the dashboard reflects your real portfolio, and keep the widget scannable.
 
-### 2. Wire into `tagQRunToAccount`
+1. **Remove the hard 12-row truncation** in `PulseDashboard.tsx`:
+   - Replace `liveOrSeed.slice(0, 12)` with a windowed render: show all live accounts (no slice), but render them inside a vertically scrollable container so the section height stays stable.
+   - Keep the `pulseSeedAccounts` (12 fixtures) untouched — those are only used when you have zero real accounts, purely as a demo state.
+2. **Add a row count + "View all" affordance** above the list:
+   - Eyebrow text: `Portfolio · {N} accounts` so it's obvious how many you have.
+   - "View all" link → `/csfactors` accounts grid (which already lists everything).
+3. **Sort consistency**: keep the existing sort (ARR desc) so the most material accounts stay at the top of the visible window.
+4. **No backend changes** — `listAccounts` already returns the full set; this is presentation-only.
 
-Extend the handler in `src/lib/q-agent.functions.ts` after the run-update step:
+### Files touched
+- `src/components/csfactors/pulse/PulseDashboard.tsx` (remove slice, add scroll container + count + link)
 
-1. Fetch the run's question + reply from `q_runs` (already owned by user).
-2. Fetch prior `csm_sentiment` from `cs_accounts` and (if `stakeholder` provided) prior `sentiment` from the matching `cs_stakeholders` row.
-3. Call `inferLumiRunSentiment(...)`.
-4. **Always** append a `sentiment.inferred` event to `cs_account_events` with `{ run_id, label, confidence, source, rationale, prior_account, prior_stakeholder, stakeholder }` (audit trail — never lost).
-5. **Account chip update** — compute rolling sentiment over the last 5 `sentiment.inferred` events for this account (plus the new one). Apply majority rule:
-   - 3+ Critical out of 5 → set `csm_sentiment = 'Critical'`
-   - 3+ Positive out of 5 → `'Positive'`
-   - otherwise `'Neutral'`
-   This prevents one ambiguous run from whipsawing the chip.
-6. **Stakeholder update** — only when the tag carries a `stakeholder` string AND it matches an existing `cs_stakeholders.contact_name` (case-insensitive) for that account. Overwrite directly with the single run's label (`Positive → positive`, `Critical → negative`, else `neutral`). Skip silently if no match — never invent a stakeholder row.
-7. Return the inferred label in the server-fn response so the tagger can toast "Tagged · sentiment: Positive".
+### Not changing
+- `RunAccountTagger.tsx` and `listMyAccountsForTagging` — they're already correct.
+- Seed fixtures, RLS, or any data fetch.
 
-Clearing a tag (existing `!accountId` branch) — no sentiment changes; the audit events remain.
-
-### 3. Realtime in CSFactors
-
-Migration: `ALTER PUBLICATION supabase_realtime ADD TABLE public.cs_accounts, public.cs_stakeholders, public.cs_account_events;` (already RLS-scoped to `auth.uid()`, so subscribers only see their own rows).
-
-Subscribe inside the CSFactors route component (`src/routes/csfactors.tsx`, mounted only when logged in):
-
-- `useEffect` opens a single channel listening for `postgres_changes` (`UPDATE` on `cs_accounts`, `UPDATE` on `cs_stakeholders`, `INSERT` on `cs_account_events`).
-- On any event, call `queryClient.invalidateQueries({ queryKey: ['csfactors', 'accounts'] })` and `['csfactors','stakeholders']`. Tear the channel down on unmount.
-- Same pattern (scoped to one account) inside `src/routes/csfactors.$accountId.tsx` so the drawer chip + stakeholder map repaint live.
-
-### 4. UI surface
-
-- `RunAccountTagger` (`src/components/agent/RunAccountTagger.tsx`) — on save success, render the returned label as a subtle chip under the "Tagged" badge ("Sentiment inferred: Critical · from this run").
-- `AccountDrawer` — show a small "Last inferred: <label> · <date>" line under the manually-editable CSM Sentiment field, sourced from the latest `sentiment.inferred` event, so the operator knows the chip moved.
-
-### 5. Tests / verification
-
-- Unit test `inferLumiRunSentiment` with three fixtures (clearly positive, clearly negative, borderline that triggers AI).
-- Update `tests/e2e/lumi-tag-flow.spec.ts` to assert the tagger toast surfaces a sentiment label and that `AccountDrawer` reflects it.
-- Manual: tag a critical-sounding run, confirm chip flips after enough runs accumulate; tag from a second tab, confirm Realtime updates the first tab without refresh.
-
-## Files touched
-
-- New: `src/lib/lumi-sentiment.server.ts`
-- Edit: `src/lib/q-agent.functions.ts` (extend `tagQRunToAccount`)
-- Edit: `src/components/agent/RunAccountTagger.tsx` (show returned label)
-- Edit: `src/routes/csfactors.tsx`, `src/routes/csfactors.$accountId.tsx` (Realtime subscriptions)
-- Edit: `src/components/csfactors/AccountDrawer.tsx` (last-inferred line)
-- New migration: `ALTER PUBLICATION supabase_realtime ADD TABLE ...`
-- Edit: `tests/e2e/lumi-tag-flow.spec.ts`
-
-No schema changes — `csm_sentiment`, `cs_stakeholders.sentiment`, and `cs_account_events.payload` already exist.
-
-## Out of scope
-
-- Backfilling sentiment for previously tagged runs (can be a one-shot admin script later).
-- Sentiment trend chart on the account drawer (today we only surface the latest).
-- Changing the manual `csm_sentiment` editor in `AccountDrawer` — the operator can still override at any time; the next 3-out-of-5 inferred result will move it again.
+### Verification
+- With your live account list (Beetel, Laerdal, sportzinteractive, …) visible on `/csfactors` Pulse, confirm the dashboard now lists the same names that show up in the Lumi run-tag dropdown.
+- Empty-state demo (signed-out / no accounts) still shows the 12 seed accounts.
