@@ -5,6 +5,9 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { listPlaybooks } from "@/lib/playbooks.functions";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { useTilt } from "@/hooks/useTilt";
+import { useFlipCards } from "@/hooks/useFlipCards";
+
 
 const playbooksQuery = queryOptions({
   queryKey: ["playbooks"],
@@ -31,6 +34,9 @@ function CodexPage() {
   const playbooks = allPlaybooks.filter((p) => p.slug !== "cs-ai-readiness-diagnostic");
   const sub = useSubscriptionTier();
   const hasFullAccess = sub.canAccessCSFactors; // practitioner+
+  useTilt();
+  useFlipCards();
+
 
 
 
@@ -71,37 +77,70 @@ function CodexPage() {
         )}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {playbooks.map((p) => (
-            <article key={p.id} className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors card-lift">
-              <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
-                <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
-                  <Lock size={12} /> {hasFullAccess ? "Included" : "Premium"}
+            <article
+              key={p.id}
+              data-tilt
+              className="flip-card border border-border bg-card flex flex-col group hover:border-foreground transition-colors card-lift"
+            >
+              <div className="flip-card-inner">
+                <div className="flip-front">
+                  <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
+                    <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
+                      <Lock size={12} /> {hasFullAccess ? "Included" : "Premium"}
+                    </div>
+                    <div className="absolute top-4 right-4 font-mono text-xs opacity-50">{p.pages}pp</div>
+                    <FileText size={48} className="opacity-30" />
+                    <div className="absolute bottom-4 left-4 right-4 font-mono text-xs uppercase tracking-widest opacity-50">
+                      {p.category}
+                    </div>
+                  </div>
+                  <div className="p-6 flex flex-col flex-1">
+                    <h2 className="font-display text-2xl mb-3 leading-tight">{p.title}</h2>
+                    <p className="text-sm text-foreground/70 text-pretty mb-6 flex-1">{p.summary}</p>
+                    <div className="space-y-2">
+                      <Link
+                        to="/codex/$slug"
+                        params={{ slug: p.slug }}
+                        className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
+                      >
+                        {hasFullAccess ? "Open playbook" : `$${(p.price_cents / 100).toFixed(0)} · View playbook`}
+                      </Link>
+                      {!hasFullAccess && p.included_in_vanguard && (
+                        <Link to="/pricing" className="block text-center uppercase tracking-widest text-xs font-mono text-secondary-accent hover:text-accent">
+                          Or unlock all 6 from $39/mo →
+                        </Link>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="absolute top-4 right-4 font-mono text-xs opacity-50">{p.pages}pp</div>
-                <FileText size={48} className="opacity-30" />
-                <div className="absolute bottom-4 left-4 right-4 font-mono text-xs uppercase tracking-widest opacity-50">
-                  {p.category}
-                </div>
-              </div>
-              <div className="p-6 flex flex-col flex-1">
-                <h2 className="font-display text-2xl mb-3 leading-tight">{p.title}</h2>
-                <p className="text-sm text-foreground/70 text-pretty mb-6 flex-1">{p.summary}</p>
-                <div className="space-y-2">
-                  <Link
-                    to="/codex/$slug"
-                    params={{ slug: p.slug }}
-                    className="block w-full py-3 text-center bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-accent transition-colors"
-                  >
-                    {hasFullAccess ? "Open playbook" : `$${(p.price_cents / 100).toFixed(0)} · View playbook`}
-                  </Link>
-                  {!hasFullAccess && p.included_in_vanguard && (
-                    <Link to="/pricing" className="block text-center uppercase tracking-widest text-xs font-mono text-secondary-accent hover:text-accent">
-                      Or unlock all 6 from $39/mo →
+
+                <div className="flip-back p-6 bg-card border-l-4 border-l-accent">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-3">
+                    {p.category} · {p.pages}pp
+                  </div>
+                  <h3 className="font-display text-2xl mb-4 leading-tight">{p.title}</h3>
+                  <p className="text-sm text-foreground/75 text-pretty mb-6 flex-1">
+                    {p.summary}
+                  </p>
+                  <div className="space-y-2">
+                    <Link
+                      to="/codex/$slug"
+                      params={{ slug: p.slug }}
+                      className="block w-full py-3 text-center bg-accent text-accent-foreground font-mono uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
+                    >
+                      Open playbook →
                     </Link>
-                  )}
+                    {!hasFullAccess && (
+                      <Link to="/pricing" className="block text-center uppercase tracking-widest text-xs font-mono text-secondary-accent hover:text-accent">
+                        Unlock the full Codex →
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             </article>
           ))}
+
         </div>
 
         {playbooks.length === 0 && (

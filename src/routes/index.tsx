@@ -12,6 +12,9 @@ import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
 
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
+import { useHeroDepth } from "@/hooks/useHeroDepth";
+import { useTilt } from "@/hooks/useTilt";
+
 import { usePersona } from "@/hooks/usePersona";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
@@ -64,6 +67,9 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { t } = useTranslation();
+  useHeroDepth();
+  useTilt();
+
   const { data: posts } = useSuspenseQuery(postsQuery);
   const featured = posts[0];
   const { group, isRecruiterOrLead } = usePersona();
@@ -106,7 +112,7 @@ function HomePage() {
     <div className="min-h-screen flex flex-col">
       <SiteHeader />
 
-      <header className="max-w-7xl w-full mx-auto px-6 pt-20 md:pt-24 pb-6 text-center md:animate-fade-up">
+      <header className="max-w-7xl w-full mx-auto px-6 pt-20 md:pt-24 pb-6 text-center md:animate-fade-up" data-depth="0.04">
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           {t("home.eyebrow")}
         </div>

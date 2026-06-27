@@ -1,15 +1,20 @@
+import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { StageRevealSection } from "@/components/home/StageRevealSection";
 import { CSFLogo } from "@/components/csfactors/CSFLogo";
+import { useTilt } from "@/hooks/useTilt";
+
 
 type LandingMode = "visitor" | "below-tier";
 
 export function CSFactorsLanding({ mode }: { mode: LandingMode }) {
+  useTilt();
   const primary =
     mode === "visitor"
       ? { to: "/login" as const, label: "Start free" }
       : { to: "/pricing" as const, label: "Upgrade to Practitioner" };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -144,8 +149,10 @@ export function CSFactorsLanding({ mode }: { mode: LandingMode }) {
           ].map((c) => (
             <div
               key={c.title}
+              data-tilt
               className="border border-border bg-card p-6 hover:border-foreground transition-colors card-lift"
             >
+
               <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-accent mb-3">
                 {c.eyebrow}
               </div>

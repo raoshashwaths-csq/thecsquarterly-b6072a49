@@ -828,3 +828,97 @@
   .lumi-bubble { animation: none; opacity: 1; }
   .lumi-bubble-progress { animation: none; width: 0; }
 }
+
+/* ============================================================
+   3D Animation Systems (tilt, hero depth, flip)
+   Tokens only. Respects prefers-reduced-motion.
+   ============================================================ */
+
+/* --- Tilt + specular highlight --- */
+[data-tilt] {
+  transform-style: preserve-3d;
+  transition: transform 220ms var(--ease-out-expo);
+  position: relative;
+}
+[data-tilt]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    520px circle at var(--tilt-x, 50%) var(--tilt-y, 50%),
+    color-mix(in oklab, var(--accent) 18%, transparent),
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 220ms var(--ease-out-expo);
+  z-index: 1;
+  mix-blend-mode: screen;
+}
+[data-tilt]:hover::before,
+[data-tilt]:focus-within::before {
+  opacity: 1;
+}
+[data-tilt] > * { position: relative; z-index: 2; }
+
+/* --- Hero depth parallax target --- */
+[data-depth] {
+  will-change: transform;
+}
+
+/* --- Flip card --- */
+.flip-card {
+  perspective: 1200px;
+  position: relative;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 520ms var(--ease-out-expo);
+  transform-style: preserve-3d;
+}
+.flip-card:hover .flip-card-inner,
+.flip-card:focus-within .flip-card-inner,
+.flip-card.is-flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-front,
+.flip-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+}
+/* Front stays in normal flow so the card sizes to its content. */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-tilt],
+  [data-tilt]::before,
+  .flip-card-inner {
+    transition: none !important;
+    transform: none !important;
+  }
+  [data-tilt]:hover::before,
+  [data-tilt]:focus-within::before { opacity: 0; }
+  /* Reveal back-face content instantly on hover/focus instead of animating. */
+  .flip-card:hover .flip-back,
+  .flip-card:focus-within .flip-back,
+  .flip-card.is-flipped .flip-back {
+    transform: none;
+    position: static;
+  }
+  .flip-card:hover .flip-front,
+  .flip-card:focus-within .flip-front,
+  .flip-card.is-flipped .flip-front {
+    display: none;
+  }
+  [data-depth] { transform: none !important; }
+}
+
