@@ -55,12 +55,13 @@ type FormState = {
   current_focus_account: string;
 };
 
-export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss }: Props) {
+export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss, mode = "full" }: Props) {
   const submit = useServerFn(finishOnboarding);
   const saveFutureOperator = useServerFn(saveFutureOperatorOnboarding);
   const { dRank } = useEntitlements();
   const isPractitionerPlus = dRank >= 1;
-  const [step, setStep] = useState(0);
+  const futureOperatorOnly = mode === "future-operator";
+  const [step, setStep] = useState(futureOperatorOnly ? 5 : 0);
   const [submitting, setSubmitting] = useState(false);
   const [commitmentDraft, setCommitmentDraft] = useState("");
   const [form, setForm] = useState<FormState>({
@@ -74,7 +75,8 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss 
     current_focus_account: "",
   });
 
-  const total = isPractitionerPlus ? 6 : 5;
+  const total = futureOperatorOnly ? 1 : isPractitionerPlus ? 6 : 5;
+  const displayStep = futureOperatorOnly ? 0 : step;
   const canNext = useMemo(() => {
     if (step === 0) return !!form.persona;
     if (step === 1) return !!form.acv_band;
