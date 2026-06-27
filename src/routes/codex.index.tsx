@@ -35,7 +35,7 @@ function CodexPage() {
   const sub = useSubscriptionTier();
   const hasFullAccess = sub.canAccessCSFactors; // practitioner+
   useTilt();
-  useFlipCards();
+
 
 
 
