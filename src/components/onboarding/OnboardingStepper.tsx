@@ -92,15 +92,17 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss,
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await submit({
-        data: {
-          persona: form.persona,
-          acv_band: form.acv_band,
-          company_arr_range: form.company_arr_range,
-          challenges: form.challenges,
-          difficult_account: form.difficult_account.trim(),
-        },
-      });
+      if (!futureOperatorOnly) {
+        await submit({
+          data: {
+            persona: form.persona,
+            acv_band: form.acv_band,
+            company_arr_range: form.company_arr_range,
+            challenges: form.challenges,
+            difficult_account: form.difficult_account.trim(),
+          },
+        });
+      }
       if (isPractitionerPlus && form.future_team_state.trim() && form.core_commitments.length > 0) {
         try {
           const tz =
@@ -120,7 +122,11 @@ export function OnboardingStepper({ open, initialPersona, onComplete, onDismiss,
           console.warn("Future Operator save failed", foErr);
         }
       }
-      toast.success("Lumi has your context. Ask anything.");
+      toast.success(
+        futureOperatorOnly
+          ? "Future Operator activated. Lumi will start sending signals."
+          : "Lumi has your context. Ask anything.",
+      );
       onComplete();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your profile.");
