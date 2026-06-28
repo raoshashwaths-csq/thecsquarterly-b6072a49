@@ -53,16 +53,21 @@ function PlaybookPage() {
   const me = useQuery({ queryKey: ["me"], queryFn: () => fetchMe(), enabled: !!user });
   const purchases = useQuery({ queryKey: ["my-purchases"], queryFn: () => fetchPurchases(), enabled: !!user });
 
+  // Rank-based tier gate: any designation at Practitioner or above unlocks the
+  // playbook. `useSubscriptionTier` maps legacy `vanguard` tier rows onto the
+  // `practitioner` designation, so existing paid users keep their access.
+  const sub = useSubscriptionTier();
+
   if (!pb) return null;
 
   // Resolve gate only after auth + entitlement queries have settled, so a
-  // logged-in Vanguard never sees a flash of paywall before `me` returns.
+  // logged-in subscriber never sees a flash of paywall before tier data returns.
   const entitlementLoading =
-    authLoading || (!!user && (me.isLoading || purchases.isLoading || !me.data));
+    authLoading || sub.loading || (!!user && (me.isLoading || purchases.isLoading || !me.data));
 
   const unlocked =
     me.data?.isAdmin ||
-    me.data?.subscriptionTier === "vanguard" ||
+    sub.canAccess("practitioner") ||
     (purchases.data ?? []).some((p) => p.item_type === "playbook" && p.item_id === pb.id);
 
   const onBuy = async () => {
