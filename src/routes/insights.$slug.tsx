@@ -378,6 +378,8 @@ function PostPage() {
           )}
           <HighlightedBody body={body} progress={progress} className="prose-content mt-12 animate-tone-swap" key={`body-${tone}`} />
 
+          <PlaybookCtaCard slug={slug} />
+
           <AnnotationBar slug={slug} />
 
           {sources.length > 0 && (
