@@ -20,6 +20,7 @@ import { RelatedIntelligencePanel } from "@/components/site/RelatedIntelligenceP
 import { getPost } from "@/lib/posts.functions";
 import { LumiDebriefCard } from "@/components/lumi/LumiDebriefCard";
 import { DispatchReactionCard } from "@/components/lumi/DispatchReactionCard";
+import { PlaybookCtaCard } from "@/components/site/PlaybookCtaCard";
 
 const postQuery = (slug: string) =>
   queryOptions({
@@ -376,6 +377,8 @@ function PostPage() {
             </div>
           )}
           <HighlightedBody body={body} progress={progress} className="prose-content mt-12 animate-tone-swap" key={`body-${tone}`} />
+
+          <PlaybookCtaCard slug={slug} />
 
           <AnnotationBar slug={slug} />
 
