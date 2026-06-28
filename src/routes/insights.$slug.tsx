@@ -20,6 +20,7 @@ import { RelatedIntelligencePanel } from "@/components/site/RelatedIntelligenceP
 import { getPost } from "@/lib/posts.functions";
 import { LumiDebriefCard } from "@/components/lumi/LumiDebriefCard";
 import { DispatchReactionCard } from "@/components/lumi/DispatchReactionCard";
+import { PlaybookCtaCard } from "@/components/site/PlaybookCtaCard";
 
 const postQuery = (slug: string) =>
   queryOptions({
