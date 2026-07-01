@@ -156,19 +156,22 @@ function BenchmarkSidebar({ active }: { active: string }) {
 
 /* ───────────────────────── HERO ───────────────────────── */
 
-function Hero() {
+function Hero({ firstName, audited }: { firstName: string; audited: Record<string, boolean> }) {
   return (
     <section className="relative border-b border-border px-6 lg:px-10 pt-14 pb-12">
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex flex-wrap items-center gap-3 mb-6">
           <span className="font-mono text-[10px] tracking-[0.4em] uppercase text-accent border border-accent/40 px-2 py-0.5">
             Q2 2026 · Institutional Research
           </span>
           <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-muted-foreground/80">
             N = 2,900+ SaaS companies
           </span>
+          <div className="ml-auto">
+            <ExportBar firstName={firstName} audited={audited} />
+          </div>
         </div>
-        <h1 className="font-display text-4xl md:text-6xl tracking-tight leading-[1.02] text-balance">
+        <h1 className="font-display text-4xl md:text-6xl tracking-tight leading-[1.02] text-balance animate-fade-up">
           The Churn Compression &amp; Post-Sale Financial Architecture.
         </h1>
         <p className="mt-4 max-w-3xl text-base md:text-lg text-muted-foreground leading-relaxed">
@@ -177,14 +180,67 @@ function Hero() {
           expansion dependency, GAAP allocation, and the AI gross-margin reset.
         </p>
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-px bg-border border border-border">
-          <KpiCard label="Median Net Revenue Retention" value={101} suffix="%" direction="down" detail="Compressed from 2021–22 peaks. Top quartile holds >120%." accent="#38BDF8" />
-          <KpiCard label="Median Gross Revenue Retention" value={84} suffix="%" direction="down" detail="SMB-anchored floor. Enterprise band 91–94%." accent="#EF4444" />
-          <KpiCard label="Expansion ARR Dependency" value={40} suffix="%+" direction="up" detail="At >$50M ARR, expansion exceeds 50% of net-new ARR." accent="#06B6D4" />
+          <KpiCard label="Median Net Revenue Retention" value={101} suffix="%" direction="down" detail="Compressed from 2021–22 peaks. Top quartile holds >120%." tone="accent" />
+          <KpiCard label="Median Gross Revenue Retention" value={84} suffix="%" direction="down" detail="SMB-anchored floor. Enterprise band 91–94%." tone="destructive" />
+          <KpiCard label="Expansion ARR Dependency" value={40} suffix="%+" direction="up" detail="At >$50M ARR, expansion exceeds 50% of net-new ARR." tone="secondary" />
         </div>
       </div>
     </section>
   );
 }
+
+function ExportBar({ firstName, audited }: { firstName: string; audited: Record<string, boolean> }) {
+  const [open, setOpen] = useState(false);
+  const btn =
+    "inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.22em] border border-border hover:border-accent hover:text-accent transition-colors cursor-pointer";
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="inline-flex items-center gap-2 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.22em] border border-accent/50 text-accent hover:bg-accent/10 transition-colors cursor-pointer"
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        <Download className="h-3.5 w-3.5" />
+        Export Report
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 top-full mt-2 w-64 bg-card border border-border shadow-lg z-20 animate-fade-in"
+          onMouseLeave={() => setOpen(false)}
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => { exportBenchmarkMatrixCsv(); setOpen(false); }}
+            className={`${btn} w-full justify-start border-0 border-b border-border py-3`}
+          >
+            <TableIcon className="h-3.5 w-3.5" /> Benchmark matrix (CSV)
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => { exportChecklistCsv(audited); setOpen(false); }}
+            className={`${btn} w-full justify-start border-0 border-b border-border py-3`}
+          >
+            <TableIcon className="h-3.5 w-3.5" /> Audit checklist progress (CSV)
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => { exportFullReportPdf(firstName, audited); setOpen(false); }}
+            className={`${btn} w-full justify-start border-0 py-3`}
+          >
+            <FileText className="h-3.5 w-3.5" /> Full report (branded PDF)
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function KpiCard({
   label,
