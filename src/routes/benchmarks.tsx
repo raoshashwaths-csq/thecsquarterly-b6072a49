@@ -883,8 +883,7 @@ function Chapter4() {
 
 /* ───────────────────────── CHAPTER 5 ───────────────────────── */
 
-function Chapter5() {
-  const [audited, setAudited] = useState<Record<string, boolean>>({});
+function Chapter5({ audited, setAudited }: { audited: Record<string, boolean>; setAudited: React.Dispatch<React.SetStateAction<Record<string, boolean>>> }) {
   const [open, setOpen] = useState<string | null>(null);
   const completedCount = Object.values(audited).filter(Boolean).length;
   const pct = (completedCount / CHECKLIST.length) * 100;
