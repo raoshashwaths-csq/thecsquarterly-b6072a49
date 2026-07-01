@@ -61,7 +61,7 @@ function BenchmarksPage() {
           className="pointer-events-none absolute inset-0 opacity-[0.08]"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(56,189,248,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.4) 1px, transparent 1px)",
+              "linear-gradient(var(--color-accent) 1px, transparent 1px), linear-gradient(90deg, var(--color-accent) 1px, transparent 1px)",
             backgroundSize: "64px 64px",
             maskImage: "radial-gradient(ellipse at top, black 30%, transparent 75%)",
           }}
@@ -730,7 +730,7 @@ function Chapter4() {
                 style={{ width: `${traditional}%` }}
               />
               <div
-                className="absolute top-1/2 -translate-y-1/2 h-4 w-px bg-slate-300"
+                className="absolute top-1/2 -translate-y-1/2 h-4 w-px bg-foreground"
                 style={{ left: `${compressedFloor}%` }}
               />
               <div
@@ -842,7 +842,7 @@ function Chapter5() {
             <div
               key={item.id}
               className={`bg-card border transition-all duration-300 ${
-                checked ? "border-accent/60 shadow-[0_0_0_1px_rgba(56,189,248,0.2)]" : "border-border"
+                checked ? "border-accent/60 shadow-[0_0_0_1px_var(--color-accent)]" : "border-border"
               }`}
             >
               <button
@@ -861,7 +861,7 @@ function Chapter5() {
                   }`}
                   aria-label="Mark audited"
                 >
-                  {checked && <Check className="h-3 w-3 text-[#020617]" strokeWidth={3} />}
+                  {checked && <Check className="h-3 w-3 text-accent-foreground" strokeWidth={3} />}
                 </button>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-3">
@@ -1000,7 +1000,7 @@ function Chapter6() {
         ))}
       </ol>
 
-      <div className="mt-8 p-6 bg-gradient-to-br from-[#0F172A] to-[#020617] border border-secondary-accent/30">
+      <div className="mt-8 p-6 bg-gradient-to-br from-card to-background border border-secondary-accent/30">
         <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary-accent mb-4">
           Worked Example · NRR manufactured via AI SKU stack
         </div>
