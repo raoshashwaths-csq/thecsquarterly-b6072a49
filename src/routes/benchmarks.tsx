@@ -37,6 +37,20 @@ const CHAPTERS = [
 
 function BenchmarksPage() {
   const [active, setActive] = useState("executive-summary");
+  const { user } = useAuth();
+  const firstName = firstNameFromUser(user);
+
+  // Persisted checklist audit state (shared across the page so exports can read it)
+  const [audited, setAudited] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+      if (raw) setAudited(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(audited)); } catch { /* ignore */ }
+  }, [audited]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -72,14 +86,14 @@ function BenchmarksPage() {
         <div className="relative grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-0">
           <BenchmarkSidebar active={active} />
           <div className="min-w-0">
-            <Hero />
+            <Hero firstName={firstName} audited={audited} />
             <div className="max-w-5xl mx-auto px-6 lg:px-10 pb-24 space-y-24">
               <ExecutiveSummary />
               <Chapter1 />
               <Chapter2 />
               <Chapter3 />
               <Chapter4 />
-              <Chapter5 />
+              <Chapter5 audited={audited} setAudited={setAudited} />
               <Chapter6 />
               <References />
             </div>
