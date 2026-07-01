@@ -248,31 +248,35 @@ function KpiCard({
   suffix,
   direction,
   detail,
-  accent,
+  tone,
 }: {
   label: string;
   value: number;
   suffix: string;
   direction: "up" | "down";
   detail: string;
-  accent: string;
+  tone: "accent" | "destructive" | "secondary";
 }) {
   const display = useCountUp(value);
   const Arrow = direction === "up" ? ArrowUp : ArrowDown;
+  const toneClass =
+    tone === "destructive" ? "text-destructive" : tone === "secondary" ? "text-secondary-accent" : "text-accent";
+  const toneVar =
+    tone === "destructive" ? "var(--color-destructive)" : tone === "secondary" ? "var(--color-secondary-accent)" : "var(--color-accent)";
   return (
-    <div className="relative bg-card/80 p-6 group overflow-hidden">
+    <div className="relative bg-card/80 p-6 group overflow-hidden card-lift">
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-px"
-        style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+        style={{ background: `linear-gradient(90deg, transparent, ${toneVar}, transparent)` }}
       />
       <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground/80 mb-5">{label}</div>
       <div className="flex items-baseline gap-2">
-        <span className="font-mono text-5xl md:text-6xl font-light tabular-nums tracking-tight" style={{ color: accent }}>
+        <span className={`font-mono text-5xl md:text-6xl font-light tabular-nums tracking-tight ${toneClass}`}>
           {display}
         </span>
         <span className="font-mono text-2xl text-muted-foreground">{suffix}</span>
-        <Arrow className="h-5 w-5 ml-1" style={{ color: accent }} />
+        <Arrow className={`h-5 w-5 ml-1 ${toneClass}`} />
       </div>
       <div className="mt-5 pt-4 border-t border-border text-xs text-muted-foreground/80 leading-relaxed">{detail}</div>
     </div>
