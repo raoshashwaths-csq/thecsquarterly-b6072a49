@@ -3,9 +3,12 @@ import { LumiRouteLoader } from "@/components/site/LumiRouteLoader";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, Check, ChevronRight, Activity, Cpu, AlertTriangle, ShieldCheck, TrendingUp, Layers, Calculator, ScrollText, FileWarning, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, ChevronRight, Activity, Cpu, AlertTriangle, ShieldCheck, TrendingUp, Layers, Calculator, ScrollText, FileWarning, Sparkles, Download, FileText, Table as TableIcon } from "lucide-react";
 import { useCountUp } from "@/components/benchmarks/useCountUp";
 import { ACV_BANDS, BENCHMARK_MATRIX, HURDLE_RATES, VARIABLE_GLOSSARY, COGS_ITEMS, OPEX_ITEMS, CHECKLIST, AI_CALLOUTS, AI_GM_DRIVERS, MARGIN_GOVERNORS, type AcvBand } from "@/components/benchmarks/data";
+import { CHECKLIST_STORAGE_KEY, exportBenchmarkMatrixCsv, exportChecklistCsv, exportFullReportPdf } from "@/components/benchmarks/exports";
+import { useAuth } from "@/hooks/useAuth";
+import { firstNameFromUser } from "@/lib/brand-pdf";
 
 export const Route = createFileRoute("/benchmarks")({
   pendingComponent: LumiRouteLoader,
