@@ -1,75 +1,63 @@
-## Goal
-Seed three editorial dispatches (Reader/free tier) and three linked interactive Codex playbooks (Practitioner+), with a CTA at the foot of each article pointing to its playbook.
+# Felix & Nora Comic Strip — `/strip`
 
-## Scope
+Static, self-contained editorial page. No DB, no auth, no nav link. New files only; nothing existing is modified except `src/routes/__root.tsx` (font `<link>` tags only).
 
-### 1. Seed migration — `posts` + `playbooks`
-One SQL migration inserting:
+## Files created
 
-**Posts** (section = `retention-protocol`, category = `Escalation`, `is_premium=false`, `tier='free'`, series = `the-structural-reckoning`, `series_total=9`):
-- IV — `frontline-sovereignty-handling-high-volatility-account-friction` (part 4)
-- V — `executive-fortitude-the-cco-churn-protocol` (part 5)
-- VI — `upward-alignment-the-mis-sold-contract` (part 6)
+```
+src/routes/strip.tsx                     — page + route
+src/components/strip/StripCard.tsx
+src/components/strip/StripHeader.tsx
+src/components/strip/Panel.tsx
+src/components/strip/DialoguePanel.tsx
+src/components/strip/SpeechBubble.tsx
+src/data/strips.ts                       — 3 strips verbatim from PRD
+src/styles/strip.css                     — imported in strip.tsx only
+```
 
-Each post gets full `title`, `title_mckinsey`, `title_wodehouse`, `subtitle*`, `excerpt`, `body_mckinsey`, `body_wodehouse`, `sources`. Article IV uses the verbatim body from the PRD. Articles V and VI bodies are authored in the established CSQ two-voice style following the 3-2-1 model and the PRD's section structure (Philosophy → Core Soft Skill → Decision Tree narrative → Operator's Briefing). Hero images: generated via `imagegen` from each `hero_prompt` and uploaded as `cover_image_url`.
+## Route
 
-**Playbooks** (`included_in_vanguard=true`, `price_cents=0`, `category='Escalation'`, `published=true`):
-- `frontline-sovereignty-triage-playbook` — Account Volatility Triage
-- `churn-volatility-triage-playbook` — Churn Decision / ICP Save-or-Release
-- `upward-alignment-misold-contract-playbook` — Upward Alignment & Mis-Sell
+`src/routes/strip.tsx` uses `createFileRoute("/strip")` with `head()` setting title "Felix & Nora — The CS Quarterly", description, and matching og:title/og:description/twitter:card. No og:image (per site rule — omit rather than use generic). No navigation entry added anywhere.
 
-Each `body` carries the structured text (used as fallback render); the interactive UI is driven by the React components below.
+## Fonts
 
-### 2. Tier-gate refactor on `/codex/$slug`
-Replace the legacy `subscriptionTier === "vanguard"` check with rank-based access: `unlocked = isAdmin || DESIGNATION_RANK[designation] >= DESIGNATION_RANK.practitioner || purchased`. Uses the existing `useSubscriptionTier` hook. Applies to all playbooks (existing six included) per "Update globally".
+Add three `<link>` tags to `src/routes/__root.tsx` `head().links` (preconnect + one stylesheet URL) for Playfair Display, Libre Baskerville, DM Mono. Only surgical edit to an existing file. Referenced by name in `strip.css` inline `font-family` declarations — no changes to `styles.css` or global tokens.
 
-### 3. Three interactive playbook components
-New files under `src/components/playbooks/`:
-- `AccountVolatilityTriage.tsx`
-- `ChurnVolatilityDecision.tsx`
-- `UpwardAlignmentMisSell.tsx`
+## Data
 
-Each uses local React state for the branching tree: current node, history stack, Back/Reset controls, action-card terminal screens (oxblood-bordered `SectionCard`s), a fillable Executive Briefing template (Article IV) / cost-model worksheet (Article V) / board-risk-report worksheet (Article VI), and a completable Operator's Checklist with localStorage persistence keyed by slug. Uses only semantic tokens (`--accent`, `--secondary-accent`, `border-border`) and existing dashboard primitives (`SectionCard`, `MetricCard` where applicable). No new color tokens.
+`src/data/strips.ts` exports the exact `PanelType`, `SpeechBubble`, `StripPanel`, `Strip` types and the three strips (No. 4, 30, 3) verbatim as in the PRD.
 
-Register all three in `src/components/playbooks/index.tsx` keyed by slug so `codex.$slug.tsx` picks them up via `PLAYBOOK_COMPONENTS[pb.slug]` (already wired).
+## Components (built per PRD spec)
 
-### 4. Article → Playbook CTA
-New shared component `src/components/site/PlaybookCtaCard.tsx`. Rendered at the bottom of `insights.$slug.tsx` (right after the body, before `DispatchReactionCard` / `RelatedIntelligencePanel`) only when a matching playbook exists.
+- **StripHeader** — flex row, `title={hoverText}`, `cursor: help`, native browser tooltip for the punchline reveal. No.### + title on the left, tag badge on the right.
+- **Panel** — illustration container with placeholder = 72px circle (only element with border-radius) + character initial + italic `imageAlt` description. Optional overlaid `SpeechBubble`s and optional bottom stage-direction strip.
+- **DialoguePanel** — text-only, gold left border (3px `var(--accent, #C4A45A)`), stage direction in brackets, bubbles stack statically.
+- **SpeechBubble** — two contexts (`panel` absolute-positioned / `dialogue` static). Character label color: FELIX = `var(--muted-foreground)`, NORA/BRENDAN = `var(--accent, #C4A45A)`.
+- **StripCard** — max-width 720px, grid `repeat(panelCount, 1fr)` desktop, 2-col mobile (3-panel: last spans full width). Footer with `thecsquarterly.com/strip` left, `F&N` gold right.
 
-Lookup: derive `playbookSlug` from a small static map `src/lib/article-playbook-map.ts` (article slug → playbook slug + button label). Uses `useSubscriptionTier` and `useAuth`:
-- Practitioner+: link straight to `/codex/$slug`.
-- Free/Reader/Visitor: render the same button but on click open a slide-up `Sheet` (shadcn) showing the locked-tier copy + "Unlock with Practitioner" CTA → `/pricing`, plus "Sign in" link when logged out.
+## Design tokens (per user answer: "tokens with hex fallbacks as written")
 
-Visual: oxblood `bg-accent` flush rectangle CTA, JetBrains Mono uppercase label, eyebrow "Codex Playbook", serif descriptor line. Matches the PRD spec.
+Map PRD names to real project tokens with the PRD's hex fallbacks kept as written:
+- `var(--gold, #C4A45A)` → uses project `--accent`; hex fallback preserved verbatim per PRD.
+- `var(--bg, #0A0A0A)` → uses `--background`; hex preserved for the speech-bubble "cutout" match.
+- `var(--text-primary)` → `--foreground`; `var(--text-muted)` / `var(--text-dim)` → `--muted-foreground`; `var(--surface)` → `--card`; `var(--border)` → `--border`.
 
-### 5. SEO + metadata
-Each new playbook route inherits the existing `head()` from `codex.$slug.tsx`. Each article inherits the existing `insights.$slug.tsx` head with og:image from `cover_image_url`. No new routes needed.
+All in `strip.css` and inline styles — no changes to global token definitions.
 
-## Files
+## Layout / motion
 
-Created:
-- `supabase/migrations/<ts>_structural_reckoning_iv_v_vi.sql`
-- `src/components/playbooks/AccountVolatilityTriage.tsx`
-- `src/components/playbooks/ChurnVolatilityDecision.tsx`
-- `src/components/playbooks/UpwardAlignmentMisSell.tsx`
-- `src/components/site/PlaybookCtaCard.tsx`
-- `src/lib/article-playbook-map.ts`
-- 3 hero images via imagegen → uploaded as assets, URLs inlined into migration
+- No rounded corners anywhere except the 72px avatar circle.
+- No new animations. Static page. Existing site header (from `__root.tsx`) still renders above; page adds its own 64px top padding.
+- Character key row: two entries side by side desktop with vertical hairline separator, stacked mobile.
+- Strip order rendered: 4 → 30 → 3.
 
-Edited:
-- `src/components/playbooks/index.tsx` — register 3 new slugs
-- `src/routes/codex.$slug.tsx` — swap legacy gate for rank-based check
-- `src/routes/insights.$slug.tsx` — mount `<PlaybookCtaCard slug={slug} />` at body foot
+## Not doing (explicit non-goals from PRD)
 
-No changes to: supabase auto-gen files, RLS (existing post/playbook policies already cover this), tier matrix, header/nav.
+- No Midjourney / stock / generated illustrations — placeholder circle + `imageAlt` IS the design.
+- No nav link to `/strip`.
+- No modifications to any existing component, route, or global CSS beyond adding font `<link>`s to `__root.tsx`.
+- No custom hover tooltip — uses native `title` attribute, intentionally.
 
-## Open assumptions (flag if wrong)
-- `series_total = 9` per PRD (existing parts I–III already seeded under same series_slug).
-- Practitioner price line in lock panel reads "$39/mo" (current `tiers.ts`), not the PRD's "$49/mo".
-- Reader tier = free tier per the existing hook comment; both see the locked panel.
+## Testing
 
-## Verification
-- `supabase--linter` after migration.
-- Visit `/insights/frontline-sovereignty-...` logged out → CTA opens locked sheet.
-- Sign in as practitioner → CTA links to `/codex/frontline-sovereignty-triage-playbook`, interactive tree renders.
-- Free user hitting `/codex/...-playbook` directly → BlurredTeaser + Paywall.
+After build, load `/strip` and verify: route resolves, three strips render in order 4/30/3, hovering a strip header shows the browser-native tooltip with the hoverText, 4-panel strips are 4-col desktop / 2×2 mobile, gold left border only on dialogue panels, no rounded corners besides the avatar circles.
