@@ -13,6 +13,7 @@ import { Route as VanguardRouteImport } from './routes/vanguard'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TeamsRouteImport } from './routes/teams'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as StripRouteImport } from './routes/strip'
 import { Route as SituationRoomRouteImport } from './routes/situation-room'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SequencerRouteImport } from './routes/sequencer'
@@ -112,6 +113,11 @@ const TeamsRoute = TeamsRouteImport.update({
 const SubscribeRoute = SubscribeRouteImport.update({
   id: '/subscribe',
   path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StripRoute = StripRouteImport.update({
+  id: '/strip',
+  path: '/strip',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SituationRoomRoute = SituationRoomRouteImport.update({
@@ -561,6 +567,7 @@ export interface FileRoutesByFullPath {
   '/sequencer': typeof SequencerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situation-room': typeof SituationRoomRoute
+  '/strip': typeof StripRoute
   '/subscribe': typeof SubscribeRoute
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -644,6 +651,7 @@ export interface FileRoutesByTo {
   '/sequencer': typeof SequencerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situation-room': typeof SituationRoomRoute
+  '/strip': typeof StripRoute
   '/subscribe': typeof SubscribeRoute
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -730,6 +738,7 @@ export interface FileRoutesById {
   '/sequencer': typeof SequencerRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situation-room': typeof SituationRoomRoute
+  '/strip': typeof StripRoute
   '/subscribe': typeof SubscribeRoute
   '/teams': typeof TeamsRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -818,6 +827,7 @@ export interface FileRouteTypes {
     | '/sequencer'
     | '/sitemap.xml'
     | '/situation-room'
+    | '/strip'
     | '/subscribe'
     | '/teams'
     | '/unsubscribe'
@@ -901,6 +911,7 @@ export interface FileRouteTypes {
     | '/sequencer'
     | '/sitemap.xml'
     | '/situation-room'
+    | '/strip'
     | '/subscribe'
     | '/teams'
     | '/unsubscribe'
@@ -986,6 +997,7 @@ export interface FileRouteTypes {
     | '/sequencer'
     | '/sitemap.xml'
     | '/situation-room'
+    | '/strip'
     | '/subscribe'
     | '/teams'
     | '/unsubscribe'
@@ -1073,6 +1085,7 @@ export interface RootRouteChildren {
   SequencerRoute: typeof SequencerRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SituationRoomRoute: typeof SituationRoomRoute
+  StripRoute: typeof StripRoute
   SubscribeRoute: typeof SubscribeRoute
   TeamsRoute: typeof TeamsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -1147,6 +1160,13 @@ declare module '@tanstack/react-router' {
       path: '/subscribe'
       fullPath: '/subscribe'
       preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/strip': {
+      id: '/strip'
+      path: '/strip'
+      fullPath: '/strip'
+      preLoaderRoute: typeof StripRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/situation-room': {
@@ -1830,6 +1850,7 @@ const rootRouteChildren: RootRouteChildren = {
   SequencerRoute: SequencerRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SituationRoomRoute: SituationRoomRoute,
+  StripRoute: StripRoute,
   SubscribeRoute: SubscribeRoute,
   TeamsRoute: TeamsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
@@ -1880,13 +1901,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
