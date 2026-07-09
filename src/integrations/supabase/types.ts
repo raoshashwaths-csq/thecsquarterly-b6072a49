@@ -1594,8 +1594,10 @@ export type Database = {
           series_slug: string | null
           series_title: string | null
           series_total: number | null
+          signal_quote: string | null
           slug: string
           sources: string | null
+          strip_placement_note: string | null
           subtitle: string | null
           tier: string
           title: string
@@ -1623,8 +1625,10 @@ export type Database = {
           series_slug?: string | null
           series_title?: string | null
           series_total?: number | null
+          signal_quote?: string | null
           slug: string
           sources?: string | null
+          strip_placement_note?: string | null
           subtitle?: string | null
           tier?: string
           title: string
@@ -1652,8 +1656,10 @@ export type Database = {
           series_slug?: string | null
           series_title?: string | null
           series_total?: number | null
+          signal_quote?: string | null
           slug?: string
           sources?: string | null
+          strip_placement_note?: string | null
           subtitle?: string | null
           tier?: string
           title?: string
