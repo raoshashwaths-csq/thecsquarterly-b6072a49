@@ -109,6 +109,8 @@ function HomePage() {
     sub: t("home.hero.sub"),
   };
   const hero = rotations?.[dayIndex] ?? fallback;
+  const dailyHeadline = getHeadlineForDay(dayIndex);
+
 
   return (
     <div className="min-h-screen flex flex-col">
