@@ -12,6 +12,8 @@ import { OperatorTools } from "@/components/site/OperatorTools";
 import { QHint } from "@/components/site/QHint";
 
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
+import HeadlineMorph from "@/components/homepage/HeadlineMorph";
+import { getHeadlineForDay } from "@/data/homepageHeadlines";
 import { useHeroDepth } from "@/hooks/useHeroDepth";
 import { useTilt } from "@/hooks/useTilt";
 
@@ -107,6 +109,8 @@ function HomePage() {
     sub: t("home.hero.sub"),
   };
   const hero = rotations?.[dayIndex] ?? fallback;
+  const dailyHeadline = getHeadlineForDay(dayIndex);
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -116,9 +120,8 @@ function HomePage() {
         <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-6 font-semibold">
           {t("home.eyebrow")}
         </div>
-        <h1 className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 text-balance leading-[0.95] tracking-tight">
-          {hero.line1} <span className="not-italic text-accent">{hero.line2}</span>
-        </h1>
+        <HeadlineMorph dayIndex={dayIndex} headline={dailyHeadline} />
+
         <p className="max-w-3xl mx-auto text-lg md:text-xl text-foreground/75 text-pretty mb-8">
           {hero.sub}
         </p>
