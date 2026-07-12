@@ -97,12 +97,9 @@ function HomePage() {
     : restRecency;
 
 
-  // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
-  // server render; swap to the viewer's local day-of-week after mount.
-  const [dayIndex, setDayIndex] = useState(0);
-  useEffect(() => {
-    setDayIndex(new Date().getDay());
-  }, []);
+  // SSR-safe daily headline rotation. Computed in the route loader (UTC) so
+  // SSR, hydration and client render all agree — no post-mount swap flash.
+  const { dayIndex } = Route.useLoaderData();
   const rotations = t("home.hero.rotations", { returnObjects: true }) as
     | Array<{ line1: string; line2: string; sub: string }>
     | undefined;
