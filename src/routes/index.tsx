@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LayoutGrid, Compass } from "lucide-react";
 import { queryOptions, useQuery, useSuspenseQuery } from "@tanstack/react-query";
@@ -62,7 +62,10 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(postsQuery),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(postsQuery);
+    return { dayIndex: new Date().getUTCDay() };
+  },
   component: HomePage,
 });
 
@@ -94,12 +97,9 @@ function HomePage() {
     : restRecency;
 
 
-  // SSR-safe daily headline rotation. Default to Sunday (brand anchor) on
-  // server render; swap to the viewer's local day-of-week after mount.
-  const [dayIndex, setDayIndex] = useState(0);
-  useEffect(() => {
-    setDayIndex(new Date().getDay());
-  }, []);
+  // SSR-safe daily headline rotation. Computed in the route loader (UTC) so
+  // SSR, hydration and client render all agree — no post-mount swap flash.
+  const { dayIndex } = Route.useLoaderData();
   const rotations = t("home.hero.rotations", { returnObjects: true }) as
     | Array<{ line1: string; line2: string; sub: string }>
     | undefined;
