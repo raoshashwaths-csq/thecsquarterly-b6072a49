@@ -1,13 +1,13 @@
 // Homepage hero headline rotation. Indexed by day-of-week (0 = Sunday) to
-// match the existing daily rotation in src/routes/index.tsx. Each entry is
-// split into exactly 3 phrases for the HeadlineMorph animation. `line1` and
-// `line2` preserve the existing accent-span rendering on the final static
-// headline (line2 renders in the accent color, matching the pre-morph hero).
+// match the existing daily rotation in src/routes/index.tsx. Phrase splits are
+// editorial beats, not a forced count: some headlines resolve in two moves,
+// others need three. `line1` and `line2` preserve the existing accent-span
+// rendering on the final static headline.
 
 export interface HeadlineSet {
   id: string;
   dayIndex: number; // 0 = Sunday .. 6 = Saturday
-  phrases: [string, string, string];
+  phrases: [string, string, ...string[]];
   line1: string;
   line2: string;
   fullText: string;
@@ -19,8 +19,7 @@ export const homepageHeadlines: HeadlineSet[] = [
     dayIndex: 0,
     phrases: [
       "Stop managing accounts.",
-      "Start engineering",
-      "trajectory.",
+      "Start engineering trajectory.",
     ],
     line1: "Stop managing accounts.",
     line2: "Start engineering trajectory.",
@@ -30,8 +29,7 @@ export const homepageHeadlines: HeadlineSet[] = [
     id: "monday-nrr-gap",
     dayIndex: 1,
     phrases: [
-      "The gap between 94% and 120% NRR",
-      "is not headcount.",
+      "The gap between 94% NRR and 120% NRR is not headcount.",
       "It is system design.",
     ],
     line1: "The gap between 94% NRR and 120% NRR",
@@ -43,8 +41,7 @@ export const homepageHeadlines: HeadlineSet[] = [
     id: "tuesday-high-touch-liability",
     dayIndex: 2,
     phrases: [
-      "High-touch CS",
-      "is a scaling liability.",
+      "High-touch CS is a scaling liability.",
       "Here is what replaces it.",
     ],
     line1: "High-touch CS is a scaling liability.",
@@ -56,8 +53,7 @@ export const homepageHeadlines: HeadlineSet[] = [
     dayIndex: 3,
     phrases: [
       "Stop managing accounts.",
-      "Start engineering",
-      "revenue.",
+      "Start engineering revenue.",
     ],
     line1: "Stop managing accounts.",
     line2: "Start engineering revenue.",
@@ -68,8 +64,7 @@ export const homepageHeadlines: HeadlineSet[] = [
     dayIndex: 4,
     phrases: [
       "Your peers are managing relationships.",
-      "The top quartile",
-      "is engineering expansion.",
+      "The top quartile is engineering expansion.",
     ],
     line1: "Your peers are managing relationships.",
     line2: "The top quartile is engineering expansion.",
@@ -80,8 +75,7 @@ export const homepageHeadlines: HeadlineSet[] = [
     id: "friday-revenue-leadership",
     dayIndex: 5,
     phrases: [
-      "CS done right",
-      "does not feel like CS.",
+      "CS done right does not feel like CS.",
       "It feels like revenue leadership.",
     ],
     line1: "CS done right does not feel like CS.",
