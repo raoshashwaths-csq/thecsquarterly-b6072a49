@@ -62,7 +62,10 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "/" }],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(postsQuery),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(postsQuery);
+    return { dayIndex: new Date().getUTCDay() };
+  },
   component: HomePage,
 });
 
