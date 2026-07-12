@@ -49,7 +49,7 @@ export default function HeadlineMorph({ dayIndex = 0, headline }: Props) {
     };
   }, [mounted, reducedMotion, headlineSet.id]);
 
-  const isFinal = stage === 3 || !mounted;
+  const isFinal = stage === 3;
 
   return (
     <div className="headline-morph relative">

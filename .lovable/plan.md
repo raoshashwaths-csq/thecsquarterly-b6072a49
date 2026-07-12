@@ -1,81 +1,60 @@
+## Audit findings
 
-## Goal
+**Bug 1 — "overlay on top of blurred headline".** There is no duplicate `<h1>` in `src/routes/index.tsx` — only `<HeadlineMorph />` is rendered in the hero (line 123). The blurred layer the user sees is HeadlineMorph's *own* `<h1>` in its initial state:
 
-Reflect the 25 rewritten dispatches in `CSQ_Full_Article_Repolish.zip` on the live site. No new features, no layout/design/route changes, no CSFactors/Lumi/dashboard touches.
+- On first render, `mounted = false`, so `isFinal = true` and the `<h1>` renders **sharp with the full Sunday headline**.
+- The mount effect then flips `mounted = true` → `isFinal = false`, and the `<h1>` transitions to `opacity-0 blur-sm` over 500ms while the phrase overlay fades in on top of it.
+- During that 500ms transition, the user sees the full Sunday headline blurring out underneath phrase 1. That is the "blurred headline behind an overlay" symptom — it is the same element, mid-transition, not a second element.
 
-## Discovery results
+**Bug 2 — wrong-headline flash.** This is **CHECK B (SSR/client mismatch)**, specifically the two-phase `dayIndex` in `src/routes/index.tsx`:
 
-- **Storage (PRD Check 1):** PATH A — Supabase table `public.posts` (not `articles`).
-- **Fields (Check 2):** need name/shape mapping from the PRD's schema to ours:
-  - `body` ✓, `excerpt` ✓, `section` ✓, `category` ✓, `tier` ✓, `published_at` ✓
-  - `read_time_minutes` → **`read_minutes`**
-  - `status: 'published' | 'draft'` → **`published` boolean** (no status column)
-  - `strip_placement_note`, `signal_quote` → **do not exist yet** (Step 4 needed)
-  - Extras we leave untouched: `title_mckinsey/body_mckinsey`, `title_wodehouse/body_wodehouse`, `series_*`, `sources`, `embedding`, `hero_prompt`, `cover_image_url`, `subtitle`, `is_premium`.
-- **Renderer (Check 3):** `src/routes/insights.$slug.tsx` already renders markdown (existing bodies use `##`, `>` blockquotes, `**bold**`). **Step 3 not needed** — I'll verify once during build by loading one refined post.
-- **Slugs (Check 4):** 25 posts exist. **14 of the PRD's 25 slugs do not match** current DB slugs and need a mapping table before upsert.
-
-### Slug mapping (PRD slug → existing DB slug)
-
-Exact matches (11): `new-cs-operating-model`, `vendor-consolidation-curve`, `compensating-humans-agentic-stack`, `what-the-machine-cannot-do`, `ai-native-qbr`, `upward-alignment-mis-sold-contract` *(matches `upward-alignment-the-mis-sold-contract`? see ambiguous)*, `end-of-cs-toil`, `high-touch-cs-scaling-liability`, `negotiators-dilemma-renewals`, `how-to-comp-csms-on-upsells`, `nrr-120-expansion-playbook`.
-
-High-confidence remaps:
-- `enterprise-accounts-self-serve` → `when-enterprise-accounts-self-serve`
-- `executive-fortitude-cco-churn-protocol` → `executive-fortitude-the-cco-churn-protocol`
-- `algorithm-renewal-table` → `algorithm-at-the-renewal-table`
-- `frontline-sovereignty` → `frontline-sovereignty-handling-high-volatility-account-friction`
-- `chargebee-rebuilt-cs-reactive-predictive` → `chargebee-reactive-to-predictive`
-- `notion-nrr-plg-expansion` → `notion-105-to-128-nrr`
-- `algorithmic-orchestration-new-cs-operating-model` → `ai-orchestration-cs-org`
-- `managing-csuite-enterprise-escalations` → `escalation-playbook-c-suite`
-- `driving-nrr-down-market` → `driving-nrr-in-a-down-market`
-- `pricing-models-ai-agents` → `pricing-models-for-ai-agents`
-- `upward-alignment-mis-sold-contract` → `upward-alignment-the-mis-sold-contract`
-
-**Ambiguous — need your call before I upsert:**
-1. `structural-reckoning` (PRD: series overview, 14min) → DB has both `structural-reckoning-part-1-the-structural-reckoning` and `structural-reckoning-prologue`. Which is the "series overview"?
-2. `structural-reckoning-begins` (PRD: part 1/12, 7min) → the other of the two above?
-3. `identifying-churn-risk-before-contract` → closest DB slug is `qualification-bridge-sales-cs`. Same article?
-4. `structural-stakeholders-enterprise-accounts` → closest DB slug is `stakeholder-mapping-frameworks`. Same article?
-
-I will not change existing slugs (routes stay intact) — I'll upsert refined content onto the DB slug and keep the PRD slug only as internal reference.
-
-## Implementation
-
-### Step 1 — Schema additions (single migration)
-```sql
-ALTER TABLE public.posts
-  ADD COLUMN IF NOT EXISTS strip_placement_note text,
-  ADD COLUMN IF NOT EXISTS signal_quote text;
 ```
-No RLS/policy/GRANT change (existing table).
+const [dayIndex, setDayIndex] = useState(0);           // SSR + first client render = Sunday
+useEffect(() => { setDayIndex(new Date().getDay()); }, []);  // then swaps to today
+```
 
-### Step 2 — Content import script (one-shot, not shipped)
-`scripts/import-refined-dispatches.ts` — Node script run locally with the service-role env already used by other maintenance scripts. For each of the 25 articles it:
-1. Parses `csq-dispatches-refined.md` into `{prdSlug → body}` by splitting on `^# \d+\. `.
-2. Applies the slug map above → `dbSlug`.
-3. Builds a row: `title, excerpt, body, section, category, tier, published (= status==='published'), published_at, read_minutes, series_slug/series_title/series_part/series_total (parsed from PRD "series" line when present), signal_quote, strip_placement_note`.
-4. `UPDATE posts SET … WHERE slug = dbSlug` for existing rows; `INSERT` only if no row exists for that slug (none expected after mapping).
-5. Leaves `title_mckinsey/body_mckinsey/title_wodehouse/body_wodehouse/sources/embedding/hero_prompt/cover_image_url/subtitle/is_premium` untouched — only fields listed in the PRD change.
+So SSR renders Sunday's headline; the browser hydrates with Sunday's headline; then the effect runs and swaps to today's headline, resetting the morph. The "different headline that flashes first" is always Sunday's.
 
-Body is stored raw (markdown). Existing renderer parses it.
+CHECK C does not apply — the old `t("home.hero.rotations")` i18n rotation only feeds the sub-headline (`hero.sub`), not the `<h1>`.
 
-### Step 3 — Draft handling
-PRD marks 3 articles `draft`. Set `published = false` and leave `published_at` null. Confirm the public listing query (`listPostsBySection`, insights index, RSS, sitemap) already filters on `published = true` — if any surface doesn't, add that filter in the same session (read-only surfaces only, no design change).
+## Fix plan
 
-### Step 4 — Verification
-- Load one refined post at `/insights/<slug>` and confirm the `> _"..."_` epigraph renders as a blockquote with the gold left border and `##` renders as a section header (no raw markdown visible). If a specific block doesn't render, add the minimal `.article-body` CSS rules from PRD Step 3 to the existing insights stylesheet — no new file, no token changes.
-- Spot-check 3 posts across sections (`vanguard`, `retention-protocol`, `outcome-forum`) for body/excerpt/read-time refresh.
-- Confirm drafts do not appear on `/insights`, `/vanguard`, `/retention-protocol`, `/outcome-forum`, `/rss.xml`, `/sitemap.xml`.
-- Confirm existing routes still resolve and paywall still gates `tier=premium`.
+Two surgical changes, no rebuild, no animation/CSS/data changes.
+
+### 1. `src/components/homepage/HeadlineMorph.tsx` — remove the pre-mount "final" flash
+
+Change the initial visual state so nothing sharp renders before the morph starts. The `<h1>` still exists (SEO + reserved layout height), but it starts hidden and only becomes visible at stage 3.
+
+- Drop the `isFinal = stage === 3 || !mounted` shortcut. Compute visibility from `stage` alone: `isFinal = stage === 3`.
+- Keep the `mounted` gate only for starting the timers (so SSR doesn't try to `setTimeout`).
+- For the reduced-motion branch, still set `stage = 3` immediately in the effect — reduced-motion users get an instant sharp headline with no animation, same as today.
+- Net effect: SSR/first paint shows an invisible (opacity-0, blurred) `<h1>` with the phrase overlay layered on top rendering phrase 1. No sharp full-sentence flash, no visible blurred layer underneath.
+
+The screen-reader `<span className="sr-only">{fullText}</span>` stays, so a11y is unchanged even during the morph.
+
+### 2. `src/routes/index.tsx` — remove the Sunday→today swap
+
+Replace the two-phase `dayIndex` state with a value that is stable across SSR and hydration. Use the route loader (already present) to compute the day server-side and pass it through, so SSR and the first client render agree.
+
+- In the route's `loader`, compute `dayIndex = new Date().getUTCDay()` (UTC to avoid edge/server timezone drift) and return `{ dayIndex }` alongside the existing `ensureQueryData` call.
+- In `HomePage`, read `dayIndex` from `Route.useLoaderData()` instead of `useState(0) + useEffect`.
+- Delete the `useState`/`useEffect` pair for `dayIndex` and the `rotations`/`fallback`/`hero` block only insofar as `hero` still needs `dayIndex` — keep the i18n sub-headline logic, just source `dayIndex` from the loader.
+- Result: SSR, hydration, and post-mount all render the same headline. No swap, no flash.
+
+Using UTC means the "today" boundary rolls over at 00:00 UTC everywhere, which is acceptable for a weekly-cadence editorial site and is the standard fix for SSR date mismatches. If we later want viewer-local day, we'd need a cookie-based approach — out of scope for this bug fix.
+
+### Verification
+
+- Hard refresh homepage 3–4×: first visible text is phrase 1 of today's headline; no full-sentence flash; no blurred layer visible behind the phrases.
+- DOM inspection: exactly one `<h1>` in the hero, plus the phrase overlay div only while `stage < 3`.
+- Final state: sharp `<h1>` with the accent-colored `line2` span, zero residual blur/opacity.
+- Reduced-motion: instant sharp headline, no animation, correct day.
 
 ### Files touched
-- **New:** one Supabase migration (columns), `scripts/import-refined-dispatches.ts`, `/tmp/repolish/csq-dispatches-refined.md` copied into `scripts/` as the source.
-- **Possibly touched (only if a listing query lacks the `published` filter):** the specific loader file, filter clause only.
-- **Possibly touched (only if renderer misses blockquote/header styles):** existing insights stylesheet, additive CSS only.
-- **Not touched:** routes, components, tokens, CSFactors, Lumi, dashboards, any article not in the 25.
 
-## Open questions (blocking, please answer)
+- `src/components/homepage/HeadlineMorph.tsx` — 2-line change to `isFinal` derivation.
+- `src/routes/index.tsx` — move `dayIndex` from `useState`/`useEffect` into the route `loader` + `useLoaderData`.
 
-1. Confirm the 4 ambiguous slug mappings above (structural-reckoning ×2, identifying-churn-risk, structural-stakeholders).
-2. For the 3 drafts, do you want them created now with `published=false`, or held back entirely until you flip them live?
+No changes to `src/data/homepageHeadlines.ts`, `src/styles.css`, keyframes, SVG goo filter, or timing constants.
+
+Make sure these changes reflect cleanly on mobile as well 
