@@ -1,12 +1,12 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getHeadlineForDay,
   type HeadlineSet,
 } from "@/data/homepageHeadlines";
 
-const PHRASE_HOLD = 1.2; // seconds fully visible
+const PHRASE_HOLD = 1.4; // seconds fully visible
 const MORPH_DURATION = 0.55; // seconds for blur/scale transition
-const STEP_MS = (PHRASE_HOLD + MORPH_DURATION) * 1000;
+const STEP_MS = Math.round((PHRASE_HOLD + MORPH_DURATION) * 1000);
 
 interface Props {
   /** Day-of-week (0 = Sunday). Pass from parent to stay SSR-safe. */
@@ -20,84 +20,55 @@ export default function HeadlineMorph({ dayIndex = 0, headline }: Props) {
   const { phrases, line1, line2, fullText } = headlineSet;
   const finalStage = phrases.length;
 
-  const rawId = useId();
-  const filterId = `headline-morph-goo-${rawId.replace(/[:]/g, "")}`;
+  // Single-owner timeline: refs so the effect can run once (empty deps)
+  // without React re-scheduling anything based on prop identity.
+  const phrasesRef = useRef(phrases);
+  phrasesRef.current = phrases;
+  const finalStageRef = useRef(finalStage);
+  finalStageRef.current = finalStage;
 
-  const [stage, setStage] = useState(0); // phrase index, then finalStage = final static headline
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+  const [stage, setStage] = useState(0);
 
   useEffect(() => {
-    setMounted(true);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    if (reducedMotion) {
-      setStage(finalStage);
+    if (mq.matches) {
+      setStage(finalStageRef.current);
       return;
     }
-    setStage(0);
-    phrases.slice(1).forEach((_, index) => {
-      timers.current.push(setTimeout(() => setStage(index + 1), STEP_MS * (index + 1)));
-    });
-    timers.current.push(setTimeout(() => setStage(finalStage), STEP_MS * finalStage));
-    return () => {
-      timers.current.forEach(clearTimeout);
-      timers.current = [];
-    };
-  }, [mounted, reducedMotion, headlineSet.id, finalStage, phrases]);
+    const timers: Array<ReturnType<typeof setTimeout>> = [];
+    const total = finalStageRef.current;
+    for (let i = 1; i < total; i++) {
+      timers.push(setTimeout(() => setStage(i), STEP_MS * i));
+    }
+    timers.push(setTimeout(() => setStage(total), STEP_MS * total));
+    return () => timers.forEach(clearTimeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const isFinal = stage === finalStage;
+
+
+  const isFinal = stage >= finalStage;
   const currentPhrase = phrases[Math.min(stage, phrases.length - 1)];
 
   return (
     <div className="headline-morph">
-      {/* SVG goo filter — the numeric matrix is a filter math constant, not a
-          brand color. It reshapes alpha to create the liquid morph edge. */}
-      <svg
-        aria-hidden
-        className="absolute h-0 w-0 overflow-hidden"
-        style={{ position: "absolute" }}
-      >
-        <defs>
-          <filter id={filterId}>
-            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
-            <feColorMatrix
-              in="blur"
-              mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7"
-              result="goo"
-            />
-            <feBlend in="SourceGraphic" in2="goo" />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* The single visual headline. During the sequence this same h1 changes
-          text in-place; there is no absolute overlay layer. */}
       <h1
         className="font-display text-5xl md:text-7xl lg:text-8xl mb-8 min-h-[4.75em] sm:min-h-[3.8em] md:min-h-[2.85em] text-balance leading-[0.95] tracking-tight"
-        aria-live="polite"
         aria-label={fullText}
       >
         {isFinal ? (
-          <span key={`${headlineSet.id}-final`} className="headline-morph-final">
+          <span key="final" className="headline-morph-final">
             {line1} <span className="not-italic text-accent">{line2}</span>
           </span>
         ) : (
-          <span
-            key={`${headlineSet.id}-${stage}`}
-            className="headline-morph-piece"
-            style={{ filter: `url(#${filterId})` }}
-          >
+          <span key={`piece-${stage}`} className="headline-morph-piece">
             {currentPhrase}
           </span>
         )}
       </h1>
+      {/* Screen-reader-only full sentence so assistive tech always reads the
+          complete headline regardless of animation stage. */}
+      <span className="sr-only">{fullText}</span>
     </div>
   );
 }
