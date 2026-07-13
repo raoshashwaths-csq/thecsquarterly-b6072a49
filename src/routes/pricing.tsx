@@ -198,9 +198,10 @@ function TierCard({ tier, index }: { tier: Tier; index: number }) {
       className={
         "flex flex-col p-7 border card-lift relative " +
         (emphasized
-          ? "border-2 border-accent bg-card"
+          ? "border-2 border-accent bg-card elevated-primary"
           : "border-border bg-card/60")
       }
+
     >
       {emphasized && tier.highlightLabel && (
         <div className="absolute -top-3 left-7 bg-accent text-accent-foreground px-3 py-1 font-mono text-xs uppercase tracking-widest">
