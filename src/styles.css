@@ -152,9 +152,38 @@
   background-size: 220px 220px;
 }
 .dark .paper-grain::before {
-  /* Lift the grain off dark backgrounds; keep available if you want to enable later */
-  opacity: 0;
+  /* Dark-mode grain: neutral procedural noise, barely-perceptible surface quality on the midnight-slate background. */
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 200px 200px;
 }
+
+/* ---------------------------------------------------------------
+   Depth utilities — hard offset shadows + inset surface.
+   Reserved for a small, named set of elements. Sharp corners only.
+   --------------------------------------------------------------- */
+@utility elevated {
+  box-shadow: 3px 3px 0 0 var(--border);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  &:hover {
+    box-shadow: 5px 5px 0 0 var(--border);
+    transform: translate(-1px, -1px);
+  }
+}
+@utility elevated-primary {
+  box-shadow: 4px 4px 0 0 var(--accent);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  &:hover {
+    box-shadow: 6px 6px 0 0 var(--accent);
+    transform: translate(-1px, -1px);
+  }
+}
+@utility inset-surface {
+  border: 1px solid var(--border);
+  box-shadow: inset 1px 1px 0 0 color-mix(in oklab, var(--foreground) 12%, transparent);
+}
+
 
 /* Tone-aware accent: witty mode shifts to deeper patina gold for legibility */
 .tone-witty {
