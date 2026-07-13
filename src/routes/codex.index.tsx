@@ -80,7 +80,7 @@ function CodexPage() {
             <article
               key={p.id}
               data-tilt
-              className="border border-border bg-card flex flex-col group hover:border-foreground transition-colors card-lift"
+              className="border border-border bg-card flex flex-col group hover:border-foreground transition-[color,border-color,box-shadow,transform] duration-150 card-lift hover:shadow-[5px_5px_0_0_var(--border)] hover:-translate-x-px hover:-translate-y-px"
             >
               <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
                 <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
