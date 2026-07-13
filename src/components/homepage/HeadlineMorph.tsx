@@ -30,7 +30,7 @@ export default function HeadlineMorph({ dayIndex = 0, headline }: Props) {
   const [stage, setStage] = useState(0);
 
   useEffect(() => {
-    // Reduced-motion: skip straight to the final headline.
+    console.log("[HeadlineMorph] mount, finalStage=", finalStageRef.current);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mq.matches) {
       setStage(finalStageRef.current);
@@ -39,21 +39,28 @@ export default function HeadlineMorph({ dayIndex = 0, headline }: Props) {
 
     const timers: Array<ReturnType<typeof setTimeout>> = [];
     const total = finalStageRef.current;
-    // Schedule each intermediate phrase advance.
     for (let i = 1; i < total; i++) {
-      timers.push(setTimeout(() => setStage(i), STEP_MS * i));
+      timers.push(
+        setTimeout(() => {
+          console.log("[HeadlineMorph] setStage", i);
+          setStage(i);
+        }, STEP_MS * i),
+      );
     }
-    // Final resolve.
-    timers.push(setTimeout(() => setStage(total), STEP_MS * total));
+    timers.push(
+      setTimeout(() => {
+        console.log("[HeadlineMorph] setStage final", total);
+        setStage(total);
+      }, STEP_MS * total),
+    );
 
     return () => {
+      console.log("[HeadlineMorph] cleanup, clearing", timers.length);
       timers.forEach(clearTimeout);
     };
-    // Empty deps: the timeline runs exactly once per mount, regardless of
-    // prop re-references or parent re-renders. If the headline changes
-    // mid-flight we accept it — this component owns one animation cycle.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const isFinal = stage >= finalStage;
   const currentPhrase = phrases[Math.min(stage, phrases.length - 1)];
