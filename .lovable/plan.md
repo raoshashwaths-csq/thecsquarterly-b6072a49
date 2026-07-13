@@ -1,60 +1,82 @@
-## Audit findings
+## Depth & Texture System — Plan
 
-**Bug 1 — "overlay on top of blurred headline".** There is no duplicate `<h1>` in `src/routes/index.tsx` — only `<HeadlineMorph />` is rendered in the hero (line 123). The blurred layer the user sees is HeadlineMorph's *own* `<h1>` in its initial state:
+Three additive changes to the design system. No layout, spacing, typography, or color-token changes. Sharp corners preserved everywhere.
 
-- On first render, `mounted = false`, so `isFinal = true` and the `<h1>` renders **sharp with the full Sunday headline**.
-- The mount effect then flips `mounted = true` → `isFinal = false`, and the `<h1>` transitions to `opacity-0 blur-sm` over 500ms while the phrase overlay fades in on top of it.
-- During that 500ms transition, the user sees the full Sunday headline blurring out underneath phrase 1. That is the "blurred headline behind an overlay" symptom — it is the same element, mid-transition, not a second element.
+### 1. Background grain (dark mode)
 
-**Bug 2 — wrong-headline flash.** This is **CHECK B (SSR/client mismatch)**, specifically the two-phase `dayIndex` in `src/routes/index.tsx`:
+The codebase already has a `.paper-grain` layer on `<body>` (`src/styles.css` ~line 139) that is explicitly disabled in dark mode (`opacity: 0`). Since the site's default theme is the dark midnight-slate, that means the grain currently never shows on the primary experience.
 
+Change: enable the grain in dark mode using a lighter overlay tuned for the indigo background, matching the PRD spec.
+
+- Keep the existing light-mode grain untouched (multiply, warm ink tint).
+- In `.dark .paper-grain::before`, replace `opacity: 0` with a second SVG data URI using neutral white noise + `mix-blend-mode: overlay` at `opacity: 0.035`.
+- Position stays `fixed` + `pointer-events: none` (already the case), so it does not scroll with content and never intercepts input.
+- No new asset, no network request, no application to any card or component.
+
+Tuning: ship at `0.035`; if it reads as "a texture" rather than a surface quality, drop to `0.025`.
+
+### 2. Hard offset shadow utilities
+
+Add two utilities to `src/styles.css`. Colors reference existing tokens only (`--border`, `--accent`) — no new hex.
+
+```css
+@utility elevated {
+  box-shadow: 3px 3px 0 0 var(--border);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  &:hover { box-shadow: 5px 5px 0 0 var(--border); transform: translate(-1px, -1px); }
+}
+@utility elevated-primary {
+  box-shadow: 4px 4px 0 0 var(--accent);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  &:hover { box-shadow: 6px 6px 0 0 var(--accent); transform: translate(-1px, -1px); }
+}
 ```
-const [dayIndex, setDayIndex] = useState(0);           // SSR + first client render = Sunday
-useEffect(() => { setDayIndex(new Date().getDay()); }, []);  // then swaps to today
+
+Apply to exactly this small set:
+
+- `src/routes/index.tsx` — the primary hero CTA button → `elevated-primary` (once per homepage).
+- `src/routes/index.tsx` — the featured/hero article card (if a distinct "featured" slot exists on the homepage after the hero) → `elevated`.
+- `src/routes/pricing.tsx` — the recommended tier card only → `elevated`.
+- `src/routes/codex.index.tsx` (and codex list card) — playbook card on `:hover` only, via `hover:shadow-[5px_5px_0_0_var(--border)] hover:-translate-x-px hover:-translate-y-px transition-[box-shadow,transform] duration-150`. Not `elevated` permanently.
+
+Standard article grids, nav, footer, and every other card stay untouched.
+
+### 3. Inset surface utility
+
+```css
+@utility inset-surface {
+  border: 1px solid var(--border);
+  box-shadow: inset 1px 1px 0 0 color-mix(in oklab, var(--foreground) 12%, transparent);
+}
 ```
 
-So SSR renders Sunday's headline; the browser hydrates with Sunday's headline; then the effect runs and swaps to today's headline, resetting the morph. The "different headline that flashes first" is always Sunday's.
+Uses existing `--border` + a foreground-derived inner edge (no new token). No outer shadow, no radius.
 
-CHECK C does not apply — the old `t("home.hero.rotations")` i18n rotation only feeds the sub-headline (`hero.sub`), not the `<h1>`.
+Apply to:
 
-## Fix plan
+- `src/components/site/RetentionLedger.tsx` — the ticker wrapper (currently `border-y border-border`). Adds the recessed inner edge.
+- Search / form text inputs on high-signal pages: the FAQ search input (`src/routes/faq.tsx`) and the Lumi chat input textarea in the global agent (`src/components/site/QAgentButton.tsx` / drawer input) — apply the class alongside existing styling, no structural change.
 
-Two surgical changes, no rebuild, no animation/CSS/data changes.
-
-### 1. `src/components/homepage/HeadlineMorph.tsx` — remove the pre-mount "final" flash
-
-Change the initial visual state so nothing sharp renders before the morph starts. The `<h1>` still exists (SEO + reserved layout height), but it starts hidden and only becomes visible at stage 3.
-
-- Drop the `isFinal = stage === 3 || !mounted` shortcut. Compute visibility from `stage` alone: `isFinal = stage === 3`.
-- Keep the `mounted` gate only for starting the timers (so SSR doesn't try to `setTimeout`).
-- For the reduced-motion branch, still set `stage = 3` immediately in the effect — reduced-motion users get an instant sharp headline with no animation, same as today.
-- Net effect: SSR/first paint shows an invisible (opacity-0, blurred) `<h1>` with the phrase overlay layered on top rendering phrase 1. No sharp full-sentence flash, no visible blurred layer underneath.
-
-The screen-reader `<span className="sr-only">{fullText}</span>` stays, so a11y is unchanged even during the morph.
-
-### 2. `src/routes/index.tsx` — remove the Sunday→today swap
-
-Replace the two-phase `dayIndex` state with a value that is stable across SSR and hydration. Use the route loader (already present) to compute the day server-side and pass it through, so SSR and the first client render agree.
-
-- In the route's `loader`, compute `dayIndex = new Date().getUTCDay()` (UTC to avoid edge/server timezone drift) and return `{ dayIndex }` alongside the existing `ensureQueryData` call.
-- In `HomePage`, read `dayIndex` from `Route.useLoaderData()` instead of `useState(0) + useEffect`.
-- Delete the `useState`/`useEffect` pair for `dayIndex` and the `rotations`/`fallback`/`hero` block only insofar as `hero` still needs `dayIndex` — keep the i18n sub-headline logic, just source `dayIndex` from the loader.
-- Result: SSR, hydration, and post-mount all render the same headline. No swap, no flash.
-
-Using UTC means the "today" boundary rolls over at 00:00 UTC everywhere, which is acceptable for a weekly-cadence editorial site and is the standard fix for SSR date mismatches. If we later want viewer-local day, we'd need a cookie-based approach — out of scope for this bug fix.
+Additional inputs (Codex search, subscribe forms) are out of scope for this pass; if we want them later, we extend deliberately.
 
 ### Verification
 
-- Hard refresh homepage 3–4×: first visible text is phrase 1 of today's headline; no full-sentence flash; no blurred layer visible behind the phrases.
-- DOM inspection: exactly one `<h1>` in the hero, plus the phrase overlay div only while `stage < 3`.
-- Final state: sharp `<h1>` with the accent-colored `line2` span, zero residual blur/opacity.
-- Reduced-motion: instant sharp headline, no animation, correct day.
+- Hard refresh in dark mode: grain visible only on very close inspection in the empty indigo gaps between content; not visible on any card.
+- Hard refresh in light mode: existing cream-paper grain unchanged.
+- Scroll: grain does not move with content.
+- Homepage: exactly one `elevated-primary` (hero CTA); at most one additional `elevated` (featured card).
+- Pricing: only the recommended tier has the hard shadow; other tiers unchanged.
+- Codex: playbook cards flat at rest, lift on hover.
+- Retention ticker: reads as recessed, no outer shadow.
+- No new hex introduced. No border-radius added.
 
 ### Files touched
 
-- `src/components/homepage/HeadlineMorph.tsx` — 2-line change to `isFinal` derivation.
-- `src/routes/index.tsx` — move `dayIndex` from `useState`/`useEffect` into the route `loader` + `useLoaderData`.
+- `src/styles.css` — enable dark-mode grain; add `elevated`, `elevated-primary`, `inset-surface` utilities.
+- `src/routes/index.tsx` — hero CTA + featured card classes.
+- `src/routes/pricing.tsx` — recommended tier class.
+- `src/routes/codex.index.tsx` (and/or the codex card component it uses) — hover-only shadow.
+- `src/components/site/RetentionLedger.tsx` — inset class on ticker wrapper.
+- `src/routes/faq.tsx` + Lumi drawer input — inset class on input(s).
 
-No changes to `src/data/homepageHeadlines.ts`, `src/styles.css`, keyframes, SVG goo filter, or timing constants.
-
-Make sure these changes reflect cleanly on mobile as well 
+No component restructuring, no new files, no new dependencies.

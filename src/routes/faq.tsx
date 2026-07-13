@@ -107,7 +107,7 @@ function FaqPage() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder={ui.searchPlaceholder}
             aria-label={ui.searchPlaceholder}
-            className="w-full pl-11 pr-11 py-3.5 bg-background border border-border rounded-md font-body text-base focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+            className="inset-surface w-full pl-11 pr-11 py-3.5 bg-background rounded-md font-body text-base focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
           />
           {trimmed && (
             <button
