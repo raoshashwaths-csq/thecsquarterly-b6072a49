@@ -30,36 +30,21 @@ export default function HeadlineMorph({ dayIndex = 0, headline }: Props) {
   const [stage, setStage] = useState(0);
 
   useEffect(() => {
-    console.log("[HeadlineMorph] mount, finalStage=", finalStageRef.current);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mq.matches) {
       setStage(finalStageRef.current);
       return;
     }
-
     const timers: Array<ReturnType<typeof setTimeout>> = [];
     const total = finalStageRef.current;
     for (let i = 1; i < total; i++) {
-      timers.push(
-        setTimeout(() => {
-          console.log("[HeadlineMorph] setStage", i);
-          setStage(i);
-        }, STEP_MS * i),
-      );
+      timers.push(setTimeout(() => setStage(i), STEP_MS * i));
     }
-    timers.push(
-      setTimeout(() => {
-        console.log("[HeadlineMorph] setStage final", total);
-        setStage(total);
-      }, STEP_MS * total),
-    );
-
-    return () => {
-      console.log("[HeadlineMorph] cleanup, clearing", timers.length);
-      timers.forEach(clearTimeout);
-    };
+    timers.push(setTimeout(() => setStage(total), STEP_MS * total));
+    return () => timers.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
 
   const isFinal = stage >= finalStage;
