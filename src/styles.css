@@ -106,6 +106,11 @@
   --secondary-foreground: oklch(0.955 0.012 80);
   --destructive: oklch(0.7 0.2 25);             /* brightened — AA on midnight for small text */
   --destructive-foreground: oklch(0.98 0 0);
+
+  /* Depth tokens — dark theme keeps gold hairline shadows for continuity. */
+  --elevated-shadow: oklch(0.835 0.082 86 / 0.35);
+  --inset-edge: oklch(0.955 0.012 80 / 0.12);
+  --inset-border: oklch(0.835 0.082 86 / 0.28);
 }
 
 @keyframes reveal-line {
