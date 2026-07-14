@@ -182,10 +182,10 @@
    Reserved for a small, named set of elements. Sharp corners only.
    --------------------------------------------------------------- */
 @utility elevated {
-  box-shadow: 3px 3px 0 0 var(--border);
+  box-shadow: 3px 3px 0 0 var(--elevated-shadow);
   transition: box-shadow 0.15s ease, transform 0.15s ease;
   &:hover {
-    box-shadow: 5px 5px 0 0 var(--border);
+    box-shadow: 5px 5px 0 0 var(--elevated-shadow);
     transform: translate(-1px, -1px);
   }
 }
@@ -198,8 +198,8 @@
   }
 }
 @utility inset-surface {
-  border: 1px solid var(--border);
-  box-shadow: inset 1px 1px 0 0 color-mix(in oklab, var(--foreground) 12%, transparent);
+  border: 1px solid var(--inset-border);
+  box-shadow: inset 1px 1px 0 0 var(--inset-edge);
 }
 
 
