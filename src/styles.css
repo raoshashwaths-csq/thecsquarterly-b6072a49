@@ -72,6 +72,13 @@
   --secondary-foreground: oklch(0.247 0.085 271);
   --destructive: oklch(0.55 0.22 27);
   --destructive-foreground: oklch(0.98 0 0);
+
+  /* Depth tokens — indigo-tinted "ledger stock" for light theme.
+     Shadow derived from --foreground (Royal Blue) at reduced alpha so it
+     reads as ink on fine bond, not neutral grey. */
+  --elevated-shadow: oklch(0.247 0.085 271 / 0.55);
+  --inset-edge: oklch(0.247 0.085 271 / 0.10);
+  --inset-border: oklch(0.247 0.085 271 / 0.22);
 }
 
 .dark {
