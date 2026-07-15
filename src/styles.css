@@ -151,13 +151,17 @@
 .paper-grain {
   --paper-grain-opacity: 0.035;
   position: relative;
+  z-index: 0;
+  isolation: isolate;
 }
 .paper-grain::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  /* Sit BEHIND all in-flow content so opaque card / section backgrounds
+     mask the grain. Only the body background shows the texture. */
+  z-index: -1;
   opacity: var(--paper-grain-opacity);
   mix-blend-mode: multiply;
   /* Light mode: fine, mechanical banknote/ledger grain — higher baseFrequency

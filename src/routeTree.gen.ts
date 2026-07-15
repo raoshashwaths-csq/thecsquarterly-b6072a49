@@ -46,6 +46,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as DiagnosticsChampionDependencyRouteImport } from './routes/diagnostics.champion-dependency'
 import { Route as DiagnosticsAiReadinessRouteImport } from './routes/diagnostics.ai-readiness'
 import { Route as DesignSystemLumiBadgeRouteImport } from './routes/design-system.lumi-badge'
+import { Route as DesignSystemGrainTestRouteImport } from './routes/design-system.grain-test'
 import { Route as CsfactorsCtasRouteImport } from './routes/csfactors.ctas'
 import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
 import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
@@ -279,6 +280,11 @@ const DiagnosticsAiReadinessRoute = DiagnosticsAiReadinessRouteImport.update({
 const DesignSystemLumiBadgeRoute = DesignSystemLumiBadgeRouteImport.update({
   id: '/design-system/lumi-badge',
   path: '/design-system/lumi-badge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesignSystemGrainTestRoute = DesignSystemGrainTestRouteImport.update({
+  id: '/design-system/grain-test',
+  path: '/design-system/grain-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CsfactorsCtasRoute = CsfactorsCtasRouteImport.update({
@@ -585,6 +591,7 @@ export interface FileRoutesByFullPath {
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
   '/csfactors/ctas': typeof CsfactorsCtasRoute
+  '/design-system/grain-test': typeof DesignSystemGrainTestRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessRouteWithChildren
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
@@ -669,6 +676,7 @@ export interface FileRoutesByTo {
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
   '/csfactors/ctas': typeof CsfactorsCtasRoute
+  '/design-system/grain-test': typeof DesignSystemGrainTestRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -756,6 +764,7 @@ export interface FileRoutesById {
   '/csfactors/$accountId': typeof CsfactorsAccountIdRoute
   '/csfactors/360': typeof Csfactors360Route
   '/csfactors/ctas': typeof CsfactorsCtasRoute
+  '/design-system/grain-test': typeof DesignSystemGrainTestRoute
   '/design-system/lumi-badge': typeof DesignSystemLumiBadgeRoute
   '/diagnostics/ai-readiness': typeof DiagnosticsAiReadinessRouteWithChildren
   '/diagnostics/champion-dependency': typeof DiagnosticsChampionDependencyRoute
@@ -845,6 +854,7 @@ export interface FileRouteTypes {
     | '/csfactors/$accountId'
     | '/csfactors/360'
     | '/csfactors/ctas'
+    | '/design-system/grain-test'
     | '/design-system/lumi-badge'
     | '/diagnostics/ai-readiness'
     | '/diagnostics/champion-dependency'
@@ -929,6 +939,7 @@ export interface FileRouteTypes {
     | '/csfactors/$accountId'
     | '/csfactors/360'
     | '/csfactors/ctas'
+    | '/design-system/grain-test'
     | '/design-system/lumi-badge'
     | '/diagnostics/champion-dependency'
     | '/email/unsubscribe'
@@ -1015,6 +1026,7 @@ export interface FileRouteTypes {
     | '/csfactors/$accountId'
     | '/csfactors/360'
     | '/csfactors/ctas'
+    | '/design-system/grain-test'
     | '/design-system/lumi-badge'
     | '/diagnostics/ai-readiness'
     | '/diagnostics/champion-dependency'
@@ -1095,6 +1107,7 @@ export interface RootRouteChildren {
   AccountWorkspaceRoute: typeof AccountWorkspaceRoute
   AgentFrameworkRoute: typeof AgentFrameworkRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
+  DesignSystemGrainTestRoute: typeof DesignSystemGrainTestRoute
   DesignSystemLumiBadgeRoute: typeof DesignSystemLumiBadgeRoute
   DiagnosticsAiReadinessRoute: typeof DiagnosticsAiReadinessRouteWithChildren
   DiagnosticsChampionDependencyRoute: typeof DiagnosticsChampionDependencyRoute
@@ -1391,6 +1404,13 @@ declare module '@tanstack/react-router' {
       path: '/design-system/lumi-badge'
       fullPath: '/design-system/lumi-badge'
       preLoaderRoute: typeof DesignSystemLumiBadgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/design-system/grain-test': {
+      id: '/design-system/grain-test'
+      path: '/design-system/grain-test'
+      fullPath: '/design-system/grain-test'
+      preLoaderRoute: typeof DesignSystemGrainTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/csfactors/ctas': {
@@ -1860,6 +1880,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountWorkspaceRoute: AccountWorkspaceRoute,
   AgentFrameworkRoute: AgentFrameworkRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
+  DesignSystemGrainTestRoute: DesignSystemGrainTestRoute,
   DesignSystemLumiBadgeRoute: DesignSystemLumiBadgeRoute,
   DiagnosticsAiReadinessRoute: DiagnosticsAiReadinessRouteWithChildren,
   DiagnosticsChampionDependencyRoute: DiagnosticsChampionDependencyRoute,
