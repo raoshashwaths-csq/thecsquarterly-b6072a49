@@ -184,7 +184,7 @@ function HomePage() {
             <div className="flex items-center gap-3 mb-4">
               <span
                 aria-hidden
-                className="flex h-10 w-10 shrink-0 items-center justify-center bg-foreground text-background rounded-sm group-hover:scale-105 transition-transform"
+                className="flex h-10 w-10 shrink-0 items-center justify-center bg-background text-foreground rounded-sm group-hover:scale-105 transition-transform"
               >
                 <LayoutGrid size={18} strokeWidth={2.5} />
               </span>

@@ -194,7 +194,7 @@ function ThreeSixtyPage() {
                       type="button"
                       onClick={() => setTeamScope("me")}
                       className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
-                        teamScope === "me" ? "bg-foreground text-background" : "hover:bg-muted"
+                        teamScope === "me" ? "bg-background text-foreground" : "hover:bg-muted"
                       }`}
                     >
                       My accounts
@@ -203,7 +203,7 @@ function ThreeSixtyPage() {
                       type="button"
                       onClick={() => setTeamScope("team")}
                       className={`px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] transition-colors ${
-                        teamScope === "team" ? "bg-foreground text-background" : "hover:bg-muted"
+                        teamScope === "team" ? "bg-background text-foreground" : "hover:bg-muted"
                       }`}
                     >
                       Whole team

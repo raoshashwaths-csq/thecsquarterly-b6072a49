@@ -52,8 +52,8 @@
   /* Swan Wing cream + Royal Blue ink + Quicksand gold (editorial executive palette) */
   --background: oklch(0.953 0.012 80);          /* #F5F0E9 Swan Wing */
   --foreground: oklch(0.247 0.085 271);         /* #112250 Royal Blue */
-  --muted: oklch(0.86 0.018 55);                /* #D9CBC2 Shellstone */
-  --muted-foreground: oklch(0.45 0.075 268);    /* #3C507D Sapphire */
+  --muted: oklch(0.34 0.06 271);                /* was: oklch(0.86 0.018 55) — nested surface, same hue as new --card */
+  --muted-foreground: oklch(0.9 0.02 80);       /* was: oklch(0.45 0.075 268) — cream text on dark muted */
   --accent: oklch(0.58 0.13 72);                /* deepened patina gold for legibility on cream */
   --accent-foreground: oklch(0.97 0.01 85);
   --secondary-accent: oklch(0.45 0.075 268);    /* Sapphire */
@@ -62,10 +62,11 @@
   --input: oklch(0.247 0.085 271 / 0.18);
   --ring: oklch(0.58 0.13 72);
 
-  --card: oklch(0.973 0.01 85);                 /* #FBF7F1 raised paper */
-  --card-foreground: oklch(0.247 0.085 271);
-  --popover: oklch(0.973 0.01 85);
-  --popover-foreground: oklch(0.247 0.085 271);
+  /* Session 2: cards invert — Royal Blue card on cream page. */
+  --card: oklch(0.247 0.085 271);               /* was: oklch(0.973 0.01 85) — now = --foreground */
+  --card-foreground: oklch(0.953 0.012 80);     /* was: oklch(0.247 0.085 271) — now = --background */
+  --popover: oklch(0.247 0.085 271);            /* was: oklch(0.973 0.01 85) — mirrors new --card */
+  --popover-foreground: oklch(0.953 0.012 80); /* was: oklch(0.247 0.085 271) — mirrors new --card-foreground */
   --primary: oklch(0.247 0.085 271);
   --primary-foreground: oklch(0.953 0.012 80);
   --secondary: oklch(0.86 0.018 55);
@@ -85,8 +86,8 @@
   /* Midnight Slate canvas + layered navy cards + white-gold hairline borders */
   --background: oklch(0.19 0.045 268);          /* #0c1226 deep midnight slate */
   --foreground: oklch(0.955 0.012 80);          /* cream off-white */
-  --muted: oklch(0.34 0.05 268);
-  --muted-foreground: oklch(0.78 0.02 85 / 0.72);
+  --muted: oklch(0.88 0.015 80);                /* was: oklch(0.34 0.05 268) — nested surface, hue matches new cream --card */
+  --muted-foreground: oklch(0.25 0.04 268);     /* was: oklch(0.78 0.02 85 / 0.72) — midnight ink on cream muted */
   --accent: oklch(0.835 0.082 86);              /* Quicksand gold */
   --accent-foreground: oklch(0.19 0.045 268);
   --secondary-accent: oklch(0.62 0.09 268);     /* lifted sapphire — AA on midnight (≥4.5:1) */
@@ -96,10 +97,11 @@
   --border: oklch(0.835 0.082 86 / 0.28);
   --input: oklch(0.835 0.082 86 / 0.28);
   --ring: oklch(0.835 0.082 86);
-  --card: oklch(0.235 0.05 268);                /* #161d38 layered navy */
-  --card-foreground: oklch(0.955 0.012 80);
-  --popover: oklch(0.235 0.05 268);
-  --popover-foreground: oklch(0.955 0.012 80);
+  /* Session 2: cards invert — cream card on midnight page. */
+  --card: oklch(0.955 0.012 80);                /* was: oklch(0.235 0.05 268) — now = --foreground (cream) */
+  --card-foreground: oklch(0.19 0.045 268);     /* was: oklch(0.955 0.012 80) — now = --background (midnight) */
+  --popover: oklch(0.955 0.012 80);             /* was: oklch(0.235 0.05 268) — mirrors new --card */
+  --popover-foreground: oklch(0.19 0.045 268); /* was: oklch(0.955 0.012 80) — mirrors new --card-foreground */
   --primary: oklch(0.835 0.082 86);
   --primary-foreground: oklch(0.19 0.045 268);
   --secondary: oklch(0.28 0.05 268);
