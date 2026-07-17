@@ -82,7 +82,7 @@ function CodexPage() {
               data-tilt
               className="border border-border bg-card flex flex-col group hover:border-foreground transition-[color,border-color,box-shadow,transform] duration-150 card-lift hover:shadow-[5px_5px_0_0_var(--elevated-shadow)] hover:-translate-x-px hover:-translate-y-px"
             >
-              <div className="aspect-[4/3] bg-foreground text-background relative overflow-hidden flex items-center justify-center">
+              <div className="aspect-[4/3] bg-background text-foreground relative overflow-hidden flex items-center justify-center">
                 <div className="absolute top-4 left-4 flex items-center gap-2 font-mono uppercase tracking-widest text-xs opacity-80">
                   <Lock size={12} /> {hasFullAccess ? "Included" : "Premium"}
                 </div>
