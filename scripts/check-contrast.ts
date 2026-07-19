@@ -93,7 +93,7 @@ function extractBlock(css: string, selector: string): Tokens {
   }
   const body = css.slice(brace + 1, i - 1);
   const tokens: Tokens = {};
-  const re = /--([a-z0-9-]+)\s*:\s*(oklch\([^)]+\))\s*;/gi;
+  const tokenRe = /--([a-z0-9-]+)\s*:\s*(oklch\([^)]+\))\s*;/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(body))) {
     const parsed = parseOklch(m[2]);
