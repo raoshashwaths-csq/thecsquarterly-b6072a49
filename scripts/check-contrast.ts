@@ -95,7 +95,7 @@ function extractBlock(css: string, selector: string): Tokens {
   const tokens: Tokens = {};
   const tokenRe = /--([a-z0-9-]+)\s*:\s*(oklch\([^)]+\))\s*;/gi;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(body))) {
+  while ((m = tokenRe.exec(body))) {
     const parsed = parseOklch(m[2]);
     if (parsed) tokens[m[1]] = parsed;
   }
