@@ -12,6 +12,7 @@
     "test": "vitest run",
     "check:wiring": "bun scripts/check-wiring.ts",
     "check:timeline-kinds": "bun scripts/check-timeline-kinds.ts",
+    "check:contrast": "bun scripts/check-contrast.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
