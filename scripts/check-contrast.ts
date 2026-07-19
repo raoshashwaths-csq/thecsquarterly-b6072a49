@@ -78,9 +78,12 @@ function composite(fg: [number, number, number], fgA: number, bg: [number, numbe
 type Tokens = Record<string, { rgb: [number, number, number]; a: number }>;
 
 function extractBlock(css: string, selector: string): Tokens {
-  const start = css.indexOf(selector);
-  if (start === -1) throw new Error(`Selector ${selector} not found`);
-  const brace = css.indexOf("{", start);
+  // Match `<selector> {` so we skip prefixes like `@custom-variant dark (...)`
+  // or descendant selectors such as `.dark .foo`.
+  const re = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\{", "g");
+  const match = re.exec(css);
+  if (!match) throw new Error(`Selector ${selector} not found`);
+  const brace = match.index + match[0].length - 1;
   // Find matching close brace
   let depth = 1, i = brace + 1;
   while (i < css.length && depth > 0) {
