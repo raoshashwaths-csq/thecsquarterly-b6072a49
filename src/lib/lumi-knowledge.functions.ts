@@ -118,6 +118,14 @@ export async function getLumiKnowledgeContext(opts: {
 // for paid tiers); currently does not change the assembled prompt.
 // ---------------------------------------------------------------------------
 
+/**
+ * @deprecated Unused as of 2026-07-20 — no callers anywhere in the codebase.
+ * The identity text was moved to `src/lib/lumi-voice.ts` (LUMI_IDENTITY) and
+ * is now used by both askQ and runQNode. buildLumiSystemPrompt below uses a
+ * recency-based knowledge lookup; runQNode and askQ both use the semantic
+ * retrieval in getLumiKnowledgeContext instead, which is strictly better.
+ * Safe to delete in a future cleanup session once confirmed still unused.
+ */
 const LUMI_BASE_VOICE = [
   "You are Lumi — The CS Quarterly's operational advisor.",
   "The institutional knowledge of a 40-year Customer Success veteran, available at 11pm.",
