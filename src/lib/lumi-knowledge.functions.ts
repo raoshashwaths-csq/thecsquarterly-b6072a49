@@ -142,6 +142,12 @@ const LANGUAGE_NAME: Record<string, string> = {
   en: "English",
 };
 
+/**
+ * @deprecated Unused as of 2026-07-20 — no callers anywhere in the codebase.
+ * Superseded by the shared voice module (`src/lib/lumi-voice.ts`) plus the
+ * semantic `getLumiKnowledgeContext` above. Retained temporarily in case a
+ * dynamic reference was missed; safe to delete in a future cleanup pass.
+ */
 export async function buildLumiSystemPrompt(
   treeId: string | null | undefined,
   userTier: string | null | undefined,
