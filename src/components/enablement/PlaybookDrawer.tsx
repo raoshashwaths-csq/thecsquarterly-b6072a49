@@ -121,7 +121,7 @@ export function PlaybookDrawer({ open, onOpenChange, onStartTour, hasTour = true
                   {visibleTips.map((tip) => (
                     <li
                       key={tip.id}
-                      className="rounded-md border border-border bg-card/60 p-4 transition-colors hover:bg-card animate-fade-in"
+                      className="rounded-md border border-border bg-card p-4 transition-colors hover:bg-card animate-fade-in"
                     >
                       <h4 className="font-display text-base leading-snug">{tip.title}</h4>
                       <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">
@@ -209,7 +209,7 @@ function EmptyTips({
   hasDismissed: boolean;
 }) {
   return (
-    <div className="rounded-md border border-dashed border-border bg-card/40 p-6 text-center">
+    <div className="rounded-md border border-dashed border-border bg-card p-6 text-center">
       <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary-accent">
         All caught up
       </p>
