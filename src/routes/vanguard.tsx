@@ -33,7 +33,7 @@ export const Route = createFileRoute("/vanguard")({
           <div className="grid md:grid-cols-2 gap-6">
             <Link
               to="/codex"
-              className="group block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-8"
+              className="group block border border-border bg-card hover:bg-card hover:border-foreground transition-colors p-8"
             >
               <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">The Codex</div>
               <h3 className="font-display text-2xl md:text-3xl mb-2 leading-tight">
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/vanguard")({
             </Link>
             <Link
               to="/diagnostics"
-              className="group block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-8"
+              className="group block border border-border bg-card hover:bg-card hover:border-foreground transition-colors p-8"
             >
               <div className="font-mono text-xs text-secondary-accent font-semibold mb-3">The Diagnostic</div>
               <h3 className="font-display text-2xl md:text-3xl mb-2 leading-tight">

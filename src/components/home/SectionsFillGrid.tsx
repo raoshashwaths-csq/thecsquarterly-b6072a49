@@ -20,7 +20,7 @@ export function SectionsFillGrid() {
           key={s.to}
           to={s.to}
           data-tilt
-          className="group relative block border border-border bg-card/60 hover:bg-card hover:border-foreground transition-colors p-6 pt-7 card-lift"
+          className="group relative block border border-border bg-card hover:bg-card hover:border-foreground transition-colors p-6 pt-7 card-lift"
         >
           <span aria-hidden className="absolute -top-px left-0 right-0 h-px bg-foreground/80" />
           <div className="font-mono text-xs font-semibold mb-3 text-secondary-accent">

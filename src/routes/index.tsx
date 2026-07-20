@@ -436,7 +436,7 @@ function ClosingCTA() {
     : { to: "/pricing" as const, label: t("home.closing.ctaSecondary") };
 
   return (
-    <section className="border-t border-border bg-card/40">
+    <section className="border-t border-border bg-card">
       <div className="max-w-5xl w-full mx-auto px-6 py-16 md:py-20 text-center">
         <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-secondary-accent mb-5 font-semibold">
           {t("home.closing.eyebrow")}
