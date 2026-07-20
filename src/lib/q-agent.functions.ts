@@ -350,6 +350,7 @@ export const runQNode = createServerFn({ method: "POST" })
         latency_ms: latencyMs,
         cost_micros: costMicros,
         model: Q_MODEL,
+        knowledge_records_injected: knowledge.recordCount,
       })
       .select("id")
       .single();
