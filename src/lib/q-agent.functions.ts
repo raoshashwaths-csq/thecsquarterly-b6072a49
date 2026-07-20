@@ -6,6 +6,7 @@ import { assertQUnderCap } from "./q-usage.functions";
 import { computeCostMicros } from "./q-pricing";
 import { recallMemoryFor, recordMemoryFor, renderMemoryBlock } from "./lumi-memory.functions";
 import { getLumiKnowledgeContext } from "./lumi-knowledge.functions";
+import { LUMI_IDENTITY, getVoiceRider } from "./lumi-voice";
 
 const Q_MODEL = "google/gemini-2.5-flash";
 
