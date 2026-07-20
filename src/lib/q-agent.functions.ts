@@ -282,8 +282,27 @@ export const runQNode = createServerFn({ method: "POST" })
 
     const breadcrumb = breadcrumbFor(node.id);
     const category = getTree(node.treeId)?.category;
+
+    // Ground this tree run in real benchmarks + tree-scoped knowledge,
+    // reusing the same retrieval path askQ already uses. The query is
+    // built from the node's prompt template + the operator's typed
+    // context so the semantic match has real signal, even though this
+    // surface never takes a free-form question.
+    const groundingQuery = [node.promptTemplate, data.context.context]
+      .filter(Boolean)
+      .join(" — ");
+    const knowledge = await getLumiKnowledgeContext({
+      query: groundingQuery,
+      treeId: node.treeId,
+    });
+
     const messages = [
-      { role: "system", content: buildSystem(data.witty, category) },
+      {
+        role: "system",
+        content: [buildSystem(data.witty, category), knowledge.block]
+          .filter(Boolean)
+          .join("\n\n"),
+      },
       {
         role: "user",
         content: buildUser({
