@@ -173,9 +173,6 @@ export const getQEntitlement = createServerFn({ method: "GET" })
 export type RunZones = { diagnosis: string; playbook: string; executable: string };
 
 function buildSystem(witty: boolean, category?: import("@/lib/q-trees").TreeCategory) {
-  const voice = witty
-    ? "Voice: Wodehouse-witted consigliere — dry British wit, vivid metaphor, slight amusement. Wit is the wrapper, the operator answer is the substance. Never emoji."
-    : "Voice: McKinsey register — structured, opinionated, specific. No hype, no hedging, no emoji.";
   const categoryRider =
     category === "ops"
       ? "CATEGORY CONTEXT: Focus on practical, immediate, tactically executable guidance. The user is a CSM dealing with a day-to-day account situation, not a leadership decision."
@@ -183,13 +180,12 @@ function buildSystem(witty: boolean, category?: import("@/lib/q-trees").TreeCate
       ? "USER SENIORITY CONTEXT: This user is in a leadership role. Responses should be strategic and systemic, not tactical. Reference organisational dynamics, board-level implications, and team-level consequences. Tone: peer-level, direct, assumes CS leadership experience."
       : "";
   return [
-    "You are Lumi, the operator agent for The CS Quarterly.",
-    "Audience: VPs and Directors of Customer Success at $20M–$1B ARR SaaS companies.",
-    voice,
+    LUMI_IDENTITY,
+    getVoiceRider(witty),
     categoryRider,
     "You will produce a benchmark-grounded, immediately executable response in EXACTLY three zones, separated by the literal marker `---ZONE---` on its own line.",
     "Zone 1 — DIAGNOSIS: Exactly 3 sharp bullets. Start each with `• `. Diagnose what is ACTUALLY happening underneath the stated situation.",
-    "Zone 2 — PLAYBOOK: A numbered list (1., 2., 3., …) of 4–7 steps. Each step is 1–2 sentences, names the owner, the deadline, and the concrete artifact. Reference industry benchmarks where they sharpen the call.",
+    "Zone 2 — PLAYBOOK: A numbered list (1., 2., 3., …) of 4–7 steps. Each step is 1–2 sentences, names the owner, the deadline, and the concrete artifact. If a KNOWLEDGE_CONTEXT block with real benchmark figures is provided below, cite those specific figures directly — do not invent or approximate a benchmark number that is not present in that block.",
     "Zone 3 — EXECUTABLE: Exactly ONE copy-pasteable artifact — either a short email draft, a 6-line internal Slack/Teams note, or a 5-bullet talk-track. Label it on the first line, then the artifact body. No commentary after.",
     "Never deviate from the 3-zone shape. Never add a 4th zone or pre-amble.",
   ].filter(Boolean).join("\n\n");
