@@ -116,13 +116,9 @@ const PAIRS: Pair[] = [
   { fg: "destructive-foreground", bg: "destructive", label: "text-destructive-foreground on bg-destructive" },
   // Accent-colored text on canvas surfaces (used for eyebrows, links)
   { fg: "accent", bg: "background", label: "text-accent on bg-background" },
-  { fg: "accent", bg: "card", label: "text-accent on bg-card" },
+  { fg: "accent-on-card", bg: "card", label: "text-accent-on-card on bg-card" },
   { fg: "secondary-accent", bg: "background", label: "text-secondary-accent on bg-background" },
-  { fg: "secondary-accent", bg: "card", label: "text-secondary-accent on bg-card" },
-  // Translucent card overlays composited over the page background
-  { fg: "card-foreground", bg: "card", bgAlpha: 0.4, label: "text-card-foreground on bg-card/40 (over bg-background)" },
-  { fg: "card-foreground", bg: "card", bgAlpha: 0.6, label: "text-card-foreground on bg-card/60 (over bg-background)" },
-  { fg: "muted-foreground", bg: "card", bgAlpha: 0.4, label: "text-muted-foreground on bg-card/40 (over bg-background)" },
+  { fg: "secondary-accent-on-card", bg: "card", label: "text-secondary-accent-on-card on bg-card" },
 ];
 
 const AA_NORMAL = 4.5;

@@ -19,8 +19,10 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-on-card: var(--accent-on-card);
   --color-secondary-accent: var(--secondary-accent);
   --color-secondary-accent-foreground: var(--secondary-accent-foreground);
+  --color-secondary-accent-on-card: var(--secondary-accent-on-card);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -54,10 +56,12 @@
   --foreground: oklch(0.247 0.085 271);         /* #112250 Royal Blue */
   --muted: oklch(0.34 0.06 271);                /* was: oklch(0.86 0.018 55) — nested surface, same hue as new --card */
   --muted-foreground: oklch(0.9 0.02 80);       /* was: oklch(0.45 0.075 268) — cream text on dark muted */
-  --accent: oklch(0.58 0.13 72);                /* deepened patina gold for legibility on cream */
+  --accent: oklch(0.54 0.13 72);                /* deepened patina gold — AA on cream page + on its own pill */
   --accent-foreground: oklch(0.97 0.01 85);
-  --secondary-accent: oklch(0.45 0.075 268);    /* Sapphire */
+  --accent-on-card: oklch(0.75 0.11 86);        /* lifted gold — tuned for text on Royal Blue card */
+  --secondary-accent: oklch(0.45 0.075 268);    /* Sapphire (page-level use) */
   --secondary-accent-foreground: oklch(0.97 0.01 85);
+  --secondary-accent-on-card: oklch(0.72 0.09 268); /* lifted sapphire — tuned for text on Royal Blue card */
   --border: oklch(0.247 0.085 271 / 0.18);
   --input: oklch(0.247 0.085 271 / 0.18);
   --ring: oklch(0.58 0.13 72);
@@ -88,10 +92,12 @@
   --foreground: oklch(0.955 0.012 80);          /* cream off-white */
   --muted: oklch(0.88 0.015 80);                /* was: oklch(0.34 0.05 268) — nested surface, hue matches new cream --card */
   --muted-foreground: oklch(0.25 0.04 268);     /* was: oklch(0.78 0.02 85 / 0.72) — midnight ink on cream muted */
-  --accent: oklch(0.835 0.082 86);              /* Quicksand gold */
+  --accent: oklch(0.835 0.082 86);              /* Quicksand gold (page-level use on midnight) */
   --accent-foreground: oklch(0.19 0.045 268);
+  --accent-on-card: oklch(0.50 0.13 70);        /* deep gold — tuned for text on cream card */
   --secondary-accent: oklch(0.62 0.09 268);     /* lifted sapphire — AA on midnight (≥4.5:1) */
   --secondary-accent-foreground: oklch(0.955 0.012 80);
+  --secondary-accent-on-card: oklch(0.45 0.075 268); /* deep sapphire — tuned for text on cream card */
   /* Quicksand gold hairline (28% in dark) — provides brand-aligned contrast for
      separators, table rules and card edges on midnight backgrounds. */
   --border: oklch(0.835 0.082 86 / 0.28);
@@ -106,7 +112,7 @@
   --primary-foreground: oklch(0.19 0.045 268);
   --secondary: oklch(0.28 0.05 268);
   --secondary-foreground: oklch(0.955 0.012 80);
-  --destructive: oklch(0.7 0.2 25);             /* brightened — AA on midnight for small text */
+  --destructive: oklch(0.55 0.22 27);           /* darkened — AA on midnight against white text */
   --destructive-foreground: oklch(0.98 0 0);
 
   /* Depth tokens — dark theme keeps gold hairline shadows for continuity. */
