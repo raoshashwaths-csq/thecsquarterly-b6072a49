@@ -116,9 +116,9 @@ const PAIRS: Pair[] = [
   { fg: "destructive-foreground", bg: "destructive", label: "text-destructive-foreground on bg-destructive" },
   // Accent-colored text on canvas surfaces (used for eyebrows, links)
   { fg: "accent", bg: "background", label: "text-accent on bg-background" },
-  { fg: "accent-on-card", bg: "card", label: "text-accent-on-card on bg-card" },
+  { fg: "accent", bg: "card", label: "text-accent on bg-card" },
   { fg: "secondary-accent", bg: "background", label: "text-secondary-accent on bg-background" },
-  { fg: "secondary-accent-on-card", bg: "card", label: "text-secondary-accent-on-card on bg-card" },
+  { fg: "secondary-accent", bg: "card", label: "text-secondary-accent on bg-card" },
 ];
 
 const AA_NORMAL = 4.5;

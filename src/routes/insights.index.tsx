@@ -79,7 +79,7 @@ function InsightsPage() {
               key={p.id}
               to="/insights/$slug"
               params={{ slug: p.slug }}
-              className="group block border border-border bg-card p-6 card-lift"
+              className="group block border border-border bg-card/40 p-6 card-lift"
             >
               <div className="flex justify-between font-mono uppercase tracking-widest text-xs text-muted-foreground mb-4">
                 <span className="text-accent">{p.category}</span>
