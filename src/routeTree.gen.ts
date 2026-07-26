@@ -9,211 +9,96 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VanguardRouteImport } from './routes/vanguard'
-import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
-import { Route as TeamsRouteImport } from './routes/teams'
-import { Route as SubscribeRouteImport } from './routes/subscribe'
-import { Route as StripRouteImport } from './routes/strip'
-import { Route as SituationRoomRouteImport } from './routes/situation-room'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SequencerRouteImport } from './routes/sequencer'
-import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
-import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
-import { Route as PulseDemoRouteImport } from './routes/pulse-demo'
-import { Route as PricingRouteImport } from './routes/pricing'
-import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as JobBoardRouteImport } from './routes/job-board'
-import { Route as InsightsRouteImport } from './routes/insights'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as DirectoryRouteImport } from './routes/directory'
-import { Route as CsfactorsRouteImport } from './routes/csfactors'
-import { Route as CodexRouteImport } from './routes/codex'
-import { Route as CalculatorRouteImport } from './routes/calculator'
-import { Route as BenchmarksRouteImport } from './routes/benchmarks'
-import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as InsightsIndexRouteImport } from './routes/insights.index'
-import { Route as DiagnosticsIndexRouteImport } from './routes/diagnostics.index'
-import { Route as CodexIndexRouteImport } from './routes/codex.index'
-import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AiReadinessRouteImport } from './routes/ai-readiness'
+import { Route as BenchmarksRouteImport } from './routes/benchmarks'
+import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as CodexRouteImport } from './routes/codex'
+import { Route as CsfactorsRouteImport } from './routes/csfactors'
+import { Route as DirectoryRouteImport } from './routes/directory'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as InsightsRouteImport } from './routes/insights'
+import { Route as JobBoardRouteImport } from './routes/job-board'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as OutcomeForumRouteImport } from './routes/outcome-forum'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PulseDemoRouteImport } from './routes/pulse-demo'
+import { Route as RetentionProtocolRouteImport } from './routes/retention-protocol'
+import { Route as RssDotxmlRouteImport } from './routes/rss[.]xml'
+import { Route as SequencerRouteImport } from './routes/sequencer'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SituationRoomRouteImport } from './routes/situation-room'
+import { Route as StripRouteImport } from './routes/strip'
+import { Route as SubscribeRouteImport } from './routes/subscribe'
+import { Route as TeamsRouteImport } from './routes/teams'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as VanguardRouteImport } from './routes/vanguard'
 import { Route as AccountIndexRouteImport } from './routes/account.index'
-import { Route as MTokenRouteImport } from './routes/m.$token'
-import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as DiagnosticsChampionDependencyRouteImport } from './routes/diagnostics.champion-dependency'
-import { Route as DiagnosticsAiReadinessRouteImport } from './routes/diagnostics.ai-readiness'
-import { Route as DesignSystemLumiBadgeRouteImport } from './routes/design-system.lumi-badge'
-import { Route as DesignSystemGrainTestRouteImport } from './routes/design-system.grain-test'
-import { Route as CsfactorsCtasRouteImport } from './routes/csfactors.ctas'
-import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
-import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
-import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
-import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
-import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
-import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
-import { Route as AdminPlansRouteImport } from './routes/admin.plans'
-import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
-import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
-import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
-import { Route as AccountQuestsRouteImport } from './routes/account.quests'
 import { Route as AccountApiRouteImport } from './routes/account.api'
-import { Route as DiagnosticsAiReadinessIndexRouteImport } from './routes/diagnostics.ai-readiness.index'
-import { Route as CsfactorsMapsIndexRouteImport } from './routes/csfactors.maps.index'
+import { Route as AccountQuestsRouteImport } from './routes/account.quests'
+import { Route as AccountWorkspaceRouteImport } from './routes/account.workspace'
+import { Route as AdminControlPanelRouteImport } from './routes/admin.control-panel'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminPlansRouteImport } from './routes/admin.plans'
+import { Route as AgentFrameworkRouteImport } from './routes/agent.framework'
+import { Route as AiReadinessIndexRouteImport } from './routes/ai-readiness.index'
+import { Route as AiReadinessSurveyRouteImport } from './routes/ai-readiness.survey'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as CodexIndexRouteImport } from './routes/codex.index'
+import { Route as CodexSlugRouteImport } from './routes/codex.$slug'
+import { Route as CsfactorsAccountIdRouteImport } from './routes/csfactors.$accountId'
+import { Route as Csfactors360RouteImport } from './routes/csfactors.360'
+import { Route as CsfactorsCtasRouteImport } from './routes/csfactors.ctas'
+import { Route as DesignSystemGrainTestRouteImport } from './routes/design-system.grain-test'
+import { Route as DesignSystemLumiBadgeRouteImport } from './routes/design-system.lumi-badge'
+import { Route as DiagnosticsIndexRouteImport } from './routes/diagnostics.index'
+import { Route as DiagnosticsAiReadinessRouteImport } from './routes/diagnostics.ai-readiness'
+import { Route as DiagnosticsChampionDependencyRouteImport } from './routes/diagnostics.champion-dependency'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
+import { Route as MTokenRouteImport } from './routes/m.$token'
 import { Route as AccountAnalyticsIndexRouteImport } from './routes/account.analytics.index'
-import { Route as QResponseRunIdRouteImport } from './routes/q.response.$runId'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
-import { Route as DiagnosticsAiReadinessSurveyRouteImport } from './routes/diagnostics.ai-readiness.survey'
-import { Route as CsfactorsPlaybookSlugRouteImport } from './routes/csfactors.playbook.$slug'
-import { Route as CsfactorsMapsNewRouteImport } from './routes/csfactors.maps.new'
-import { Route as CsfactorsMapsIdRouteImport } from './routes/csfactors.maps.$id'
-import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
-import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
-import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
-import { Route as AdminContentTranslationRouteImport } from './routes/admin.content.translation'
-import { Route as AccountExecutiveAnalyticsRouteImport } from './routes/account.executive.analytics'
-import { Route as AccountAnalyticsTeamLeaderboardRouteImport } from './routes/account.analytics.team-leaderboard'
-import { Route as AccountAnalyticsStakeholderRadarRouteImport } from './routes/account.analytics.stakeholder-radar'
-import { Route as AccountAnalyticsRetentionFunnelRouteImport } from './routes/account.analytics.retention-funnel'
 import { Route as AccountAnalyticsNrrWaterfallRouteImport } from './routes/account.analytics.nrr-waterfall'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.retention-ledger.ticker'
-import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
-import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
-import { Route as ApiPublicHooksTranslateKnowledgeRouteImport } from './routes/api/public/hooks/translate-knowledge'
-import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
-import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
-import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
-import { Route as ApiPublicHooksGenerateDailyQuestsRouteImport } from './routes/api/public/hooks/generate-daily-quests'
-import { Route as ApiPublicHooksFlagTranslationsRouteImport } from './routes/api/public/hooks/flag-translations'
-import { Route as ApiPublicHooksDispatchReadRouteImport } from './routes/api/public/hooks/dispatch-read'
-import { Route as ApiPublicHooksDiscoverRegionalRouteImport } from './routes/api/public/hooks/discover-regional'
-import { Route as ApiPublicHooksCurateHighRatedRouteImport } from './routes/api/public/hooks/curate-high-rated'
-import { Route as ApiPublicHooksCheckDriftSignalsRouteImport } from './routes/api/public/hooks/check-drift-signals'
+import { Route as AccountAnalyticsRetentionFunnelRouteImport } from './routes/account.analytics.retention-funnel'
+import { Route as AccountAnalyticsStakeholderRadarRouteImport } from './routes/account.analytics.stakeholder-radar'
+import { Route as AccountAnalyticsTeamLeaderboardRouteImport } from './routes/account.analytics.team-leaderboard'
+import { Route as AccountExecutiveAnalyticsRouteImport } from './routes/account.executive.analytics'
+import { Route as AdminContentTranslationRouteImport } from './routes/admin.content.translation'
+import { Route as AgentResponseRunIdRouteImport } from './routes/agent.response.$runId'
+import { Route as ApiElevenlabsSttRouteImport } from './routes/api/elevenlabs/stt'
+import { Route as ApiV1SplatRouteImport } from './routes/api/v1.$'
+import { Route as CsfactorsMapsIndexRouteImport } from './routes/csfactors.maps.index'
+import { Route as CsfactorsMapsIdRouteImport } from './routes/csfactors.maps.$id'
+import { Route as CsfactorsMapsNewRouteImport } from './routes/csfactors.maps.new'
+import { Route as CsfactorsPlaybookSlugRouteImport } from './routes/csfactors.playbook.$slug'
+import { Route as DiagnosticsAiReadinessIndexRouteImport } from './routes/diagnostics.ai-readiness.index'
+import { Route as DiagnosticsAiReadinessSurveyRouteImport } from './routes/diagnostics.ai-readiness.survey'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as QResponseRunIdRouteImport } from './routes/q.response.$runId'
 import { Route as ApiPublicHooksAnalyzeInteractionsRouteImport } from './routes/api/public/hooks/analyze-interactions'
+import { Route as ApiPublicHooksCheckDriftSignalsRouteImport } from './routes/api/public/hooks/check-drift-signals'
+import { Route as ApiPublicHooksCurateHighRatedRouteImport } from './routes/api/public/hooks/curate-high-rated'
+import { Route as ApiPublicHooksDiscoverRegionalRouteImport } from './routes/api/public/hooks/discover-regional'
+import { Route as ApiPublicHooksDispatchReadRouteImport } from './routes/api/public/hooks/dispatch-read'
+import { Route as ApiPublicHooksFlagTranslationsRouteImport } from './routes/api/public/hooks/flag-translations'
+import { Route as ApiPublicHooksGenerateDailyQuestsRouteImport } from './routes/api/public/hooks/generate-daily-quests'
+import { Route as ApiPublicHooksIngestArticlesRouteImport } from './routes/api/public/hooks/ingest-articles'
+import { Route as ApiPublicHooksPullExternalIntelRouteImport } from './routes/api/public/hooks/pull-external-intel'
+import { Route as ApiPublicHooksRefreshBenchmarksRouteImport } from './routes/api/public/hooks/refresh-benchmarks'
+import { Route as ApiPublicHooksTranslateKnowledgeRouteImport } from './routes/api/public/hooks/translate-knowledge'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiV1BenchmarksNrrRouteImport } from './routes/api/v1.benchmarks.nrr'
+import { Route as ApiV1RetentionLedgerTickerRouteImport } from './routes/api/v1.retention-ledger.ticker'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 
-const VanguardRoute = VanguardRouteImport.update({
-  id: '/vanguard',
-  path: '/vanguard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UnsubscribeRoute = UnsubscribeRouteImport.update({
-  id: '/unsubscribe',
-  path: '/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TeamsRoute = TeamsRouteImport.update({
-  id: '/teams',
-  path: '/teams',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SubscribeRoute = SubscribeRouteImport.update({
-  id: '/subscribe',
-  path: '/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StripRoute = StripRouteImport.update({
-  id: '/strip',
-  path: '/strip',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SituationRoomRoute = SituationRoomRouteImport.update({
-  id: '/situation-room',
-  path: '/situation-room',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SequencerRoute = SequencerRouteImport.update({
-  id: '/sequencer',
-  path: '/sequencer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RssDotxmlRoute = RssDotxmlRouteImport.update({
-  id: '/rss.xml',
-  path: '/rss.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RetentionProtocolRoute = RetentionProtocolRouteImport.update({
-  id: '/retention-protocol',
-  path: '/retention-protocol',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PulseDemoRoute = PulseDemoRouteImport.update({
-  id: '/pulse-demo',
-  path: '/pulse-demo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PricingRoute = PricingRouteImport.update({
-  id: '/pricing',
-  path: '/pricing',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OutcomeForumRoute = OutcomeForumRouteImport.update({
-  id: '/outcome-forum',
-  path: '/outcome-forum',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JobBoardRoute = JobBoardRouteImport.update({
-  id: '/job-board',
-  path: '/job-board',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InsightsRoute = InsightsRouteImport.update({
-  id: '/insights',
-  path: '/insights',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DirectoryRoute = DirectoryRouteImport.update({
-  id: '/directory',
-  path: '/directory',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CsfactorsRoute = CsfactorsRouteImport.update({
-  id: '/csfactors',
-  path: '/csfactors',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CodexRoute = CodexRouteImport.update({
-  id: '/codex',
-  path: '/codex',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CalculatorRoute = CalculatorRouteImport.update({
-  id: '/calculator',
-  path: '/calculator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BenchmarksRoute = BenchmarksRouteImport.update({
-  id: '/benchmarks',
-  path: '/benchmarks',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AiReadinessRoute = AiReadinessRouteImport.update({
-  id: '/ai-readiness',
-  path: '/ai-readiness',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -221,19 +106,179 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InsightsIndexRoute = InsightsIndexRouteImport.update({
+const AiReadinessRoute = AiReadinessRouteImport.update({
+  id: '/ai-readiness',
+  path: '/ai-readiness',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BenchmarksRoute = BenchmarksRouteImport.update({
+  id: '/benchmarks',
+  path: '/benchmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodexRoute = CodexRouteImport.update({
+  id: '/codex',
+  path: '/codex',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CsfactorsRoute = CsfactorsRouteImport.update({
+  id: '/csfactors',
+  path: '/csfactors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirectoryRoute = DirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobBoardRoute = JobBoardRouteImport.update({
+  id: '/job-board',
+  path: '/job-board',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OutcomeForumRoute = OutcomeForumRouteImport.update({
+  id: '/outcome-forum',
+  path: '/outcome-forum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PulseDemoRoute = PulseDemoRouteImport.update({
+  id: '/pulse-demo',
+  path: '/pulse-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetentionProtocolRoute = RetentionProtocolRouteImport.update({
+  id: '/retention-protocol',
+  path: '/retention-protocol',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RssDotxmlRoute = RssDotxmlRouteImport.update({
+  id: '/rss.xml',
+  path: '/rss.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SequencerRoute = SequencerRouteImport.update({
+  id: '/sequencer',
+  path: '/sequencer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SituationRoomRoute = SituationRoomRouteImport.update({
+  id: '/situation-room',
+  path: '/situation-room',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StripRoute = StripRouteImport.update({
+  id: '/strip',
+  path: '/strip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SubscribeRoute = SubscribeRouteImport.update({
+  id: '/subscribe',
+  path: '/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamsRoute = TeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VanguardRoute = VanguardRouteImport.update({
+  id: '/vanguard',
+  path: '/vanguard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountApiRoute = AccountApiRouteImport.update({
+  id: '/account/api',
+  path: '/account/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountQuestsRoute = AccountQuestsRouteImport.update({
+  id: '/account/quests',
+  path: '/account/quests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountWorkspaceRoute = AccountWorkspaceRouteImport.update({
+  id: '/account/workspace',
+  path: '/account/workspace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminControlPanelRoute = AdminControlPanelRouteImport.update({
+  id: '/control-panel',
+  path: '/control-panel',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlansRoute = AdminPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
+  id: '/agent/framework',
+  path: '/agent/framework',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => InsightsRoute,
+  getParentRoute: () => AiReadinessRoute,
 } as any)
-const DiagnosticsIndexRoute = DiagnosticsIndexRouteImport.update({
-  id: '/diagnostics/',
-  path: '/diagnostics/',
+const AiReadinessSurveyRoute = AiReadinessSurveyRouteImport.update({
+  id: '/survey',
+  path: '/survey',
+  getParentRoute: () => AiReadinessRoute,
+} as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CodexIndexRoute = CodexIndexRouteImport.update({
@@ -241,29 +286,44 @@ const CodexIndexRoute = CodexIndexRouteImport.update({
   path: '/',
   getParentRoute: () => CodexRoute,
 } as any)
-const AiReadinessIndexRoute = AiReadinessIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AiReadinessRoute,
-} as any)
-const AccountIndexRoute = AccountIndexRouteImport.update({
-  id: '/account/',
-  path: '/account/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MTokenRoute = MTokenRouteImport.update({
-  id: '/m/$token',
-  path: '/m/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InsightsSlugRoute = InsightsSlugRouteImport.update({
+const CodexSlugRoute = CodexSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
-  getParentRoute: () => InsightsRoute,
+  getParentRoute: () => CodexRoute,
 } as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
+const CsfactorsAccountIdRoute = CsfactorsAccountIdRouteImport.update({
+  id: '/$accountId',
+  path: '/$accountId',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const Csfactors360Route = Csfactors360RouteImport.update({
+  id: '/360',
+  path: '/360',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const CsfactorsCtasRoute = CsfactorsCtasRouteImport.update({
+  id: '/ctas',
+  path: '/ctas',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const DesignSystemGrainTestRoute = DesignSystemGrainTestRouteImport.update({
+  id: '/design-system/grain-test',
+  path: '/design-system/grain-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DesignSystemLumiBadgeRoute = DesignSystemLumiBadgeRouteImport.update({
+  id: '/design-system/lumi-badge',
+  path: '/design-system/lumi-badge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiagnosticsIndexRoute = DiagnosticsIndexRouteImport.update({
+  id: '/diagnostics/',
+  path: '/diagnostics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiagnosticsAiReadinessRoute = DiagnosticsAiReadinessRouteImport.update({
+  id: '/diagnostics/ai-readiness',
+  path: '/diagnostics/ai-readiness',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticsChampionDependencyRoute =
@@ -272,169 +332,35 @@ const DiagnosticsChampionDependencyRoute =
     path: '/diagnostics/champion-dependency',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DiagnosticsAiReadinessRoute = DiagnosticsAiReadinessRouteImport.update({
-  id: '/diagnostics/ai-readiness',
-  path: '/diagnostics/ai-readiness',
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DesignSystemLumiBadgeRoute = DesignSystemLumiBadgeRouteImport.update({
-  id: '/design-system/lumi-badge',
-  path: '/design-system/lumi-badge',
-  getParentRoute: () => rootRouteImport,
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => InsightsRoute,
 } as any)
-const DesignSystemGrainTestRoute = DesignSystemGrainTestRouteImport.update({
-  id: '/design-system/grain-test',
-  path: '/design-system/grain-test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CsfactorsCtasRoute = CsfactorsCtasRouteImport.update({
-  id: '/ctas',
-  path: '/ctas',
-  getParentRoute: () => CsfactorsRoute,
-} as any)
-const Csfactors360Route = Csfactors360RouteImport.update({
-  id: '/360',
-  path: '/360',
-  getParentRoute: () => CsfactorsRoute,
-} as any)
-const CsfactorsAccountIdRoute = CsfactorsAccountIdRouteImport.update({
-  id: '/$accountId',
-  path: '/$accountId',
-  getParentRoute: () => CsfactorsRoute,
-} as any)
-const CodexSlugRoute = CodexSlugRouteImport.update({
+const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
-  getParentRoute: () => CodexRoute,
+  getParentRoute: () => InsightsRoute,
 } as any)
-const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
-  id: '/checkout/return',
-  path: '/checkout/return',
+const MTokenRoute = MTokenRouteImport.update({
+  id: '/m/$token',
+  path: '/m/$token',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AiReadinessSurveyRoute = AiReadinessSurveyRouteImport.update({
-  id: '/survey',
-  path: '/survey',
-  getParentRoute: () => AiReadinessRoute,
-} as any)
-const AgentFrameworkRoute = AgentFrameworkRouteImport.update({
-  id: '/agent/framework',
-  path: '/agent/framework',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminPlansRoute = AdminPlansRouteImport.update({
-  id: '/plans',
-  path: '/plans',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminControlPanelRoute = AdminControlPanelRouteImport.update({
-  id: '/control-panel',
-  path: '/control-panel',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AccountWorkspaceRoute = AccountWorkspaceRouteImport.update({
-  id: '/account/workspace',
-  path: '/account/workspace',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountQuestsRoute = AccountQuestsRouteImport.update({
-  id: '/account/quests',
-  path: '/account/quests',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountApiRoute = AccountApiRouteImport.update({
-  id: '/account/api',
-  path: '/account/api',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiagnosticsAiReadinessIndexRoute =
-  DiagnosticsAiReadinessIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => DiagnosticsAiReadinessRoute,
-  } as any)
-const CsfactorsMapsIndexRoute = CsfactorsMapsIndexRouteImport.update({
-  id: '/maps/',
-  path: '/maps/',
-  getParentRoute: () => CsfactorsRoute,
 } as any)
 const AccountAnalyticsIndexRoute = AccountAnalyticsIndexRouteImport.update({
   id: '/account/analytics/',
   path: '/account/analytics/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const QResponseRunIdRoute = QResponseRunIdRouteImport.update({
-  id: '/q/response/$runId',
-  path: '/q/response/$runId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiagnosticsAiReadinessSurveyRoute =
-  DiagnosticsAiReadinessSurveyRouteImport.update({
-    id: '/survey',
-    path: '/survey',
-    getParentRoute: () => DiagnosticsAiReadinessRoute,
-  } as any)
-const CsfactorsPlaybookSlugRoute = CsfactorsPlaybookSlugRouteImport.update({
-  id: '/playbook/$slug',
-  path: '/playbook/$slug',
-  getParentRoute: () => CsfactorsRoute,
-} as any)
-const CsfactorsMapsNewRoute = CsfactorsMapsNewRouteImport.update({
-  id: '/maps/new',
-  path: '/maps/new',
-  getParentRoute: () => CsfactorsRoute,
-} as any)
-const CsfactorsMapsIdRoute = CsfactorsMapsIdRouteImport.update({
-  id: '/maps/$id',
-  path: '/maps/$id',
-  getParentRoute: () => CsfactorsRoute,
-} as any)
-const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
-  id: '/api/v1/$',
-  path: '/api/v1/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiElevenlabsSttRoute = ApiElevenlabsSttRouteImport.update({
-  id: '/api/elevenlabs/stt',
-  path: '/api/elevenlabs/stt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
-  id: '/agent/response/$runId',
-  path: '/agent/response/$runId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminContentTranslationRoute = AdminContentTranslationRouteImport.update({
-  id: '/content/translation',
-  path: '/content/translation',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AccountExecutiveAnalyticsRoute =
-  AccountExecutiveAnalyticsRouteImport.update({
-    id: '/account/executive/analytics',
-    path: '/account/executive/analytics',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AccountAnalyticsTeamLeaderboardRoute =
-  AccountAnalyticsTeamLeaderboardRouteImport.update({
-    id: '/account/analytics/team-leaderboard',
-    path: '/account/analytics/team-leaderboard',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AccountAnalyticsStakeholderRadarRoute =
-  AccountAnalyticsStakeholderRadarRouteImport.update({
-    id: '/account/analytics/stakeholder-radar',
-    path: '/account/analytics/stakeholder-radar',
+const AccountAnalyticsNrrWaterfallRoute =
+  AccountAnalyticsNrrWaterfallRouteImport.update({
+    id: '/account/analytics/nrr-waterfall',
+    path: '/account/analytics/nrr-waterfall',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AccountAnalyticsRetentionFunnelRoute =
@@ -443,99 +369,90 @@ const AccountAnalyticsRetentionFunnelRoute =
     path: '/account/analytics/retention-funnel',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AccountAnalyticsNrrWaterfallRoute =
-  AccountAnalyticsNrrWaterfallRouteImport.update({
-    id: '/account/analytics/nrr-waterfall',
-    path: '/account/analytics/nrr-waterfall',
+const AccountAnalyticsStakeholderRadarRoute =
+  AccountAnalyticsStakeholderRadarRouteImport.update({
+    id: '/account/analytics/stakeholder-radar',
+    path: '/account/analytics/stakeholder-radar',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
+const AccountAnalyticsTeamLeaderboardRoute =
+  AccountAnalyticsTeamLeaderboardRouteImport.update({
+    id: '/account/analytics/team-leaderboard',
+    path: '/account/analytics/team-leaderboard',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
+const AccountExecutiveAnalyticsRoute =
+  AccountExecutiveAnalyticsRouteImport.update({
+    id: '/account/executive/analytics',
+    path: '/account/executive/analytics',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1RetentionLedgerTickerRoute =
-  ApiV1RetentionLedgerTickerRouteImport.update({
-    id: '/api/v1/retention-ledger/ticker',
-    path: '/api/v1/retention-ledger/ticker',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1BenchmarksNrrRoute = ApiV1BenchmarksNrrRouteImport.update({
-  id: '/api/v1/benchmarks/nrr',
-  path: '/api/v1/benchmarks/nrr',
+const AdminContentTranslationRoute = AdminContentTranslationRouteImport.update({
+  id: '/content/translation',
+  path: '/content/translation',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AgentResponseRunIdRoute = AgentResponseRunIdRouteImport.update({
+  id: '/agent/response/$runId',
+  path: '/agent/response/$runId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicPaymentsWebhookRoute =
-  ApiPublicPaymentsWebhookRouteImport.update({
-    id: '/api/public/payments/webhook',
-    path: '/api/public/payments/webhook',
-    getParentRoute: () => rootRouteImport,
+const ApiElevenlabsSttRoute = ApiElevenlabsSttRouteImport.update({
+  id: '/api/elevenlabs/stt',
+  path: '/api/elevenlabs/stt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SplatRoute = ApiV1SplatRouteImport.update({
+  id: '/api/v1/$',
+  path: '/api/v1/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CsfactorsMapsIndexRoute = CsfactorsMapsIndexRouteImport.update({
+  id: '/maps/',
+  path: '/maps/',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const CsfactorsMapsIdRoute = CsfactorsMapsIdRouteImport.update({
+  id: '/maps/$id',
+  path: '/maps/$id',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const CsfactorsMapsNewRoute = CsfactorsMapsNewRouteImport.update({
+  id: '/maps/new',
+  path: '/maps/new',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const CsfactorsPlaybookSlugRoute = CsfactorsPlaybookSlugRouteImport.update({
+  id: '/playbook/$slug',
+  path: '/playbook/$slug',
+  getParentRoute: () => CsfactorsRoute,
+} as any)
+const DiagnosticsAiReadinessIndexRoute =
+  DiagnosticsAiReadinessIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DiagnosticsAiReadinessRoute,
   } as any)
-const ApiPublicHooksTranslateKnowledgeRoute =
-  ApiPublicHooksTranslateKnowledgeRouteImport.update({
-    id: '/api/public/hooks/translate-knowledge',
-    path: '/api/public/hooks/translate-knowledge',
-    getParentRoute: () => rootRouteImport,
+const DiagnosticsAiReadinessSurveyRoute =
+  DiagnosticsAiReadinessSurveyRouteImport.update({
+    id: '/survey',
+    path: '/survey',
+    getParentRoute: () => DiagnosticsAiReadinessRoute,
   } as any)
-const ApiPublicHooksRefreshBenchmarksRoute =
-  ApiPublicHooksRefreshBenchmarksRouteImport.update({
-    id: '/api/public/hooks/refresh-benchmarks',
-    path: '/api/public/hooks/refresh-benchmarks',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksPullExternalIntelRoute =
-  ApiPublicHooksPullExternalIntelRouteImport.update({
-    id: '/api/public/hooks/pull-external-intel',
-    path: '/api/public/hooks/pull-external-intel',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksIngestArticlesRoute =
-  ApiPublicHooksIngestArticlesRouteImport.update({
-    id: '/api/public/hooks/ingest-articles',
-    path: '/api/public/hooks/ingest-articles',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksGenerateDailyQuestsRoute =
-  ApiPublicHooksGenerateDailyQuestsRouteImport.update({
-    id: '/api/public/hooks/generate-daily-quests',
-    path: '/api/public/hooks/generate-daily-quests',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksFlagTranslationsRoute =
-  ApiPublicHooksFlagTranslationsRouteImport.update({
-    id: '/api/public/hooks/flag-translations',
-    path: '/api/public/hooks/flag-translations',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksDispatchReadRoute =
-  ApiPublicHooksDispatchReadRouteImport.update({
-    id: '/api/public/hooks/dispatch-read',
-    path: '/api/public/hooks/dispatch-read',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksDiscoverRegionalRoute =
-  ApiPublicHooksDiscoverRegionalRouteImport.update({
-    id: '/api/public/hooks/discover-regional',
-    path: '/api/public/hooks/discover-regional',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksCurateHighRatedRoute =
-  ApiPublicHooksCurateHighRatedRouteImport.update({
-    id: '/api/public/hooks/curate-high-rated',
-    path: '/api/public/hooks/curate-high-rated',
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QResponseRunIdRoute = QResponseRunIdRouteImport.update({
+  id: '/q/response/$runId',
+  path: '/q/response/$runId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksAnalyzeInteractionsRoute =
+  ApiPublicHooksAnalyzeInteractionsRouteImport.update({
+    id: '/api/public/hooks/analyze-interactions',
+    path: '/api/public/hooks/analyze-interactions',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksCheckDriftSignalsRoute =
@@ -544,10 +461,93 @@ const ApiPublicHooksCheckDriftSignalsRoute =
     path: '/api/public/hooks/check-drift-signals',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksAnalyzeInteractionsRoute =
-  ApiPublicHooksAnalyzeInteractionsRouteImport.update({
-    id: '/api/public/hooks/analyze-interactions',
-    path: '/api/public/hooks/analyze-interactions',
+const ApiPublicHooksCurateHighRatedRoute =
+  ApiPublicHooksCurateHighRatedRouteImport.update({
+    id: '/api/public/hooks/curate-high-rated',
+    path: '/api/public/hooks/curate-high-rated',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksDiscoverRegionalRoute =
+  ApiPublicHooksDiscoverRegionalRouteImport.update({
+    id: '/api/public/hooks/discover-regional',
+    path: '/api/public/hooks/discover-regional',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksDispatchReadRoute =
+  ApiPublicHooksDispatchReadRouteImport.update({
+    id: '/api/public/hooks/dispatch-read',
+    path: '/api/public/hooks/dispatch-read',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksFlagTranslationsRoute =
+  ApiPublicHooksFlagTranslationsRouteImport.update({
+    id: '/api/public/hooks/flag-translations',
+    path: '/api/public/hooks/flag-translations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksGenerateDailyQuestsRoute =
+  ApiPublicHooksGenerateDailyQuestsRouteImport.update({
+    id: '/api/public/hooks/generate-daily-quests',
+    path: '/api/public/hooks/generate-daily-quests',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksIngestArticlesRoute =
+  ApiPublicHooksIngestArticlesRouteImport.update({
+    id: '/api/public/hooks/ingest-articles',
+    path: '/api/public/hooks/ingest-articles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksPullExternalIntelRoute =
+  ApiPublicHooksPullExternalIntelRouteImport.update({
+    id: '/api/public/hooks/pull-external-intel',
+    path: '/api/public/hooks/pull-external-intel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRefreshBenchmarksRoute =
+  ApiPublicHooksRefreshBenchmarksRouteImport.update({
+    id: '/api/public/hooks/refresh-benchmarks',
+    path: '/api/public/hooks/refresh-benchmarks',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksTranslateKnowledgeRoute =
+  ApiPublicHooksTranslateKnowledgeRouteImport.update({
+    id: '/api/public/hooks/translate-knowledge',
+    path: '/api/public/hooks/translate-knowledge',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiV1BenchmarksNrrRoute = ApiV1BenchmarksNrrRouteImport.update({
+  id: '/api/v1/benchmarks/nrr',
+  path: '/api/v1/benchmarks/nrr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1RetentionLedgerTickerRoute =
+  ApiV1RetentionLedgerTickerRouteImport.update({
+    id: '/api/v1/retention-ledger/ticker',
+    path: '/api/v1/retention-ledger/ticker',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -1147,172 +1147,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vanguard': {
-      id: '/vanguard'
-      path: '/vanguard'
-      fullPath: '/vanguard'
-      preLoaderRoute: typeof VanguardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/unsubscribe': {
-      id: '/unsubscribe'
-      path: '/unsubscribe'
-      fullPath: '/unsubscribe'
-      preLoaderRoute: typeof UnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/teams': {
-      id: '/teams'
-      path: '/teams'
-      fullPath: '/teams'
-      preLoaderRoute: typeof TeamsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/subscribe': {
-      id: '/subscribe'
-      path: '/subscribe'
-      fullPath: '/subscribe'
-      preLoaderRoute: typeof SubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/strip': {
-      id: '/strip'
-      path: '/strip'
-      fullPath: '/strip'
-      preLoaderRoute: typeof StripRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/situation-room': {
-      id: '/situation-room'
-      path: '/situation-room'
-      fullPath: '/situation-room'
-      preLoaderRoute: typeof SituationRoomRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sequencer': {
-      id: '/sequencer'
-      path: '/sequencer'
-      fullPath: '/sequencer'
-      preLoaderRoute: typeof SequencerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rss.xml': {
-      id: '/rss.xml'
-      path: '/rss.xml'
-      fullPath: '/rss.xml'
-      preLoaderRoute: typeof RssDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/retention-protocol': {
-      id: '/retention-protocol'
-      path: '/retention-protocol'
-      fullPath: '/retention-protocol'
-      preLoaderRoute: typeof RetentionProtocolRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pulse-demo': {
-      id: '/pulse-demo'
-      path: '/pulse-demo'
-      fullPath: '/pulse-demo'
-      preLoaderRoute: typeof PulseDemoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pricing': {
-      id: '/pricing'
-      path: '/pricing'
-      fullPath: '/pricing'
-      preLoaderRoute: typeof PricingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/outcome-forum': {
-      id: '/outcome-forum'
-      path: '/outcome-forum'
-      fullPath: '/outcome-forum'
-      preLoaderRoute: typeof OutcomeForumRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/job-board': {
-      id: '/job-board'
-      path: '/job-board'
-      fullPath: '/job-board'
-      preLoaderRoute: typeof JobBoardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/insights': {
-      id: '/insights'
-      path: '/insights'
-      fullPath: '/insights'
-      preLoaderRoute: typeof InsightsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/directory': {
-      id: '/directory'
-      path: '/directory'
-      fullPath: '/directory'
-      preLoaderRoute: typeof DirectoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/csfactors': {
-      id: '/csfactors'
-      path: '/csfactors'
-      fullPath: '/csfactors'
-      preLoaderRoute: typeof CsfactorsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/codex': {
-      id: '/codex'
-      path: '/codex'
-      fullPath: '/codex'
-      preLoaderRoute: typeof CodexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/calculator': {
-      id: '/calculator'
-      path: '/calculator'
-      fullPath: '/calculator'
-      preLoaderRoute: typeof CalculatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/benchmarks': {
-      id: '/benchmarks'
-      path: '/benchmarks'
-      fullPath: '/benchmarks'
-      preLoaderRoute: typeof BenchmarksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ai-readiness': {
-      id: '/ai-readiness'
-      path: '/ai-readiness'
-      fullPath: '/ai-readiness'
-      preLoaderRoute: typeof AiReadinessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -1322,179 +1161,179 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/insights/': {
-      id: '/insights/'
-      path: '/'
-      fullPath: '/insights/'
-      preLoaderRoute: typeof InsightsIndexRouteImport
-      parentRoute: typeof InsightsRoute
-    }
-    '/diagnostics/': {
-      id: '/diagnostics/'
-      path: '/diagnostics'
-      fullPath: '/diagnostics/'
-      preLoaderRoute: typeof DiagnosticsIndexRouteImport
+    '/ai-readiness': {
+      id: '/ai-readiness'
+      path: '/ai-readiness'
+      fullPath: '/ai-readiness'
+      preLoaderRoute: typeof AiReadinessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/codex/': {
-      id: '/codex/'
-      path: '/'
-      fullPath: '/codex/'
-      preLoaderRoute: typeof CodexIndexRouteImport
-      parentRoute: typeof CodexRoute
+    '/benchmarks': {
+      id: '/benchmarks'
+      path: '/benchmarks'
+      fullPath: '/benchmarks'
+      preLoaderRoute: typeof BenchmarksRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/ai-readiness/': {
-      id: '/ai-readiness/'
-      path: '/'
-      fullPath: '/ai-readiness/'
-      preLoaderRoute: typeof AiReadinessIndexRouteImport
-      parentRoute: typeof AiReadinessRoute
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/codex': {
+      id: '/codex'
+      path: '/codex'
+      fullPath: '/codex'
+      preLoaderRoute: typeof CodexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/csfactors': {
+      id: '/csfactors'
+      path: '/csfactors'
+      fullPath: '/csfactors'
+      preLoaderRoute: typeof CsfactorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/directory': {
+      id: '/directory'
+      path: '/directory'
+      fullPath: '/directory'
+      preLoaderRoute: typeof DirectoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/job-board': {
+      id: '/job-board'
+      path: '/job-board'
+      fullPath: '/job-board'
+      preLoaderRoute: typeof JobBoardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/outcome-forum': {
+      id: '/outcome-forum'
+      path: '/outcome-forum'
+      fullPath: '/outcome-forum'
+      preLoaderRoute: typeof OutcomeForumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pulse-demo': {
+      id: '/pulse-demo'
+      path: '/pulse-demo'
+      fullPath: '/pulse-demo'
+      preLoaderRoute: typeof PulseDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retention-protocol': {
+      id: '/retention-protocol'
+      path: '/retention-protocol'
+      fullPath: '/retention-protocol'
+      preLoaderRoute: typeof RetentionProtocolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rss.xml': {
+      id: '/rss.xml'
+      path: '/rss.xml'
+      fullPath: '/rss.xml'
+      preLoaderRoute: typeof RssDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sequencer': {
+      id: '/sequencer'
+      path: '/sequencer'
+      fullPath: '/sequencer'
+      preLoaderRoute: typeof SequencerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/situation-room': {
+      id: '/situation-room'
+      path: '/situation-room'
+      fullPath: '/situation-room'
+      preLoaderRoute: typeof SituationRoomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/strip': {
+      id: '/strip'
+      path: '/strip'
+      fullPath: '/strip'
+      preLoaderRoute: typeof StripRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subscribe': {
+      id: '/subscribe'
+      path: '/subscribe'
+      fullPath: '/subscribe'
+      preLoaderRoute: typeof SubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teams': {
+      id: '/teams'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof TeamsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vanguard': {
+      id: '/vanguard'
+      path: '/vanguard'
+      fullPath: '/vanguard'
+      preLoaderRoute: typeof VanguardRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/account/': {
       id: '/account/'
       path: '/account'
       fullPath: '/account/'
       preLoaderRoute: typeof AccountIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/m/$token': {
-      id: '/m/$token'
-      path: '/m/$token'
-      fullPath: '/m/$token'
-      preLoaderRoute: typeof MTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/insights/$slug': {
-      id: '/insights/$slug'
-      path: '/$slug'
-      fullPath: '/insights/$slug'
-      preLoaderRoute: typeof InsightsSlugRouteImport
-      parentRoute: typeof InsightsRoute
-    }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/diagnostics/champion-dependency': {
-      id: '/diagnostics/champion-dependency'
-      path: '/diagnostics/champion-dependency'
-      fullPath: '/diagnostics/champion-dependency'
-      preLoaderRoute: typeof DiagnosticsChampionDependencyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/diagnostics/ai-readiness': {
-      id: '/diagnostics/ai-readiness'
-      path: '/diagnostics/ai-readiness'
-      fullPath: '/diagnostics/ai-readiness'
-      preLoaderRoute: typeof DiagnosticsAiReadinessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/design-system/lumi-badge': {
-      id: '/design-system/lumi-badge'
-      path: '/design-system/lumi-badge'
-      fullPath: '/design-system/lumi-badge'
-      preLoaderRoute: typeof DesignSystemLumiBadgeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/design-system/grain-test': {
-      id: '/design-system/grain-test'
-      path: '/design-system/grain-test'
-      fullPath: '/design-system/grain-test'
-      preLoaderRoute: typeof DesignSystemGrainTestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/csfactors/ctas': {
-      id: '/csfactors/ctas'
-      path: '/ctas'
-      fullPath: '/csfactors/ctas'
-      preLoaderRoute: typeof CsfactorsCtasRouteImport
-      parentRoute: typeof CsfactorsRoute
-    }
-    '/csfactors/360': {
-      id: '/csfactors/360'
-      path: '/360'
-      fullPath: '/csfactors/360'
-      preLoaderRoute: typeof Csfactors360RouteImport
-      parentRoute: typeof CsfactorsRoute
-    }
-    '/csfactors/$accountId': {
-      id: '/csfactors/$accountId'
-      path: '/$accountId'
-      fullPath: '/csfactors/$accountId'
-      preLoaderRoute: typeof CsfactorsAccountIdRouteImport
-      parentRoute: typeof CsfactorsRoute
-    }
-    '/codex/$slug': {
-      id: '/codex/$slug'
-      path: '/$slug'
-      fullPath: '/codex/$slug'
-      preLoaderRoute: typeof CodexSlugRouteImport
-      parentRoute: typeof CodexRoute
-    }
-    '/checkout/return': {
-      id: '/checkout/return'
-      path: '/checkout/return'
-      fullPath: '/checkout/return'
-      preLoaderRoute: typeof CheckoutReturnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ai-readiness/survey': {
-      id: '/ai-readiness/survey'
-      path: '/survey'
-      fullPath: '/ai-readiness/survey'
-      preLoaderRoute: typeof AiReadinessSurveyRouteImport
-      parentRoute: typeof AiReadinessRoute
-    }
-    '/agent/framework': {
-      id: '/agent/framework'
-      path: '/agent/framework'
-      fullPath: '/agent/framework'
-      preLoaderRoute: typeof AgentFrameworkRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/plans': {
-      id: '/admin/plans'
-      path: '/plans'
-      fullPath: '/admin/plans'
-      preLoaderRoute: typeof AdminPlansRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/payments': {
-      id: '/admin/payments'
-      path: '/payments'
-      fullPath: '/admin/payments'
-      preLoaderRoute: typeof AdminPaymentsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/control-panel': {
-      id: '/admin/control-panel'
-      path: '/control-panel'
-      fullPath: '/admin/control-panel'
-      preLoaderRoute: typeof AdminControlPanelRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/account/workspace': {
-      id: '/account/workspace'
-      path: '/account/workspace'
-      fullPath: '/account/workspace'
-      preLoaderRoute: typeof AccountWorkspaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/quests': {
-      id: '/account/quests'
-      path: '/account/quests'
-      fullPath: '/account/quests'
-      preLoaderRoute: typeof AccountQuestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/api': {
@@ -1504,123 +1343,172 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountApiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/diagnostics/ai-readiness/': {
-      id: '/diagnostics/ai-readiness/'
-      path: '/'
-      fullPath: '/diagnostics/ai-readiness/'
-      preLoaderRoute: typeof DiagnosticsAiReadinessIndexRouteImport
-      parentRoute: typeof DiagnosticsAiReadinessRoute
+    '/account/quests': {
+      id: '/account/quests'
+      path: '/account/quests'
+      fullPath: '/account/quests'
+      preLoaderRoute: typeof AccountQuestsRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/csfactors/maps/': {
-      id: '/csfactors/maps/'
-      path: '/maps'
-      fullPath: '/csfactors/maps/'
-      preLoaderRoute: typeof CsfactorsMapsIndexRouteImport
+    '/account/workspace': {
+      id: '/account/workspace'
+      path: '/account/workspace'
+      fullPath: '/account/workspace'
+      preLoaderRoute: typeof AccountWorkspaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/control-panel': {
+      id: '/admin/control-panel'
+      path: '/control-panel'
+      fullPath: '/admin/control-panel'
+      preLoaderRoute: typeof AdminControlPanelRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/plans': {
+      id: '/admin/plans'
+      path: '/plans'
+      fullPath: '/admin/plans'
+      preLoaderRoute: typeof AdminPlansRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/agent/framework': {
+      id: '/agent/framework'
+      path: '/agent/framework'
+      fullPath: '/agent/framework'
+      preLoaderRoute: typeof AgentFrameworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-readiness/': {
+      id: '/ai-readiness/'
+      path: '/'
+      fullPath: '/ai-readiness/'
+      preLoaderRoute: typeof AiReadinessIndexRouteImport
+      parentRoute: typeof AiReadinessRoute
+    }
+    '/ai-readiness/survey': {
+      id: '/ai-readiness/survey'
+      path: '/survey'
+      fullPath: '/ai-readiness/survey'
+      preLoaderRoute: typeof AiReadinessSurveyRouteImport
+      parentRoute: typeof AiReadinessRoute
+    }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/codex/': {
+      id: '/codex/'
+      path: '/'
+      fullPath: '/codex/'
+      preLoaderRoute: typeof CodexIndexRouteImport
+      parentRoute: typeof CodexRoute
+    }
+    '/codex/$slug': {
+      id: '/codex/$slug'
+      path: '/$slug'
+      fullPath: '/codex/$slug'
+      preLoaderRoute: typeof CodexSlugRouteImport
+      parentRoute: typeof CodexRoute
+    }
+    '/csfactors/$accountId': {
+      id: '/csfactors/$accountId'
+      path: '/$accountId'
+      fullPath: '/csfactors/$accountId'
+      preLoaderRoute: typeof CsfactorsAccountIdRouteImport
       parentRoute: typeof CsfactorsRoute
+    }
+    '/csfactors/360': {
+      id: '/csfactors/360'
+      path: '/360'
+      fullPath: '/csfactors/360'
+      preLoaderRoute: typeof Csfactors360RouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/csfactors/ctas': {
+      id: '/csfactors/ctas'
+      path: '/ctas'
+      fullPath: '/csfactors/ctas'
+      preLoaderRoute: typeof CsfactorsCtasRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/design-system/grain-test': {
+      id: '/design-system/grain-test'
+      path: '/design-system/grain-test'
+      fullPath: '/design-system/grain-test'
+      preLoaderRoute: typeof DesignSystemGrainTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/design-system/lumi-badge': {
+      id: '/design-system/lumi-badge'
+      path: '/design-system/lumi-badge'
+      fullPath: '/design-system/lumi-badge'
+      preLoaderRoute: typeof DesignSystemLumiBadgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diagnostics/': {
+      id: '/diagnostics/'
+      path: '/diagnostics'
+      fullPath: '/diagnostics/'
+      preLoaderRoute: typeof DiagnosticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diagnostics/ai-readiness': {
+      id: '/diagnostics/ai-readiness'
+      path: '/diagnostics/ai-readiness'
+      fullPath: '/diagnostics/ai-readiness'
+      preLoaderRoute: typeof DiagnosticsAiReadinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diagnostics/champion-dependency': {
+      id: '/diagnostics/champion-dependency'
+      path: '/diagnostics/champion-dependency'
+      fullPath: '/diagnostics/champion-dependency'
+      preLoaderRoute: typeof DiagnosticsChampionDependencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights/': {
+      id: '/insights/'
+      path: '/'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof InsightsRoute
+    }
+    '/insights/$slug': {
+      id: '/insights/$slug'
+      path: '/$slug'
+      fullPath: '/insights/$slug'
+      preLoaderRoute: typeof InsightsSlugRouteImport
+      parentRoute: typeof InsightsRoute
+    }
+    '/m/$token': {
+      id: '/m/$token'
+      path: '/m/$token'
+      fullPath: '/m/$token'
+      preLoaderRoute: typeof MTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/account/analytics/': {
       id: '/account/analytics/'
       path: '/account/analytics'
       fullPath: '/account/analytics/'
       preLoaderRoute: typeof AccountAnalyticsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/q/response/$runId': {
-      id: '/q/response/$runId'
-      path: '/q/response/$runId'
-      fullPath: '/q/response/$runId'
-      preLoaderRoute: typeof QResponseRunIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/diagnostics/ai-readiness/survey': {
-      id: '/diagnostics/ai-readiness/survey'
-      path: '/survey'
-      fullPath: '/diagnostics/ai-readiness/survey'
-      preLoaderRoute: typeof DiagnosticsAiReadinessSurveyRouteImport
-      parentRoute: typeof DiagnosticsAiReadinessRoute
-    }
-    '/csfactors/playbook/$slug': {
-      id: '/csfactors/playbook/$slug'
-      path: '/playbook/$slug'
-      fullPath: '/csfactors/playbook/$slug'
-      preLoaderRoute: typeof CsfactorsPlaybookSlugRouteImport
-      parentRoute: typeof CsfactorsRoute
-    }
-    '/csfactors/maps/new': {
-      id: '/csfactors/maps/new'
-      path: '/maps/new'
-      fullPath: '/csfactors/maps/new'
-      preLoaderRoute: typeof CsfactorsMapsNewRouteImport
-      parentRoute: typeof CsfactorsRoute
-    }
-    '/csfactors/maps/$id': {
-      id: '/csfactors/maps/$id'
-      path: '/maps/$id'
-      fullPath: '/csfactors/maps/$id'
-      preLoaderRoute: typeof CsfactorsMapsIdRouteImport
-      parentRoute: typeof CsfactorsRoute
-    }
-    '/api/v1/$': {
-      id: '/api/v1/$'
-      path: '/api/v1/$'
-      fullPath: '/api/v1/$'
-      preLoaderRoute: typeof ApiV1SplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/elevenlabs/stt': {
-      id: '/api/elevenlabs/stt'
-      path: '/api/elevenlabs/stt'
-      fullPath: '/api/elevenlabs/stt'
-      preLoaderRoute: typeof ApiElevenlabsSttRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/agent/response/$runId': {
-      id: '/agent/response/$runId'
-      path: '/agent/response/$runId'
-      fullPath: '/agent/response/$runId'
-      preLoaderRoute: typeof AgentResponseRunIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/content/translation': {
-      id: '/admin/content/translation'
-      path: '/content/translation'
-      fullPath: '/admin/content/translation'
-      preLoaderRoute: typeof AdminContentTranslationRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/account/executive/analytics': {
-      id: '/account/executive/analytics'
-      path: '/account/executive/analytics'
-      fullPath: '/account/executive/analytics'
-      preLoaderRoute: typeof AccountExecutiveAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/analytics/team-leaderboard': {
-      id: '/account/analytics/team-leaderboard'
-      path: '/account/analytics/team-leaderboard'
-      fullPath: '/account/analytics/team-leaderboard'
-      preLoaderRoute: typeof AccountAnalyticsTeamLeaderboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/analytics/stakeholder-radar': {
-      id: '/account/analytics/stakeholder-radar'
-      path: '/account/analytics/stakeholder-radar'
-      fullPath: '/account/analytics/stakeholder-radar'
-      preLoaderRoute: typeof AccountAnalyticsStakeholderRadarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/analytics/retention-funnel': {
-      id: '/account/analytics/retention-funnel'
-      path: '/account/analytics/retention-funnel'
-      fullPath: '/account/analytics/retention-funnel'
-      preLoaderRoute: typeof AccountAnalyticsRetentionFunnelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/analytics/nrr-waterfall': {
@@ -1630,109 +1518,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountAnalyticsNrrWaterfallRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+    '/account/analytics/retention-funnel': {
+      id: '/account/analytics/retention-funnel'
+      path: '/account/analytics/retention-funnel'
+      fullPath: '/account/analytics/retention-funnel'
+      preLoaderRoute: typeof AccountAnalyticsRetentionFunnelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+    '/account/analytics/stakeholder-radar': {
+      id: '/account/analytics/stakeholder-radar'
+      path: '/account/analytics/stakeholder-radar'
+      fullPath: '/account/analytics/stakeholder-radar'
+      preLoaderRoute: typeof AccountAnalyticsStakeholderRadarRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/account/analytics/team-leaderboard': {
+      id: '/account/analytics/team-leaderboard'
+      path: '/account/analytics/team-leaderboard'
+      fullPath: '/account/analytics/team-leaderboard'
+      preLoaderRoute: typeof AccountAnalyticsTeamLeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/retention-ledger/ticker': {
-      id: '/api/v1/retention-ledger/ticker'
-      path: '/api/v1/retention-ledger/ticker'
-      fullPath: '/api/v1/retention-ledger/ticker'
-      preLoaderRoute: typeof ApiV1RetentionLedgerTickerRouteImport
+    '/account/executive/analytics': {
+      id: '/account/executive/analytics'
+      path: '/account/executive/analytics'
+      fullPath: '/account/executive/analytics'
+      preLoaderRoute: typeof AccountExecutiveAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/v1/benchmarks/nrr': {
-      id: '/api/v1/benchmarks/nrr'
-      path: '/api/v1/benchmarks/nrr'
-      fullPath: '/api/v1/benchmarks/nrr'
-      preLoaderRoute: typeof ApiV1BenchmarksNrrRouteImport
+    '/admin/content/translation': {
+      id: '/admin/content/translation'
+      path: '/content/translation'
+      fullPath: '/admin/content/translation'
+      preLoaderRoute: typeof AdminContentTranslationRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/agent/response/$runId': {
+      id: '/agent/response/$runId'
+      path: '/agent/response/$runId'
+      fullPath: '/agent/response/$runId'
+      preLoaderRoute: typeof AgentResponseRunIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/payments/webhook': {
-      id: '/api/public/payments/webhook'
-      path: '/api/public/payments/webhook'
-      fullPath: '/api/public/payments/webhook'
-      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+    '/api/elevenlabs/stt': {
+      id: '/api/elevenlabs/stt'
+      path: '/api/elevenlabs/stt'
+      fullPath: '/api/elevenlabs/stt'
+      preLoaderRoute: typeof ApiElevenlabsSttRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/translate-knowledge': {
-      id: '/api/public/hooks/translate-knowledge'
-      path: '/api/public/hooks/translate-knowledge'
-      fullPath: '/api/public/hooks/translate-knowledge'
-      preLoaderRoute: typeof ApiPublicHooksTranslateKnowledgeRouteImport
+    '/api/v1/$': {
+      id: '/api/v1/$'
+      path: '/api/v1/$'
+      fullPath: '/api/v1/$'
+      preLoaderRoute: typeof ApiV1SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/refresh-benchmarks': {
-      id: '/api/public/hooks/refresh-benchmarks'
-      path: '/api/public/hooks/refresh-benchmarks'
-      fullPath: '/api/public/hooks/refresh-benchmarks'
-      preLoaderRoute: typeof ApiPublicHooksRefreshBenchmarksRouteImport
+    '/csfactors/maps/': {
+      id: '/csfactors/maps/'
+      path: '/maps'
+      fullPath: '/csfactors/maps/'
+      preLoaderRoute: typeof CsfactorsMapsIndexRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/csfactors/maps/$id': {
+      id: '/csfactors/maps/$id'
+      path: '/maps/$id'
+      fullPath: '/csfactors/maps/$id'
+      preLoaderRoute: typeof CsfactorsMapsIdRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/csfactors/maps/new': {
+      id: '/csfactors/maps/new'
+      path: '/maps/new'
+      fullPath: '/csfactors/maps/new'
+      preLoaderRoute: typeof CsfactorsMapsNewRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/csfactors/playbook/$slug': {
+      id: '/csfactors/playbook/$slug'
+      path: '/playbook/$slug'
+      fullPath: '/csfactors/playbook/$slug'
+      preLoaderRoute: typeof CsfactorsPlaybookSlugRouteImport
+      parentRoute: typeof CsfactorsRoute
+    }
+    '/diagnostics/ai-readiness/': {
+      id: '/diagnostics/ai-readiness/'
+      path: '/'
+      fullPath: '/diagnostics/ai-readiness/'
+      preLoaderRoute: typeof DiagnosticsAiReadinessIndexRouteImport
+      parentRoute: typeof DiagnosticsAiReadinessRoute
+    }
+    '/diagnostics/ai-readiness/survey': {
+      id: '/diagnostics/ai-readiness/survey'
+      path: '/survey'
+      fullPath: '/diagnostics/ai-readiness/survey'
+      preLoaderRoute: typeof DiagnosticsAiReadinessSurveyRouteImport
+      parentRoute: typeof DiagnosticsAiReadinessRoute
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/pull-external-intel': {
-      id: '/api/public/hooks/pull-external-intel'
-      path: '/api/public/hooks/pull-external-intel'
-      fullPath: '/api/public/hooks/pull-external-intel'
-      preLoaderRoute: typeof ApiPublicHooksPullExternalIntelRouteImport
+    '/q/response/$runId': {
+      id: '/q/response/$runId'
+      path: '/q/response/$runId'
+      fullPath: '/q/response/$runId'
+      preLoaderRoute: typeof QResponseRunIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/ingest-articles': {
-      id: '/api/public/hooks/ingest-articles'
-      path: '/api/public/hooks/ingest-articles'
-      fullPath: '/api/public/hooks/ingest-articles'
-      preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/generate-daily-quests': {
-      id: '/api/public/hooks/generate-daily-quests'
-      path: '/api/public/hooks/generate-daily-quests'
-      fullPath: '/api/public/hooks/generate-daily-quests'
-      preLoaderRoute: typeof ApiPublicHooksGenerateDailyQuestsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/flag-translations': {
-      id: '/api/public/hooks/flag-translations'
-      path: '/api/public/hooks/flag-translations'
-      fullPath: '/api/public/hooks/flag-translations'
-      preLoaderRoute: typeof ApiPublicHooksFlagTranslationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/dispatch-read': {
-      id: '/api/public/hooks/dispatch-read'
-      path: '/api/public/hooks/dispatch-read'
-      fullPath: '/api/public/hooks/dispatch-read'
-      preLoaderRoute: typeof ApiPublicHooksDispatchReadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/discover-regional': {
-      id: '/api/public/hooks/discover-regional'
-      path: '/api/public/hooks/discover-regional'
-      fullPath: '/api/public/hooks/discover-regional'
-      preLoaderRoute: typeof ApiPublicHooksDiscoverRegionalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/curate-high-rated': {
-      id: '/api/public/hooks/curate-high-rated'
-      path: '/api/public/hooks/curate-high-rated'
-      fullPath: '/api/public/hooks/curate-high-rated'
-      preLoaderRoute: typeof ApiPublicHooksCurateHighRatedRouteImport
+    '/api/public/hooks/analyze-interactions': {
+      id: '/api/public/hooks/analyze-interactions'
+      path: '/api/public/hooks/analyze-interactions'
+      fullPath: '/api/public/hooks/analyze-interactions'
+      preLoaderRoute: typeof ApiPublicHooksAnalyzeInteractionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/check-drift-signals': {
@@ -1742,11 +1644,109 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksCheckDriftSignalsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/analyze-interactions': {
-      id: '/api/public/hooks/analyze-interactions'
-      path: '/api/public/hooks/analyze-interactions'
-      fullPath: '/api/public/hooks/analyze-interactions'
-      preLoaderRoute: typeof ApiPublicHooksAnalyzeInteractionsRouteImport
+    '/api/public/hooks/curate-high-rated': {
+      id: '/api/public/hooks/curate-high-rated'
+      path: '/api/public/hooks/curate-high-rated'
+      fullPath: '/api/public/hooks/curate-high-rated'
+      preLoaderRoute: typeof ApiPublicHooksCurateHighRatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/discover-regional': {
+      id: '/api/public/hooks/discover-regional'
+      path: '/api/public/hooks/discover-regional'
+      fullPath: '/api/public/hooks/discover-regional'
+      preLoaderRoute: typeof ApiPublicHooksDiscoverRegionalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/dispatch-read': {
+      id: '/api/public/hooks/dispatch-read'
+      path: '/api/public/hooks/dispatch-read'
+      fullPath: '/api/public/hooks/dispatch-read'
+      preLoaderRoute: typeof ApiPublicHooksDispatchReadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/flag-translations': {
+      id: '/api/public/hooks/flag-translations'
+      path: '/api/public/hooks/flag-translations'
+      fullPath: '/api/public/hooks/flag-translations'
+      preLoaderRoute: typeof ApiPublicHooksFlagTranslationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/generate-daily-quests': {
+      id: '/api/public/hooks/generate-daily-quests'
+      path: '/api/public/hooks/generate-daily-quests'
+      fullPath: '/api/public/hooks/generate-daily-quests'
+      preLoaderRoute: typeof ApiPublicHooksGenerateDailyQuestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/ingest-articles': {
+      id: '/api/public/hooks/ingest-articles'
+      path: '/api/public/hooks/ingest-articles'
+      fullPath: '/api/public/hooks/ingest-articles'
+      preLoaderRoute: typeof ApiPublicHooksIngestArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/pull-external-intel': {
+      id: '/api/public/hooks/pull-external-intel'
+      path: '/api/public/hooks/pull-external-intel'
+      fullPath: '/api/public/hooks/pull-external-intel'
+      preLoaderRoute: typeof ApiPublicHooksPullExternalIntelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/refresh-benchmarks': {
+      id: '/api/public/hooks/refresh-benchmarks'
+      path: '/api/public/hooks/refresh-benchmarks'
+      fullPath: '/api/public/hooks/refresh-benchmarks'
+      preLoaderRoute: typeof ApiPublicHooksRefreshBenchmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/translate-knowledge': {
+      id: '/api/public/hooks/translate-knowledge'
+      path: '/api/public/hooks/translate-knowledge'
+      fullPath: '/api/public/hooks/translate-knowledge'
+      preLoaderRoute: typeof ApiPublicHooksTranslateKnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/benchmarks/nrr': {
+      id: '/api/v1/benchmarks/nrr'
+      path: '/api/v1/benchmarks/nrr'
+      fullPath: '/api/v1/benchmarks/nrr'
+      preLoaderRoute: typeof ApiV1BenchmarksNrrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/retention-ledger/ticker': {
+      id: '/api/v1/retention-ledger/ticker'
+      path: '/api/v1/retention-ledger/ticker'
+      fullPath: '/api/v1/retention-ledger/ticker'
+      preLoaderRoute: typeof ApiV1RetentionLedgerTickerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
