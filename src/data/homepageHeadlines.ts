@@ -15,15 +15,16 @@ export interface HeadlineSet {
 
 export const homepageHeadlines: HeadlineSet[] = [
   {
-    id: "sunday-engineering-trajectory",
+    id: "sunday-commanding-officer",
     dayIndex: 0,
     phrases: [
-      "Stop managing accounts.",
-      "Start engineering trajectory.",
+      "Nobody appointed you the commanding officer of your portfolio.",
+      "You already are one.",
     ],
-    line1: "Stop managing accounts.",
-    line2: "Start engineering trajectory.",
-    fullText: "Stop managing accounts. Start engineering trajectory.",
+    line1: "Nobody appointed you the commanding officer of your portfolio.",
+    line2: "You already are one.",
+    fullText:
+      "Nobody appointed you the commanding officer of your portfolio. You already are one.",
   },
   {
     id: "monday-nrr-gap",
@@ -38,50 +39,52 @@ export const homepageHeadlines: HeadlineSet[] = [
       "The gap between 94% NRR and 120% NRR is not headcount. It is system design.",
   },
   {
-    id: "tuesday-high-touch-liability",
+    id: "tuesday-leverage-treadmill",
     dayIndex: 2,
     phrases: [
-      "High-touch CS is a scaling liability.",
-      "Here is what replaces it.",
+      "Forty accounts without leverage is not a job.",
+      "It's a treadmill with a title.",
     ],
-    line1: "High-touch CS is a scaling liability.",
-    line2: "Here is what replaces it.",
-    fullText: "High-touch CS is a scaling liability. Here is what replaces it.",
+    line1: "Forty accounts without leverage is not a job.",
+    line2: "It's a treadmill with a title.",
+    fullText:
+      "Forty accounts without leverage is not a job. It's a treadmill with a title.",
   },
   {
-    id: "wednesday-engineering-revenue",
+    id: "wednesday-silence-before-churn",
     dayIndex: 3,
     phrases: [
-      "Stop managing accounts.",
-      "Start engineering revenue.",
+      "Anyone can read a churn report.",
+      "Almost nobody can read the silence that preceded it.",
     ],
-    line1: "Stop managing accounts.",
-    line2: "Start engineering revenue.",
-    fullText: "Stop managing accounts. Start engineering revenue.",
+    line1: "Anyone can read a churn report.",
+    line2: "Almost nobody can read the silence that preceded it.",
+    fullText:
+      "Anyone can read a churn report. Almost nobody can read the silence that preceded it.",
   },
   {
-    id: "thursday-top-quartile",
+    id: "thursday-118-vs-104",
     dayIndex: 4,
     phrases: [
-      "Your peers are managing relationships.",
-      "The top quartile is engineering expansion.",
+      "118% NRR is not fourteen points better than 104%.",
+      "Over five years, it's a different company.",
     ],
-    line1: "Your peers are managing relationships.",
-    line2: "The top quartile is engineering expansion.",
+    line1: "118% NRR is not fourteen points better than 104%.",
+    line2: "Over five years, it's a different company.",
     fullText:
-      "Your peers are managing relationships. The top quartile is engineering expansion.",
+      "118% NRR is not fourteen points better than 104%. Over five years, it's a different company.",
   },
   {
-    id: "friday-revenue-leadership",
+    id: "friday-long-game-renewals",
     dayIndex: 5,
     phrases: [
-      "CS done right does not feel like CS.",
-      "It feels like revenue leadership.",
+      "Every renewal looks like a short-term game.",
+      "The CSMs who win were quietly playing the long one.",
     ],
-    line1: "CS done right does not feel like CS.",
-    line2: "It feels like revenue leadership.",
+    line1: "Every renewal looks like a short-term game.",
+    line2: "The CSMs who win were quietly playing the long one.",
     fullText:
-      "CS done right does not feel like CS. It feels like revenue leadership.",
+      "Every renewal looks like a short-term game. The CSMs who win were quietly playing the long one.",
   },
   {
     id: "saturday-structural-churn",
