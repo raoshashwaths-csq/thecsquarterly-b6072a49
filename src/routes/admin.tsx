@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, FileText, MessageSquare, BookOpen, Users, CreditCard,
   ShoppingBag, BarChart3, Sparkles, Search as SearchIcon, UsersRound, Mail, Link as LinkIcon,
-  Download, Upload, ScrollText, Languages,
+  Download, Upload, ScrollText, Languages, Brain, ThumbsUp, Activity,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -25,6 +25,7 @@ import { exportDataset, importArticles, listAuditLog } from "@/lib/admin-ops.fun
 import { backfillEmbeddings } from "@/lib/embeddings.functions";
 import { listReactionAggregates } from "@/lib/post-reactions.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
+import { LumiKnowledgeAdmin, LumiFeedbackAdmin, SystemJobsAdmin } from "@/components/admin/LumiAdminPanels";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
@@ -35,7 +36,8 @@ type SectionKey =
   | "dashboard" | "posts" | "conversations" | "playbooks"
   | "subscribers" | "subscriptions" | "purchases" | "payment-links"
   | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
-  | "import-articles" | "audit-log" | "reader-signals";
+  | "import-articles" | "audit-log" | "reader-signals"
+  | "lumi-knowledge" | "lumi-feedback" | "system-jobs";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
@@ -53,6 +55,9 @@ const NAV: NavItem[] = [
   { key: "purchases", label: "Purchases", icon: ShoppingBag, group: "Commerce" },
   { key: "payment-links", label: "Payment Links", icon: LinkIcon, soon: true, group: "Commerce" },
   { key: "q-agent", label: "Q. Operator Agent", icon: Sparkles, group: "Operations" },
+  { key: "lumi-knowledge", label: "Lumi Knowledge", icon: Brain, group: "Operations" },
+  { key: "lumi-feedback", label: "Lumi Feedback", icon: ThumbsUp, group: "Operations" },
+  { key: "system-jobs", label: "System Jobs", icon: Activity, group: "Operations" },
   { key: "audit-log", label: "Audit Log", icon: ScrollText, group: "Operations" },
   { key: "ai-agent", label: "Editorial AI Agent", icon: Sparkles, soon: true, group: "Operations" },
   { key: "search", label: "Global Search", icon: SearchIcon, soon: true, group: "Operations" },
@@ -187,6 +192,9 @@ function AdminPage() {
               {active === "reader-signals" && <ReaderSignalsAdmin />}
               {active === "import-articles" && <ImportArticlesAdmin />}
               {active === "audit-log" && <AuditLogAdmin />}
+              {active === "lumi-knowledge" && <LumiKnowledgeAdmin />}
+              {active === "lumi-feedback" && <LumiFeedbackAdmin />}
+              {active === "system-jobs" && <SystemJobsAdmin />}
               {active === "conversations" && <ComingSoon
                 title="1:1 Conversations with Leaders"
                 blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."

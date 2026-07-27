@@ -2663,6 +2663,18 @@ export type Database = {
           total: number
         }[]
       }
+      admin_scheduled_job_health: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobname: string
+          last_end: string
+          last_message: string
+          last_start: string
+          last_status: string
+          schedule: string
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
