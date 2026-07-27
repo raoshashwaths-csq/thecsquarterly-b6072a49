@@ -191,9 +191,12 @@ export const getLumiFeedbackRollup = createServerFn({ method: "GET" })
     if (runIds.length) {
       const { data: runs } = await supabaseAdmin
         .from("q_runs")
-        .select("id, tree_id")
+        .select("id, node_id")
         .in("id", runIds);
-      for (const r of runs ?? []) treeByRun[r.id] = (r as { tree_id: string | null }).tree_id;
+      for (const r of (runs ?? []) as Array<{ id: string; node_id: string | null }>) {
+        // node_id looks like "T1-L2-a"; the tree prefix (T1) is the tree.
+        treeByRun[r.id] = r.node_id ? r.node_id.split("-")[0] : null;
+      }
     }
     const byTree: Record<string, { up: number; down: number }> = {};
     for (const r of rowsWithRun ?? []) {
@@ -237,10 +240,13 @@ export const listLumiFeedback = createServerFn({ method: "POST" })
     if (runIds.length) {
       const { data: runs } = await supabaseAdmin
         .from("q_runs")
-        .select("id, tree_id, prompt")
+        .select("id, node_id, query_text")
         .in("id", runIds);
-      for (const r of runs ?? []) {
-        runMap[r.id] = { tree_id: (r as any).tree_id ?? null, prompt: (r as any).prompt ?? null };
+      for (const r of (runs ?? []) as Array<{ id: string; node_id: string | null; query_text: string | null }>) {
+        runMap[r.id] = {
+          tree_id: r.node_id ? r.node_id.split("-")[0] : null,
+          prompt: r.query_text ?? null,
+        };
       }
     }
     return (rows ?? []).map((r) => ({
