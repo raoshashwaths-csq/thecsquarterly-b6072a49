@@ -70,7 +70,7 @@ function StripPage() {
       </header>
 
       <main>
-        {strips.map((s) => (
+        {strips.map((s: Strip) => (
           <StripCard key={s.id} strip={s} />
         ))}
       </main>
