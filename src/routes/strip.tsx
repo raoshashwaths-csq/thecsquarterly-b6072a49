@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { strips } from "@/data/strips";
+import { strips as fallbackStrips, type Strip } from "@/data/strips";
+import { listPublishedComicStrips } from "@/lib/admin-content.functions";
 import { StripCard } from "@/components/strip/StripCard";
 import "@/styles/strip.css";
 
@@ -32,10 +33,15 @@ export const Route = createFileRoute("/strip")({
       { rel: "canonical", href: "https://www.thecsquarterly.com/strip" },
     ],
   }),
+  loader: async () => {
+    const dbStrips = await listPublishedComicStrips().catch(() => []);
+    return { strips: dbStrips.length ? dbStrips : fallbackStrips };
+  },
   component: StripPage,
 });
 
 function StripPage() {
+  const { strips } = Route.useLoaderData();
   return (
     <div className="strip-page">
       <header className="strip-page-header">
@@ -64,7 +70,7 @@ function StripPage() {
       </header>
 
       <main>
-        {strips.map((s) => (
+        {strips.map((s: Strip) => (
           <StripCard key={s.id} strip={s} />
         ))}
       </main>

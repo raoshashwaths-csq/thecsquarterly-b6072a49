@@ -26,6 +26,7 @@ import { backfillEmbeddings } from "@/lib/embeddings.functions";
 import { listReactionAggregates } from "@/lib/post-reactions.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 import { LumiKnowledgeAdmin, LumiFeedbackAdmin, SystemJobsAdmin } from "@/components/admin/LumiAdminPanels";
+import { HomepageHeadlinesAdmin, ComicStripsAdmin } from "@/components/admin/EditorialAdminPanels";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
@@ -37,7 +38,8 @@ type SectionKey =
   | "subscribers" | "subscriptions" | "purchases" | "payment-links"
   | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
   | "import-articles" | "audit-log" | "reader-signals"
-  | "lumi-knowledge" | "lumi-feedback" | "system-jobs";
+  | "lumi-knowledge" | "lumi-feedback" | "system-jobs"
+  | "headlines" | "strips";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
@@ -47,6 +49,8 @@ const NAV: NavItem[] = [
   { key: "import-articles", label: "Import Articles", icon: Upload, group: "Editorial" },
   { key: "conversations", label: "1:1 Conversations", icon: MessageSquare, soon: true, group: "Editorial" },
   { key: "playbooks", label: "Codex Playbooks", icon: BookOpen, group: "Editorial" },
+  { key: "headlines", label: "Homepage Headlines", icon: ScrollText, group: "Editorial" },
+  { key: "strips", label: "Felix & Nora Strips", icon: FileText, group: "Editorial" },
   { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
   { key: "subscriptions", label: "Members", icon: Users, group: "Audience" },
   { key: "diagnostic", label: "Diagnostic Responses", icon: BarChart3, group: "Audience" },
@@ -195,6 +199,8 @@ function AdminPage() {
               {active === "lumi-knowledge" && <LumiKnowledgeAdmin />}
               {active === "lumi-feedback" && <LumiFeedbackAdmin />}
               {active === "system-jobs" && <SystemJobsAdmin />}
+              {active === "headlines" && <HomepageHeadlinesAdmin />}
+              {active === "strips" && <ComicStripsAdmin />}
               {active === "conversations" && <ComingSoon
                 title="1:1 Conversations with Leaders"
                 blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."

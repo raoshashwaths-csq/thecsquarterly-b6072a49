@@ -14,6 +14,7 @@ import { QHint } from "@/components/site/QHint";
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import HeadlineMorph from "@/components/homepage/HeadlineMorph";
 import { getHeadlineForDay } from "@/data/homepageHeadlines";
+import { getHeadlineForDayDB } from "@/lib/admin-content.functions";
 import { useHeroDepth } from "@/hooks/useHeroDepth";
 import { useTilt } from "@/hooks/useTilt";
 
@@ -63,8 +64,12 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "/" }],
   }),
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(postsQuery);
-    return { dayIndex: new Date().getUTCDay() };
+    const dayIndex = new Date().getUTCDay();
+    const [_, dbHeadline] = await Promise.all([
+      context.queryClient.ensureQueryData(postsQuery),
+      getHeadlineForDayDB({ data: { dayIndex } }).catch(() => null),
+    ]);
+    return { dayIndex, dbHeadline };
   },
   component: HomePage,
 });
@@ -99,7 +104,7 @@ function HomePage() {
 
   // SSR-safe daily headline rotation. Computed in the route loader (UTC) so
   // SSR, hydration and client render all agree — no post-mount swap flash.
-  const { dayIndex } = Route.useLoaderData();
+  const { dayIndex, dbHeadline } = Route.useLoaderData();
   const rotations = t("home.hero.rotations", { returnObjects: true }) as
     | Array<{ line1: string; line2: string; sub: string }>
     | undefined;
@@ -109,7 +114,7 @@ function HomePage() {
     sub: t("home.hero.sub"),
   };
   const hero = rotations?.[dayIndex] ?? fallback;
-  const dailyHeadline = getHeadlineForDay(dayIndex);
+  const dailyHeadline = dbHeadline ?? getHeadlineForDay(dayIndex);
 
 
   return (

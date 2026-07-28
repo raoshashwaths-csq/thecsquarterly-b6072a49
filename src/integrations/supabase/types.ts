@@ -170,6 +170,45 @@ export type Database = {
         }
         Relationships: []
       }
+      comic_strips: {
+        Row: {
+          created_at: string
+          hover_text: string
+          id: string
+          is_published: boolean
+          panels: Json
+          slug: string
+          sort_order: number
+          tag: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hover_text: string
+          id?: string
+          is_published?: boolean
+          panels: Json
+          slug: string
+          sort_order?: number
+          tag: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hover_text?: string
+          id?: string
+          is_published?: boolean
+          panels?: Json
+          slug?: string
+          sort_order?: number
+          tag?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cs_account_events: {
         Row: {
           account_id: string
@@ -863,6 +902,39 @@ export type Database = {
           timezone?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      homepage_headlines: {
+        Row: {
+          created_at: string
+          day_index: number
+          full_text: string
+          line1: string
+          line2: string
+          phrases: string[]
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_index: number
+          full_text: string
+          line1: string
+          line2: string
+          phrases: string[]
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_index?: number
+          full_text?: string
+          line1?: string
+          line2?: string
+          phrases?: string[]
+          slug?: string
+          updated_at?: string
         }
         Relationships: []
       }
