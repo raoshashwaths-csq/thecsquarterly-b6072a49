@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { strips } from "@/data/strips";
+import { strips as fallbackStrips } from "@/data/strips";
+import { listPublishedComicStrips } from "@/lib/admin-content.functions";
 import { StripCard } from "@/components/strip/StripCard";
 import "@/styles/strip.css";
 
@@ -32,6 +33,10 @@ export const Route = createFileRoute("/strip")({
       { rel: "canonical", href: "https://www.thecsquarterly.com/strip" },
     ],
   }),
+  loader: async () => {
+    const dbStrips = await listPublishedComicStrips().catch(() => []);
+    return { strips: dbStrips.length ? dbStrips : fallbackStrips };
+  },
   component: StripPage,
 });
 
