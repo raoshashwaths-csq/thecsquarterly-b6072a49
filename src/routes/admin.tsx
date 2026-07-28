@@ -199,6 +199,8 @@ function AdminPage() {
               {active === "lumi-knowledge" && <LumiKnowledgeAdmin />}
               {active === "lumi-feedback" && <LumiFeedbackAdmin />}
               {active === "system-jobs" && <SystemJobsAdmin />}
+              {active === "headlines" && <HomepageHeadlinesAdmin />}
+              {active === "strips" && <ComicStripsAdmin />}
               {active === "conversations" && <ComingSoon
                 title="1:1 Conversations with Leaders"
                 blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."
