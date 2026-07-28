@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { strips as fallbackStrips } from "@/data/strips";
+import { strips as fallbackStrips, type Strip } from "@/data/strips";
 import { listPublishedComicStrips } from "@/lib/admin-content.functions";
 import { StripCard } from "@/components/strip/StripCard";
 import "@/styles/strip.css";
