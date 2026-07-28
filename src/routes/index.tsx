@@ -64,8 +64,12 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "canonical", href: "/" }],
   }),
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(postsQuery);
-    return { dayIndex: new Date().getUTCDay() };
+    const dayIndex = new Date().getUTCDay();
+    const [_, dbHeadline] = await Promise.all([
+      context.queryClient.ensureQueryData(postsQuery),
+      getHeadlineForDayDB({ data: { dayIndex } }).catch(() => null),
+    ]);
+    return { dayIndex, dbHeadline };
   },
   component: HomePage,
 });
