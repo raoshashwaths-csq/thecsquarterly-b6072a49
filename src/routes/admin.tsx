@@ -26,6 +26,7 @@ import { backfillEmbeddings } from "@/lib/embeddings.functions";
 import { listReactionAggregates } from "@/lib/post-reactions.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 import { LumiKnowledgeAdmin, LumiFeedbackAdmin, SystemJobsAdmin } from "@/components/admin/LumiAdminPanels";
+import { HomepageHeadlinesAdmin, ComicStripsAdmin } from "@/components/admin/EditorialAdminPanels";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
