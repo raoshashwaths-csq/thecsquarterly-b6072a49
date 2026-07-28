@@ -49,6 +49,8 @@ const NAV: NavItem[] = [
   { key: "import-articles", label: "Import Articles", icon: Upload, group: "Editorial" },
   { key: "conversations", label: "1:1 Conversations", icon: MessageSquare, soon: true, group: "Editorial" },
   { key: "playbooks", label: "Codex Playbooks", icon: BookOpen, group: "Editorial" },
+  { key: "headlines", label: "Homepage Headlines", icon: ScrollText, group: "Editorial" },
+  { key: "strips", label: "Felix & Nora Strips", icon: FileText, group: "Editorial" },
   { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
   { key: "subscriptions", label: "Members", icon: Users, group: "Audience" },
   { key: "diagnostic", label: "Diagnostic Responses", icon: BarChart3, group: "Audience" },
