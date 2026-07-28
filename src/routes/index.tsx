@@ -104,7 +104,7 @@ function HomePage() {
 
   // SSR-safe daily headline rotation. Computed in the route loader (UTC) so
   // SSR, hydration and client render all agree — no post-mount swap flash.
-  const { dayIndex } = Route.useLoaderData();
+  const { dayIndex, dbHeadline } = Route.useLoaderData();
   const rotations = t("home.hero.rotations", { returnObjects: true }) as
     | Array<{ line1: string; line2: string; sub: string }>
     | undefined;
@@ -114,7 +114,7 @@ function HomePage() {
     sub: t("home.hero.sub"),
   };
   const hero = rotations?.[dayIndex] ?? fallback;
-  const dailyHeadline = getHeadlineForDay(dayIndex);
+  const dailyHeadline = dbHeadline ?? getHeadlineForDay(dayIndex);
 
 
   return (
