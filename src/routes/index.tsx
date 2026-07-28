@@ -14,6 +14,7 @@ import { QHint } from "@/components/site/QHint";
 import { SectionsFillGrid } from "@/components/home/SectionsFillGrid";
 import HeadlineMorph from "@/components/homepage/HeadlineMorph";
 import { getHeadlineForDay } from "@/data/homepageHeadlines";
+import { getHeadlineForDayDB } from "@/lib/admin-content.functions";
 import { useHeroDepth } from "@/hooks/useHeroDepth";
 import { useTilt } from "@/hooks/useTilt";
 
