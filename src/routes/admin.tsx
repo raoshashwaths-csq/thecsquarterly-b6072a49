@@ -38,7 +38,8 @@ type SectionKey =
   | "subscribers" | "subscriptions" | "purchases" | "payment-links"
   | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
   | "import-articles" | "audit-log" | "reader-signals"
-  | "lumi-knowledge" | "lumi-feedback" | "system-jobs";
+  | "lumi-knowledge" | "lumi-feedback" | "system-jobs"
+  | "headlines" | "strips";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
