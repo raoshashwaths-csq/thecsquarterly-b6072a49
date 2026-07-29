@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, FileText, MessageSquare, BookOpen, Users, CreditCard,
   ShoppingBag, BarChart3, Sparkles, Search as SearchIcon, UsersRound, Mail, Link as LinkIcon,
-  Download, Upload, ScrollText, Languages, Brain, ThumbsUp, Activity,
+  Download, Upload, ScrollText, Languages, Brain, ThumbsUp, Activity, Building2, ClipboardList,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -27,6 +27,7 @@ import { listReactionAggregates } from "@/lib/post-reactions.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 import { LumiKnowledgeAdmin, LumiFeedbackAdmin, SystemJobsAdmin } from "@/components/admin/LumiAdminPanels";
 import { HomepageHeadlinesAdmin, ComicStripsAdmin } from "@/components/admin/EditorialAdminPanels";
+import { TeamsAdmin, BenchmarkSurveyAdmin } from "@/components/admin/EnterpriseAdminPanels";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · The CS Quarterly" }, { name: "robots", content: "noindex" }] }),
@@ -39,7 +40,8 @@ type SectionKey =
   | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
   | "import-articles" | "audit-log" | "reader-signals"
   | "lumi-knowledge" | "lumi-feedback" | "system-jobs"
-  | "headlines" | "strips";
+  | "headlines" | "strips"
+  | "teams" | "benchmark-survey";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
 
@@ -53,7 +55,9 @@ const NAV: NavItem[] = [
   { key: "strips", label: "Felix & Nora Strips", icon: FileText, group: "Editorial" },
   { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
   { key: "subscriptions", label: "Members", icon: Users, group: "Audience" },
+  { key: "teams", label: "Teams & Workspaces", icon: Building2, group: "Audience" },
   { key: "diagnostic", label: "Diagnostic Responses", icon: BarChart3, group: "Audience" },
+  { key: "benchmark-survey", label: "Retention Ledger Survey", icon: ClipboardList, group: "Audience" },
   { key: "reader-signals", label: "Reader Signals", icon: BarChart3, group: "Audience" },
   { key: "community", label: "Community", icon: UsersRound, soon: true, group: "Audience" },
   { key: "purchases", label: "Purchases", icon: ShoppingBag, group: "Commerce" },
@@ -201,6 +205,8 @@ function AdminPage() {
               {active === "system-jobs" && <SystemJobsAdmin />}
               {active === "headlines" && <HomepageHeadlinesAdmin />}
               {active === "strips" && <ComicStripsAdmin />}
+              {active === "teams" && <TeamsAdmin />}
+              {active === "benchmark-survey" && <BenchmarkSurveyAdmin />}
               {active === "conversations" && <ComingSoon
                 title="1:1 Conversations with Leaders"
                 blurb="A long-form interview section. Schedule, draft, and publish recorded conversations with CS leaders alongside transcripts and pull-quotes."
