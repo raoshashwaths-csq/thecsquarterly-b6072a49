@@ -21,6 +21,7 @@ import { getPost } from "@/lib/posts.functions";
 import { LumiDebriefCard } from "@/components/lumi/LumiDebriefCard";
 import { DispatchReactionCard } from "@/components/lumi/DispatchReactionCard";
 import { PlaybookCtaCard } from "@/components/site/PlaybookCtaCard";
+import { StripPlacement } from "@/components/strip/StripPlacement";
 
 const postQuery = (slug: string) =>
   queryOptions({
@@ -406,6 +407,9 @@ function PostPage() {
               </ol>
             </section>
           )}
+
+          {/* Inline strip placements — confirmed by editorial team */}
+          <StripPlacement targetType="post" targetSlug={slug} />
 
           <DispatchReactionCard postId={post.id} slug={slug} />
 
