@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard, FileText, MessageSquare, BookOpen, Users, CreditCard,
   ShoppingBag, BarChart3, Sparkles, Search as SearchIcon, UsersRound, Mail, Link as LinkIcon,
-  Download, Upload, ScrollText, Languages, Brain, ThumbsUp, Activity, Building2, ClipboardList,
+  Download, Upload, ScrollText, Languages, Brain, ThumbsUp, Activity, Building2, ClipboardList, LayoutList,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -26,7 +26,7 @@ import { backfillEmbeddings } from "@/lib/embeddings.functions";
 import { listReactionAggregates } from "@/lib/post-reactions.functions";
 import { TREES, getNode, breadcrumbFor } from "@/lib/q-trees";
 import { LumiKnowledgeAdmin, LumiFeedbackAdmin, SystemJobsAdmin } from "@/components/admin/LumiAdminPanels";
-import { HomepageHeadlinesAdmin, ComicStripsAdmin } from "@/components/admin/EditorialAdminPanels";
+import { HomepageHeadlinesAdmin, ComicStripsAdmin, PlacementReviewPanel } from "@/components/admin/EditorialAdminPanels";
 import { TeamsAdmin, BenchmarkSurveyAdmin } from "@/components/admin/EnterpriseAdminPanels";
 
 export const Route = createFileRoute("/admin")({
@@ -40,7 +40,7 @@ type SectionKey =
   | "diagnostic" | "community" | "q-agent" | "ai-agent" | "search" | "email"
   | "import-articles" | "audit-log" | "reader-signals"
   | "lumi-knowledge" | "lumi-feedback" | "system-jobs"
-  | "headlines" | "strips"
+  | "headlines" | "strips" | "placements"
   | "teams" | "benchmark-survey";
 
 type NavItem = { key: SectionKey; label: string; icon: React.ComponentType<{ className?: string }>; soon?: boolean; group: "Editorial" | "Audience" | "Commerce" | "Operations" };
@@ -53,6 +53,7 @@ const NAV: NavItem[] = [
   { key: "playbooks", label: "Codex Playbooks", icon: BookOpen, group: "Editorial" },
   { key: "headlines", label: "Homepage Headlines", icon: ScrollText, group: "Editorial" },
   { key: "strips", label: "Felix & Nora Strips", icon: FileText, group: "Editorial" },
+  { key: "placements", label: "Strip Placements", icon: LayoutList, group: "Editorial" },
   { key: "subscribers", label: "Newsletter Subscribers", icon: Mail, group: "Audience" },
   { key: "subscriptions", label: "Members", icon: Users, group: "Audience" },
   { key: "teams", label: "Teams & Workspaces", icon: Building2, group: "Audience" },
@@ -205,6 +206,7 @@ function AdminPage() {
               {active === "system-jobs" && <SystemJobsAdmin />}
               {active === "headlines" && <HomepageHeadlinesAdmin />}
               {active === "strips" && <ComicStripsAdmin />}
+              {active === "placements" && <PlacementReviewPanel />}
               {active === "teams" && <TeamsAdmin />}
               {active === "benchmark-survey" && <BenchmarkSurveyAdmin />}
               {active === "conversations" && <ComingSoon
@@ -220,7 +222,7 @@ function AdminPage() {
               {active === "ai-agent" && <ComingSoon
                 title="Editorial AI Agent"
                 blurb="A co-pilot that drafts the 3-2-1 model articles in your voice, suggests headlines, and flags repetition between title, subtitle and excerpt."
-                checklist={["Style-guide retrieval (memory + past pieces)", "Draft → review → revise loop", "Repetition detector for title/subtitle/excerpt", "Push to Articles as a draft"]}
+                checklist={["Style-guide retrieval (memory + past pieces)", "Draft -> review -> revise loop", "Repetition detector for title/subtitle/excerpt", "Push to Articles as a draft"]}
               />}
               {active === "search" && <ComingSoon
                 title="Global Search"
@@ -230,7 +232,7 @@ function AdminPage() {
               {active === "payment-links" && <ComingSoon
                 title="Payment Links"
                 blurb="Single-click links for Vanguard subscriptions and Codex playbooks. Create, share, and track conversions per link."
-                checklist={["Stripe payment-link table (slug → price_id)", "Per-link conversion metrics", "Embed as buttons in articles", "Promo codes + expiry"]}
+                checklist={["Stripe payment-link table (slug -> price_id)", "Per-link conversion metrics", "Embed as buttons in articles", "Promo codes + expiry"]}
               />}
               {active === "email" && <ComingSoon
                 title="Editorial Email"
@@ -245,8 +247,6 @@ function AdminPage() {
     </div>
   );
 }
-
-// ============== Sections ==============
 
 function StatCard({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
@@ -466,12 +466,12 @@ function PurchasesList() {
         rows={q.data ?? []}
         empty="No purchases yet."
         cols={[
-          { key: "user_id", label: "User", render: (r) => <code className="text-xs">{String(r.user_id).slice(0, 8)}</code> },
+          { key: "user_email", label: "User" },
           { key: "item_type", label: "Type" },
-          { key: "item_id", label: "Item" },
+          { key: "item_title", label: "Item" },
           { key: "amount_cents", label: "Amount", render: (r) => `$${(r.amount_cents / 100).toFixed(2)}` },
           { key: "status", label: "Status" },
-          { key: "created_at", label: "When", render: (r) => fmtDate(r.created_at) },
+          { key: "created_at", label: "Date", render: (r) => fmtDate(r.created_at) },
         ]}
       />
     </div>
@@ -480,672 +480,102 @@ function PurchasesList() {
 
 function DiagnosticList() {
   const fn = useServerFn(listSurveyResponses);
-  const q = useQuery({ queryKey: ["admin-surveys"], queryFn: () => fn() });
+  const q = useQuery({ queryKey: ["admin-diagnostic"], queryFn: () => fn() });
   return (
     <div className="space-y-4">
       <SectionHeader title="Diagnostic Responses" dataset="survey_responses" />
       <DataTable
         rows={q.data ?? []}
-        empty="No diagnostic responses yet."
+        empty="No responses yet."
         cols={[
           { key: "email", label: "Email" },
           { key: "name", label: "Name" },
           { key: "company", label: "Company" },
           { key: "role", label: "Role" },
-          { key: "score", label: "Score" },
           { key: "tier", label: "Tier" },
-          { key: "created_at", label: "When", render: (r) => fmtDate(r.created_at) },
+          { key: "score", label: "Score" },
+          { key: "created_at", label: "Date", render: (r) => fmtDate(r.created_at) },
         ]}
       />
     </div>
   );
 }
 
-// ============== Posts & Playbooks (unchanged structure, restyled headings) ==============
-
-function PostsAdmin() {
-  const fetchAll = useServerFn(listAllPostsAdmin);
-  const save = useServerFn(upsertPost);
-  const del = useServerFn(deletePost);
-  const list = useQuery({ queryKey: ["admin-posts"], queryFn: () => fetchAll() });
-  const [editing, setEditing] = useState<any | null>(null);
-
-  const blank = () => setEditing({
-    slug: "", title: "", subtitle: "", excerpt: "", body: "## Heading\n\nWrite here.",
-    title_mckinsey: "", body_mckinsey: "",
-    title_wodehouse: "", body_wodehouse: "",
-    category: "Vanguard", section: "vanguard", author: "The Editors",
-    read_minutes: 7, tier: "free", published: true, cover_image_url: "",
-    published_at: "",
-    series_slug: "", series_title: "", series_part: null, series_total: null, sources: "",
-  });
-
-  const submit = async () => {
-    try {
-      const payload: any = { ...editing };
-      if (!payload.id) delete payload.id;
-      if (!payload.cover_image_url) delete payload.cover_image_url;
-      if (!payload.subtitle) delete payload.subtitle;
-      (["title_mckinsey","body_mckinsey","title_wodehouse","body_wodehouse",
-        "series_slug","series_title","sources","published_at"] as const).forEach((k) => {
-        if (!payload[k] || !String(payload[k]).trim()) payload[k] = null;
-      });
-      // series_part / series_total: blank → null, else coerce to number
-      (["series_part","series_total"] as const).forEach((k) => {
-        const v = payload[k];
-        if (v === "" || v === null || v === undefined) payload[k] = null;
-        else payload[k] = typeof v === "number" ? v : parseInt(String(v), 10) || null;
-      });
-      await save({ data: payload });
-      toast.success("Saved.");
-      setEditing(null);
-      list.refetch();
-    } catch (e) { toast.error((e as Error).message); }
-  };
-
-  return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Articles</h2><ExportButton dataset="posts" /><BackfillEmbeddingsButton /></div>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-xs hover:bg-foreground/90 transition-colors">+ New article</button>
-      </div>
-      <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto bg-background">
-        {(list.data ?? []).map((p) => (
-          <div key={p.id} className="p-4 flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <div className="font-display text-lg truncate">{p.title}</div>
-              <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
-                {p.section} · {p.tier} · {p.published ? "live" : "draft"}
-              </div>
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <button onClick={() => setEditing(p)} className="px-3 py-1 border border-border text-xs hover:bg-muted/40 transition-colors">Edit</button>
-              <button onClick={async () => { if (confirm("Delete?")) { await del({ data: { id: p.id } }); list.refetch(); } }} className="px-3 py-1 border border-destructive text-destructive text-xs hover:bg-destructive/10 transition-colors">Delete</button>
-            </div>
-          </div>
-        ))}
-        {list.data?.length === 0 && <div className="p-6 text-sm text-muted-foreground">No articles yet.</div>}
-      </div>
-
-      {editing && <PostEditor editing={editing} setEditing={setEditing} onCancel={() => setEditing(null)} onSubmit={submit} />}
-    </section>
-  );
-}
-
-type Tone = "default" | "analytical" | "witty";
-
-function PostEditor({ editing, setEditing, onCancel, onSubmit }: {
-  editing: any; setEditing: (e: any) => void; onCancel: () => void; onSubmit: () => void;
-}) {
-  const [tone, setTone] = useState<Tone>("default");
-  const inputCls = "w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors";
-  const selectCls = `${inputCls} appearance-none cursor-pointer`;
-
-  return (
-    <div className="fixed inset-0 bg-foreground/70 z-50 flex items-start sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
-      <div className="bg-background border border-border w-full max-w-2xl my-0 sm:my-8 max-h-[100dvh] sm:max-h-[calc(100dvh-4rem)] flex flex-col shadow-2xl">
-        {/* Sticky header */}
-        <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border bg-background sticky top-0 z-10">
-          <div>
-            <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-1">
-              {editing.id ? "Editing" : "New article"}
-            </div>
-            <div className="font-display text-2xl leading-tight">
-              {editing.title || "Untitled"}
-            </div>
-          </div>
-          <button onClick={onCancel} aria-label="Close" className="text-muted-foreground hover:text-foreground text-2xl leading-none px-2">×</button>
-        </div>
-
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-          {/* Tone tabs */}
-          <div className="inline-flex border border-border bg-background rounded-sm overflow-hidden text-xs font-mono uppercase tracking-widest">
-            {([
-              { k: "default", label: "Canonical" },
-              { k: "analytical", label: "Analytical" },
-              { k: "witty", label: "Witty" },
-            ] as { k: Tone; label: string }[]).map((t) => (
-              <button
-                key={t.k}
-                onClick={() => setTone(t.k)}
-                className={`px-3 py-1.5 transition-colors ${
-                  tone === t.k
-                    ? t.k === "witty"
-                      ? "bg-secondary-accent text-secondary-accent-foreground"
-                      : "bg-foreground text-background"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {tone === "default"
-              ? "The canonical version. Required."
-              : tone === "analytical"
-              ? "McKinsey-style structured analysis. Optional — leave blank to skip."
-              : "Wodehouse-style witty voice. Optional — leave blank to skip."}
-          </p>
-
-          {tone === "default" && (
-            <div className="grid gap-3 text-sm">
-              <Field label="Slug">
-                <input placeholder="lowercase-with-dashes" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className={inputCls} />
-              </Field>
-              <Field label="Title">
-                <input placeholder="Headline" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className={inputCls} />
-              </Field>
-              <Field label="Subtitle" hint="Distinct from the title.">
-                <input value={editing.subtitle ?? ""} onChange={(e) => setEditing({ ...editing, subtitle: e.target.value })} className={inputCls} />
-              </Field>
-              <Field label="Excerpt" hint="Distinct from both title and subtitle.">
-                <textarea value={editing.excerpt} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} rows={2} className={inputCls} />
-              </Field>
-              <Field label="Body" hint="Markdown lite (## heading, - bullet). Follow 3 facts, 2 insights, 1 actionable.">
-                <textarea value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={14} className={`${inputCls} font-mono text-xs leading-relaxed`} />
-              </Field>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <Field label="Category">
-                  <input value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className={inputCls} />
-                </Field>
-                <Field label="Section">
-                  <select value={editing.section} onChange={(e) => setEditing({ ...editing, section: e.target.value })} className={selectCls}>
-                    {SECTIONS.map((s) => <option key={s} value={s} className="bg-background text-foreground">{s}</option>)}
-                  </select>
-                </Field>
-                <Field label="Author">
-                  <input value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} className={inputCls} />
-                </Field>
-                <Field label="Read minutes">
-                  <input type="number" min={1} max={120} value={editing.read_minutes} onChange={(e) => setEditing({ ...editing, read_minutes: parseInt(e.target.value) || 1 })} className={inputCls} />
-                </Field>
-                <Field label="Tier">
-                  <select value={editing.tier} onChange={(e) => setEditing({ ...editing, tier: e.target.value })} className={selectCls}>
-                    <option value="free" className="bg-background text-foreground">Free</option>
-                    <option value="premium" className="bg-background text-foreground">Premium (Vanguard)</option>
-                  </select>
-                </Field>
-                <Field label="Status">
-                  <label className="flex items-center gap-2 border border-border px-3 py-2 cursor-pointer bg-background">
-                    <input type="checkbox" checked={editing.published} onChange={(e) => setEditing({ ...editing, published: e.target.checked })} className="accent-accent" />
-                    <span className="text-sm">Published</span>
-                  </label>
-                </Field>
-              </div>
-
-              <div className="pt-4 mt-2 border-t border-border space-y-3">
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent">Scheduling & series</div>
-                <Field label="Publish at" hint="ISO timestamp. Blank = publish immediately. Future = scheduled release.">
-                  <input type="text" placeholder="2026-06-02T12:00:00+00:00" value={editing.published_at ?? ""} onChange={(e) => setEditing({ ...editing, published_at: e.target.value })} className={inputCls} />
-                </Field>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Field label="Series slug" hint="lowercase-with-dashes. Leave blank for standalone dispatch.">
-                    <input value={editing.series_slug ?? ""} onChange={(e) => setEditing({ ...editing, series_slug: e.target.value })} className={inputCls} />
-                  </Field>
-                  <Field label="Series title">
-                    <input value={editing.series_title ?? ""} onChange={(e) => setEditing({ ...editing, series_title: e.target.value })} className={inputCls} />
-                  </Field>
-                  <Field label="Part #">
-                    <input type="number" min={1} max={99} value={editing.series_part ?? ""} onChange={(e) => setEditing({ ...editing, series_part: e.target.value === "" ? null : parseInt(e.target.value) })} className={inputCls} />
-                  </Field>
-                  <Field label="Total parts">
-                    <input type="number" min={1} max={99} value={editing.series_total ?? ""} onChange={(e) => setEditing({ ...editing, series_total: e.target.value === "" ? null : parseInt(e.target.value) })} className={inputCls} />
-                  </Field>
-                </div>
-                <Field label="Sources" hint="One per line. Rendered as a list at the foot of the article.">
-                  <textarea value={editing.sources ?? ""} onChange={(e) => setEditing({ ...editing, sources: e.target.value })} rows={5} className={`${inputCls} font-mono text-xs leading-relaxed`} />
-                </Field>
-              </div>
-            </div>
-          )}
-
-          {tone === "analytical" && (
-            <div className="grid gap-3 text-sm">
-              <Field label="Analytical title" hint="Optional. Leave blank to skip the analytical voice for this piece.">
-                <input value={editing.title_mckinsey ?? ""} onChange={(e) => setEditing({ ...editing, title_mckinsey: e.target.value })} className={inputCls} />
-              </Field>
-              <Field label="Analytical body" hint="Same 3-2-1 structure, McKinsey register.">
-                <textarea value={editing.body_mckinsey ?? ""} onChange={(e) => setEditing({ ...editing, body_mckinsey: e.target.value })} rows={20} className={`${inputCls} font-mono text-xs leading-relaxed`} />
-              </Field>
-            </div>
-          )}
-
-          {tone === "witty" && (
-            <div className="grid gap-3 text-sm">
-              <Field label="Witty title" hint="Optional. Leave blank to skip the witty voice for this piece.">
-                <input value={editing.title_wodehouse ?? ""} onChange={(e) => setEditing({ ...editing, title_wodehouse: e.target.value })} className={inputCls} />
-              </Field>
-              <Field label="Witty body" hint="Same 3-2-1 structure, Wodehouse register.">
-                <textarea value={editing.body_wodehouse ?? ""} onChange={(e) => setEditing({ ...editing, body_wodehouse: e.target.value })} rows={20} className={`${inputCls} font-mono text-xs leading-relaxed`} />
-              </Field>
-            </div>
-          )}
-        </div>
-
-        {/* Sticky footer */}
-        <div className="flex justify-end gap-2 px-6 py-4 border-t border-border bg-background sticky bottom-0 z-10">
-          <button onClick={onCancel} className="px-4 py-2 border border-border text-sm hover:bg-muted/40 transition-colors">Cancel</button>
-          <button onClick={onSubmit} className="px-4 py-2 bg-foreground text-background text-sm font-mono uppercase tracking-widest hover:bg-foreground/90 transition-colors">Save</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-1.5">{label}</div>
-      {children}
-      {hint && <div className="text-xs text-muted-foreground mt-1.5 leading-snug">{hint}</div>}
-    </label>
-  );
-}
-
-
-function PlaybooksAdmin() {
-  const fetchAll = useServerFn(listAllPlaybooksAdmin);
-  const save = useServerFn(upsertPlaybook);
-  const del = useServerFn(deletePlaybook);
-  const list = useQuery({ queryKey: ["admin-playbooks"], queryFn: () => fetchAll() });
-  const [editing, setEditing] = useState<any | null>(null);
-
-  const blank = () => setEditing({
-    slug: "", title: "", summary: "", body: "## Section\n\nContent.",
-    category: "Framework", price_cents: 4900, pages: 12, included_in_vanguard: true, published: true,
-  });
-
-  const submit = async () => {
-    try {
-      const payload = { ...editing };
-      if (!payload.id) delete payload.id;
-      await save({ data: payload });
-      toast.success("Saved.");
-      setEditing(null);
-      list.refetch();
-    } catch (e) { toast.error((e as Error).message); }
-  };
-
-  return (
-    <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2"><h2 className="font-display text-3xl">Codex Playbooks</h2><ExportButton dataset="playbooks" /></div>
-        <button onClick={blank} className="px-4 py-2 bg-foreground text-background font-mono uppercase tracking-widest text-xs">+ New playbook</button>
-      </div>
-      <div className="border border-border divide-y divide-border max-h-[600px] overflow-auto">
-        {(list.data ?? []).map((p: any) => (
-          <div key={p.id} className="p-4 flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <div className="font-display text-lg truncate">{p.title}</div>
-              <div className="font-mono uppercase tracking-widest text-xs text-muted-foreground">
-                {p.category} · ${(p.price_cents / 100).toFixed(0)} · {p.pages}pp
-              </div>
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <button onClick={() => setEditing(p)} className="px-3 py-1 border border-border text-xs">Edit</button>
-              <button onClick={async () => { if (confirm("Delete?")) { await del({ data: { id: p.id } }); list.refetch(); } }} className="px-3 py-1 border border-destructive text-destructive text-xs">Delete</button>
-            </div>
-          </div>
-        ))}
-        {list.data?.length === 0 && <div className="p-6 text-sm text-muted-foreground">No playbooks yet.</div>}
-      </div>
-
-      {editing && (
-        <div className="fixed inset-0 bg-foreground/70 z-50 flex items-start sm:items-center justify-center p-0 sm:p-6 overflow-y-auto">
-          <div className="bg-background border border-border w-full max-w-2xl my-0 sm:my-8 max-h-[100dvh] sm:max-h-[calc(100dvh-4rem)] flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-border bg-background sticky top-0 z-10">
-              <div>
-                <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-1">
-                  {editing.id ? "Editing playbook" : "New playbook"}
-                </div>
-                <div className="font-display text-2xl leading-tight">{editing.title || "Untitled"}</div>
-              </div>
-              <button onClick={() => setEditing(null)} aria-label="Close" className="text-muted-foreground hover:text-foreground text-2xl leading-none px-2">×</button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
-              <div className="grid gap-3 text-sm">
-                <Field label="Slug">
-                  <input value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
-                </Field>
-                <Field label="Title">
-                  <input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
-                </Field>
-                <Field label="Summary">
-                  <textarea value={editing.summary} onChange={(e) => setEditing({ ...editing, summary: e.target.value })} rows={2} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
-                </Field>
-                <Field label="Body" hint="Markdown lite.">
-                  <textarea value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} rows={14} className="w-full border border-border bg-background text-foreground px-3 py-2 font-mono text-xs leading-relaxed focus:outline-none focus:border-accent transition-colors" />
-                </Field>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                  <Field label="Category">
-                    <input value={editing.category} onChange={(e) => setEditing({ ...editing, category: e.target.value })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
-                  </Field>
-                  <Field label="Price (cents)">
-                    <input type="number" value={editing.price_cents} onChange={(e) => setEditing({ ...editing, price_cents: parseInt(e.target.value) || 0 })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
-                  </Field>
-                  <Field label="Pages">
-                    <input type="number" value={editing.pages} onChange={(e) => setEditing({ ...editing, pages: parseInt(e.target.value) || 0 })} className="w-full border border-border bg-background text-foreground px-3 py-2 focus:outline-none focus:border-accent transition-colors" />
-                  </Field>
-                  <Field label="Vanguard">
-                    <label className="flex items-center gap-2 border border-border px-3 py-2 cursor-pointer bg-background">
-                      <input type="checkbox" checked={editing.included_in_vanguard} onChange={(e) => setEditing({ ...editing, included_in_vanguard: e.target.checked })} className="accent-accent" />
-                      <span className="text-sm">Included in Vanguard</span>
-                    </label>
-                  </Field>
-                  <Field label="Status">
-                    <label className="flex items-center gap-2 border border-border px-3 py-2 cursor-pointer bg-background">
-                      <input type="checkbox" checked={editing.published} onChange={(e) => setEditing({ ...editing, published: e.target.checked })} className="accent-accent" />
-                      <span className="text-sm">Published</span>
-                    </label>
-                  </Field>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 px-6 py-4 border-t border-border bg-background sticky bottom-0 z-10">
-              <button onClick={() => setEditing(null)} className="px-4 py-2 border border-border text-sm hover:bg-muted/40 transition-colors">Cancel</button>
-              <button onClick={submit} className="px-4 py-2 bg-foreground text-background text-sm font-mono uppercase tracking-widest hover:bg-foreground/90 transition-colors">Save</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </section>
-  );
-}
-
-// ============== Q. — Operator Agent ==============
-
-function QAgentAdmin() {
-  const fetchStats = useServerFn(getQAdminStats);
-  const fetchRuns = useServerFn(listQRunsAdmin);
-  const fetchEnts = useServerFn(listQEntitlementsAdmin);
-  const stats = useQuery({ queryKey: ["q-admin-stats"], queryFn: () => fetchStats() });
-  const runs = useQuery({ queryKey: ["q-admin-runs"], queryFn: () => fetchRuns() });
-  const ents = useQuery({ queryKey: ["q-admin-ents"], queryFn: () => fetchEnts() });
-  const s = stats.data;
-
-  const treeRows = TREES.map((t) => ({
-    id: t.id,
-    title: t.title,
-    blurb: t.blurb,
-    count: s?.perTree30?.[t.id] ?? 0,
-  })).sort((a, b) => b.count - a.count);
-
-  const wittyPct = s && s.total > 0 ? Math.round((s.wittyCount / s.total) * 100) : 0;
-
-  return (
-    <div className="space-y-10">
-      <div>
-        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Operator agent</div>
-        <h2 className="font-display text-4xl mb-2"><QMark /> Control Room</h2>
-        <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
-          Every canvas run, every voice toggle, every shared response. <QMark /> is gated to admins and active Vanguard subscribers — manage them here.
-        </p>
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <StatCard label="Total runs" value={s?.total ?? "—"} />
-        <StatCard label="Last 7 days" value={s?.last7 ?? "—"} />
-        <StatCard label="Last 30 days" value={s?.last30 ?? "—"} hint={`${s?.uniqueOperators30 ?? 0} unique operators`} />
-        <StatCard label="Witty voice" value={s ? `${wittyPct}%` : "—"} hint="Wodehouse register share" />
-        <StatCard label="Shared runs" value={s?.sharedCount ?? "—"} hint="Marked shareable by operators" />
-        <StatCard label="Entitled operators" value={ents.data?.length ?? "—"} hint="Admins + active Vanguard" />
-      </div>
-
-      <div>
-        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">Trees · last 30 days</div>
-        <div className="border border-border divide-y divide-border">
-          {treeRows.map((t) => {
-            const max = Math.max(1, ...treeRows.map((r) => r.count));
-            const pct = (t.count / max) * 100;
-            return (
-              <div key={t.id} className="px-4 py-3 grid grid-cols-[60px_1fr_auto] items-center gap-4">
-                <div className="font-mono text-xs text-accent">{t.id}</div>
-                <div>
-                  <div className="font-display text-base leading-tight">{t.title}</div>
-                  <div className="text-xs text-muted-foreground">{t.blurb}</div>
-                  <div className="mt-1.5 h-1 bg-muted/50">
-                    <div className="h-full bg-accent" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-                <div className="font-mono text-sm tabular-nums">{t.count}</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">Recent runs</div>
-        <DataTable
-          rows={runs.data ?? []}
-          empty="No Q. runs yet."
-          cols={[
-            { key: "created_at", label: "When", render: (r) => new Date(r.created_at).toLocaleString() },
-            { key: "operator_email", label: "Operator" },
-            { key: "node_id", label: "Decision", render: (r) => {
-              const n = getNode(r.node_id);
-              return (
-                <div>
-                  <div className="text-sm">{n?.label ?? r.node_id}</div>
-                  <div className="text-xs font-mono text-muted-foreground">{breadcrumbFor(r.node_id).join(" › ")}</div>
-                </div>
-              );
-            }},
-            { key: "witty", label: "Voice", render: (r) => (
-              <span className="font-mono uppercase tracking-widest text-xs">
-                {r.witty ? "Witty" : "Analytical"}
-              </span>
-            )},
-            { key: "shared", label: "Shared", render: (r) => r.shared ? <span className="text-accent">●</span> : <span className="text-muted-foreground">—</span> },
-            { key: "id", label: "Run", render: (r) => (
-              <a href={`/agent/response/${r.id}`} className="font-mono uppercase tracking-widest text-xs underline">Open</a>
-            )},
-          ]}
-        />
-      </div>
-
-      <div>
-        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-3">Entitled operators</div>
-        <DataTable
-          rows={ents.data ?? []}
-          empty="No entitled operators yet."
-          cols={[
-            { key: "email", label: "Email" },
-            { key: "is_admin", label: "Admin", render: (r) => r.is_admin ? <span className="font-mono uppercase tracking-widest text-xs text-accent">Admin</span> : "—" },
-            { key: "has_vanguard", label: "Vanguard", render: (r) => r.has_vanguard ? <span className="font-mono uppercase tracking-widest text-xs">Active</span> : "—" },
-            { key: "since", label: "Since", render: (r) => fmtDate(r.since) },
-            { key: "renews", label: "Renews", render: (r) => fmtDate(r.renews) },
-          ]}
-        />
-      </div>
-    </div>
-  );
-}
-
-
-// ============== Import Articles ==============
-
 function ImportArticlesAdmin() {
   const run = useServerFn(importArticles);
-  const [text, setText] = useState("");
-  const [mode, setMode] = useState<"upsert" | "skip-existing">("upsert");
   const [busy, setBusy] = useState(false);
-  const [results, setResults] = useState<{ slug: string; status: string; error?: string }[] | null>(null);
-
-  const parseCsv = (raw: string): Record<string, unknown>[] => {
-    const lines: string[][] = [];
-    let cur: string[] = [];
-    let cell = "";
-    let inQ = false;
-    for (let i = 0; i < raw.length; i++) {
-      const c = raw[i];
-      if (inQ) {
-        if (c === '"' && raw[i + 1] === '"') { cell += '"'; i++; }
-        else if (c === '"') inQ = false;
-        else cell += c;
-      } else {
-        if (c === '"') inQ = true;
-        else if (c === ",") { cur.push(cell); cell = ""; }
-        else if (c === "\n" || c === "\r") {
-          if (c === "\r" && raw[i + 1] === "\n") i++;
-          cur.push(cell); lines.push(cur); cur = []; cell = "";
-        } else cell += c;
-      }
-    }
-    if (cell.length || cur.length) { cur.push(cell); lines.push(cur); }
-    const nonEmpty = lines.filter((l) => l.some((v) => v.trim() !== ""));
-    if (nonEmpty.length < 2) return [];
-    const headers = nonEmpty[0].map((h) => h.trim());
-    return nonEmpty.slice(1).map((row) => {
-      const o: Record<string, unknown> = {};
-      headers.forEach((h, i) => { o[h] = row[i] ?? ""; });
-      return o;
-    });
-  };
-
-  const submit = async () => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const mode = formData.get("mode") as "upsert" | "skip";
+    const files = formData.getAll("files") as File[];
+    if (!files.length) { toast.error("Choose at least one file."); return; }
+    setBusy(true);
     try {
-      setBusy(true);
-      setResults(null);
-      const trimmed = text.trim();
-      if (!trimmed) { toast.error("Paste CSV or JSON first."); return; }
-      let articles: Record<string, unknown>[];
-      if (trimmed.startsWith("[") || trimmed.startsWith("{")) {
-        const parsed = JSON.parse(trimmed);
-        articles = Array.isArray(parsed) ? parsed : [parsed];
-      } else {
-        articles = parseCsv(trimmed);
+      const rows = [] as any[];
+      for (const file of files) {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        rows.push(...(Array.isArray(parsed) ? parsed : [parsed]));
       }
-      if (!articles.length) { toast.error("No rows detected."); return; }
-      const res = await run({ data: { articles, mode } });
-      setResults(res.results);
-      toast.success(`Imported ${res.ok}, skipped ${res.skipped}, errored ${res.errored}.`);
+      const res = await run({ data: { rows, mode } });
+      toast.success(`Imported ${res.imported} / ${res.total}.`);
+      form.reset();
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
       setBusy(false);
     }
   };
-
-  const onFile = async (f: File) => {
-    setText(await f.text());
-  };
-
   return (
     <div className="space-y-6">
-      <div>
-        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Bulk import</div>
-        <h2 className="font-display text-4xl mb-2">Import Articles</h2>
-        <p className="text-muted-foreground max-w-2xl text-sm leading-relaxed">
-          Upload a CSV or paste JSON. Required columns: <code>slug, title, excerpt, body</code>.
-          Optional: <code>subtitle, category, section, author, read_minutes, tier, published,
-          published_at, cover_image_url, title_mckinsey, body_mckinsey, title_wodehouse, body_wodehouse,
-          series_slug, series_title, series_part, series_total, sources</code>.
-        </p>
-      </div>
-
-      <div className="border border-border p-5 space-y-4">
-        <div className="flex flex-wrap gap-3 items-center">
-          <label className="inline-flex items-center gap-2 px-3 py-2 border border-border text-xs font-mono uppercase tracking-widest cursor-pointer hover:bg-muted/40">
-            <Upload className="h-3.5 w-3.5" /> Choose file
-            <input type="file" accept=".csv,.json,text/csv,application/json" className="hidden"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
-          </label>
-          <div className="inline-flex border border-border text-xs font-mono uppercase tracking-widest">
-            {(["upsert", "skip-existing"] as const).map((m) => (
-              <button key={m} onClick={() => setMode(m)}
-                className={`px-3 py-2 ${mode === m ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
-                {m === "upsert" ? "Upsert" : "Skip existing"}
-              </button>
-            ))}
+      <SectionHeader title="Import Articles" />
+      <div className="border border-border p-6">
+        <div className="text-sm text-muted-foreground mb-6">
+          Upload JSON files containing articles. Each file should be an array of objects with:
+          <code className="text-xs ml-1">slug, title, subtitle, excerpt, body, category, author, read_minutes, is_premium, section, tier, published</code>
+        </div>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2 block">Mode</label>
+            <select name="mode" className="border border-border px-3 py-2 bg-transparent text-sm">
+              <option value="upsert">Upsert (insert or update)</option>
+              <option value="skip">Skip existing</option>
+            </select>
           </div>
-          <button onClick={submit} disabled={busy}
-            className="ml-auto px-4 py-2 bg-foreground text-background text-xs font-mono uppercase tracking-widest disabled:opacity-50">
+          <div>
+            <label className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2 block">Files</label>
+            <input type="file" name="files" accept=".json" multiple className="text-sm" />
+          </div>
+          <button
+            type="submit"
+            disabled={busy}
+            className="px-4 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40 transition-colors disabled:opacity-50"
+          >
             {busy ? "Importing…" : "Import"}
           </button>
-        </div>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Paste CSV (with header row) or a JSON array of article objects…"
-          rows={14}
-          className="w-full border border-border bg-background text-foreground px-3 py-2 font-mono text-xs leading-relaxed focus:outline-none focus:border-accent"
-        />
+        </form>
       </div>
-
-      {results && (
-        <div className="border border-border">
-          <div className="px-4 py-3 border-b border-border font-mono uppercase tracking-widest text-xs text-muted-foreground">
-            Results · {results.length}
-          </div>
-          <div className="max-h-[400px] overflow-auto divide-y divide-border">
-            {results.map((r, i) => (
-              <div key={i} className="px-4 py-2 flex items-start gap-3 text-sm">
-                <span className={`font-mono uppercase tracking-widest text-xs shrink-0 ${
-                  r.status === "ok" ? "text-accent" : r.status === "skipped" ? "text-muted-foreground" : "text-destructive"
-                }`}>{r.status}</span>
-                <span className="font-mono text-xs">{r.slug}</span>
-                {r.error && <span className="text-xs text-destructive">{r.error}</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-// ============== Audit Log ==============
-
 function AuditLogAdmin() {
   const fn = useServerFn(listAuditLog);
-  const [filterAction, setFilterAction] = useState("");
-  const [filterEmail, setFilterEmail] = useState("");
-  const q = useQuery({
-    queryKey: ["admin-audit-log", filterAction, filterEmail],
-    queryFn: () => fn({ data: { limit: 200, action: filterAction || undefined, actor_email: filterEmail || undefined } }),
-  });
-
+  const q = useQuery({ queryKey: ["admin-audit-log"], queryFn: () => fn({ data: { limit: 100 } }) });
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Activity</div>
-          <h2 className="font-display text-4xl">Audit Log</h2>
-        </div>
-        <ExportButton dataset="admin_audit_log" />
-      </div>
-      <div className="flex gap-3 flex-wrap">
-        <input
-          placeholder="Filter action (e.g. export.csv)"
-          value={filterAction}
-          onChange={(e) => setFilterAction(e.target.value)}
-          className="border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:border-accent w-64"
-        />
-        <input
-          placeholder="Filter actor email"
-          value={filterEmail}
-          onChange={(e) => setFilterEmail(e.target.value)}
-          className="border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:border-accent w-64"
-        />
-        <button onClick={() => q.refetch()} className="px-3 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40">
-          Refresh
-        </button>
-      </div>
+    <div className="space-y-4">
+      <SectionHeader title="Audit Log" dataset="admin_audit_log" />
       <DataTable
         rows={q.data ?? []}
-        empty="No admin actions recorded yet."
+        empty="No audit entries yet."
         cols={[
-          { key: "created_at", label: "When", render: (r) => new Date(r.created_at).toLocaleString() },
-          { key: "actor_email", label: "Actor", render: (r) => r.actor_email ?? <code className="text-xs">{String(r.actor_id ?? "").slice(0, 8)}</code> },
-          { key: "action", label: "Action", render: (r) => <span className="font-mono text-xs">{r.action}</span> },
-          { key: "target_table", label: "Target", render: (r) => r.target_table ? <span className="font-mono text-xs">{r.target_table}{r.target_id ? `/${String(r.target_id).slice(0, 8)}` : ""}</span> : "—" },
-          { key: "details", label: "Details", render: (r) => <code className="text-xs text-muted-foreground">{r.details ? JSON.stringify(r.details) : ""}</code> },
-          { key: "ip", label: "IP", render: (r) => <span className="font-mono text-xs text-muted-foreground">{r.ip ?? "—"}</span> },
+          { key: "action", label: "Action" },
+          { key: "actor_email", label: "Actor" },
+          { key: "target_table", label: "Table" },
+          { key: "details", label: "Details", render: (r) => <code className="text-xs">{JSON.stringify(r.details ?? {}).slice(0, 120)}</code> },
+          { key: "created_at", label: "Date", render: (r) => fmtDate(r.created_at) },
         ]}
       />
     </div>
@@ -1153,126 +583,360 @@ function AuditLogAdmin() {
 }
 
 function ReaderSignalsAdmin() {
-  const fetchAgg = useServerFn(listReactionAggregates);
-  const q = useQuery({
-    queryKey: ["admin-reader-signals"],
-    queryFn: () => fetchAgg({ data: { sinceDays: 30, limit: 50 } }),
-  });
-  const rows = q.data?.rows ?? [];
-  const threads = q.data?.disagreeThreads ?? [];
-  const totals = rows.reduce(
-    (acc, r) => ({
-      total: acc.total + r.total,
-      applied: acc.applied + r.applied,
-      language: acc.language + r.language,
-      confirmed: acc.confirmed + r.confirmed,
-      disagree: acc.disagree + r.disagree,
-    }),
-    { total: 0, applied: 0, language: 0, confirmed: 0, disagree: 0 },
-  );
-  const pct = (n: number) => (totals.total ? Math.round((n / totals.total) * 100) : 0);
+  const fetchStats = useServerFn(getAdminStats);
+  const stats = useQuery({ queryKey: ["admin-stats"], queryFn: () => fetchStats() });
+  const d = stats.data;
+  const fn = useServerFn(listReactionAggregates);
+  const reactions = useQuery({ queryKey: ["admin-reactions"], queryFn: () => fn(), enabled: !!d?.posts });
 
   return (
-    <div className="space-y-8">
-      <div>
-        <div className="font-mono text-xs uppercase tracking-[0.3em] text-accent mb-2">Editorial calibration</div>
-        <h2 className="font-display text-4xl mb-3">Reader Signals</h2>
-        <p className="text-muted-foreground max-w-2xl leading-relaxed">
-          One tap per reader per dispatch. Use disagree-rate to surface theses worth revisiting; the pushback threads below are saved Lumi conversations.
-        </p>
+    <div className="space-y-6">
+      <SectionHeader title="Reader Signals" />
+      <div className="grid sm:grid-cols-3 gap-4">
+        <StatCard label="Total Reactions" value={d?.totalReactions ?? "—"} />
+        <StatCard label="Avg Reactions / Post" value={d?.avgReactionsPerPost ?? "—"} />
+        <StatCard label="Top Reactor" value={d?.topReactorEmail ?? "—"} hint={`${d?.topReactorCount ?? 0} reactions`} />
       </div>
+      {reactions.data && reactions.data.length > 0 && (
+        <DataTable
+          rows={reactions.data}
+          empty="No reactions yet."
+          cols={[
+            { key: "emoji", label: "Emoji" },
+            { key: "post_title", label: "Post" },
+            { key: "count", label: "Count" },
+            { key: "user_emails", label: "Users", render: (r) => (r.user_emails ?? []).slice(0, 3).join(", ") },
+          ]}
+        />
+      )}
+    </div>
+  );
+}
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard label="Signals (30d)" value={totals.total} />
-        <StatCard label="Applied" value={pct(totals.applied) + "%"} hint={totals.applied + " signals"} />
-        <StatCard label="Language" value={pct(totals.language) + "%"} hint={totals.language + " signals"} />
-        <StatCard label="Confirmed" value={pct(totals.confirmed) + "%"} hint={totals.confirmed + " signals"} />
-        <StatCard label="Disagree" value={pct(totals.disagree) + "%"} hint={totals.disagree + " signals"} />
+// Q-Agent Admin
+function QAgentAdmin() {
+  const [selectedTree, setSelectedTree] = useState<string>("");
+  const fetchStats = useServerFn(getQAdminStats);
+  const stats = useQuery({ queryKey: ["q-admin-stats"], queryFn: () => fetchStats() });
+  const listEntitlements = useServerFn(listQEntitlementsAdmin);
+  const entitlements = useQuery({
+    queryKey: ["q-entitlements"],
+    queryFn: () => listEntitlements(),
+  });
+  const listRuns = useServerFn(listQRunsAdmin);
+  const [runFilters, setRunFilters] = useState({ treeId: "", nodeId: "", limit: 50 });
+  const runs = useQuery({
+    queryKey: ["q-runs", runFilters],
+    queryFn: () => listRuns({ data: runFilters }),
+  });
+
+  const selectedTreeData = TREES.find((t) => t.id === selectedTree);
+  const selectedNode = selectedTreeData && selectedTree ? getNode(selectedTree, selectedTree) : null;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="font-display text-3xl"><QMark /> Operator Agent</h2>
       </div>
-
-      <div className="border border-border">
-        <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-          <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
-            Per-dispatch breakdown · last 30 days
+      {stats.data && (
+        <div className="grid sm:grid-cols-4 gap-4">
+          <StatCard label="Total Runs" value={stats.data.totalRuns ?? "—"} />
+          <StatCard label="Unique Users" value={stats.data.uniqueUsers ?? "—"} />
+          <StatCard label="Avg Turns" value={stats.data.avgTurns ?? "—"} />
+          <StatCard label="Completion Rate" value={stats.data.completionRate ? `${(stats.data.completionRate * 100).toFixed(1)}%` : "—"} />
+        </div>
+      )}
+      <div className="border border-border p-6">
+        <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-4">Decision Trees</div>
+        <div className="space-y-2">
+          {TREES.map((tree) => (
+            <button
+              key={tree.id}
+              onClick={() => setSelectedTree(tree.id === selectedTree ? "" : tree.id)}
+              className={`w-full text-left px-4 py-3 border transition-colors ${
+                selectedTree === tree.id ? "border-accent bg-muted/40" : "border-border hover:bg-muted/30"
+              }`}
+            >
+              <div className="font-display text-lg">{tree.name}</div>
+              <div className="text-xs text-muted-foreground">{tree.id} · {Object.keys(tree.nodes).length} nodes</div>
+            </button>
+          ))}
+        </div>
+        {selectedNode && (
+          <div className="mt-4 p-4 border border-accent/30 bg-accent/5">
+            <div className="font-mono text-xs uppercase tracking-[0.25em] text-accent mb-2">Selected Node</div>
+            <div className="font-display text-xl">{selectedNode.question}</div>
+            <div className="text-xs text-muted-foreground mt-1">{selectedTree} → {selectedTree}</div>
           </div>
-          <button onClick={() => q.refetch()} className="px-3 py-1 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40">
-            Refresh
-          </button>
-        </div>
-        {q.isLoading ? (
-          <div className="p-6 text-sm text-muted-foreground">Loading…</div>
-        ) : rows.length === 0 ? (
-          <div className="p-6 text-sm text-muted-foreground">No signals yet.</div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border text-left">
-                <th className="px-4 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">Dispatch</th>
-                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Total</th>
-                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Applied</th>
-                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Language</th>
-                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Confirmed</th>
-                <th className="px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground text-right">Disagree</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows
-                .slice()
-                .sort((a, b) => (b.disagree / Math.max(b.total, 1)) - (a.disagree / Math.max(a.total, 1)))
-                .map((r) => {
-                  const p = (n: number) => (r.total ? Math.round((n / r.total) * 100) : 0);
-                  return (
-                    <tr key={r.post_id} className="border-b border-border/60 hover:bg-muted/20">
-                      <td className="px-4 py-2">
-                        <Link to="/insights/$slug" params={{ slug: r.slug }} className="hover:text-accent underline-offset-2 hover:underline">
-                          {r.title}
-                        </Link>
-                        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{r.section}</div>
-                      </td>
-                      <td className="px-3 py-2 text-right font-mono text-xs">{r.total}</td>
-                      <td className="px-3 py-2 text-right font-mono text-xs">{p(r.applied)}%</td>
-                      <td className="px-3 py-2 text-right font-mono text-xs">{p(r.language)}%</td>
-                      <td className="px-3 py-2 text-right font-mono text-xs">{p(r.confirmed)}%</td>
-                      <td className="px-3 py-2 text-right font-mono text-xs">
-                        <span className={p(r.disagree) >= 25 ? "text-accent" : ""}>{p(r.disagree)}%</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
         )}
       </div>
-
-      <div className="border border-border">
-        <div className="px-4 py-3 border-b border-border font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">
-          Recent pushback threads
+      {entitlements.data && entitlements.data.length > 0 && (
+        <div className="space-y-4">
+          <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground">Entitlements</div>
+          <DataTable
+            rows={entitlements.data}
+            empty="No entitlements."
+            cols={[
+              { key: "user_id", label: "User" },
+              { key: "tree_id", label: "Tree" },
+              { key: "node_id", label: "Node" },
+              { key: "unlocked", label: "Unlocked" },
+              { key: "created_at", label: "Date", render: (r) => fmtDate(r.created_at) },
+            ]}
+          />
         </div>
-        {threads.length === 0 ? (
-          <div className="p-6 text-sm text-muted-foreground">No disagreement threads yet.</div>
-        ) : (
-          <ul className="divide-y divide-border">
-            {threads.map((t) => (
-              <li key={t.id} className="px-4 py-3 text-sm flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <div className="truncate">
-                    <span className="text-muted-foreground">Pushback on </span>
-                    {t.postSlug ? (
-                      <Link to="/insights/$slug" params={{ slug: t.postSlug }} className="hover:text-accent underline-offset-2 hover:underline">
-                        {t.postTitle || t.title}
-                      </Link>
-                    ) : (
-                      <span>{t.postTitle || t.title}</span>
-                    )}
-                  </div>
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                    {new Date(t.createdAt).toLocaleString()}
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+      )}
+    </div>
+  );
+}
+
+// Posts Admin
+function PostsAdmin() {
+  const listFn = useServerFn(listAllPostsAdmin);
+  const { data: posts, isLoading, refetch } = useQuery({ queryKey: ["admin-posts"], queryFn: () => listFn() });
+  const upsertFn = useServerFn(upsertPost);
+  const deleteFn = useServerFn(deletePost);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [form, setForm] = useState<Record<string, any>>({});
+
+  if (isLoading) return <div className="text-sm text-muted-foreground">Loading articles…</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <SectionHeader title="Articles" dataset="posts" />
+        <button
+          onClick={() => { setEditing("new"); setForm({}); }}
+          className="px-3 py-2 border border-accent text-accent text-xs font-mono uppercase tracking-widest hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          New Article
+        </button>
+      </div>
+      {editing === "new" && (
+        <PostForm
+          form={form}
+          setForm={setForm}
+          onSave={async () => {
+            await upsertFn({ data: form });
+            toast.success("Article saved.");
+            setEditing(null);
+            refetch();
+          }}
+          onCancel={() => setEditing(null)}
+        />
+      )}
+      <DataTable
+        rows={posts ?? []}
+        empty="No articles yet."
+        cols={[
+          { key: "title", label: "Title", render: (r) => <span className="font-display">{r.title}</span> },
+          { key: "slug", label: "Slug", render: (r) => <code className="text-xs">{r.slug}</code> },
+          { key: "category", label: "Category" },
+          { key: "is_premium", label: "Premium", render: (r) => r.is_premium ? "Yes" : "No" },
+          { key: "published", label: "Published", render: (r) => r.published ? "Yes" : "No" },
+          { key: "actions", label: "", render: (r) => (
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setEditing(r.id); setForm(r); }}
+                className="text-xs font-mono uppercase tracking-widest text-accent hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                onClick={async () => { if (confirm("Delete this article?")) { await deleteFn({ data: { id: r.id } }); toast.success("Deleted."); refetch(); } }}
+                className="text-xs font-mono uppercase tracking-widest text-destructive hover:underline"
+              >
+                Delete
+              </button>
+            </div>
+          )},
+        ]}
+      />
+      {editing && editing !== "new" && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background border border-border p-6 max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <PostForm
+              form={form}
+              setForm={setForm}
+              onSave={async () => {
+                await upsertFn({ data: form });
+                toast.success("Article updated.");
+                setEditing(null);
+                refetch();
+              }}
+              onCancel={() => setEditing(null)}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PostForm({ form, setForm, onSave, onCancel }: {
+  form: Record<string, any>;
+  setForm: (f: Record<string, any>) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const fields = [
+    { key: "slug", label: "Slug" },
+    { key: "title", label: "Title" },
+    { key: "subtitle", label: "Subtitle" },
+    { key: "excerpt", label: "Excerpt" },
+    { key: "body", label: "Body", textarea: true },
+    { key: "category", label: "Category" },
+    { key: "author", label: "Author" },
+    { key: "read_minutes", label: "Read Minutes", type: "number" },
+  ];
+  return (
+    <div className="border border-border p-6 space-y-4">
+      <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
+        {form.id ? "Edit Article" : "New Article"}
+      </div>
+      {fields.map((f) => (
+        <div key={f.key}>
+          <label className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-1 block">{f.label}</label>
+          {f.textarea ? (
+            <textarea
+              value={form[f.key] ?? ""}
+              onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+              className="w-full border border-border px-3 py-2 bg-transparent text-sm min-h-[200px]"
+            />
+          ) : (
+            <input
+              type={f.type ?? "text"}
+              value={form[f.key] ?? ""}
+              onChange={(e) => setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })}
+              className="w-full border border-border px-3 py-2 bg-transparent text-sm"
+            />
+          )}
+        </div>
+      ))}
+      <div className="flex gap-2">
+        <button onClick={onSave} className="px-4 py-2 border border-accent text-accent text-xs font-mono uppercase tracking-widest hover:bg-accent hover:text-accent-foreground transition-colors">
+          Save
+        </button>
+        <button onClick={onCancel} className="px-4 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40 transition-colors">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Playbooks Admin
+function PlaybooksAdmin() {
+  const listFn = useServerFn(listAllPlaybooksAdmin);
+  const { data: playbooks, isLoading, refetch } = useQuery({ queryKey: ["admin-playbooks"], queryFn: () => listFn() });
+  const upsertFn = useServerFn(upsertPlaybook);
+  const deleteFn = useServerFn(deletePlaybook);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [form, setForm] = useState<Record<string, any>>({});
+
+  if (isLoading) return <div className="text-sm text-muted-foreground">Loading playbooks…</div>;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <SectionHeader title="Codex Playbooks" dataset="playbooks" />
+        <button
+          onClick={() => { setEditing("new"); setForm({}); }}
+          className="px-3 py-2 border border-accent text-accent text-xs font-mono uppercase tracking-widest hover:bg-accent hover:text-accent-foreground transition-colors"
+        >
+          New Playbook
+        </button>
+      </div>
+      {editing === "new" && (
+        <PlaybookForm
+          form={form}
+          setForm={setForm}
+          onSave={async () => {
+            await upsertFn({ data: form });
+            toast.success("Playbook saved.");
+            setEditing(null);
+            refetch();
+          }}
+          onCancel={() => setEditing(null)}
+        />
+      )}
+      <DataTable
+        rows={playbooks ?? []}
+        empty="No playbooks yet."
+        cols={[
+          { key: "title", label: "Title", render: (r) => <span className="font-display">{r.title}</span> },
+          { key: "slug", label: "Slug", render: (r) => <code className="text-xs">{r.slug}</code> },
+          { key: "category", label: "Category" },
+          { key: "price_cents", label: "Price", render: (r) => `$${(r.price_cents / 100).toFixed(2)}` },
+          { key: "published", label: "Published", render: (r) => r.published ? "Yes" : "No" },
+          { key: "actions", label: "", render: (r) => (
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setEditing(r.id); setForm(r); }}
+                className="text-xs font-mono uppercase tracking-widest text-accent hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                onClick={async () => { if (confirm("Delete this playbook?")) { await deleteFn({ data: { id: r.id } }); toast.success("Deleted."); refetch(); } }}
+                className="text-xs font-mono uppercase tracking-widest text-destructive hover:underline"
+              >
+                Delete
+              </button>
+            </div>
+          )},
+        ]}
+      />
+    </div>
+  );
+}
+
+function PlaybookForm({ form, setForm, onSave, onCancel }: {
+  form: Record<string, any>;
+  setForm: (f: Record<string, any>) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) {
+  const fields = [
+    { key: "slug", label: "Slug" },
+    { key: "title", label: "Title" },
+    { key: "summary", label: "Summary" },
+    { key: "body", label: "Body", textarea: true },
+    { key: "category", label: "Category" },
+    { key: "price_cents", label: "Price (cents)", type: "number" },
+    { key: "pages", label: "Pages", type: "number" },
+  ];
+  return (
+    <div className="border border-border p-6 space-y-4">
+      <div className="font-mono text-xs uppercase tracking-[0.25em] text-muted-foreground mb-2">
+        {form.id ? "Edit Playbook" : "New Playbook"}
+      </div>
+      {fields.map((f) => (
+        <div key={f.key}>
+          <label className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-1 block">{f.label}</label>
+          {f.textarea ? (
+            <textarea
+              value={form[f.key] ?? ""}
+              onChange={(e) => setForm({ ...form, [f.key]: e.target.value })}
+              className="w-full border border-border px-3 py-2 bg-transparent text-sm min-h-[200px]"
+            />
+          ) : (
+            <input
+              type={f.type ?? "text"}
+              value={form[f.key] ?? ""}
+              onChange={(e) => setForm({ ...form, [f.key]: f.type === "number" ? Number(e.target.value) : e.target.value })}
+              className="w-full border border-border px-3 py-2 bg-transparent text-sm"
+            />
+          )}
+        </div>
+      ))}
+      <div className="flex gap-2">
+        <button onClick={onSave} className="px-4 py-2 border border-accent text-accent text-xs font-mono uppercase tracking-widest hover:bg-accent hover:text-accent-foreground transition-colors">
+          Save
+        </button>
+        <button onClick={onCancel} className="px-4 py-2 border border-border text-xs font-mono uppercase tracking-widest hover:bg-muted/40 transition-colors">
+          Cancel
+        </button>
       </div>
     </div>
   );
