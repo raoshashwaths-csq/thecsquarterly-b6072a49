@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { getMe, listMyPurchases, recordPurchasePlaceholder } from "@/lib/auth.functions";
 import { PLAYBOOK_COMPONENTS } from "@/components/playbooks";
 import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { StripPlacement } from "@/components/strip/StripPlacement";
 
 const playbookQuery = (slug: string) => queryOptions({
   queryKey: ["playbook", slug],
@@ -127,6 +128,10 @@ function PlaybookPage() {
                 return <p key={i} className="text-lg leading-relaxed my-5 text-foreground/85">{para}</p>;
               });
             })()}
+
+            {/* Inline strip placements — confirmed by editorial team */}
+            <StripPlacement targetType="playbook" targetSlug={slug} />
+
             <div className="mt-12 pt-8 border-t border-border">
               <div className="font-mono text-xs uppercase tracking-[0.3em] text-secondary-accent mb-3">
                 Take it live
