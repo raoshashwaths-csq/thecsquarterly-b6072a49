@@ -6,11 +6,14 @@ export interface SpeechBubble {
   position: "top" | "bottom";
 }
 
+/** Session-1 panel shape: image-first, with legacy bubble/dialogue fields preserved for backwards compat. */
 export interface StripPanel {
   type: PanelType;
+  /** Session 1 — uploaded image URL (preferred over alt-text-only rendering). */
+  imageUrl?: string;
+  imageAlt?: string;
   stageDirection?: string;
   bubbles?: SpeechBubble[];
-  imageAlt?: string;
 }
 
 export interface Strip {
