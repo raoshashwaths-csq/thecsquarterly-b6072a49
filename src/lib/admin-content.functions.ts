@@ -3,6 +3,7 @@
  * marketing routes and admin-gated CRUD for the newsroom.
  */
 import { createServerFn } from "@tanstack/react-start";
+import { zodValidator } from "@tanstack/zod-adapter";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -230,4 +231,136 @@ export const deleteComicStrip = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+// ─── Panel image upload ──────────────────────────────────────────────
+
+export const uploadPanelImage = createServerFn({ method: "POST" })
+  .validator(zodValidator(z.object({
+    fileBase64: z.string(),
+    fileName: z.string(),
+    contentType: z.string(),
+  })))
+  .handler(async ({ data }) => {
+    const { requireRole } = await import("@/integrations/supabase/auth-middleware");
+    await requireRole("admin");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const buffer = Buffer.from(data.fileBase64, "base64");
+    const path = `panels/${Date.now()}_${data.fileName}`;
+
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("comic-strip-panels")
+      .upload(path, buffer, { contentType: data.contentType, upsert: false });
+    if (upErr) throw new Error(upErr.message);
+
+    const { data: urlData } = supabaseAdmin.storage
+      .from("comic-strip-panels")
+      .getPublicUrl(path);
+    return { publicUrl: urlData.publicUrl };
+  });
+
+// ─── Strip context parser ────────────────────────────────────────────
+
+export { parseStripContext } from "./strip-context-parser.functions";
+
+// ─── Placements ──────────────────────────────────────────────────────
+
+export const listStripsWithPlacements = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { requireRole } = await import("@/integrations/supabase/auth-middleware");
+    await requireRole("admin");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: strips, error } = await supabaseAdmin
+      .from("comic_strips")
+      .select("id, title, tag, panels, sort_order, is_published")
+      .order("sort_order");
+    if (error) throw new Error(error.message);
+
+    const { data: placements } = await supabaseAdmin
+      .from("strip_placements")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    return (strips ?? []).map((s) => ({
+      id: s.id,
+      title: s.title,
+      tag: s.tag,
+      placements: (placements ?? []).filter((p) => p.strip_id === s.id),
+    }));
+  });
+
+export const confirmPlacement = createServerFn({ method: "POST" })
+  .validator(zodValidator(z.object({ id: z.string().uuid() })))
+  .handler(async ({ data }) => {
+    const { requireRole } = await import("@/integrations/supabase/auth-middleware");
+    await requireRole("admin");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { error } = await supabaseAdmin
+      .from("strip_placements")
+      .update({ confirmed: true })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deletePlacement = createServerFn({ method: "POST" })
+  .validator(zodValidator(z.object({ id: z.string().uuid() })))
+  .handler(async ({ data }) => {
+    const { requireRole } = await import("@/integrations/supabase/auth-middleware");
+    await requireRole("admin");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { error } = await supabaseAdmin
+      .from("strip_placements")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const updatePlacementNote = createServerFn({ method: "POST" })
+  .validator(zodValidator(z.object({ id: z.string().uuid(), note: z.string() })))
+  .handler(async ({ data }) => {
+    const { requireRole } = await import("@/integrations/supabase/auth-middleware");
+    await requireRole("admin");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { error } = await supabaseAdmin
+      .from("strip_placements")
+      .update({ admin_note: data.note })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ─── Public: confirmed placements by target ─────────────────────────
+
+export const getConfirmedPlacementsForTarget = createServerFn({ method: "GET" })
+  .validator(zodValidator(z.object({
+    targetType: z.enum(["post", "playbook"]),
+    targetSlug: z.string(),
+  })))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("strip_placements")
+      .select("*, comic_strips(title, tag, panels)")
+      .eq("target_type", data.targetType)
+      .eq("target_slug", data.targetSlug)
+      .eq("confirmed", true)
+      .order("created_at");
+
+    if (error) throw new Error(error.message);
+    return (rows ?? []).map((r) => ({
+      id: r.id,
+      stripId: r.strip_id,
+      placement: r.placement,
+      stripTitle: r.comic_strips?.title ?? "",
+      stripTag: r.comic_strips?.tag ?? "",
+      panels: r.comic_strips?.panels ?? [],
+    }));
   });
