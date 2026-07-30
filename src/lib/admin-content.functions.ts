@@ -167,6 +167,7 @@ export const listComicStripsAdmin = createServerFn({ method: "GET" })
 const PanelSchema = z.object({
   type: z.enum(["illustration", "dialogue", "single"]),
   stageDirection: z.string().optional(),
+  imageUrl: z.string().optional(),
   imageAlt: z.string().optional(),
   bubbles: z
     .array(
@@ -235,23 +236,38 @@ export const deleteComicStrip = createServerFn({ method: "POST" })
 
 // ─── Panel image upload ──────────────────────────────────────────────
 
+/**
+ * Decode a base64 string to a Uint8Array.
+ * Uses atob() which is available in Cloudflare Workers (no Node.js Buffer).
+ */
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
 export const uploadPanelImage = createServerFn({ method: "POST" })
-  .validator(zodValidator(z.object({
-    fileBase64: z.string(),
-    fileName: z.string(),
-    contentType: z.string(),
-  })))
-  .handler(async ({ data }) => {
-    const { requireRole } = await import("@/integrations/supabase/auth-middleware");
-    await requireRole("admin");
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({
+      fileBase64: z.string(),
+      fileName: z.string(),
+      contentType: z.string(),
+    }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const buffer = Buffer.from(data.fileBase64, "base64");
+    const bytes = base64ToUint8Array(data.fileBase64);
     const path = `panels/${Date.now()}_${data.fileName}`;
 
     const { error: upErr } = await supabaseAdmin.storage
       .from("comic-strip-panels")
-      .upload(path, buffer, { contentType: data.contentType, upsert: false });
+      .upload(path, bytes, { contentType: data.contentType, upsert: false });
     if (upErr) throw new Error(upErr.message);
 
     const { data: urlData } = supabaseAdmin.storage
