@@ -425,25 +425,49 @@ function StripEditor({
     }
   }
 
+  /**
+   * Analyzes uploaded panel images with AI to generate improved alt texts
+   * and placement suggestions. Requires the strip to be saved first (has UUID).
+   */
   async function handleAiUpload(panelIndex: number) {
+    // Must have a saved strip (UUID) to analyze
+    if (!row.id) {
+      toast.error("Save the strip first before analyzing with AI");
+      return;
+    }
+    // Must have at least one panel image uploaded
     const panel = row.panels[panelIndex];
-    const context =
-      panel.imageAlt || panel.stageDirection || row.hoverText || row.title;
-    if (!context) {
-      toast.error("Add alt text or stage direction for AI context");
+    if (!panel.imageUrl) {
+      toast.error("Upload a panel image first");
       return;
     }
     try {
-      toast.loading("Generating panel…");
-      const result = await parseCtx({ data: { context } });
-      if (result && typeof result === "object" && "imageUrl" in result) {
-        updatePanel(panelIndex, { imageUrl: (result as { imageUrl: string }).imageUrl });
-        toast.success("Panel generated");
+      toast.loading("Analyzing panels with AI…");
+      const result = await parseCtx({
+        data: {
+          stripId: row.id,
+          panels: row.panels.map((p) => ({
+            imageUrl: p.imageUrl,
+            imageAlt: p.imageAlt ?? "",
+          })),
+        },
+      });
+      if (result && typeof result === "object") {
+        // Update alt texts from AI analysis
+        if (
+          "altTexts" in result &&
+          Array.isArray((result as { altTexts: string[] }).altTexts)
+        ) {
+          (result as { altTexts: string[] }).altTexts.forEach((alt, i) => {
+            if (alt && row.panels[i]) updatePanel(i, { imageAlt: alt });
+          });
+        }
+        toast.success("Analysis complete — alt texts updated");
       } else {
-        toast.error("No image returned from AI");
+        toast.error("No analysis returned from AI");
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "AI generation failed");
+      toast.error(e instanceof Error ? e.message : "AI analysis failed");
     }
   }
 
@@ -596,10 +620,18 @@ function StripEditor({
                     }}
                   />
                   <button
-                    className="inline-flex items-center gap-1 text-xs font-mono uppercase tracking-[0.15em] border border-border px-2 py-1 hover:bg-muted flex-1 justify-center"
+                    className="inline-flex items-center gap-1 text-xs font-mono uppercase tracking-[0.15em] border border-border px-2 py-1 hover:bg-muted flex-1 justify-center disabled:opacity-40 disabled:cursor-not-allowed"
                     onClick={() => handleAiUpload(i)}
+                    disabled={!row.id || !p.imageUrl}
+                    title={
+                      !row.id
+                        ? "Save the strip first"
+                        : !p.imageUrl
+                        ? "Upload an image first"
+                        : "Analyze panel with AI for alt text and placement suggestions"
+                    }
                   >
-                    <Sparkles className="h-3 w-3" /> Upload via AI
+                    <Sparkles className="h-3 w-3" /> Analyze with AI
                   </button>
                 </div>
               </div>
